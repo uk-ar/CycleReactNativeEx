@@ -6,6 +6,10 @@
     "start": "react-native start"
   },
   "dependencies": {
-    "react-native": "^0.14.2"
+    "react-native": "^0.13.1"
+  },
+  "devDependencies": {
+    "@cycle/react-native": "^1.0.0-experimental.12",
+    "react-native": "^0.13.1"
   }
 }
