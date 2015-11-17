@@ -1,0 +1,3 @@
+rootProject.name = 'CycleReactNativeEx'
+
+include ':app'
