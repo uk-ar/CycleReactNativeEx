@@ -7,6 +7,7 @@
 let React = require('react-native');
 let {Rx, run} = require('@cycle/core');
 let {makeReactNativeDriver} = require('@cycle/react-native');
+let {makeHTTPDriver} = require('@cycle/http');
 
 var {
   AppRegistry,
@@ -39,16 +40,27 @@ function renderMovie(movie) {
   );
 }
 
-function main({RN}) {
+function main({RN,HTTP}) {
   var movie = MOCKED_MOVIES_DATA[0];
+  let request$ = Rx.Observable.just(REQUEST_URL);
+
+  HTTP.filter(res$ => res$.request === REQUEST_URL)
+    .mergeAll()
+    .map(res => res.text)
+    .subscribe()
+    //.do(i => console.log(i))
+      //.subscribe();
+
   return {
     RN: RN.select('button').events('press')
       .map(ev => +1)
       .startWith(0)
       .scan((x,y) => x+y)
+      .do(i => console.log(i))
       .map(i =>
            renderMovie(movie)
           ),
+    HTTP: request$,
       // <Text style={styles.button} selector="button">Increment</Text>
       // <Text>You have clicked the button {i} times.</Text>
   };
@@ -81,4 +93,5 @@ var styles = StyleSheet.create({
 
 run(main, {
   RN: makeReactNativeDriver('CycleReactNativeEx'),
+  HTTP: makeHTTPDriver()
 });
