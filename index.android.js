@@ -26,8 +26,10 @@ var MOCKED_MOVIES_DATA = [
 var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
 
 function renderMovie(movie) {
+    //<Text>You have clicked the button {i} times.</Text>
   return (
       <View style={styles.container}>
+      <Text style={styles.button} selector="button">Increment</Text>
       <Image
     source={{uri: movie.posters.thumbnail}}
     style={styles.thumbnail}
@@ -39,30 +41,40 @@ function renderMovie(movie) {
       </View>
   );
 }
+var dataSource = new ListView.DataSource({
+  rowHasChanged: (row1, row2) => row1 !== row2,
+})
 
 function main({RN,HTTP}) {
   var movie = MOCKED_MOVIES_DATA[0];
-  let request$ = Rx.Observable.just(REQUEST_URL);
+  //let request$ = Rx.Observable.just(REQUEST_URL);
+  let request$ = RN.select('button').events('press')
+      .map(i => REQUEST_URL);
 
-  HTTP.filter(res$ => res$.request === REQUEST_URL)
-    .mergeAll()
-    .map(res => res.text)
-    .subscribe()
+  // .startWith(0)
+  // .map(ev => +1)
+  // .scan((x,y) => x+y)
+
+  //.subscribe()
     //.do(i => console.log(i))
       //.subscribe();
 
   return {
-    RN: RN.select('button').events('press')
-      .map(ev => +1)
-      .startWith(0)
-      .scan((x,y) => x+y)
+    RN:
+    HTTP.filter(res$ => res$.request === REQUEST_URL)
+      .mergeAll()
+      .map(res => res)
       .do(i => console.log(i))
+      .startWith(MOCKED_MOVIES_DATA)
       .map(i =>
            renderMovie(movie)
+           // <ListView
+           // dataSource = {dataSource.cloneWithRows(i.movies)}
+           // renderRow ={renderMovie}
+           // style={styles.listView}
+           // />
           ),
     HTTP: request$,
-      // <Text style={styles.button} selector="button">Increment</Text>
-      // <Text>You have clicked the button {i} times.</Text>
   };
 }
 
@@ -88,6 +100,10 @@ var styles = StyleSheet.create({
   thumbnail: {
     width: 53,
     height: 81,
+  },
+  listView: {
+    paddingTop: 20,
+    backgroundColor: '#F5FCFF',
   },
 });
 
