@@ -16,6 +16,9 @@ var {
   Image,
   ListView,
   View,
+  Platform,
+  TouchableHighlight,
+  TouchableNativeFeedback,
 } = React;
 
 var MOCKED_MOVIES_DATA = [
@@ -24,21 +27,36 @@ var MOCKED_MOVIES_DATA = [
 ];
 
 var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
+function cellPress(){
+  console.log("pressed")
+}
 
 function renderMovie(movie) {
-    //<Text>You have clicked the button {i} times.</Text>
+  //<Text>You have clicked the button {i} times.</Text>
+  var TouchableElement = TouchableHighlight;
+  if (Platform.OS === 'android') {
+    TouchableElement = TouchableNativeFeedback;
+  }
+    //
+    // //selector="cell" onPress={cellPress}
+  // <TouchableElement>
+  //</TouchableElement>
+  // augmentVTreeWithHandlers->view(all) text listview
+  // extend component
+  //https://github.com/facebook/react-native/issues/1908
   return (
-      <View style={styles.container}>
-      <Text style={styles.button} selector="button">Increment</Text>
+      <TouchableNativeFeedback>
+      <View key="cell" style={styles.container} selector="cell">
       <Image
     source={{uri: movie.posters.thumbnail}}
     style={styles.thumbnail}
       />
-      <View style={styles.rightContainer}>
+      <View key="cell-part" style={styles.rightContainer}>
       <Text style={styles.title}>{movie.title}</Text>
       <Text style={styles.year}>{movie.year}</Text>
       </View>
       </View>
+      </TouchableNativeFeedback>
   );
 }
 var dataSource = new ListView.DataSource({
@@ -46,10 +64,15 @@ var dataSource = new ListView.DataSource({
 })
 
 function main({RN,HTTP}) {
-  var movie = MOCKED_MOVIES_DATA[0];
+  //var movie = MOCKED_MOVIES_DATA[0];
   //let request$ = Rx.Observable.just(REQUEST_URL);
   let request$ = RN.select('button').events('press')
-      .map(i => REQUEST_URL);
+      .map(i => REQUEST_URL)
+      // .do(i => console.log(i));
+
+  let cell$ = RN.select('cell').events('press')
+      .do(i => console.log(i))
+        .subscribe();
 
   // .startWith(0)
   // .map(ev => +1)
@@ -63,16 +86,19 @@ function main({RN,HTTP}) {
     RN:
     HTTP.filter(res$ => res$.request === REQUEST_URL)
       .mergeAll()
-      .map(res => res)
-      .do(i => console.log(i))
+      .map(res => JSON.parse(res.text).movies)
       .startWith(MOCKED_MOVIES_DATA)
-      .map(i =>
-           renderMovie(movie)
-           // <ListView
-           // dataSource = {dataSource.cloneWithRows(i.movies)}
-           // renderRow ={renderMovie}
-           // style={styles.listView}
-           // />
+      //.do(i => console.log(i))
+        .map(i =>
+             //renderMovie(i[0])
+             <View key="all" style={styles.rightContainer}>
+             <Text style={styles.button} selector="button">Increment</Text>
+             <ListView
+             dataSource = {dataSource.cloneWithRows(i)}
+             renderRow ={renderMovie}
+             style={styles.listView}
+             />
+             </View>
           ),
     HTTP: request$,
   };
@@ -82,6 +108,7 @@ var styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
+    //flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
