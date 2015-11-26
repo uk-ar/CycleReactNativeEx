@@ -6,7 +6,7 @@
 
 let React = require('react-native');
 let {Rx, run} = require('@cycle/core');
-let {makeReactNativeDriver} = require('@cycle/react-native');
+let {makeReactNativeDriver, augmentVTreeWithHandlers} = require('@cycle/react-native');
 let {makeHTTPDriver} = require('@cycle/http');
 
 var {
@@ -44,35 +44,41 @@ function renderMovie(movie) {
   // augmentVTreeWithHandlers->view(all) text listview
   // extend component
   //https://github.com/facebook/react-native/issues/1908
-  return (
-      <TouchableNativeFeedback>
-      <View key="cell" style={styles.container} selector="cell">
-      <Image
-    source={{uri: movie.posters.thumbnail}}
-    style={styles.thumbnail}
-      />
-      <View key="cell-part" style={styles.rightContainer}>
-      <Text style={styles.title}>{movie.title}</Text>
-      <Text style={styles.year}>{movie.year}</Text>
-      </View>
-      </View>
-      </TouchableNativeFeedback>
-  );
+  return(<TouchableNativeFeedback selector="cell">
+         <View key="cell" style={styles.container}>
+         <Image
+         source={{uri: movie.posters.thumbnail}}
+         style={styles.thumbnail}
+         />
+         <View key="cell-part" style={styles.rightContainer}>
+         <Text style={styles.title}>{movie.title}</Text>
+         <Text style={styles.year}>{movie.year}</Text>
+         </View>
+         </View>
+         </TouchableNativeFeedback>)
 }
 var dataSource = new ListView.DataSource({
   rowHasChanged: (row1, row2) => row1 !== row2,
 })
 
+//https://facebook.github.io/react/docs/top-level-api.html#react.cloneelement
+// var CycleListView = React.createClass({
+//   render: function() {
+//     var renderRow = this.props.renderRow;
+//     function wrapRenderRow(i){
+//       var vtree = renderRow.call({},i)
+//       return augmentVTreeWithHandlers(vtree);
+//     }
+//     return (<ListView {...this.props} renderRow = {wrapRenderRow}/>)
+//   }
+// })
+
 function main({RN,HTTP}) {
   //var movie = MOCKED_MOVIES_DATA[0];
   //let request$ = Rx.Observable.just(REQUEST_URL);
-  let request$ = RN.select('button').events('press')
+  let request$ = RN.select('button').events('press').merge(RN.select('cell').events('press'))
       .map(i => REQUEST_URL)
       // .do(i => console.log(i));
-
-  let cell$ = RN.select('cell').events('press')
-      .do(i => console.log(i))
-        .subscribe();
 
   // .startWith(0)
   // .map(ev => +1)
@@ -93,7 +99,7 @@ function main({RN,HTTP}) {
              //renderMovie(i[0])
              <View key="all" style={styles.rightContainer}>
              <Text style={styles.button} selector="button">Increment</Text>
-             <ListView
+             <CycleListView
              dataSource = {dataSource.cloneWithRows(i)}
              renderRow ={renderMovie}
              style={styles.listView}
