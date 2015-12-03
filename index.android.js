@@ -8,6 +8,7 @@ let React = require('react-native');
 let {Rx, run} = require('@cycle/core');
 let {makeReactNativeDriver, CycleListView} = require('@cycle/react-native');
 let {makeHTTPDriver} = require('@cycle/http');
+var WebViewAndroid = require('react-native-webview-android');
 
 var {
   AppRegistry,
@@ -20,7 +21,6 @@ var {
   TouchableHighlight,
   TouchableNativeFeedback,
   ToastAndroid,
-  WebView,
   ToolbarAndroid,
   Navigator,
 } = React;
@@ -80,43 +80,54 @@ var MySceneComponent = React.createClass({
 function main({RN,HTTP}) {
   //var movie = MOCKED_MOVIES_DATA[0];
   //let request$ = Rx.Observable.just(REQUEST_URL);
-  let request$ = RN.select('button').events('press').merge(RN.select('cell').events('press'))
+  let request$ = RN.select('button').events('press')
       .map(i => REQUEST_URL)
-      // .do(i => console.log(i));
+      .do(i => console.log(i));
 
-  return {
-    RN:
-    HTTP.filter(res$ => res$.request === REQUEST_URL)
+  let DetailView$ = RN.select('cell').events('press')
+  //.map(i => i.currentTarget.props.item)
+      .map(i => i.currentTarget.props.item.posters.thumbnail)
+      .do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
+        .map(i =>
+             <View style={{flex: 1}}>
+             <WebViewAndroid url={i}
+             style={styles.containerWebView}
+             />
+             </View>)
+
+  //https://facebook.github.io/react/docs/top-level-api.html#react.cloneelement
+  //https://facebook.github.io/react-native/docs/direct-manipulation.html
+  //https://github.com/facebook/react-native/blob/master/Examples/Movies/Movies
+  let SearchView$ = HTTP.filter(res$ => res$.request === REQUEST_URL)
       .mergeAll()
       .map(res => JSON.parse(res.text).movies)
       .startWith(MOCKED_MOVIES_DATA)
-    //.do(i => console.log(i))
-    //https://facebook.github.io/react/docs/top-level-api.html#react.cloneelement
-    //https://facebook.github.io/react-native/docs/direct-manipulation.html
-    //https://github.com/facebook/react-native/blob/master/Examples/Movies/MoviesApp.android.js
-        .map(i =>
-             <Navigator
-             initialRoute={{name: 'My First Scene', index: 0}}
-             renderScene={(route, navigator) =>
-                          <MySceneComponent
-                          dataSource={i}
-                          name={route.name}
-                          onForward={() => {
-                            var nextIndex = route.index + 1;
-                            navigator.push({
-                              name: 'Scene ' + nextIndex,
-                              index: nextIndex,
-                            });
-                          }}
-                          onBack={() => {
-                            if (route.index > 0) {
-                              navigator.pop();
-                            }
-                          }}
-                          />
-                         }
-             />
-          ),
+      .map(i =>
+           <Navigator
+           initialRoute={{name: 'My First Scene', index: 0}}
+           renderScene={(route, navigator) =>
+                        <View style={{flex: 1}}>
+                        <MySceneComponent
+                        dataSource={i}
+                        onForward={() => {
+                          var nextIndex = route.index + 1;
+                          navigator.push({
+                            name: 'Scene ' + nextIndex,
+                            index: nextIndex,
+                          });
+                        }}
+                        onBack={() => {
+                          if (route.index > 0) {
+                            navigator.pop();
+                          }
+                        }}
+                        />
+                        </View>
+                       }
+           />);
+
+  return {
+    RN:SearchView$.merge(DetailView$),
     HTTP: request$,
   };
 }
@@ -148,6 +159,13 @@ var styles = StyleSheet.create({
     paddingTop: 20,
     backgroundColor: '#F5FCFF',
   },
+  toolbar: {
+    backgroundColor: '#a9a9a9',
+    height: 56,
+  },
+  containerWebView: {
+    flex: 1,
+  }
 });
 
 run(main, {

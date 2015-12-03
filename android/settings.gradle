@@ -1,3 +1,5 @@
 rootProject.name = 'CycleReactNativeEx'
 
 include ':app'
+include ':RNWebView', ':app'
+project(':RNWebView').projectDir = new File(rootProject.projectDir, '../node_mo
