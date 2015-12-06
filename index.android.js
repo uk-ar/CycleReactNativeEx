@@ -6,7 +6,7 @@
 
 let React = require('react-native');
 let {Rx, run} = require('@cycle/core');
-let {makeReactNativeDriver, CycleListView} = require('@cycle/react-native');
+let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native
 let {makeHTTPDriver} = require('@cycle/http');
 var WebViewAndroid = require('react-native-webview-android');
 
@@ -23,6 +23,7 @@ var {
   ToastAndroid,
   ToolbarAndroid,
   Navigator,
+  BackAndroid,
 } = React;
 
 var MOCKED_MOVIES_DATA = [
@@ -67,9 +68,9 @@ var MySceneComponent = React.createClass({
     return(
         <View key="all" style={styles.rightContainer}>
         <Text style={styles.button} selector="button">Increment</Text>
-        <CycleListView
+        <ListView
       dataSource = {dataSource.cloneWithRows(this.props.dataSource)}
-      renderRow ={renderMovie}
+      renderRow ={generateCycleRender(renderMovie)}
       style={styles.listView}
         />
         </View>
@@ -82,18 +83,68 @@ function main({RN,HTTP}) {
   //let request$ = Rx.Observable.just(REQUEST_URL);
   let request$ = RN.select('button').events('press')
       .map(i => REQUEST_URL)
-      .do(i => console.log(i));
+      .do(i => console.log(i))
+        .subscribe();
 
-  let DetailView$ = RN.select('cell').events('press')
+  let _navigator;
+
+  //let DetailView$ =
+  RN.select('cell').events('press')
   //.map(i => i.currentTarget.props.item)
+      .do(i => console.log(i))
       .map(i => i.currentTarget.props.item.posters.thumbnail)
       .do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
-        .map(i =>
-             <View style={{flex: 1}}>
-             <WebViewAndroid url={i}
-             style={styles.containerWebView}
-             />
-             </View>)
+        .map(i => {
+          _navigator.push({
+            name: 'detail',
+            url:i
+          })
+          //return DetailView(i)
+        }).subscribe()
+  //navigator streem
+  //https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/
+  //return value to sender?
+  // let backIntent$ = Rx.Observable.fromEvent(BackAndroid,'hardwareBackPress')
+  // backIntent$.subscribe(() => {
+  //   if (_navigator && _navigator.getCurrentRoutes().length > 1) {
+  //     _navigator.pop();
+  //     return true;
+  //   }
+  //   return false;
+  // })
+  BackAndroid.addEventListener('hardwareBackPress', () => {
+    if (_navigator && _navigator.getCurrentRoutes().length > 1) {
+      _navigator.pop();
+      return true;
+    }
+    return false;
+  });
+
+  var RouteMapper = function(route, navigator, component) {
+    if(_navigator === undefined){
+      _navigator=navigator;
+    }
+
+    if (route.name === 'search') {
+      return (
+          <View key="scene" style={{flex: 1}}>
+          <MySceneComponent
+        key="my-scene"
+        //dataSource={i}
+        dataSource={MOCKED_MOVIES_DATA}
+          />
+          </View>
+      )
+    } else if (route.name === 'detail') {
+    return(
+        <View key="webview" style={{flex: 1}}>
+        <WebViewAndroid url={route.url}
+      style={styles.containerWebView}
+        />
+        </View>
+    )
+  }
+  }
 
   //https://facebook.github.io/react/docs/top-level-api.html#react.cloneelement
   //https://facebook.github.io/react-native/docs/direct-manipulation.html
@@ -104,31 +155,14 @@ function main({RN,HTTP}) {
       .startWith(MOCKED_MOVIES_DATA)
       .map(i =>
            <Navigator
-           initialRoute={{name: 'My First Scene', index: 0}}
-           renderScene={(route, navigator) =>
-                        <View style={{flex: 1}}>
-                        <MySceneComponent
-                        dataSource={i}
-                        onForward={() => {
-                          var nextIndex = route.index + 1;
-                          navigator.push({
-                            name: 'Scene ' + nextIndex,
-                            index: nextIndex,
-                          });
-                        }}
-                        onBack={() => {
-                          if (route.index > 0) {
-                            navigator.pop();
-                          }
-                        }}
-                        />
-                        </View>
-                       }
+           key="nav"
+           initialRoute={{name: 'search', index: 0}}
+           renderScene={generateCycleRender(RouteMapper)}
            />);
 
   return {
-    RN:SearchView$.merge(DetailView$),
-    HTTP: request$,
+    RN:SearchView$//.merge(DetailView$),
+    //HTTP: request$,
   };
 }
 
