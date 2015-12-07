@@ -6,9 +6,10 @@
 
 let React = require('react-native');
 let {Rx, run} = require('@cycle/core');
-let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native
+let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native')
 let {makeHTTPDriver} = require('@cycle/http');
 var WebViewAndroid = require('react-native-webview-android');
+var Icon = require('react-native-vector-icons/FontAwesome');
 
 var {
   AppRegistry,
@@ -128,6 +129,7 @@ function main({RN,HTTP}) {
     if (route.name === 'search') {
       return (
           <View key="scene" style={{flex: 1}}>
+          <Icon name="rocket" size={30} color="#900" />
           <MySceneComponent
         key="my-scene"
         //dataSource={i}
