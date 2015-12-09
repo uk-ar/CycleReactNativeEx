@@ -129,7 +129,7 @@ function main({RN,HTTP}) {
     if (route.name === 'search') {
       return (
           <View key="scene" style={{flex: 1}}>
-          <Icon name="rocket" size={30} color="#900" />
+          <Icon name = "angle-left" size = {40} color="#900" />
           <MySceneComponent
         key="my-scene"
         //dataSource={i}
