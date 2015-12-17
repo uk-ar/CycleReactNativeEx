@@ -129,27 +129,25 @@ function main({RN,HTTP}) {
     if (route.name === 'search') {
       return (
           <View key="scene" style={{flex: 1}}>
-          <Icon name = "angle-left" size = {40} color="#900" />
-          <ToolbarAndroid
-        actions={[]}
-        navIcon={require('image!ic_arrow_back_white_24dp')}
-        //navIcon = {require('image!android_back_white')}
-        //onIconClicked={navigationOperations.pop}
-        style={styles.toolbar}
-        titleColor="white"
-        //title={route.movie.title}
-          />
           <MySceneComponent
         key="my-scene"
         //dataSource={i}
         dataSource={MOCKED_MOVIES_DATA}
           />
           </View>
-          //
+          //<Icon name = "angle-left" size = {40} color="#900" />
       )
     } else if (route.name === 'detail') {
-    return(
-        <View key="webview" style={{flex: 1}}>
+      return(
+          <View key="webview" style={{flex: 1}}>
+          <ToolbarAndroid
+        actions={[]}
+        navIcon={require('image!ic_arrow_back_white_24dp')}
+        //onIconClicked={navigationOperations.pop}
+        style={styles.toolbar}
+        titleColor="white"
+        //title={route.movie.title}
+          />
         <WebViewAndroid url={route.url}
       style={styles.containerWebView}
         />
