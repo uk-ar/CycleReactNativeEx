@@ -5,7 +5,8 @@
 'use strict';
 
 let React = require('react-native');
-let {Rx, run} = require('@cycle/core');
+let Rx = require('rx');
+let {run} = require('@cycle/core');
 let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native');
 let {makeHTTPDriver} = require('@cycle/http');
 var WebViewAndroid = require('react-native-webview-android');
