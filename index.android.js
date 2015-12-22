@@ -76,71 +76,41 @@ var dataSource = new ListView.DataSource({
   })
 
   function main({RN,HTTP}) {
-    //var movie = MOCKED_MOVIES_DATA[0];
+    let _navigator;
+
     //let request$ = Rx.Observable.just(REQUEST_URL);
     let request$ = RN.select('button').events('press')
                      .map(i => REQUEST_URL);
 
-    let _navigator;
-    //onIconClicked
-    let foo$ = RN.select('back').events('iconClicked')
-                 .map(i => ToastAndroid.show("click", ToastAndroid.SHORT))
-                 .subscribe();
-
-    //let DetailView$ =
     RN.select('cell').events('press')
-      .do(i => console.log(i))
-      //.map(i => i.currentTarget.props.item)
       .map(i => i.currentTarget.props.item.posters.thumbnail)
-      .do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
+      //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
       .map(url => {
         _navigator.push({
           name: 'detail',
           url:  url
         })
       }).subscribe();
-    //navigator streem
-    //https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/
-    // return value to sender?
-    // let backIntent$ = Rx.Observable.fromEventPattern(BackAndroid,'hardwareBackPress')
-    // backIntent$.subscribe(() => {
-    /* if (_navigator && _navigator.getCurrentRoutes().length > 1) {
-       _navigator.pop();
-       return true;
-       }
-       return false; */
-    // })
 
-    //let backIntent$ = Rx.Observable.fromEvent(BackAndroid,'hardwareBackPress')
-    //http://jsdo.it/38elements/rxjs-fromeventpattern
-    /* let backIntent$ = Rx.Observable.fromEventPattern(
-       function add(h){
-       BackAndroid.addEventListener('hardwareBackPress', h)
-       },
-       function remove(h){
-       BackAndroid.removeEventListener('hardwareBackPress', h)
-       }
-       );
-       backIntent$.subscribe(() => {
-       if (_navigator && _navigator.getCurrentRoutes().length > 1) {
-       _navigator.pop();
-       return true;
-       }
-       return false;
-       }); */
-    /* BackAndroid.addEventListener('hardwareBackPress', () => {
-       if (_navigator && _navigator.getCurrentRoutes().length > 1) {
-       _navigator.pop();
-       return true;
-       }
-       return false;
-       }); */
+    function backAction(){
+      if (_navigator && _navigator.getCurrentRoutes().length > 1) {
+        _navigator.pop();
+        return true;
+      }
+      return false;
+    }
+
+    //onIconClicked
+    let foo$ = RN.select('back').events('iconClicked')
+                 .do(backAction)
+                 .subscribe();
+    //FIXME:Change to stream
+    BackAndroid.addEventListener('hardwareBackPress', backAction);
 
     var RouteMapper = function(route, navigator, component) {
       if(_navigator === undefined){
         _navigator=navigator;
       }
-      //{MOCKED_MOVIES_DATA}
       if (route.name === 'search') {
         return (
           <View key="scene" style={{flex: 1}}>
@@ -157,7 +127,6 @@ var dataSource = new ListView.DataSource({
                 actions={[]}
                 navIcon={require('image!ic_arrow_back_white_24dp')}
                 selector = "back"
-                //onIconClicked={navigationOperations.pop}
                 style={styles.toolbar}
                 titleColor="white"
                 //title={route.movie.title}
