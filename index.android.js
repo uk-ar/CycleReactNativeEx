@@ -28,60 +28,24 @@ var {
   BackAndroid,
 } = React;
 
+var SearchScreen = require('./SearchScreen');
+
 var MOCKED_MOVIES_DATA = [
+  {title: 'Title', year: '2015', posters: {thumbnail: 'http://resizing.flixster.com/DeLpPTAwX3O2LszOpeaMHjbzuAw=/53x77/dkpu1ddg7pbsk.cloudfront.net/movie/11/16/47/11164719_ori.jpg'
+  }},
   {title: 'Title', year: '2015', posters: {thumbnail: 'http://resizing.flixster.com/DeLpPTAwX3O2LszOpeaMHjbzuAw=/53x77/dkpu1ddg7pbsk.cloudfront.net/movie/11/16/47/11164719_ori.jpg'
   }}
 ];
 
 var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
 
-function renderMovieCell(movie) {
-  var TouchableElement = TouchableHighlight;
-  if (Platform.OS === 'android') {
-    TouchableElement = TouchableNativeFeedback;
-  }
-
-  return(
-    <TouchableElement selector="cell" item={movie}>
-      <View key="cell" style={styles.container}>
-        <Image
-            source={{uri: movie.posters.thumbnail}}
-            style={styles.thumbnail}
-        />
-        <View key="cell-part" style={styles.rightContainer}>
-          <Text style={styles.title}>{movie.title}</Text>
-          <Text style={styles.year}>{movie.year}</Text>
-        </View>
-      </View>
-    </TouchableElement>
-  )}
-
-var dataSource = new ListView.DataSource({
-  rowHasChanged: (row1, row2) => row1 !== row2,
-});
-
-var MySceneComponent = React.createClass({
-  render: function() {
-    return(
-      <View key="all" style={styles.rightContainer}>
-        <Text style={styles.button} selector="button">Increment</Text>
-        <ListView
-            dataSource = {dataSource.cloneWithRows(this.props.dataSource)}
-            renderRow ={generateCycleRender(renderMovieCell)}
-            style={styles.listView}
-        />
-      </View>
-    )
-  }
-});
-
 function main({RN,HTTP}) {
   let _navigator;
 
-  //let request$ = Rx.Observable.just(REQUEST_URL);
   let request$ = RN.select('button').events('press')
                    .map(i => REQUEST_URL);
 
+  //FIXME:Change navigator to stream
   RN.select('cell').events('press')
     .map(i => i.currentTarget.props.item.posters.thumbnail)
     //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
@@ -113,12 +77,10 @@ function main({RN,HTTP}) {
     }
     if (route.name === 'search') {
       return (
-        <View key="scene" style={{flex: 1}}>
-          <MySceneComponent
+          <SearchScreen
               key="my-scene"
               dataSource = {route.dataSource}
           />
-        </View>
       )
     } else if (route.name === 'detail') {
       return(
