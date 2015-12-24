@@ -9,6 +9,7 @@ var {
   StyleSheet,
   Text,
   View,
+  Image,
   TouchableHighlight,
   TouchableNativeFeedback,
 } = React;
