@@ -14,14 +14,18 @@ var {
   TouchableNativeFeedback,
 } = React;
 
-function renderMovieCell(movie) {
+function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
   var TouchableElement = TouchableHighlight;
   if (Platform.OS === 'android') {
     TouchableElement = TouchableNativeFeedback;
   }
-
+  {/* onShowUnderlay={()=>highlightRowFunc(sectionID, rowID)}
+      onHideUnderlay={highlightRowFunc(null, null)} */}
   return(
-    <TouchableElement selector="cell" item={movie}>
+    <TouchableElement
+        selector="cell"
+        item={movie}
+    >
       <View key="cell" style={styles.container}>
         <Image
             source={{uri: movie.posters.thumbnail}}
@@ -46,6 +50,10 @@ var SearchScreen = React.createClass({
           dataSource = {dataSource.cloneWithRows(this.props.dataSource)}
           renderRow ={generateCycleRender(renderMovieCell)}
           style={styles.listView}
+          automaticallyAdjustContentInsets={false}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps={true}
+          showsVerticalScrollIndicator={false}
       />
     )
   }
