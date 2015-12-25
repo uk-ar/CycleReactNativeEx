@@ -56,6 +56,9 @@ function main({RN,HTTP}) {
       })
     }).subscribe();
 
+  RN.select('input').events('change')
+    .do(i => console.log).subscribe();
+
   function backAction(){
     if (_navigator && _navigator.getCurrentRoutes().length > 1) {
       _navigator.pop();
@@ -105,6 +108,7 @@ function main({RN,HTTP}) {
   //https://facebook.github.io/react/docs/top-level-api.html#react.cloneelement
   //https://facebook.github.io/react-native/docs/direct-manipulation.html
   //https://github.com/facebook/react-native/blob/master/Examples/Movies/Movies
+  //https://facebook.github.io/react/docs/reusable-components.html
   let SearchView$ =
   HTTP.filter(res$ => res$.request === REQUEST_URL)
       .mergeAll()

@@ -8,7 +8,7 @@
   "dependencies": {
     "@cycle/core": "6.0.x",
     "@cycle/http": "7.0.x",
-    "@cycle/react-native": "http://github.com/uk-ar/cycle-react-native.git",
+    "@cycle/react-native": "git+http://github.com/uk-ar/cycle-react-native.git",
     "react-native": "0.16",
     "react-native-vector-icons": "1.0.0",
     "react-native-webview-android": "^1.0.11"
