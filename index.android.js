@@ -9,6 +9,7 @@ let Rx = require('rx');
 let {run} = require('@cycle/core');
 let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native');
 let {makeHTTPDriver} = require('@cycle/http');
+let {makeJSONPDriver} = require('@cycle/jsonp');
 var WebViewAndroid = require('react-native-webview-android');
 var Icon = require('react-native-vector-icons/FontAwesome');
 
@@ -39,11 +40,91 @@ var MOCKED_MOVIES_DATA = [
 
 var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
 
-function main({RN,HTTP}) {
-  let _navigator;
+const CALIL_STATUS_API = `http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=${LIBRARY_ID}&format=json&isbn=`
 
-  let request$ = RN.select('button').events('press')
-                   .map(i => REQUEST_URL);
+function intent({RN, HTTP, JSONP}){
+  const RAKUTEN_SEARCH_API =
+  'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&booksGenreId=001&applicationId=1088506385229803383&formatVersion=2&keyword='
+
+  //Actions
+  return{
+    changeSearch$: RN.select('text-input')
+                     .events('change')
+                     .map(event => event.args[0].nativeEvent.text),
+
+      //.do(i => console.log("i:%O", i))
+    //intent & model
+    books$: HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
+                .switch()
+                .map(res => res.body.Items)
+                .startWith([]),
+
+    booksStatus$: JSONP.filter(res$ => res$.request.url.indexOf(CALIL_STATUS_API) === 0)
+                       .switch()
+                       .flatMap(result => {
+                         [Object.assign({}, result, {continue:0}), result]
+                       })
+                       .map(result => {
+                         if(result.continue == 1){
+                           throw result
+                         }
+                         return result
+                       })
+                       .retryWhen(function(errors) {
+                         return errors.delay(2000); //.map(log)
+                       }).distinctUntilChanged().map(result=>result.books)
+                       .startWith([]);
+      //.share();
+  };
+}
+
+function model(actions){
+  const searchRequest$ = actions.changeSearch$.debounce(500)
+                                .filter(query => query.length > 1)
+                                .map(q => RAKUTEN_SEARCH_API + encodeURI(q));
+
+  const LIBRARY_ID = "Tokyo_Fuchu"
+  //model(Actions) -> State$
+  const statusRequest$ = actions.books$.filter(query => query.length > 0)
+                                .map(books => books.map(book => book.isbn))
+                                .map(q => CALIL_STATUS_API + encodeURI(q));
+  //model
+  const booksWithStatus$ = actions
+    .books$
+    .combineLatest(booksStatus$, (books, booksStatus) => {
+      return books.map(book => {
+        if((booksStatus[book.isbn] !== undefined)&&
+           (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)){
+             book.exist =
+             Object.keys(booksStatus[book.isbn][LIBRARY_ID].libkey).length !=0;
+
+             book.status =
+             booksStatus[book.isbn][LIBRARY_ID].libkey;
+
+             book.reserveUrl =
+             booksStatus[book.isbn][LIBRARY_ID].reserveurl;
+
+             //console.log(book.exist)
+        }
+        return book
+      })
+    })
+    .startWith([])
+    .do(i => console.log("booksWithStatus$:%O", i))
+    .subscribe()
+    /* .combineLatest(filterRequest$,(books,filter)=>{
+       return filter ? books.filter(book => book.exist) : books
+       }) */
+
+  return{
+    searchRequest$: searchRequest$,//request$
+    statusRequest$: statusRequest$,
+    booksWithStatus$: booksWithStatus$
+  }
+}
+
+function main({RN, HTTP, JSONP}) {
+  let _navigator;
 
   //FIXME:Change navigator to stream
   RN.select('cell').events('press')
@@ -56,9 +137,7 @@ function main({RN,HTTP}) {
       })
     }).subscribe();
 
-  RN.select('input').events('change')
-    .do(i => console.log).subscribe();
-
+  // for android action
   function backAction(){
     if (_navigator && _navigator.getCurrentRoutes().length > 1) {
       _navigator.pop();
@@ -66,14 +145,13 @@ function main({RN,HTTP}) {
     }
     return false;
   }
-
-  //onIconClicked
-  let foo$ = RN.select('back').events('iconClicked')
-               .do(backAction)
-               .subscribe();
   //FIXME:Change to stream
   BackAndroid.addEventListener('hardwareBackPress', backAction);
-
+  //onIconClicked
+  RN.select('back').events('iconClicked')
+                     .do(backAction)
+                     .subscribe();
+  // for android action
   var RouteMapper = function(route, navigator, component) {
     if(_navigator === undefined){
       _navigator=navigator;
@@ -121,9 +199,13 @@ function main({RN,HTTP}) {
             renderScene={generateCycleRender(RouteMapper)}
         />);
 
+  const actions = intent({RN:RN, HTTP:HTTP, JSONP:JSONP});
+  const state$ = model(actions);
+
   return {
-    RN:SearchView$,//.merge(DetailView$),
-    HTTP: request$,
+    RN: SearchView$,//.merge(DetailView$),
+    HTTP: state$.searchRequest$,//request$
+    JSONP: state$.statusRequest$
   };
 }
 
@@ -165,5 +247,6 @@ var styles = StyleSheet.create({
 
 run(main, {
   RN: makeReactNativeDriver('CycleReactNativeEx'),
-  HTTP: makeHTTPDriver()
+  HTTP: makeHTTPDriver(),
+  JSONP: makeJSONPDriver()
 });

@@ -1,5 +1,5 @@
 var React = require('react-native');
-let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native');
+let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
 
 var {
   ActivityIndicatorIOS,
@@ -69,7 +69,7 @@ var SearchBar = React.createClass({
                      TouchableNativeFeedback.SelectableBackgroundBorderless() :
                      TouchableNativeFeedback.SelectableBackground();
     return (
-      <View style={styles.searchBar}>
+      <CycleView style={styles.searchBar}>
         <TouchableNativeFeedback
             background={background}
             onPress={() => this.refs.input && this.refs.input.focus()}>
@@ -85,13 +85,13 @@ var SearchBar = React.createClass({
             autoCapitalize="none"
             autoCorrect={false}
             autoFocus={true}
-            selector="input"
+            selector="text-input"
             placeholder="Search a movie..."
             placeholderTextColor="rgba(255, 255, 255, 0.5)"
             style={styles.searchBarInput}
         />
         {loadingView}
-      </View>
+      </CycleView>
     );
     //onChange={this.props.onSearchChange}
     //onFocus={this.props.onFocus}
