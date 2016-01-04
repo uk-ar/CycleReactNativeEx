@@ -32,7 +32,7 @@ function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
     >
       <View style={styles.row}>
         <Image
-            source={{uri: movie.posters.thumbnail}}
+            source={{uri: movie.thumbnail}}
             style={styles.cellImage}
         />
         <View style={styles.textContainer}>
@@ -40,7 +40,7 @@ function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
             {movie.title}
           </Text>
           <Text style={styles.movieYear} numberOfLines={1}>
-            {movie.year}
+            {movie.author}
           </Text>
         </View>
       </View>

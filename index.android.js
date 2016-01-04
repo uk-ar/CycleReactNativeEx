@@ -32,20 +32,22 @@ var {
 var SearchScreen = require('./SearchScreen');
 
 var MOCKED_MOVIES_DATA = [
-  {title: 'Title', year: '2015', posters: {thumbnail: 'http://resizing.flixster.com/DeLpPTAwX3O2LszOpeaMHjbzuAw=/53x77/dkpu1ddg7pbsk.cloudfront.net/movie/11/16/47/11164719_ori.jpg'
-  }},
-  {title: 'Title', year: '2015', posters: {thumbnail: 'http://resizing.flixster.com/DeLpPTAwX3O2LszOpeaMHjbzuAw=/53x77/dkpu1ddg7pbsk.cloudfront.net/movie/11/16/47/11164719_ori.jpg'
-  }}
+  {title: "はじめてのABCえほん", author: "仲田利津子/黒田昌代",
+   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200"
+  },
+  {title: "はじめてのABCえほん", author: "仲田利津子/黒田昌代",
+   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200"
+  }//size 200x200 largeImageUrl 64x64
 ];
 
-var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
+const LIBRARY_ID = "Tokyo_Fuchu"
 
 const CALIL_STATUS_API = `http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=${LIBRARY_ID}&format=json&isbn=`
 
-function intent({RN, HTTP, JSONP}){
-  const RAKUTEN_SEARCH_API =
-  'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&booksGenreId=001&applicationId=1088506385229803383&formatVersion=2&keyword='
+const RAKUTEN_SEARCH_API =
+'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&booksGenreId=001&applicationId=1088506385229803383&formatVersion=2&keyword='
 
+function intent({RN, HTTP, JSONP}){
   //Actions
   return{
     changeSearch$: RN.select('text-input')
@@ -73,7 +75,7 @@ function intent({RN, HTTP, JSONP}){
                        .retryWhen(function(errors) {
                          return errors.delay(2000); //.map(log)
                        }).distinctUntilChanged().map(result=>result.books)
-                       .startWith([]);
+                       .startWith([])
       //.share();
   };
 }
@@ -83,7 +85,6 @@ function model(actions){
                                 .filter(query => query.length > 1)
                                 .map(q => RAKUTEN_SEARCH_API + encodeURI(q));
 
-  const LIBRARY_ID = "Tokyo_Fuchu"
   //model(Actions) -> State$
   const statusRequest$ = actions.books$.filter(query => query.length > 0)
                                 .map(books => books.map(book => book.isbn))
@@ -91,7 +92,7 @@ function model(actions){
   //model
   const booksWithStatus$ = actions
     .books$
-    .combineLatest(booksStatus$, (books, booksStatus) => {
+    .combineLatest(actions.booksStatus$, (books, booksStatus) => {
       return books.map(book => {
         if((booksStatus[book.isbn] !== undefined)&&
            (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)){
@@ -106,12 +107,16 @@ function model(actions){
 
              //console.log(book.exist)
         }
-        return book
-      })
+        return ({
+          title: book.title,
+          author: book.author,
+          thumbnail: book.largeImageUrl,
+        })
+      }
+      )
     })
     .startWith([])
     .do(i => console.log("booksWithStatus$:%O", i))
-    .subscribe()
     /* .combineLatest(filterRequest$,(books,filter)=>{
        return filter ? books.filter(book => book.exist) : books
        }) */
@@ -128,7 +133,7 @@ function main({RN, HTTP, JSONP}) {
 
   //FIXME:Change navigator to stream
   RN.select('cell').events('press')
-    .map(i => i.currentTarget.props.item.posters.thumbnail)
+    .map(i => i.currentTarget.props.item.thumbnail)
     //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
     .map(url => {
       _navigator.push({
@@ -176,31 +181,29 @@ function main({RN, HTTP, JSONP}) {
               //title = "detail"
           />
           <WebViewAndroid url={route.url}
-                          style={styles.containerWebView}
+                          style={styles.WebViewContainer}
           />
         </View>
       )
     }
   }
+  const actions = intent({RN:RN, HTTP:HTTP, JSONP:JSONP});
+  const state$ = model(actions);
+  console.log("booksWithStatus$2:%O", state$.booksWithStatus$);
 
   //https://facebook.github.io/react/docs/top-level-api.html#react.cloneelement
   //https://facebook.github.io/react-native/docs/direct-manipulation.html
   //https://github.com/facebook/react-native/blob/master/Examples/Movies/Movies
   //https://facebook.github.io/react/docs/reusable-components.html
-  let SearchView$ =
-  HTTP.filter(res$ => res$.request === REQUEST_URL)
-      .mergeAll()
-      .map(res => JSON.parse(res.text).movies)
-      .startWith(MOCKED_MOVIES_DATA)
+  let SearchView$ = state$.booksWithStatus$
+                          .startWith(MOCKED_MOVIES_DATA)
+                          .do(i => console.log("booksWithStatus3$:%O", i))
       .map(i =>
         <Navigator
             key="nav"
-            initialRoute = {{name: 'search', dataSource: MOCKED_MOVIES_DATA}}
+            initialRoute = {{name: 'search', dataSource: i}}
             renderScene={generateCycleRender(RouteMapper)}
         />);
-
-  const actions = intent({RN:RN, HTTP:HTTP, JSONP:JSONP});
-  const state$ = model(actions);
 
   return {
     RN: SearchView$,//.merge(DetailView$),
@@ -210,28 +213,6 @@ function main({RN, HTTP, JSONP}) {
 }
 
 var styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  rightContainer: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 20,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  year: {
-    textAlign: 'center',
-  },
-  thumbnail: {
-    width: 53,
-    height: 81,
-  },
   listView: {
     paddingTop: 20,
     backgroundColor: '#F5FCFF',
@@ -240,7 +221,7 @@ var styles = StyleSheet.create({
     backgroundColor: '#a9a9a9',
     height: 56,
   },
-  containerWebView: {
+  WebViewContainer: {
     flex: 1,
   }
 });
