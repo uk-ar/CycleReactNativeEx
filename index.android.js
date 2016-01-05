@@ -52,14 +52,15 @@ function intent({RN, HTTP, JSONP}){
   return{
     changeSearch$: RN.select('text-input')
                      .events('change')
-                     .map(event => event.args[0].nativeEvent.text),
-
-      //.do(i => console.log("i:%O", i))
+                     .map(event => event.args[0].nativeEvent.text)
+                     .do(i => console.log("search text change:%O", i))
+      ,
     //intent & model
     books$: HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
                 .switch()
                 .map(res => res.body.Items)
-                .startWith([]),
+                .do(i => console.log("books change:%O", i))
+                ,
 
     booksStatus$: JSONP.filter(res$ => res$.request.url.indexOf(CALIL_STATUS_API) === 0)
                        .switch()
@@ -75,7 +76,6 @@ function intent({RN, HTTP, JSONP}){
                        .retryWhen(function(errors) {
                          return errors.delay(2000); //.map(log)
                        }).distinctUntilChanged().map(result=>result.books)
-                       .startWith([])
       //.share();
   };
 }
@@ -92,7 +92,7 @@ function model(actions){
   //model
   const booksWithStatus$ = actions
     .books$
-    .combineLatest(actions.booksStatus$, (books, booksStatus) => {
+    .combineLatest(actions.booksStatus$.startWith([]), (books, booksStatus) => {
       return books.map(book => {
         if((booksStatus[book.isbn] !== undefined)&&
            (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)){
@@ -115,7 +115,6 @@ function model(actions){
       }
       )
     })
-    .startWith([])
     .do(i => console.log("booksWithStatus$:%O", i))
     /* .combineLatest(filterRequest$,(books,filter)=>{
        return filter ? books.filter(book => book.exist) : books
@@ -153,9 +152,11 @@ function main({RN, HTTP, JSONP}) {
   //FIXME:Change to stream
   BackAndroid.addEventListener('hardwareBackPress', backAction);
   //onIconClicked
-  RN.select('back').events('iconClicked')
-                     .do(backAction)
-                     .subscribe();
+  RN.select('back')
+    .events('iconClicked')
+    .do(backAction)
+    .subscribe();
+
   // for android action
   var RouteMapper = function(route, navigator, component) {
     if(_navigator === undefined){
@@ -164,7 +165,6 @@ function main({RN, HTTP, JSONP}) {
     if (route.name === 'search') {
       return (
           <SearchScreen
-              key="my-scene"
               dataSource = {route.dataSource}
           />
       )
@@ -189,21 +189,27 @@ function main({RN, HTTP, JSONP}) {
   }
   const actions = intent({RN:RN, HTTP:HTTP, JSONP:JSONP});
   const state$ = model(actions);
-  console.log("booksWithStatus$2:%O", state$.booksWithStatus$);
 
+  state$.booksWithStatus$
+        .do(i =>
+          _navigator.replace({name: 'search', dataSource: i})
+        )
+        .do(i => console.log("navi change event:%O", i))
+        .subscribe()
+    /* .startWith(MOCKED_MOVIES_DATA)
+       .do(i =>
+       _navigator.push({name: 'search', dataSource: MOCKED_MOVIES_DATA})
+       ) */
   //https://facebook.github.io/react/docs/top-level-api.html#react.cloneelement
   //https://facebook.github.io/react-native/docs/direct-manipulation.html
   //https://github.com/facebook/react-native/blob/master/Examples/Movies/Movies
   //https://facebook.github.io/react/docs/reusable-components.html
-  let SearchView$ = state$.booksWithStatus$
-                          .startWith(MOCKED_MOVIES_DATA)
-                          .do(i => console.log("booksWithStatus3$:%O", i))
-      .map(i =>
-        <Navigator
-            key="nav"
-            initialRoute = {{name: 'search', dataSource: i}}
-            renderScene={generateCycleRender(RouteMapper)}
-        />);
+  let SearchView$ = Rx.Observable.just(
+    <Navigator
+        key="nav"
+        initialRoute = {{name: 'search', dataSource: MOCKED_MOVIES_DATA}}
+        renderScene={generateCycleRender(RouteMapper)}
+    />);
 
   return {
     RN: SearchView$,//.merge(DetailView$),
