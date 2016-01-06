@@ -10,8 +10,9 @@
     "@cycle/http": "7.0.x",
     "@cycle/jsonp": "^5.0.0",
     "@cycle/react-native": "git+http://github.com/uk-ar/cycle-react-native.git",
-    "react-native": "0.16",
+    "react-native": "0.17.0",
     "react-native-vector-icons": "1.0.0",
-    "react-native-webview-android": "^1.0.11"
+    "react-native-webview-android": "^1.0.12",
+    "rx": "^4.0.6"
   }
 }
