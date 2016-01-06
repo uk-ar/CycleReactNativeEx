@@ -27,6 +27,7 @@ var {
   ToolbarAndroid,
   Navigator,
   BackAndroid,
+  WebView
 } = React;
 
 var SearchScreen = require('./SearchScreen');
@@ -49,6 +50,37 @@ const RAKUTEN_SEARCH_API =
 
 function intent({RN, HTTP, JSONP}){
   //Actions
+  /* .flatMap(result => {
+     [Object.assign({}, result, {continue:0}), result]
+     })
+   */
+  const booksStatusRetry$ = JSONP
+        .filter(res$ => res$.request.indexOf(CALIL_STATUS_API) === 0)
+        .mergeAll()
+    /* .do(i => console.log("retry:%O", i.request))
+       .do(i => console.log("retry:%O", i.text)) */
+    /* .switch()
+       .map(result => {
+       if(result.continue == 1){
+       throw result
+       }
+       return result
+       })
+       .retryWhen(function(errors) {
+       return errors.delay(2000); //.map(log)
+       }).distinctUntilChanged().map(result=>result.books) */
+    .subscribe()
+    /* .subscribe(
+       function (x) {
+       console.log('Next: %s', x);
+       },
+       function (err) {
+       console.log('Error: %s', err);
+       },
+       function () {
+       console.log('Completed');
+       }) */
+
   return{
     changeSearch$: RN.select('text-input')
                      .events('change')
@@ -62,21 +94,12 @@ function intent({RN, HTTP, JSONP}){
                 .do(i => console.log("books change:%O", i))
                 ,
 
-    booksStatus$: JSONP.filter(res$ => res$.request.url.indexOf(CALIL_STATUS_API) === 0)
-                       .switch()
-                       .flatMap(result => {
-                         [Object.assign({}, result, {continue:0}), result]
-                       })
-                       .map(result => {
-                         if(result.continue == 1){
-                           throw result
-                         }
-                         return result
-                       })
-                       .retryWhen(function(errors) {
-                         return errors.delay(2000); //.map(log)
-                       }).distinctUntilChanged().map(result=>result.books)
-      //.share();
+    booksStatus$: Rx.Observable.just()
+    /* JSONP.filter(res$ => res$.request.indexOf(CALIL_STATUS_API) === 0)
+                     .switch()
+                     .distinctUntilChanged()
+                     .map(result=>result.books)
+                     .do(i => console.log("bookstatus:%O", i))*/
   };
 }
 
@@ -86,9 +109,19 @@ function model(actions){
                                 .map(q => RAKUTEN_SEARCH_API + encodeURI(q));
 
   //model(Actions) -> State$
-  const statusRequest$ = actions.books$.filter(query => query.length > 0)
-                                .map(books => books.map(book => book.isbn))
-                                .map(q => CALIL_STATUS_API + encodeURI(q));
+  /* const statusRequest$ = actions.books$
+     //.filter(query => query.length > 0)
+     .do(i => console.log("status req0:%O", i))
+     .map(books => books.map(book => book.isbn))
+     .map(q => CALIL_STATUS_API + encodeURI(q))
+     .do(i => console.log("status req:%O", i));
+   */
+  const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472")
+    /* .do(i => console.log("status req0:%O", i));
+       .map(books => books.map(book => book.isbn))
+       .map(q => CALIL_STATUS_API + encodeURI(q))
+       .do(i => console.log("status req:%O", i)); */
+
   //model
   const booksWithStatus$ = actions
     .books$
@@ -180,8 +213,8 @@ function main({RN, HTTP, JSONP}) {
               //title={route.movie.title}
               //title = "detail"
           />
-          <WebViewAndroid url={route.url}
-                          style={styles.WebViewContainer}
+          <WebView url={route.url}
+                   style={styles.WebViewContainer}
           />
         </View>
       )
