@@ -9,7 +9,6 @@ let Rx = require('rx');
 let {run} = require('@cycle/core');
 let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native');
 let {makeHTTPDriver} = require('@cycle/http');
-let {makeJSONPDriver} = require('@cycle/jsonp');
 var WebViewAndroid = require('react-native-webview-android');
 var Icon = require('react-native-vector-icons/FontAwesome');
 
@@ -48,39 +47,8 @@ const CALIL_STATUS_API = `http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d9
 const RAKUTEN_SEARCH_API =
 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&booksGenreId=001&applicationId=1088506385229803383&formatVersion=2&keyword='
 
-function intent({RN, HTTP, JSONP}){
+function intent({RN, HTTP}){
   //Actions
-  /* .flatMap(result => {
-     [Object.assign({}, result, {continue:0}), result]
-     })
-   */
-  const booksStatusRetry$ = JSONP
-        .filter(res$ => res$.request.indexOf(CALIL_STATUS_API) === 0)
-        .mergeAll()
-    /* .do(i => console.log("retry:%O", i.request))
-       .do(i => console.log("retry:%O", i.text)) */
-    /* .switch()
-       .map(result => {
-       if(result.continue == 1){
-       throw result
-       }
-       return result
-       })
-       .retryWhen(function(errors) {
-       return errors.delay(2000); //.map(log)
-       }).distinctUntilChanged().map(result=>result.books) */
-    .subscribe()
-    /* .subscribe(
-       function (x) {
-       console.log('Next: %s', x);
-       },
-       function (err) {
-       console.log('Error: %s', err);
-       },
-       function () {
-       console.log('Completed');
-       }) */
-
   return{
     changeSearch$: RN.select('text-input')
                      .events('change')
@@ -90,16 +58,33 @@ function intent({RN, HTTP, JSONP}){
     //intent & model
     books$: HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
                 .switch()
-                .map(res => res.body.Items)
+                .map(res => res.body.Items.filter(book => book.isbn))
                 .do(i => console.log("books change:%O", i))
+                .share()
                 ,
-
-    booksStatus$: Rx.Observable.just()
-    /* JSONP.filter(res$ => res$.request.indexOf(CALIL_STATUS_API) === 0)
-                     .switch()
-                     .distinctUntilChanged()
-                     .map(result=>result.books)
-                     .do(i => console.log("bookstatus:%O", i))*/
+    booksStatus$: HTTP
+      .filter(res$ => res$.request.url.indexOf(CALIL_STATUS_API) === 0)
+      .switch()
+      .map(res$ => JSON.parse(res$.text.match(/callback\((.*)\)/)[1]))
+      .do(i => console.log("books status retry:%O", i))
+      //FIXME:
+      .flatMap(result => [Object.assign({}, result, {continue:0}), result])
+      .map(result => {
+        if(result.continue == 1){
+          throw result
+        }
+        return result //don't use?
+      })
+      //cannot capture retry stream
+      .retryWhen(function(errors) {
+        return errors.delay(2000); //.map(log)
+      })
+      .map(result => result.books)
+      .distinctUntilChanged()
+      /* .do(books =>
+         Object.keys(books).map(function(v) { return obj[k] })
+         books.filter(book => book["Tokyo_Fuchu"]["status"] == "OK")) */
+      .do(i => console.log("books status change:%O", i))
   };
 }
 
@@ -109,41 +94,33 @@ function model(actions){
                                 .map(q => RAKUTEN_SEARCH_API + encodeURI(q));
 
   //model(Actions) -> State$
-  /* const statusRequest$ = actions.books$
-     //.filter(query => query.length > 0)
-     .do(i => console.log("status req0:%O", i))
-     .map(books => books.map(book => book.isbn))
-     .map(q => CALIL_STATUS_API + encodeURI(q))
-     .do(i => console.log("status req:%O", i));
-   */
-  const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472")
-    /* .do(i => console.log("status req0:%O", i));
-       .map(books => books.map(book => book.isbn))
-       .map(q => CALIL_STATUS_API + encodeURI(q))
-       .do(i => console.log("status req:%O", i)); */
+  const statusRequest$ = actions.books$
+                                .map(books => books.map(book => book.isbn))
+                                .map(q => CALIL_STATUS_API + encodeURI(q))
+                                .do(i => console.log("status req:%O", i));
+
+  /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
 
   //model
   const booksWithStatus$ = actions
     .books$
     .combineLatest(actions.booksStatus$.startWith([]), (books, booksStatus) => {
       return books.map(book => {
-        if((booksStatus[book.isbn] !== undefined)&&
+        //sub library exist?
+        if((booksStatus[book.isbn] !== undefined) && //not yet retrieve
            (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)){
-             book.exist =
-             Object.keys(booksStatus[book.isbn][LIBRARY_ID].libkey).length !=0;
-
-             book.status =
-             booksStatus[book.isbn][LIBRARY_ID].libkey;
-
-             book.reserveUrl =
-             booksStatus[book.isbn][LIBRARY_ID].reserveurl;
-
-             //console.log(book.exist)
+          book.exist = Object.keys(booksStatus[book.isbn][LIBRARY_ID].libkey).length !=0;
+          book.status = booksStatus[book.isbn][LIBRARY_ID].libkey;
+          book.reserveUrl = booksStatus[book.isbn][LIBRARY_ID].reserveurl;
         }
         return ({
           title: book.title,
           author: book.author,
+          isbn: book.isbn,
           thumbnail: book.largeImageUrl,
+          status: book.status,
+          exist: book.exist,
+          reserveUrl: book.reserveUrl,
         })
       }
       )
@@ -160,7 +137,7 @@ function model(actions){
   }
 }
 
-function main({RN, HTTP, JSONP}) {
+function main({RN, HTTP}) {
   let _navigator;
 
   //FIXME:Change navigator to stream
@@ -220,11 +197,12 @@ function main({RN, HTTP, JSONP}) {
       )
     }
   }
-  const actions = intent({RN:RN, HTTP:HTTP, JSONP:JSONP});
+  const actions = intent({RN:RN, HTTP:HTTP});
   const state$ = model(actions);
 
   state$.booksWithStatus$
         .do(i =>
+          //FIXME:replace clears current input text
           _navigator.replace({name: 'search', dataSource: i})
         )
         .do(i => console.log("navi change event:%O", i))
@@ -246,8 +224,7 @@ function main({RN, HTTP, JSONP}) {
 
   return {
     RN: SearchView$,//.merge(DetailView$),
-    HTTP: state$.searchRequest$,//request$
-    JSONP: state$.statusRequest$
+    HTTP: state$.searchRequest$.merge(state$.statusRequest$)
   };
 }
 
@@ -267,6 +244,5 @@ var styles = StyleSheet.create({
 
 run(main, {
   RN: makeReactNativeDriver('CycleReactNativeEx'),
-  HTTP: makeHTTPDriver(),
-  JSONP: makeJSONPDriver()
+  HTTP: makeHTTPDriver()
 });
