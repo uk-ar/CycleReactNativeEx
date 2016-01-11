@@ -6,6 +6,7 @@
 
 let React = require('react-native');
 let Rx = require('rx');
+var _ = require('lodash');
 let {run} = require('@cycle/core');
 let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native');
 let {makeHTTPDriver} = require('@cycle/http');
@@ -106,21 +107,24 @@ function model(actions){
     .books$
     .combineLatest(actions.booksStatus$.startWith([]), (books, booksStatus) => {
       return books.map(book => {
-        //sub library exist?
         if((booksStatus[book.isbn] !== undefined) && //not yet retrieve
+           //sub library exist?
            (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)){
-          book.exist = Object.keys(booksStatus[book.isbn][LIBRARY_ID].libkey).length !=0;
-          book.status = booksStatus[book.isbn][LIBRARY_ID].libkey;
-          book.reserveUrl = booksStatus[book.isbn][LIBRARY_ID].reserveurl;
-        }
+             const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
+             book.libraryStatus = {
+               exist: Object.keys(bookStatus.libkey)
+                            .length !== 0,
+               rentable: _.values(bookStatus.libkey)//Object.values
+                          .some(i => i === "貸出可"),
+               status: bookStatus.libkey,
+               reserveUrl: bookStatus.reserveurl
+             }}
         return ({
           title: book.title,
           author: book.author,
           isbn: book.isbn,
           thumbnail: book.largeImageUrl,
-          status: book.status,
-          exist: book.exist,
-          reserveUrl: book.reserveUrl,
+          libraryStatus: book.libraryStatus
         })
       }
       )

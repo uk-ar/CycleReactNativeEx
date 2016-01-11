@@ -1,5 +1,6 @@
 var React = require('react-native');
 let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
+var Icon = require('react-native-vector-icons/FontAwesome');
 
 var {
   ActivityIndicatorIOS,
@@ -17,6 +18,33 @@ var {
   // searchBar
   TextInput,
 } = React;
+
+var LibraryStatus = React.createClass({
+  render: function() {
+    /* var exist = this.props.libraryStatus.exist;
+       var rentable = this.props.libraryStatus.rentable; */
+    {/* <Icon name="building-o" size={30} color="#900"/> */}
+    return (
+      <View>
+        <View style = {[styles.rating, styles.row]}>
+          <View style = {styles.iconContainer}>
+          <Icon name = "building-o" size = {30}
+                style={styles.libIcon}/>
+          </View>
+        </View>
+      </View>
+    );
+    {/* <Icon name = "book" size={30} color="#900"/>
+        <Icon name = "building" size={30} color="#900"/>
+        <Icon name = "archive" size={30} color="#900"/>
+        google icon location city
+      */}
+    {/* <Text style={[styles.ratingValue, getStyleFromScore(criticsScore)]}>
+        {getTextFromScore(criticsScore)}
+        </Text>
+      */}
+  },
+});
 
 function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
   var TouchableElement = TouchableHighlight;
@@ -42,6 +70,7 @@ function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
           <Text style={styles.movieYear} numberOfLines={1}>
             {movie.author}
           </Text>
+          <LibraryStatus/>
         </View>
       </View>
     </TouchableElement>
@@ -152,6 +181,21 @@ var styles = StyleSheet.create({
     width: 24,
     height: 24,
     marginHorizontal: 8,
+  },
+  iconContainer:{
+    /* backgroundColor: 'deepskyblue', */
+    backgroundColor: 'orange',
+    /* borderRadius: 15, */
+    borderRadius: 23,
+    /* padding: 8, */
+    paddingHorizontal: 8,
+    paddingTop: 9,
+    paddingBottom: 7
+  },
+  libIcon: {
+    textAlign: 'center',
+    width: 30,
+    color: "white",
   },
   //for listview
   container: {
