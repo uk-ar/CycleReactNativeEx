@@ -43,7 +43,7 @@ var LibraryStatus = React.createClass({
         <View style = {[styles.rating, styles.row,
                         {backgroundColor: "#FFC107"} //yellow
             //{backgroundColor: "#9E9E9E"} //grey
-            //{backgroundColor: "#2196F3"} //blue
+            //{backgroundColor: "#03A9F4"} //light blue
           ]}
         >
           <Text>
