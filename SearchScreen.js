@@ -29,22 +29,20 @@ var LibraryStatus = React.createClass({
 
     if(libraryStatus.rentable){
       text="貸出可"
-      name=""
+      style={backgroundColor: "#03A9F4"} //light blue
     }else if(libraryStatus.exist){
       text="貸出中"
+      style={backgroundColor: "#FFC107"} //yellow
     }else if(libraryStatus.exist !== undefined){
       text="なし"
+      style={backgroundColor: "#9E9E9E"} //grey
     }else{
       //text="取得中"
     }
     //http://www.google.com/design/spec/style/color.html#color-color-palette
     if(text){
       return (
-        <View style = {[styles.rating, styles.row,
-                        {backgroundColor: "#FFC107"} //yellow
-            //{backgroundColor: "#9E9E9E"} //grey
-            //{backgroundColor: "#03A9F4"} //light blue
-          ]}
+        <View style = {[styles.rating, styles.row, style]}
         >
           <Text>
             {text}
