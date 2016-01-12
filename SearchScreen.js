@@ -1,6 +1,8 @@
 var React = require('react-native');
 let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
 var Icon = require('react-native-vector-icons/FontAwesome');
+var GiftedSpinner = require('react-native-gifted-spinner');
+var Emoji = require('react-native-emoji');
 
 var {
   ActivityIndicatorIOS,
@@ -21,20 +23,54 @@ var {
 
 var LibraryStatus = React.createClass({
   render: function() {
-    /* var exist = this.props.libraryStatus.exist;
-       var rentable = this.props.libraryStatus.rentable; */
-    {/* <Icon name="building-o" size={30} color="#900"/> */}
-    return (
-      <View>
-        <View style = {[styles.rating, styles.row]}>
-          <View style = {styles.iconContainer}>
-          <Icon name = "building-o" size = {30}
-                style={styles.libIcon}/>
-          </View>
+    var libraryStatus = this.props.libraryStatus || {};
+
+    var text, name, backgroundColor;
+
+    if(libraryStatus.rentable){
+      text="貸出可"
+      name=""
+    }else if(libraryStatus.exist){
+      text="貸出中"
+    }else if(libraryStatus.exist !== undefined){
+      text="なし"
+    }else{
+      //text="取得中"
+    }
+    //http://www.google.com/design/spec/style/color.html#color-color-palette
+    if(text){
+      return (
+        <View style = {[styles.rating, styles.row,
+                        {backgroundColor: "#FFC107"} //yellow
+            //{backgroundColor: "#9E9E9E"} //grey
+            //{backgroundColor: "#2196F3"} //blue
+          ]}
+        >
+          <Text>
+            {text}
+          </Text>
         </View>
-      </View>
-    );
-    {/* <Icon name = "book" size={30} color="#900"/>
+      );
+    }else{
+      return (
+        <View style = {[styles.rating, styles.row]}>
+          <GiftedSpinner />
+        </View>
+      )
+    }
+    /*
+       <Icon.Button name="facebook" backgroundColor="#3b5998">
+       </Icon.Button>
+       <Text>
+       <Emoji name = "ok"/>
+       {text}
+       </Text> */
+
+    {/*  <View style = {styles.iconContainer}>
+        <Icon name = "building-o" size = {30}
+        style={styles.libIcon}/>
+        </View>
+        <Icon name = "book" size={30} color="#900"/>
         <Icon name = "building" size={30} color="#900"/>
         <Icon name = "archive" size={30} color="#900"/>
         google icon location city
@@ -70,7 +106,7 @@ function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
           <Text style={styles.movieYear} numberOfLines={1}>
             {movie.author}
           </Text>
-          <LibraryStatus/>
+          <LibraryStatus libraryStatus={movie.libraryStatus}/>
         </View>
       </View>
     </TouchableElement>

@@ -47,6 +47,7 @@ const CALIL_STATUS_API = `http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d9
 
 const RAKUTEN_SEARCH_API =
 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&booksGenreId=001&applicationId=1088506385229803383&formatVersion=2&keyword='
+//books search api cannot use query keyword
 
 function intent({RN, HTTP}){
   //Actions
@@ -59,7 +60,13 @@ function intent({RN, HTTP}){
     //intent & model
     books$: HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
                 .switch()
-                .map(res => res.body.Items.filter(book => book.isbn))
+                .map(res =>
+                  res.body.Items
+                     .filter(book => book.isbn)
+                    //reject non book
+                     .filter(book => (book.isbn.startsWith("978")
+                         || book.isbn.startsWith("979")))
+                )
                 .do(i => console.log("books change:%O", i))
                 .share()
                 ,
@@ -111,16 +118,18 @@ function model(actions){
            //sub library exist?
            (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)){
              const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
+             var exist = Object.keys(bookStatus.libkey)
+                          .length !== 0;
+             var rentable = _.values(bookStatus.libkey)//Object.values
+                             .some(i => i === "貸出可");
              book.libraryStatus = {
-               exist: Object.keys(bookStatus.libkey)
-                            .length !== 0,
-               rentable: _.values(bookStatus.libkey)//Object.values
-                          .some(i => i === "貸出可"),
                status: bookStatus.libkey,
-               reserveUrl: bookStatus.reserveurl
+               reserveUrl: bookStatus.reserveurl,
+               rentable: rentable,
+               exist: exist
              }}
         return ({
-          title: book.title,
+          title: book.title.replace(/^【バーゲン本】/, ""),
           author: book.author,
           isbn: book.isbn,
           thumbnail: book.largeImageUrl,
