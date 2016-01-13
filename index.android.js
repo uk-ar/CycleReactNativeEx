@@ -52,11 +52,15 @@ const RAKUTEN_SEARCH_API =
 function intent({RN, HTTP}){
   //Actions
   return{
+    filterState$: RN.select('filter')
+                    .events('press')
+                    .startWith(false)
+                    .scan((current, event) => !current)
+                    .do(i => console.log("filter change:%O", i)),
     changeSearch$: RN.select('text-input')
                      .events('change')
                      .map(event => event.args[0].nativeEvent.text)
-                     .do(i => console.log("search text change:%O", i))
-      ,
+                     .do(i => console.log("search text change:%O", i)),
     //intent & model
     books$: HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
                 .switch()
@@ -68,8 +72,7 @@ function intent({RN, HTTP}){
                          || book.isbn.startsWith("979")))
                 )
                 .do(i => console.log("books change:%O", i))
-                .share()
-                ,
+                .share(),
     booksStatus$: HTTP
       .filter(res$ => res$.request.url.indexOf(CALIL_STATUS_API) === 0)
       .switch()
@@ -139,9 +142,10 @@ function model(actions){
       )
     })
     .do(i => console.log("booksWithStatus$:%O", i))
-    /* .combineLatest(filterRequest$,(books,filter)=>{
-       return filter ? books.filter(book => book.exist) : books
-       }) */
+    .combineLatest(actions.filterState$,(books,filter)=>{
+      return filter ? books.filter(book => book.libraryStatus.exist) : books
+      //TODO:case for book.libraryStatus is undefined
+    })
 
   return{
     searchRequest$: searchRequest$,//request$

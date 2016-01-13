@@ -170,7 +170,7 @@ var SearchScreen = React.createClass({
     //isLoading={this.state.isLoading}
     //onSearchChange={this.onSearchChange}
     return(
-      <View style={styles.container}>
+      <CycleView style={styles.container}>
         <SearchBar
             onFocus={() =>
               this.refs.listview && this.refs.listview.getScrollResponder().scrollTo(0, 0)}
@@ -184,8 +184,13 @@ var SearchScreen = React.createClass({
             keyboardShouldPersistTaps={true}
             showsVerticalScrollIndicator={false}
         />
-      </View>
+        <View style = {styles.row}>
+          <Icon.Button name = "filter" selector = "filter"/>
+          <Icon.Button name = "sort"/>
+        </View>
+      </CycleView>
     )
+      ////<Icon.Button name="facebook" backgroundColor="#3b5998">
   },
   //https://github.com/facebook/react-native/blob/master/Examples/Movies/SearchScreen.js
 });
