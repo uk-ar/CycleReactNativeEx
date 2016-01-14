@@ -191,9 +191,9 @@ function main({RN, HTTP}) {
     }
     if (route.name === 'search') {
       return (
-          <SearchScreen
-              dataSource = {route.dataSource}
-          />
+        <SearchScreen
+            dataSource = {route.dataSource}
+        />
       )
     } else if (route.name === 'detail') {
       return(
@@ -217,27 +217,38 @@ function main({RN, HTTP}) {
   const actions = intent({RN:RN, HTTP:HTTP});
   const state$ = model(actions);
 
-  state$.booksWithStatus$
-        .do(i =>
-          //FIXME:replace clears current input text
-          _navigator.replace({name: 'search', dataSource: i})
-        )
-        .do(i => console.log("navi change event:%O", i))
-        .subscribe()
-    /* .startWith(MOCKED_MOVIES_DATA)
-       .do(i =>
-       _navigator.push({name: 'search', dataSource: MOCKED_MOVIES_DATA})
-       ) */
+  /* state$.booksWithStatus$
+     .do(i =>
+     //FIXME:replace clears current input text & scroll status
+     // doc for ref, element, instance...
+     // https://facebook.github.io/react/docs/more-about-refs.html
+     _navigator.replace({name: 'search', dataSource: i})
+     )
+     .do(i => console.log("navi change event:%O", i))
+     .subscribe(); */
+
   //https://facebook.github.io/react/docs/top-level-api.html#react.cloneelement
   //https://facebook.github.io/react-native/docs/direct-manipulation.html
   //https://github.com/facebook/react-native/blob/master/Examples/Movies/Movies
   //https://facebook.github.io/react/docs/reusable-components.html
-  let SearchView$ = Rx.Observable.just(
-    <Navigator
-        key="nav"
-        initialRoute = {{name: 'search', dataSource: MOCKED_MOVIES_DATA}}
-        renderScene={generateCycleRender(RouteMapper)}
-    />);
+  /* .startWith(MOCKED_MOVIES_DATA)
+     .do(i =>
+     <Navigator
+     key="nav"
+     initialRoute = {{name: 'search', dataSource: MOCKED_MOVIES_DATA}}
+     renderScene={generateCycleRender(RouteMapper)}
+     />
+     _navigator.push({name: 'search', dataSource: i})
+     ) */
+  let SearchView$ = state$.booksWithStatus$
+                          .startWith(MOCKED_MOVIES_DATA)
+                          .map(i =>
+                            <Navigator
+                                key="nav"
+                                initialRoute = {{name: 'search',
+                                                 dataSource: i }}
+                                renderScene={generateCycleRender(RouteMapper)}
+                            />).do(i => console.log("nav elem:%O", i));
 
   return {
     RN: SearchView$,//.merge(DetailView$),

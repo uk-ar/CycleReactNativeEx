@@ -170,7 +170,8 @@ var SearchScreen = React.createClass({
     //isLoading={this.state.isLoading}
     //onSearchChange={this.onSearchChange}
     return(
-      <CycleView style={styles.container}>
+      <CycleView ref={component => this._root = component}
+                 style={styles.container}>
         <SearchBar
             onFocus={() =>
               this.refs.listview && this.refs.listview.getScrollResponder().scrollTo(0, 0)}
