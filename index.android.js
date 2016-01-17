@@ -8,7 +8,7 @@ let React = require('react-native');
 let Rx = require('rx');
 var _ = require('lodash');
 let {run} = require('@cycle/core');
-let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native');
+let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
 let {makeHTTPDriver} = require('@cycle/http');
 var WebViewAndroid = require('react-native-webview-android');
 var Icon = require('react-native-vector-icons/FontAwesome');
@@ -184,20 +184,25 @@ function main({RN, HTTP}) {
     .do(backAction)
     .subscribe();
 
+  const actions = intent({RN:RN, HTTP:HTTP});
+  const state$ = model(actions);
+
   // for android action
   var RouteMapper = function(route, navigator, component) {
     if(_navigator === undefined){
       _navigator=navigator;
     }
     if (route.name === 'search') {
+      //TODO:remove dataSource
       return (
         <SearchScreen
             dataSource = {route.dataSource}
+            state$ = {state$}
         />
       )
     } else if (route.name === 'detail') {
       return(
-        <View key="webview" style={{flex: 1}}>
+        <CycleView key="webview" style={{flex: 1}}>
           <ToolbarAndroid
               actions={[]}
               navIcon={require('image!ic_arrow_back_white_24dp')}
@@ -210,13 +215,10 @@ function main({RN, HTTP}) {
           <WebView url={route.url}
                    style={styles.WebViewContainer}
           />
-        </View>
+        </CycleView>
       )
     }
   }
-  const actions = intent({RN:RN, HTTP:HTTP});
-  const state$ = model(actions);
-
   /* state$.booksWithStatus$
      .do(i =>
      //FIXME:replace clears current input text & scroll status
@@ -247,7 +249,7 @@ function main({RN, HTTP}) {
                                 key="nav"
                                 initialRoute = {{name: 'search',
                                                  dataSource: i }}
-                                renderScene={generateCycleRender(RouteMapper)}
+                                renderScene={RouteMapper}
                             />).do(i => console.log("nav elem:%O", i));
 
   return {

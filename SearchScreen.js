@@ -193,6 +193,16 @@ var SearchScreen = React.createClass({
     )
       ////<Icon.Button name="facebook" backgroundColor="#3b5998">
   },
+  componentWillMount(){
+    console.log("this props:%O", this.props.state$);
+    state$ = this.props.state$;
+    state$.booksWithStatus$
+          .do(i => console.log("book status change event:%O", i))
+          .subscribe()
+  },
+  /* componentWillReceiveProps: function(nextProps){
+     console.log("recieve props:%O", nextProps)
+     } */
   //https://github.com/facebook/react-native/blob/master/Examples/Movies/SearchScreen.js
 });
 
