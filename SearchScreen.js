@@ -196,24 +196,16 @@ var SearchScreen = React.createClass({
   },
   getInitialState(){
     return {
-      dataSource:
-      [
-        {title: "はじめてのABCえほん", author: "仲田利津子/黒田昌代",
-         thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200"
-        },
-        {title: "はじめてのABCえほん", author: "仲田利津子/黒田昌代",
-         thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200"
-        }//size 200x200 largeImageUrl 64x64
-      ]
+      dataSource:[]
     }
   },
   componentWillMount(){
     console.log("this props:%O", this.props.state$);
     state$ = this.props.state$;
     state$.booksWithStatus$
-
           .do(i => console.log("book status change event:%O:%O", i,this.refs))
       //setProps is deplicated
+      //TODO:Fix filter change behavior? on scroll end
           .do(i => this.state.dataSource = i)
           .do(i => this.render())
           .subscribe()
