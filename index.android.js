@@ -141,11 +141,13 @@ function model(actions){
       }
       )
     })
+    .startWith(MOCKED_MOVIES_DATA)
     .do(i => console.log("booksWithStatus$:%O", i))
     .combineLatest(actions.filterState$,(books,filter)=>{
       return filter ? books.filter(book => book.libraryStatus.exist) : books
       //TODO:case for book.libraryStatus is undefined
     })
+    .share()
 
   return{
     searchRequest$: searchRequest$,//request$
@@ -196,7 +198,6 @@ function main({RN, HTTP}) {
       //TODO:remove dataSource
       return (
         <SearchScreen
-            dataSource = {route.dataSource}
             state$ = {state$}
         />
       )
@@ -247,8 +248,7 @@ function main({RN, HTTP}) {
                           .map(i =>
                             <Navigator
                                 key="nav"
-                                initialRoute = {{name: 'search',
-                                                 dataSource: i }}
+                                initialRoute = {{name: 'search'}}
                                 renderScene={RouteMapper}
                             />).do(i => console.log("nav elem:%O", i));
 

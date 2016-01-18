@@ -178,7 +178,8 @@ var SearchScreen = React.createClass({
         />
         <View style={styles.separator} />
         <ListView
-            dataSource = {dataSource.cloneWithRows(this.props.dataSource)}
+            ref="listview"
+            dataSource = {dataSource.cloneWithRows(this.state.dataSource)}
             renderRow ={generateCycleRender(renderMovieCell)}
             automaticallyAdjustContentInsets={false}
             keyboardDismissMode="on-drag"
@@ -193,11 +194,28 @@ var SearchScreen = React.createClass({
     )
       ////<Icon.Button name="facebook" backgroundColor="#3b5998">
   },
+  getInitialState(){
+    return {
+      dataSource:
+      [
+        {title: "はじめてのABCえほん", author: "仲田利津子/黒田昌代",
+         thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200"
+        },
+        {title: "はじめてのABCえほん", author: "仲田利津子/黒田昌代",
+         thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200"
+        }//size 200x200 largeImageUrl 64x64
+      ]
+    }
+  },
   componentWillMount(){
     console.log("this props:%O", this.props.state$);
     state$ = this.props.state$;
     state$.booksWithStatus$
-          .do(i => console.log("book status change event:%O", i))
+
+          .do(i => console.log("book status change event:%O:%O", i,this.refs))
+      //setProps is deplicated
+          .do(i => this.state.dataSource = i)
+          .do(i => this.render())
           .subscribe()
   },
   /* componentWillReceiveProps: function(nextProps){
