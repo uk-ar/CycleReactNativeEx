@@ -158,10 +158,19 @@ function model(actions){
 
 function main({RN, HTTP}) {
   let _navigator;
-
+  //ぐりとぐら
   //FIXME:Change navigator to stream
   RN.select('cell').events('press')
-    .map(i => i.currentTarget.props.item.thumbnail)
+    .do(i => console.log("url:%O", i.currentTarget.props.item))
+    .map(i => i.currentTarget.props.item)
+    // if else return has problem?
+    /* .map(i => {if(i.libraryStatus){
+       return i.libraryStatus.reserveUrl
+       }else{
+       return i.thumbnail
+       }}) */
+    .map(i => {return i.thumbnail})
+    .do(i => console.log("url:%O", i))
     //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
     .map(url => {
       _navigator.push({
