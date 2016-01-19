@@ -15,7 +15,6 @@
     "react-native-emoji": "^1.1.1",
     "react-native-gifted-spinner": "0.0.3",
     "react-native-vector-icons": "1.0.0",
-    "react-native-webview-android": "^1.0.12",
     "rx": "^4.0.6"
   }
 }
