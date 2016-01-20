@@ -10,7 +10,7 @@ var _ = require('lodash');
 let {run} = require('@cycle/core');
 let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
 let {makeHTTPDriver} = require('@cycle/http');
-var WebViewAndroid = require('react-native-webview-android');
+
 var Icon = require('react-native-vector-icons/FontAwesome');
 
 var {
@@ -121,6 +121,8 @@ function model(actions){
            //sub library exist?
            (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)){
              const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
+             //TODO:support error case
+             //if bookStatus.status == "Error"
              var exist = Object.keys(bookStatus.libkey)
                           .length !== 0;
              var rentable = _.values(bookStatus.libkey)//Object.values
@@ -164,12 +166,12 @@ function main({RN, HTTP}) {
     .do(i => console.log("url:%O", i.currentTarget.props.item))
     .map(i => i.currentTarget.props.item)
     // if else return has problem?
-    /* .map(i => {if(i.libraryStatus){
-       return i.libraryStatus.reserveUrl
-       }else{
-       return i.thumbnail
-       }}) */
-    .map(i => {return i.thumbnail})
+    .map(i => {if(i.libraryStatus && i.libraryStatus.exist){
+      return i.libraryStatus.reserveUrl
+    }else{
+      return i.thumbnail
+    }})
+    //.map(i => {return i.thumbnail})
     .do(i => console.log("url:%O", i))
     //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
     .map(url => {
@@ -178,6 +180,8 @@ function main({RN, HTTP}) {
         url:  url
       })
     }).subscribe();
+  //0192521722
+  //qwerty
 
   // for android action
   function backAction(){
@@ -223,6 +227,14 @@ function main({RN, HTTP}) {
               //title = "detail"
           />
           <WebView url={route.url}
+                   javaScriptEnabled={true}
+                   domStorageEnabled={true}
+                   startInLoadingState={true}
+                   onError = {i => console.log("on err:%O", i)}
+                   onLoad = {i => console.log("on load:%O", i)}
+                   onLoadEnd = {i => console.log("on load end:%O", i)}
+                   onLoadStart = {i => console.log("on load start:%O", i)}
+                   onNavigationStateChange = {i => console.log("on nav:%O", i)}
                    style={styles.WebViewContainer}
           />
         </CycleView>
