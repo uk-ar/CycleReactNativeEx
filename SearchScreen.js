@@ -117,6 +117,10 @@ var SearchBar = React.createClass({
      generateCycleRender(this.myRender)
      }, */
   render: function() {
+    var TouchableElement = TouchableHighlight;
+    if (Platform.OS === 'android') {
+      TouchableElement = TouchableNativeFeedback;
+    }
     var loadingView;
     if (this.props.isLoading) {
       loadingView = (
@@ -128,13 +132,9 @@ var SearchBar = React.createClass({
     } else {
       loadingView = <View style={styles.spinner} />;
     }
-    var background = IS_RIPPLE_EFFECT_SUPPORTED ?
-                     TouchableNativeFeedback.SelectableBackgroundBorderless() :
-                     TouchableNativeFeedback.SelectableBackground();
     return (
-      <CycleView style={styles.searchBar}>
-        <TouchableNativeFeedback
-            background={background}
+      <CycleView style = {styles.searchBar} key = "search">
+        <TouchableElement
             onPress={() => this.refs.input && this.refs.input.focus()}>
           <View>
             <Image
@@ -142,7 +142,7 @@ var SearchBar = React.createClass({
                 style={styles.icon}
             />
           </View>
-        </TouchableNativeFeedback>
+        </TouchableElement>
         <TextInput
             ref="input"
             autoCapitalize="none"
@@ -171,7 +171,8 @@ var SearchScreen = React.createClass({
     //onSearchChange={this.onSearchChange}
     return(
       <CycleView ref={component => this._root = component}
-                 style={styles.container}>
+                 style={styles.container}
+      key = "searchScreen">
         <SearchBar
             onFocus={() =>
               this.refs.listview && this.refs.listview.getScrollResponder().scrollTo(0, 0)}

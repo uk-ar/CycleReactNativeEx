@@ -13,6 +13,14 @@ let {makeHTTPDriver} = require('@cycle/http');
 
 var Icon = require('react-native-vector-icons/FontAwesome');
 
+let {
+  STORAGE_KEY,
+  RAKUTEN_SEARCH_API,
+  LIBRARY_ID,
+  CALIL_STATUS_API,
+  MOCKED_MOVIES_DATA,
+} = require('./common');
+
 var {
   AppRegistry,
   StyleSheet,
@@ -21,8 +29,6 @@ var {
   ListView,
   View,
   Platform,
-  TouchableHighlight,
-  TouchableNativeFeedback,
   ToastAndroid,
   ToolbarAndroid,
   Navigator,
@@ -33,74 +39,176 @@ var {
 
 var SearchScreen = require('./SearchScreen');
 
-var MOCKED_MOVIES_DATA = [
-  {title: "はじめてのABCえほん", author: "仲田利津子/黒田昌代",
-   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200",
-   isbn: "9784828867472"
-  },
-  {title: "ぐりとぐら(複数蔵書)", author: "中川李枝子/大村百合子",
-   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/0825/9784834000825.jpg?_ex=200x200", isbn: "9784834000825",
-   libraryStatus: {
-     exist: true,
-     rentable: true,
-     reserveUrl: "http://api.calil.jp/reserve?id=af299d780fe86cf8b116dfda4725dc0f"
-   }
-  },
-  {title: "ぐりとぐらの1ねんかん(単一蔵書)",
-   author: "中川李枝子/山脇百合子（絵本作家）", isbn: "9784834014655",
-   libraryStatus: {
-     exist: true,
-     rentable: true,
-     reserveUrl: "https://library.city.fuchu.tokyo.jp/licsxp-opac/WOpacTifTilListToTifTilDetailAction.do?tilcod=1009710046217"},
-   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/4655/9784834014655.jpg?_ex=200x200"
+var intent = require('./intent');
+var model = require('./model');
+
+function main({RN, HTTP}) {
+  let _navigator;
+  //FIXME:Change navigator to stream
+
+  // for android action
+  function backAction(){
+    if (_navigator && _navigator.getCurrentRoutes().length > 1) {
+      _navigator.pop();
+      return true;
+    }
+    return false;
   }
-  //size 200x200 largeImageUrl 64x64
-];
+  //FIXME:Change to stream
+  //BackAndroid.addEventListener('hardwareBackPress', backAction);
+  //onIconClicked
+  RN.select('back')
+    .events('iconClicked')
+    .do(backAction)
+    .subscribe();
 
-const LIBRARY_ID = "Tokyo_Fuchu"
+  const actions = intent({RN:RN, HTTP:HTTP});
+  const state$ = model(actions);
 
-const CALIL_STATUS_API = `http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=${LIBRARY_ID}&format=json&isbn=`
+  /* const storageRequest$ = actions
+     .inBoxStatus$
+     .flatMap(inbox =>
+     actions.openBook$
+     .startWith(inbox)
+     .scan((inbox,book) => {
+     console.log("inbox1:%O", inbox);
+     //TODO:use lodash
+     var result = inbox.filter(inBoxBook => inBoxBook.isbn !== book.isbn);
+     console.log("result1:%O", result);
+     result.unshift(book);
+     console.log("result2:%O", result);
+     return result;
+     }))
+     .do(i => console.log("inbox:%O", i))
+     .flatMap(inbox => {
+     return Rx.Observable.fromPromise(AsyncStorage.setItem(STORAGE_KEY,JSON.stringify(inbox)))
+     })
+     //.do(i => console.log("storage set:%O", i))
+     .subscribe(); */
 
-const RAKUTEN_SEARCH_API =
-'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&booksGenreId=001&applicationId=1088506385229803383&formatVersion=2&keyword='
-const STORAGE_KEY = '@CycleReactNativeEx:inBox'
+  //ぐりとぐら
+  // if else return has problem?
+  actions.openBook$
+     .map(i => {if(i.libraryStatus && i.libraryStatus.exist){
+       return i.libraryStatus.reserveUrl
+     }else{
+       return i.thumbnail
+     }})
+    //.map(i => {return i.thumbnail})
+     .do(i => console.log("url:%O", i))
+    //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
+     .map(url => {
+       _navigator.push({
+         name: 'detail',
+         url:  url
+       })
+     }).subscribe()
 
-var CycleReactNativeEx = React.createClass({
-  render: function() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!?
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
-      </View>
-    );
+  //0192521722
+  //qwerty
+
+  actions.sortState$
+         .flatMap(e => Rx.Observable.fromPromise(AsyncStorage.getItem(STORAGE_KEY)))
+         .map(i => JSON.parse(i))
+         .do(i => console.log("storage:%O", i))
+         .subscribe();
+  // for android action
+  var RouteMapper = function(route, navigator, component) {
+    if(_navigator === undefined){
+      _navigator=navigator;
+    }
+    if (route.name === 'search') {
+      //TODO:remove dataSource
+      return (
+        <SearchScreen
+            state$ = {state$}
+        />
+      )
+    } else if (route.name === 'detail') {
+      return(
+        <CycleView key="webview" style={{flex: 1}}>
+          <ToolbarAndroid
+              actions={[]}
+              navIcon={require('image!ic_arrow_back_white_24dp')}
+              selector = "back"
+              style={styles.toolbar}
+              titleColor="white"
+              //title={route.movie.title}
+              //title = "detail"
+          />
+          <WebView url={route.url}
+                   domStorageEnabled={true}
+                   startInLoadingState={true}
+                   javaScriptEnabled={true}
+                   scrollEnabled={true}
+                   scalesPageToFit={false}
+                   automaticallyAdjustContentInsets={true}
+                   onError = {i => console.log("on err:%O", i)}
+                   onLoad = {i => console.log("on load:%O", i)}
+                   onLoadEnd = {i => console.log("on load end:%O", i)}
+                   onLoadStart = {i => console.log("on load start:%O", i)}
+                   onNavigationStateChange = {i => console.log("on nav:%O", i)}
+                   style={styles.WebViewContainer}
+          />
+        </CycleView>
+      ) // 'document.querySelector("[value$=\'カートに入れる\']").click()'
+        // injectedJavaScript='document.querySelector(".button").click()'
+    }
   }
-});
+  /* state$.booksWithStatus$
+     .do(i =>
+     //FIXME:replace clears current input text & scroll status
+     // doc for ref, element, instance...
+     // https://facebook.github.io/react/docs/more-about-refs.html
+     _navigator.replace({name: 'search', dataSource: i})
+     )
+     .do(i => console.log("navi change event:%O", i))
+     .subscribe(); */
+
+  //https://facebook.github.io/react/docs/top-level-api.html#react.cloneelement
+  //https://facebook.github.io/react-native/docs/direct-manipulation.html
+  //https://github.com/facebook/react-native/blob/master/Examples/Movies/Movies
+  //https://facebook.github.io/react/docs/reusable-components.html
+  /* .startWith(MOCKED_MOVIES_DATA)
+     .do(i =>
+     <Navigator
+     key="nav"
+     initialRoute = {{name: 'search', dataSource: MOCKED_MOVIES_DATA}}
+     renderScene={generateCycleRender(RouteMapper)}
+     />
+     _navigator.push({name: 'search', dataSource: i})
+     ) */
+  let SearchView$ = state$.booksWithStatus$
+                          .startWith(MOCKED_MOVIES_DATA)
+                          .map(i =>
+                            <Navigator
+                                key="nav"
+                                initialRoute = {{name: 'search'}}
+                                renderScene={RouteMapper}
+                            />).do(i => console.log("nav elem:%O", i));
+
+  return {
+    RN: SearchView$,//.merge(DetailView$),
+    HTTP: state$.searchRequest$.merge(state$.statusRequest$),
+    //storage: storageRequest$
+  };
+}
 
 var styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  listView: {
+    paddingTop: 20,
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  toolbar: {
+    backgroundColor: '#a9a9a9',
+    height: 56,
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  WebViewContainer: {
+    flex: 1,
+  }
 });
 
-AppRegistry.registerComponent('CycleReactNativeEx', () => CycleReactNativeEx);
+run(main, {
+  RN: makeReactNativeDriver('CycleReactNativeEx'),
+  HTTP: makeHTTPDriver()
+});
