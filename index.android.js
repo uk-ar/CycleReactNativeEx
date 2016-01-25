@@ -16,11 +16,10 @@ var Icon = require('react-native-vector-icons/FontAwesome');
 let {
   STORAGE_KEY,
   RAKUTEN_SEARCH_API,
+  LIBRARY_ID,
   CALIL_STATUS_API,
-  LIBRARY_ID
+  MOCKED_MOVIES_DATA,
 } = require('./common');
-
-//const LIBRARY_ID = "Tokyo_Fuchu";
 
 var {
   AppRegistry,
@@ -42,149 +41,8 @@ var {
 
 var SearchScreen = require('./SearchScreen');
 
-var MOCKED_MOVIES_DATA = [
-  {title: "はじめてのABCえほん", author: "仲田利津子/黒田昌代",
-   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200",
-   isbn: "9784828867472"
-  },
-  {title: "ぐりとぐら(複数蔵書)", author: "中川李枝子/大村百合子",
-   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/0825/9784834000825.jpg?_ex=200x200", isbn: "9784834000825",
-   libraryStatus: {
-     exist: true,
-     rentable: true,
-     reserveUrl: "http://api.calil.jp/reserve?id=af299d780fe86cf8b116dfda4725dc0f"
-   }
-  },
-  {title: "ぐりとぐらの1ねんかん(単一蔵書)",
-   author: "中川李枝子/山脇百合子（絵本作家）", isbn: "9784834014655",
-   libraryStatus: {
-     exist: true,
-     rentable: true,
-     reserveUrl: "https://library.city.fuchu.tokyo.jp/licsxp-opac/WOpacTifTilListToTifTilDetailAction.do?tilcod=1009710046217"},
-   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/4655/9784834014655.jpg?_ex=200x200"
-  }
-  //size 200x200 largeImageUrl 64x64
-];
-
-//var intent = require('./intent');
-function intent({RN, HTTP}){
-  //Actions
-  return{
-    openBook$: RN.select('cell').events('press')
-                 .map(i => i.currentTarget.props.item),
-    inBoxStatus$: Rx.Observable
-                    .fromPromise(AsyncStorage.getItem(STORAGE_KEY))
-                    .map(i => i ? JSON.parse(i) : [])
-                    .do(i => console.log("inBoxStatus$:%O", i))
-      ,
-    filterState$: RN.select('filter')
-                    .events('press')
-                    .startWith(false)
-                    .scan((current, event) => !current)
-                    .do(i => console.log("filter change:%O", i)),
-    sortState$: RN.select('sort')
-                  .events('press')
-                  .do(i => console.log("sort change:%O", i)),
-    changeSearch$: RN.select('text-input')
-                     .events('change')
-                     .map(event => event.args[0].nativeEvent.text)
-                     .do(i => console.log("search text change:%O", i)),
-    //intent & model
-    books$: HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
-                .switch()
-                .map(res =>
-                  res.body.Items
-                     .filter(book => book.isbn)
-                    //reject non book
-                     .filter(book => (book.isbn.startsWith("978")
-                         || book.isbn.startsWith("979")))
-                )
-                .do(i => console.log("books change:%O", i))
-                .share(),
-    booksStatus$: HTTP
-      .filter(res$ => res$.request.url.indexOf(CALIL_STATUS_API) === 0)
-      .switch()
-      .map(res$ => JSON.parse(res$.text.match(/callback\((.*)\)/)[1]))
-      .do(i => console.log("books status retry:%O", i))
-      //FIXME:
-      .flatMap(result => [Object.assign({}, result, {continue:0}), result])
-      .map(result => {
-        if(result.continue == 1){
-          throw result
-        }
-        return result //don't use?
-      })
-      //cannot capture retry stream
-      .retryWhen(function(errors) {
-        return errors.delay(2000); //.map(log)
-      })
-      .map(result => result.books)
-      .distinctUntilChanged()
-      /* .do(books =>
-         Object.keys(books).map(function(v) { return obj[k] })
-         books.filter(book => book["Tokyo_Fuchu"]["status"] == "OK")) */
-      .do(i => console.log("books status change:%O", i))
-  };
-}
-
-function model(actions){
-  const searchRequest$ = actions.changeSearch$.debounce(500)
-                                .filter(query => query.length > 1)
-                                .map(q => RAKUTEN_SEARCH_API + encodeURI(q));
-
-  //model(Actions) -> State$
-  const statusRequest$ = actions.books$
-                                .map(books => books.map(book => book.isbn))
-                                .map(q => CALIL_STATUS_API + encodeURI(q))
-                                .do(i => console.log("status req:%O", i));
-
-  /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
-
-  //model
-  const booksWithStatus$ = actions
-    .books$
-    .combineLatest(actions.booksStatus$.startWith([]), (books, booksStatus) => {
-      return books.map(book => {
-        if((booksStatus[book.isbn] !== undefined) && //not yet retrieve
-           //sub library exist?
-           (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)){
-             const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
-             //TODO:support error case
-             //if bookStatus.status == "Error"
-             var exist = Object.keys(bookStatus.libkey)
-                          .length !== 0;
-             var rentable = _.values(bookStatus.libkey)//Object.values
-                             .some(i => i === "貸出可");
-             book.libraryStatus = {
-               status: bookStatus.libkey,
-               reserveUrl: bookStatus.reserveurl,
-               rentable: rentable,
-               exist: exist
-             }}
-        return ({
-          title: book.title.replace(/^【バーゲン本】/, ""),
-          author: book.author,
-          isbn: book.isbn,
-          thumbnail: book.largeImageUrl,
-          libraryStatus: book.libraryStatus
-        })
-      }
-      )
-    })
-    .startWith(MOCKED_MOVIES_DATA)
-    .do(i => console.log("booksWithStatus$:%O", i))
-    .combineLatest(actions.filterState$,(books,filter)=>{
-      return filter ? books.filter(book => book.libraryStatus.exist) : books
-      //TODO:case for book.libraryStatus is undefined
-    })
-    .share()
-
-  return{
-    searchRequest$: searchRequest$,//request$
-    statusRequest$: statusRequest$,
-    booksWithStatus$: booksWithStatus$
-  }
-}
+var intent = require('./intent');
+var model = require('./model');
 
 function main({RN, HTTP}) {
   let _navigator;
