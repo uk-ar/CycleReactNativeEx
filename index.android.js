@@ -13,6 +13,15 @@ let {makeHTTPDriver} = require('@cycle/http');
 
 var Icon = require('react-native-vector-icons/FontAwesome');
 
+let {
+  STORAGE_KEY,
+  RAKUTEN_SEARCH_API,
+  CALIL_STATUS_API,
+  LIBRARY_ID
+} = require('./common');
+
+//const LIBRARY_ID = "Tokyo_Fuchu";
+
 var {
   AppRegistry,
   StyleSheet,
@@ -27,14 +36,16 @@ var {
   ToolbarAndroid,
   Navigator,
   BackAndroid,
-  WebView
+  WebView,
+  AsyncStorage
 } = React;
 
 var SearchScreen = require('./SearchScreen');
 
 var MOCKED_MOVIES_DATA = [
   {title: "はじめてのABCえほん", author: "仲田利津子/黒田昌代",
-   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200"
+   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200",
+   isbn: "9784828867472"
   },
   {title: "ぐりとぐら(複数蔵書)", author: "中川李枝子/大村百合子",
    thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/0825/9784834000825.jpg?_ex=200x200", isbn: "9784834000825",
@@ -55,22 +66,25 @@ var MOCKED_MOVIES_DATA = [
   //size 200x200 largeImageUrl 64x64
 ];
 
-const LIBRARY_ID = "Tokyo_Fuchu"
-
-const CALIL_STATUS_API = `http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=${LIBRARY_ID}&format=json&isbn=`
-
-const RAKUTEN_SEARCH_API =
-'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&booksGenreId=001&applicationId=1088506385229803383&formatVersion=2&keyword='
-//books search api cannot use query keyword
-
+//var intent = require('./intent');
 function intent({RN, HTTP}){
   //Actions
   return{
+    openBook$: RN.select('cell').events('press')
+                 .map(i => i.currentTarget.props.item),
+    inBoxStatus$: Rx.Observable
+                    .fromPromise(AsyncStorage.getItem(STORAGE_KEY))
+                    .map(i => i ? JSON.parse(i) : [])
+                    .do(i => console.log("inBoxStatus$:%O", i))
+      ,
     filterState$: RN.select('filter')
                     .events('press')
                     .startWith(false)
                     .scan((current, event) => !current)
                     .do(i => console.log("filter change:%O", i)),
+    sortState$: RN.select('sort')
+                  .events('press')
+                  .do(i => console.log("sort change:%O", i)),
     changeSearch$: RN.select('text-input')
                      .events('change')
                      .map(event => event.args[0].nativeEvent.text)
@@ -176,24 +190,22 @@ function main({RN, HTTP}) {
   let _navigator;
   //ぐりとぐら
   //FIXME:Change navigator to stream
-  RN.select('cell').events('press')
-    .do(i => console.log("url:%O", i.currentTarget.props.item))
-    .map(i => i.currentTarget.props.item)
     // if else return has problem?
-    .map(i => {if(i.libraryStatus && i.libraryStatus.exist){
-      return i.libraryStatus.reserveUrl
-    }else{
-      return i.thumbnail
-    }})
-    //.map(i => {return i.thumbnail})
-    .do(i => console.log("url:%O", i))
-    //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
-    .map(url => {
-      _navigator.push({
-        name: 'detail',
-        url:  url
-      })
-    }).subscribe();
+    /* .map(i => {if(i.libraryStatus && i.libraryStatus.exist){
+       return i.libraryStatus.reserveUrl
+       }else{
+       return i.thumbnail
+       }})
+       //.map(i => {return i.thumbnail})
+       .do(i => console.log("url:%O", i))
+       //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
+       .map(url => {
+       _navigator.push({
+       name: 'detail',
+       url:  url
+       })
+       }) */
+
   //0192521722
   //qwerty
 
@@ -216,6 +228,32 @@ function main({RN, HTTP}) {
   const actions = intent({RN:RN, HTTP:HTTP});
   const state$ = model(actions);
 
+  const storageRequest$ = actions
+          .inBoxStatus$
+          .flatMap(inbox =>
+            actions.openBook$
+                   .startWith(inbox)
+                   .scan((inbox,book) => {
+                     console.log("inbox1:%O", inbox);
+                     //TODO:use lodash
+                     var result = inbox.filter(inBoxBook => inBoxBook.isbn !== book.isbn);
+                     console.log("result1:%O", result);
+                     result.unshift(book);
+                     console.log("result2:%O", result);
+                     return result;
+                   }))
+          .do(i => console.log("inbox:%O", i))
+          .flatMap(inbox => {
+            return Rx.Observable.fromPromise(AsyncStorage.setItem(STORAGE_KEY,JSON.stringify(inbox)))
+          })
+          //.do(i => console.log("storage set:%O", i))
+          .subscribe();
+
+  actions.sortState$
+         .flatMap(e => Rx.Observable.fromPromise(AsyncStorage.getItem(STORAGE_KEY)))
+         .map(i => JSON.parse(i))
+         .do(i => console.log("storage:%O", i))
+         .subscribe();
   // for android action
   var RouteMapper = function(route, navigator, component) {
     if(_navigator === undefined){
@@ -290,7 +328,8 @@ function main({RN, HTTP}) {
 
   return {
     RN: SearchView$,//.merge(DetailView$),
-    HTTP: state$.searchRequest$.merge(state$.statusRequest$)
+    HTTP: state$.searchRequest$.merge(state$.statusRequest$),
+    //storage: storageRequest$
   };
 }
 

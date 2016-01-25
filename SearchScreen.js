@@ -188,7 +188,7 @@ var SearchScreen = React.createClass({
         />
         <View style = {styles.row}>
           <Icon.Button name = "filter" selector = "filter"/>
-          <Icon.Button name = "sort"/>
+          <Icon.Button name = "sort" selector = "sort"/>
         </View>
       </CycleView>
     )
