@@ -12,6 +12,8 @@ let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/re
 let {makeHTTPDriver} = require('@cycle/http');
 
 var Icon = require('react-native-vector-icons/FontAwesome');
+//let EventEmitter = require('events').EventEmitter;
+let EventEmitter = require('EventEmitter');
 
 let {
   STORAGE_KEY,
@@ -45,46 +47,53 @@ var intent = require('./intent');
 var model = require('./model');
 
 function main({RN, HTTP}) {
+  const actions = intent({RN:RN, HTTP:HTTP});
+  const state$ = model(actions);
   let _navigator;
   //ぐりとぐら
   //FIXME:Change navigator to stream
-    // if else return has problem?
-    /* .map(i => {if(i.libraryStatus && i.libraryStatus.exist){
-       return i.libraryStatus.reserveUrl
-       }else{
-       return i.thumbnail
-       }})
-       //.map(i => {return i.thumbnail})
-       .do(i => console.log("url:%O", i))
-       //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
-       .map(url => {
-       _navigator.push({
-       name: 'detail',
-       url:  url
-       })
-       }) */
 
   //0192521722
   //qwerty
+  actions.openBook$
+  // if else return has problem?
+         .map(i => {if(i.libraryStatus && i.libraryStatus.exist){
+           return i.libraryStatus.reserveUrl
+         }else{
+           return i.thumbnail
+         }})
+    //.map(i => {return i.thumbnail})
+         .do(i => console.log("url:%O", i))
+    //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
+         .map(url => {
+           _navigator.push({
+             name: 'detail',
+             url:  url
+           })
+         })
+         .subscribe();
 
+  let navigatorPopRequest$ = RN.select('back')
+                               .events('iconClicked');
+  var eventEmitter = new EventEmitter();
   // for android action
-  function backAction(){
-    if (_navigator && _navigator.getCurrentRoutes().length > 1) {
-      _navigator.pop();
+  var source = Rx.Observable
+                 .fromEvent(eventEmitter, 'hardwareBackPress')
+                 .map(() => console.log("event emit:"))
+                 .subscribe();
+
+  function canPop(navigator){
+    if (navigator && navigator.getCurrentRoutes().length > 1) {
       return true;
     }
     return false;
   }
-  //FIXME:Change to stream
-  BackAndroid.addEventListener('hardwareBackPress', backAction);
-  //onIconClicked
-  RN.select('back')
-    .events('iconClicked')
-    .do(backAction)
-    .subscribe();
 
-  const actions = intent({RN:RN, HTTP:HTTP});
-  const state$ = model(actions);
+  //https://colinramsay.co.uk/2015/07/04/react-native-eventemitters.html
+  BackAndroid.addEventListener('hardwareBackPress', () =>{
+    eventEmitter.emit('hardwareBackPress');
+    return canPop(_navigator);
+  });
 
   const storageRequest$ = actions
           .inBoxStatus$
@@ -101,21 +110,51 @@ function main({RN, HTTP}) {
                      return result;
                    }))
           .do(i => console.log("inbox:%O", i))
+    //output
           .flatMap(inbox => {
             return Rx.Observable.fromPromise(AsyncStorage.setItem(STORAGE_KEY,JSON.stringify(inbox)))
           })
           //.do(i => console.log("storage set:%O", i))
+          //.subscribe();
+    actions.sortState$
+          .flatMap(e => Rx.Observable.fromPromise(AsyncStorage.getItem(STORAGE_KEY)))
+          .map(i => JSON.parse(i))
+          .do(i => console.log("storage:%O", i))
           .subscribe();
 
-  actions.sortState$
-         .flatMap(e => Rx.Observable.fromPromise(AsyncStorage.getItem(STORAGE_KEY)))
-         .map(i => JSON.parse(i))
-         .do(i => console.log("storage:%O", i))
-         .subscribe();
   // for android action
   var RouteMapper = function(route, navigator, component) {
     if(_navigator === undefined){
-      _navigator=navigator;
+      _navigator = navigator;
+
+      /* navigatorPopRequest$
+         .startWith(navigator)
+         .scan((navigator,_) => {
+         //TODO:use lodash
+         if(canPop(navigator)){
+         navigator.pop()
+         }
+         return navigator;
+         })
+         .do(i => console.log("nav poped:%O", i))
+         .subscribe()
+       */
+      Rx.Observable.just(navigator) //.just(navigator)
+        .do(i => console.log("nav1:%O", i))
+        .map(nav => {
+          navigatorPopRequest$
+           .startWith(nav)
+           .scan((navi,_) => {
+             //TODO:use lodash
+             if(canPop(navi)){
+               navi.pop()
+             }
+             return navi;
+           })
+        })
+        .do(i => console.log("nav2:%O", i))
+        //.map(navigator => _navigator = navigator)
+        .subscribe();
     }
     if (route.name === 'search') {
       //TODO:remove dataSource
@@ -140,16 +179,17 @@ function main({RN, HTTP}) {
                    domStorageEnabled={true}
                    startInLoadingState={true}
                    javaScriptEnabled={true}
-                   onError = {i => console.log("on err:%O", i)}
-                   onLoad = {i => console.log("on load:%O", i)}
-                   onLoadEnd = {i => console.log("on load end:%O", i)}
-                   onLoadStart = {i => console.log("on load start:%O", i)}
-                   onNavigationStateChange = {i => console.log("on nav:%O", i)}
                    style={styles.WebViewContainer}
           />
         </CycleView>
       ) // 'document.querySelector("[value$=\'カートに入れる\']").click()'
         // injectedJavaScript='document.querySelector(".button").click()'
+        /* onError = {i => console.log("on err:%O", i)}
+           onLoad = {i => console.log("on load:%O", i)}
+           onLoadEnd = {i => console.log("on load end:%O", i)}
+           onLoadStart = {i => console.log("on load start:%O", i)}
+           onNavigationStateChange = {i => console.log("on nav:%O", i)}
+         */
     }
   }
   /* state$.booksWithStatus$
