@@ -8,6 +8,7 @@ let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/re
 let {makeHTTPDriver} = require('@cycle/http');
 
 var Icon = require('react-native-vector-icons/FontAwesome');
+var BookScreen = require('./BookScreen');
 
 let {
   STORAGE_KEY,
@@ -91,7 +92,23 @@ function model(actions){
     return{
       searchRequest$: searchRequest$,//request$
       statusRequest$: statusRequest$,
-      booksWithStatus$: booksWithStatus$
+      booksWithStatus$: booksWithStatus$,
+      navigatorPushRequest$: actions
+        .openBook$
+        .map(i => {
+          if(i.libraryStatus && i.libraryStatus.exist){
+            return i.libraryStatus.reserveUrl
+          }else{
+            return i.thumbnail
+          }})
+        //.map(i => {return i.thumbnail})
+        .do(i => console.log("url:%O", i))
+        //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
+        .map(url => ({
+          title: 'detail',
+          component: BookScreen,
+          passProps: {url: url}
+        }))
     }
 }
 

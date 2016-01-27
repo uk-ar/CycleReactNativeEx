@@ -55,21 +55,6 @@ function main({RN, HTTP}) {
 
   //0192521722
   //qwerty
-  let navigatorPushRequest$ = actions
-        .openBook$
-  // if else return has problem?
-        .map(i => {if(i.libraryStatus && i.libraryStatus.exist){
-          return i.libraryStatus.reserveUrl
-        }else{
-          return i.thumbnail
-        }})
-    //.map(i => {return i.thumbnail})
-        .do(i => console.log("url:%O", i))
-    //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
-        .map(url => ({
-          title: 'detail',
-          url:  url
-        }))
 
   // for android action
   var eventEmitter = new EventEmitter();
@@ -136,7 +121,7 @@ function main({RN, HTTP}) {
            }))
         .switch()
         .map(nav =>
-          navigatorPushRequest$
+          state$.navigatorPushRequest$
            .startWith(nav)
            .scan((navi,route) => {
              navi.push(route);
@@ -147,44 +132,18 @@ function main({RN, HTTP}) {
         //.map(navigator => _navigator = navigator)
         .subscribe();
     }
-    if (route.title === 'search') {
-      //TODO:remove dataSource
-      return (React.createElement(route.component,route.passProps))
-    } else if (route.title === 'detail') {
-      return(
-        <CycleView key="webview" style={{flex: 1}}>
-          <ToolbarAndroid
-              actions={[]}
-              navIcon={require('image!ic_arrow_back_white_24dp')}
-              selector = "back"
-              style={styles.toolbar}
-              titleColor="white"
-              //title={route.movie.title}
-              //title = "detail"
-          />
-          <WebView url={route.url}
-                   domStorageEnabled={true}
-                   startInLoadingState={true}
-                   javaScriptEnabled={true}
-                   style={styles.WebViewContainer}
-          />
-        </CycleView>
-      ) // 'document.querySelector("[value$=\'カートに入れる\']").click()'
-        // injectedJavaScript='document.querySelector(".button").click()'
-        /* onError = {i => console.log("on err:%O", i)}
-           onLoad = {i => console.log("on load:%O", i)}
-           onLoadEnd = {i => console.log("on load end:%O", i)}
-           onLoadStart = {i => console.log("on load start:%O", i)}
-           onNavigationStateChange = {i => console.log("on nav:%O", i)}
-         */
-    }
+    return (React.createElement(route.component,route.passProps))
   }
-
+  /* var MyNavigator = React.createClass({
+     render: function() {
+     <Navigator {...this.props}/>
+     }
+     });
+   */
   let SearchView$ = state$.booksWithStatus$
                           .startWith(MOCKED_MOVIES_DATA)
                           .map(i =>
                             <Navigator
-                                key="nav"
                                 initialRoute = {{
                                     component:SearchScreen,
                                     title: 'search',
@@ -193,14 +152,13 @@ function main({RN, HTTP}) {
                                 renderScene={RouteMapper}
                             />
                           )
+    //ref="nav"
     /*                             <View
        >
        </View>
        componentDidMount={
        console.log("on nav:%O", this.refs.nav)
        } */
-    //TODO:navigationBar
-    //https://github.com/facebook/react-native/blob/cd89016ee7168bb6971f800779e0878e9a70206f/Examples/UIExplorer/Navigator/NavigationBarSample.js
                           .do(i => console.log("nav elem:%O", i));
 
   return {
