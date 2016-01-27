@@ -82,7 +82,8 @@ function model(actions){
     .startWith(MOCKED_MOVIES_DATA)
     .do(i => console.log("booksWithStatus$:%O", i))
     .combineLatest(actions.filterState$,(books,filter)=>{
-      return filter ? books.filter(book => book.libraryStatus.exist) : books
+      return filter ? books.filter(book =>
+        !book.libraryStatus || book.libraryStatus.exist) : books
       //TODO:case for book.libraryStatus is undefined
     })
     .share()

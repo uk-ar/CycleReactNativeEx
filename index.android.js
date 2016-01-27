@@ -55,32 +55,29 @@ function main({RN, HTTP}) {
 
   //0192521722
   //qwerty
-  actions.openBook$
+  let navigatorPushRequest$ = actions
+        .openBook$
   // if else return has problem?
-         .map(i => {if(i.libraryStatus && i.libraryStatus.exist){
-           return i.libraryStatus.reserveUrl
-         }else{
-           return i.thumbnail
-         }})
+        .map(i => {if(i.libraryStatus && i.libraryStatus.exist){
+          return i.libraryStatus.reserveUrl
+        }else{
+          return i.thumbnail
+        }})
     //.map(i => {return i.thumbnail})
-         .do(i => console.log("url:%O", i))
+        .do(i => console.log("url:%O", i))
     //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
-         .map(url => {
-           _navigator.push({
-             name: 'detail',
-             url:  url
-           })
-         })
-         .subscribe();
+        .map(url => ({
+          title: 'detail',
+          url:  url
+        }))
 
-  let navigatorPopRequest$ = RN.select('back')
-                               .events('iconClicked');
-  var eventEmitter = new EventEmitter();
   // for android action
-  var source = Rx.Observable
-                 .fromEvent(eventEmitter, 'hardwareBackPress')
-                 .map(() => console.log("event emit:"))
-                 .subscribe();
+  var eventEmitter = new EventEmitter();
+  let navigatorPopRequest$ = RN.select('back')
+                               .events('iconClicked')
+                               .merge(Rx.Observable
+                                        .fromEvent(eventEmitter,
+                                                   'hardwareBackPress'));
 
   function canPop(navigator){
     if (navigator && navigator.getCurrentRoutes().length > 1) {
@@ -94,6 +91,7 @@ function main({RN, HTTP}) {
     eventEmitter.emit('hardwareBackPress');
     return canPop(_navigator);
   });
+  // for android end
 
   const storageRequest$ = actions
           .inBoxStatus$
@@ -127,43 +125,32 @@ function main({RN, HTTP}) {
     if(_navigator === undefined){
       _navigator = navigator;
 
-      /* navigatorPopRequest$
-         .startWith(navigator)
-         .scan((navigator,_) => {
-         //TODO:use lodash
-         if(canPop(navigator)){
-         navigator.pop()
-         }
-         return navigator;
-         })
-         .do(i => console.log("nav poped:%O", i))
-         .subscribe()
-       */
-      Rx.Observable.just(navigator) //.just(navigator)
+      Rx.Observable.just(navigator)
         .do(i => console.log("nav1:%O", i))
-        .map(nav => {
+        .map(nav =>
           navigatorPopRequest$
            .startWith(nav)
            .scan((navi,_) => {
-             //TODO:use lodash
-             if(canPop(navi)){
-               navi.pop()
-             }
+             canPop(navi) && navi.pop()
              return navi;
-           })
-        })
+           }))
+        .switch()
+        .map(nav =>
+          navigatorPushRequest$
+           .startWith(nav)
+           .scan((navi,route) => {
+             navi.push(route);
+             return navi;
+           }))
+        .switch()
         .do(i => console.log("nav2:%O", i))
         //.map(navigator => _navigator = navigator)
         .subscribe();
     }
-    if (route.name === 'search') {
+    if (route.title === 'search') {
       //TODO:remove dataSource
-      return (
-        <SearchScreen
-            state$ = {state$}
-        />
-      )
-    } else if (route.name === 'detail') {
+      return (React.createElement(route.component,route.passProps))
+    } else if (route.title === 'detail') {
       return(
         <CycleView key="webview" style={{flex: 1}}>
           <ToolbarAndroid
@@ -192,37 +179,29 @@ function main({RN, HTTP}) {
          */
     }
   }
-  /* state$.booksWithStatus$
-     .do(i =>
-     //FIXME:replace clears current input text & scroll status
-     // doc for ref, element, instance...
-     // https://facebook.github.io/react/docs/more-about-refs.html
-     _navigator.replace({name: 'search', dataSource: i})
-     )
-     .do(i => console.log("navi change event:%O", i))
-     .subscribe(); */
 
-  //https://facebook.github.io/react/docs/top-level-api.html#react.cloneelement
-  //https://facebook.github.io/react-native/docs/direct-manipulation.html
-  //https://github.com/facebook/react-native/blob/master/Examples/Movies/Movies
-  //https://facebook.github.io/react/docs/reusable-components.html
-  /* .startWith(MOCKED_MOVIES_DATA)
-     .do(i =>
-     <Navigator
-     key="nav"
-     initialRoute = {{name: 'search', dataSource: MOCKED_MOVIES_DATA}}
-     renderScene={generateCycleRender(RouteMapper)}
-     />
-     _navigator.push({name: 'search', dataSource: i})
-     ) */
   let SearchView$ = state$.booksWithStatus$
                           .startWith(MOCKED_MOVIES_DATA)
                           .map(i =>
                             <Navigator
                                 key="nav"
-                                initialRoute = {{name: 'search'}}
+                                initialRoute = {{
+                                    component:SearchScreen,
+                                    title: 'search',
+                                    passProps: {state$: state$}
+                                    }}
                                 renderScene={RouteMapper}
-                            />).do(i => console.log("nav elem:%O", i));
+                            />
+                          )
+    /*                             <View
+       >
+       </View>
+       componentDidMount={
+       console.log("on nav:%O", this.refs.nav)
+       } */
+    //TODO:navigationBar
+    //https://github.com/facebook/react-native/blob/cd89016ee7168bb6971f800779e0878e9a70206f/Examples/UIExplorer/Navigator/NavigationBarSample.js
+                          .do(i => console.log("nav elem:%O", i));
 
   return {
     RN: SearchView$,//.merge(DetailView$),
