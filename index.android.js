@@ -106,7 +106,7 @@ function main({RN, HTTP}) {
           .subscribe();
 
   // for android action
-  var RouteMapper = function(route, navigator, component) {
+  var RouteMapper = function(navigator) {
     if(_navigator === undefined){
       _navigator = navigator;
 
@@ -132,33 +132,43 @@ function main({RN, HTTP}) {
         //.map(navigator => _navigator = navigator)
         .subscribe();
     }
-    return (React.createElement(route.component,route.passProps))
   }
-  /* var MyNavigator = React.createClass({
-     render: function() {
-     <Navigator {...this.props}/>
-     }
-     });
-   */
+
+  var MyNavigator = React.createClass({
+    componentDidMount: function(){
+      //console.log("nav ref:%O", this.refs);
+      //this.props.componentDidMount.call(this);
+      this.props.componentDidMount.call({});
+    },
+    render: function() {
+      return(
+        <Navigator
+            {...this.props}
+            ref="nav"
+            renderScene = {(route, navigator, component) =>
+              React.createElement(route.component,route.passProps)
+                          }
+        />)
+    }
+  });
+
   let SearchView$ = state$.booksWithStatus$
                           .startWith(MOCKED_MOVIES_DATA)
                           .map(i =>
-                            <Navigator
+                            <MyNavigator
                                 initialRoute = {{
                                     component:SearchScreen,
                                     title: 'search',
                                     passProps: {state$: state$}
-                                    }}
-                                renderScene={RouteMapper}
+                                  }}
+                                componentDidMount = {() => {
+                                    console.log("foo");
+                                    console.log(this);
+                                    //console.log(this.refs);
+                                    //RouteMapper(this.refs.nav)
+                                  }}
                             />
                           )
-    //ref="nav"
-    /*                             <View
-       >
-       </View>
-       componentDidMount={
-       console.log("on nav:%O", this.refs.nav)
-       } */
                           .do(i => console.log("nav elem:%O", i));
 
   return {
