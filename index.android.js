@@ -57,12 +57,10 @@ function main({RN, HTTP}) {
   //qwerty
 
   // for android action
-  var eventEmitter = new EventEmitter();
-  let navigatorPopRequest$ = RN.select('back')
-                               .events('iconClicked')
-                               .merge(Rx.Observable
-                                        .fromEvent(eventEmitter,
-                                                   'hardwareBackPress'));
+  //var eventEmitter = new EventEmitter();
+  let navigatorPopSubject$ = new Rx.Subject();
+  let navigatorPopRequest$ = navigatorPopSubject$
+                               .merge(RN.select('back').events('iconClicked'))
 
   function canPop(navigator){
     return (navigator && navigator.getCurrentRoutes().length > 1)
@@ -70,7 +68,7 @@ function main({RN, HTTP}) {
 
   //https://colinramsay.co.uk/2015/07/04/react-native-eventemitters.html
   BackAndroid.addEventListener('hardwareBackPress', () =>{
-    eventEmitter.emit('hardwareBackPress');
+    navigatorPopSubject$.onNext('hardwareBackPress');
     return canPop(_navigator);
   });
   // for android end
