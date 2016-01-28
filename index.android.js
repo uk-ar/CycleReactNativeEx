@@ -57,23 +57,18 @@ function main({RN, HTTP}) {
   //qwerty
 
   // for android action
-  var eventEmitter = new EventEmitter();
-  let navigatorPopRequest$ = RN.select('back')
-                               .events('iconClicked')
-                               .merge(Rx.Observable
-                                        .fromEvent(eventEmitter,
-                                                   'hardwareBackPress'));
+  //var eventEmitter = new EventEmitter();
+  let navigatorPopSubject$ = new Rx.Subject();
+  let navigatorPopRequest$ = navigatorPopSubject$
+                               .merge(RN.select('back').events('iconClicked'))
 
   function canPop(navigator){
-    if (navigator && navigator.getCurrentRoutes().length > 1) {
-      return true;
-    }
-    return false;
+    return (navigator && navigator.getCurrentRoutes().length > 1)
   }
 
   //https://colinramsay.co.uk/2015/07/04/react-native-eventemitters.html
   BackAndroid.addEventListener('hardwareBackPress', () =>{
-    eventEmitter.emit('hardwareBackPress');
+    navigatorPopSubject$.onNext('hardwareBackPress');
     return canPop(_navigator);
   });
   // for android end
@@ -91,6 +86,7 @@ function main({RN, HTTP}) {
                      result.unshift(book);
                      console.log("result2:%O", result);
                      return result;
+                     //return [book].concat(inbox.filter)
                    }))
           .do(i => console.log("inbox:%O", i))
     //output
@@ -136,19 +132,27 @@ function main({RN, HTTP}) {
 
   var MyNavigator = React.createClass({
     componentDidMount: function(){
-      //console.log("nav ref:%O", this.refs);
+      //console.log("nav this:%O", this);
       //this.props.componentDidMount.call(this);
-      this.props.componentDidMount.call({});
+      this.props.navigatorDidMount.call({},this.refs.nav);
     },
     render: function() {
-      return(
-        <Navigator
-            {...this.props}
-            ref="nav"
-            renderScene = {(route, navigator, component) =>
-              React.createElement(route.component,route.passProps)
-                          }
-        />)
+      if (Platform.OS === 'android') {
+        return(
+          <Navigator
+              {...this.props}
+              ref="nav"
+              renderScene = {(route, navigator, component) =>
+                React.createElement(route.component,route.passProps)
+                            }
+          />)}
+      else{
+        return (
+          <NavigatorIOS
+              {...this.props}
+              ref="nav"
+          />)
+      }
     }
   });
 
@@ -161,9 +165,9 @@ function main({RN, HTTP}) {
                                     title: 'search',
                                     passProps: {state$: state$}
                                   }}
-                                componentDidMount = {() => {
-                                    console.log("foo");
-                                    console.log(this);
+                                navigatorDidMount = {(nav) => {
+                                    console.log("nav ref2:%O", nav);
+                                    RouteMapper(nav);
                                     //console.log(this.refs);
                                     //RouteMapper(this.refs.nav)
                                   }}

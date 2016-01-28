@@ -3,6 +3,16 @@ let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/re
 var Icon = require('react-native-vector-icons/FontAwesome');
 var GiftedSpinner = require('react-native-gifted-spinner');
 var Emoji = require('react-native-emoji');
+var Swipeout = require('react-native-swipeout');
+
+var swipeoutBtns = [
+  {
+    //text: 'Button'
+    text: '読みたい',
+    onPress: (e) => console.log("action:%O", e)
+  }
+]
+//Press event to driver or event emitter
 
 var {
   ActivityIndicatorIOS,
@@ -87,11 +97,16 @@ function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
   }
   {/* onShowUnderlay={()=>highlightRowFunc(sectionID, rowID)}
       onHideUnderlay={highlightRowFunc(null, null)} */}
+  // control hide or show with filter
   return(
-    <TouchableElement
-        selector="cell"
-        item={movie}
+    <Swipeout left={swipeoutBtns}
+              close={true}
+              autoClose={true}
     >
+      <TouchableElement
+          selector="cell"
+          item={movie}
+      >
       <View style={styles.row}>
         <Image
             source={{uri: movie.thumbnail}}
@@ -107,7 +122,8 @@ function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
           <LibraryStatus libraryStatus={movie.libraryStatus}/>
         </View>
       </View>
-    </TouchableElement>
+      </TouchableElement>
+    </Swipeout>
   )}
 
 var IS_RIPPLE_EFFECT_SUPPORTED = Platform.Version >= 21;
