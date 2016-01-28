@@ -3,6 +3,16 @@ let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/re
 var Icon = require('react-native-vector-icons/FontAwesome');
 var GiftedSpinner = require('react-native-gifted-spinner');
 var Emoji = require('react-native-emoji');
+var Swipeout = require('react-native-swipeout');
+
+var swipeoutBtns = [
+  {
+    //text: 'Button',
+    text: '読みたい',
+    onPress: (e) => console.log("action:%O", e)
+  }
+]
+//Press event to driver or event emitter
 
 var {
   ActivityIndicatorIOS,
@@ -87,6 +97,16 @@ function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
   }
   {/* onShowUnderlay={()=>highlightRowFunc(sectionID, rowID)}
       onHideUnderlay={highlightRowFunc(null, null)} */}
+  // control hide or show with filter
+  /*
+     Conflict with TouchableElement?
+     <Swipeout
+     left={swipeoutBtns}
+     close={true}
+     autoClose={true}
+     >
+     </Swipeout>
+      */
   return(
     <TouchableElement
         selector="cell"
