@@ -100,17 +100,18 @@ function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
   // control hide or show with filter
   /*
      Conflict with TouchableElement?
-     <Swipeout
-     left={swipeoutBtns}
-     close={true}
-     autoClose={true}
-     >
-     </Swipeout>
       */
   return(
+    <CycleView key = "cell">
+    <Swipeout
+        left={swipeoutBtns}
+        close={true}
+        autoClose={true}
+    >
     <TouchableElement
         selector="cell"
         item={movie}
+        onPress={(e) => console.log("cell action:%O", e)}
     >
       <View style={styles.row}>
         <Image
@@ -128,6 +129,8 @@ function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
         </View>
       </View>
     </TouchableElement>
+    </Swipeout>
+    </CycleView>
   )}
 
 var IS_RIPPLE_EFFECT_SUPPORTED = Platform.Version >= 21;
