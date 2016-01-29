@@ -87,12 +87,39 @@ function model(actions){
         !book.libraryStatus || book.libraryStatus.exist) : books
       //TODO:case for book.libraryStatus is undefined
     })
-    .share()
-
+    .share();
+  // for android action
+  function canPop(navigator){
+    return (navigator && navigator.getCurrentRoutes().length > 1)
+  }
+  let navigatorPopRequest$;
+  let navigator$ = new Rx.Subject();
+  if (Platform.OS === 'android') {
+    let _navigator;
+    navigator$.subscribe((navigator) => {
+      _navigator = navigator;
+      console.log("nav mount2")
+    });
+    let hardwareBackPress$ = Rx.Observable.create((observer)=> {
+      BackAndroid.addEventListener('hardwareBackPress', () =>{
+        observer.onNext('hardwareBackPress');
+        console.log("can pop?")
+          return canPop(_navigator);
+      });
+    });
+    navigatorPopRequest$ = hardwareBackPress$
+        .merge(actions.navigatorBackPress$);
+  }else{
+    navigatorPopRequest$ = navigatorBackPress$;
+  }
+  // for android end
+    
     return{
       searchRequest$: searchRequest$,//request$
       statusRequest$: statusRequest$,
       booksWithStatus$: booksWithStatus$,
+      navigator$: navigator$,
+      navigatorPopRequest$: navigatorPopRequest$,
       navigatorPushRequest$: actions
         .openBook$
         .map(i => {

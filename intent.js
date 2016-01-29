@@ -35,6 +35,7 @@ var {
 function intent({RN, HTTP}){
   //Actions
   return{
+    navigatorBackPress$: RN.select('back').events('iconClicked'),
     openBook$: RN.select('cell').events('press')
                  .map(i => i.currentTarget.props.item),
     inBoxStatus$: Rx.Observable

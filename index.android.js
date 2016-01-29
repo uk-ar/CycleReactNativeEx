@@ -49,30 +49,12 @@ var model = require('./model');
 function main({RN, HTTP}) {
   const actions = intent({RN:RN, HTTP:HTTP});
   const state$ = model(actions);
-  let _navigator;
+
   //ぐりとぐら
   //FIXME:Change navigator to stream
 
   //0192521722
   //qwerty
-
-  // for android action
-  //var eventEmitter = new EventEmitter();
-  let navigatorPopSubject$ = new Rx.Subject();
-  let navigatorPopRequest$ = navigatorPopSubject$
-                               .merge(RN.select('back').events('iconClicked'))
-
-  function canPop(navigator){
-    return (navigator && navigator.getCurrentRoutes().length > 1)
-  }
-
-  //https://colinramsay.co.uk/2015/07/04/react-native-eventemitters.html
-  BackAndroid.addEventListener('hardwareBackPress', () =>{
-    navigatorPopSubject$.onNext('hardwareBackPress');
-    return canPop(_navigator);
-  });
-  // for android end
-
   const storageRequest$ = actions
           .inBoxStatus$
           .flatMap(inbox =>
@@ -103,31 +85,12 @@ function main({RN, HTTP}) {
 
   // for android action
   var RouteMapper = function(navigator) {
-    if(_navigator === undefined){
-      _navigator = navigator;
-
-      Rx.Observable.just(navigator)
-        .do(i => console.log("nav1:%O", i))
-        .map(nav =>
-          navigatorPopRequest$
-           .startWith(nav)
-           .scan((navi,_) => {
-             canPop(navi) && navi.pop()
-             return navi;
-           }))
-        .switch()
-        .map(nav =>
-          state$.navigatorPushRequest$
-           .startWith(nav)
-           .scan((navi,route) => {
-             navi.push(route);
-             return navi;
-           }))
-        .switch()
-        .do(i => console.log("nav2:%O", i))
-        //.map(navigator => _navigator = navigator)
-        .subscribe();
-    }
+    state$.navigator$.onNext(navigator);
+    //push & pop is Destructive operations
+    state$.navigatorPushRequest$
+          .subscribe((route) => navigator.push(route));
+    state$.navigatorPopRequest$
+          .subscribe((_)=>navigator.pop());//need to use canPop?
   }
 
   var MyNavigator = React.createClass({
