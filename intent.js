@@ -37,7 +37,8 @@ function intent({RN, HTTP}){
   return{
     navigatorBackPress$: RN.select('back').events('iconClicked'),
     openBook$: RN.select('cell').events('press')
-                 .map(i => i.currentTarget.props.item),
+                 .map(i => i.currentTarget.props.item)
+                 .do(i => console.log("cell press:%O", i)),
     inBoxStatus$: Rx.Observable
                     .fromPromise(AsyncStorage.getItem(STORAGE_KEY))
                     .map(i => i ? JSON.parse(i) : [])

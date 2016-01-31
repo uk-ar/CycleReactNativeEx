@@ -96,18 +96,19 @@ function main({RN, HTTP}) {
   var MyNavigator = React.createClass({
     componentDidMount: function(){
       //console.log("nav this:%O", this);
-      //this.props.componentDidMount.call(this);
+      /* var navigatorDidMount = this.props.navigatorDidMount.bind(this);
+         navigatorDidMount(this.refs.nav); */
       this.props.navigatorDidMount.call({},this.refs.nav);
     },
     render: function() {
       if (Platform.OS === 'android') {
         return(
-          <Navigator
-              {...this.props}
-              ref="nav"
-              renderScene = {(route, navigator, component) =>
-                React.createElement(route.component,route.passProps)
-                            }
+          <Navigator {...this.props}
+          ref="nav"
+          renderScene = {(route, navigator, component) =>{
+            //console.log("nav this:%O", this)
+            return React.createElement(route.component,route.passProps)
+          }}
           />)}
       else{
         return (
@@ -129,6 +130,7 @@ function main({RN, HTTP}) {
                                     passProps: {state$: state$}
                                   }}
                                 navigatorDidMount = {(nav) => {
+                                    console.log("nav this:%O", this);
                                     console.log("nav ref2:%O", nav);
                                     RouteMapper(nav);
                                     //console.log(this.refs);

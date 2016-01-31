@@ -100,7 +100,8 @@ function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
   // control hide or show with filter
   /*
      Conflict with TouchableElement?
-      */
+   */
+  //        onPress={(e) => console.log("cell action:%O", e)}
   return(
     <CycleView key = "cell">
     <Swipeout
