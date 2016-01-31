@@ -188,6 +188,45 @@ var dataSource = new ListView.DataSource({
   rowHasChanged: (row1, row2) => row1 !== row2,
 });
 
+var InBoxScreen = React.createClass({
+  render: function(){
+    return(
+      <CycleView style={styles.container}
+                 key = "InBoxScreen">
+        <BookListView
+            dataSource$={this.props.state$.inbox}
+        />
+      </CycleView>
+    )
+  }
+});
+
+var BookListView = React.createClass({
+  getInitialState(){
+    return {
+      dataSource:[]
+    }
+  },
+  render() {
+    return(
+      <ListView
+          ref="listview"
+          dataSource = {dataSource.cloneWithRows(this.state.dataSource)}
+          renderRow ={generateCycleRender(renderMovieCell)}
+          automaticallyAdjustContentInsets={false}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps={true}
+          showsVerticalScrollIndicator={false}
+      />
+    )
+  },
+  componentWillMount(){
+    this.props.dataSource$.subscribe((dataSource) =>
+      this.setState({dataSource:dataSource})
+    )
+  }
+});
+
 var SearchScreen = React.createClass({
   render: function() {
     //isLoading={this.state.isLoading}
@@ -195,20 +234,13 @@ var SearchScreen = React.createClass({
     return(
       <CycleView ref={component => this._root = component}
                  style={styles.container}
-      key = "searchScreen">
+                 key = "searchScreen">
         <SearchBar
             onFocus={() =>
               this.refs.listview && this.refs.listview.getScrollResponder().scrollTo(0, 0)}
         />
         <View style={styles.separator} />
-        <ListView
-            ref="listview"
-            dataSource = {dataSource.cloneWithRows(this.state.dataSource)}
-            renderRow ={generateCycleRender(renderMovieCell)}
-            automaticallyAdjustContentInsets={false}
-            keyboardDismissMode="on-drag"
-            keyboardShouldPersistTaps={true}
-            showsVerticalScrollIndicator={false}
+        <BookListView dataSource$={this.props.state$.booksWithStatus$}
         />
         <View style = {styles.row}>
           <Icon.Button name = "filter" selector = "filter"/>
@@ -217,23 +249,7 @@ var SearchScreen = React.createClass({
       </CycleView>
     )
       ////<Icon.Button name="facebook" backgroundColor="#3b5998">
-  },
-  getInitialState(){
-    return {
-      dataSource:[]
-    }
-  },
-  componentWillMount(){
-    console.log("this props:%O", this.props.state$);
-    state$ = this.props.state$;
-    state$.booksWithStatus$
-          .do(i => console.log("book status change event:%O:%O", i,this.refs))
-      //setProps is deplicated
-      //TODO:Fix filter change behavior? on scroll end
-          .do(i => this.state.dataSource = i)
-          .do(i => this.render())
-          .subscribe()
-  },
+  }
   /* componentWillReceiveProps: function(nextProps){
      console.log("recieve props:%O", nextProps)
      } */

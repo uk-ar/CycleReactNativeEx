@@ -113,7 +113,7 @@ function model(actions){
     navigatorPopRequest$ = actions.navigatorBackPress$;
   }
 
-  navigatorPushRequest$ = actions
+  let navigatorPushRequest$ = actions
               .openBook$
               .map(i => {
                 if(i.libraryStatus && i.libraryStatus.exist){
