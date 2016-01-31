@@ -29,6 +29,7 @@ var {
   PixelRatio,
   // searchBar
   TextInput,
+  ToolbarAndroid,
 } = React;
 
 var LibraryStatus = React.createClass({
@@ -209,7 +210,19 @@ var BookListView = React.createClass({
     }
   },
   render() {
+    let MyToolbar = (
+      <ToolbarAndroid
+          //logo={require('./app_logo.png')}
+          title="AwesomeApp"
+          actions = {[{title: '検索', show: 'always'},
+                      {title: '読みたい', show: 'always'}]}
+          //icon: require('./icon_settings.png'),
+          style={styles.toolbar}
+          //onActionSelected={this.onActionSelected}
+      />
+    )
     return(
+      <View style = {styles.container}>
       <ListView
           ref="listview"
           dataSource = {dataSource.cloneWithRows(this.state.dataSource)}
@@ -219,6 +232,12 @@ var BookListView = React.createClass({
           keyboardShouldPersistTaps={true}
           showsVerticalScrollIndicator={false}
       />
+      {MyToolbar}
+      <View style = {styles.row}>
+        <Icon.Button name = "filter" selector = "filter"/>
+        <Icon.Button name = "sort" selector = "sort"/>
+      </View>
+      </View>
     )
   },
   componentWillMount(){
@@ -233,20 +252,13 @@ var SearchScreen = React.createClass({
     //isLoading={this.state.isLoading}
     //onSearchChange={this.onSearchChange}
     return(
-      <CycleView ref={component => this._root = component}
-                 style={styles.container}
+      <CycleView style={styles.container}
                  key = "searchScreen">
         <SearchBar
-            onFocus={() =>
-              this.refs.listview && this.refs.listview.getScrollResponder().scrollTo(0, 0)}
-        />
+            key = "searchBar"/>
         <View style={styles.separator} />
         <BookListView dataSource$={this.props.state$.booksWithStatus$}
         />
-        <View style = {styles.row}>
-          <Icon.Button name = "filter" selector = "filter"/>
-          <Icon.Button name = "sort" selector = "sort"/>
-        </View>
       </CycleView>
     )
       ////<Icon.Button name="facebook" backgroundColor="#3b5998">
@@ -258,6 +270,11 @@ var SearchScreen = React.createClass({
 });
 
 var styles = StyleSheet.create({
+  //for toolBar
+  toolbar: {
+    backgroundColor: '#e9eaed',
+    height: 56,
+  },
   //for searchBar
   searchBar: {
     flexDirection: 'row',
