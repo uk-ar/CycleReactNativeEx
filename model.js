@@ -110,33 +110,34 @@ function model(actions){
     navigatorPopRequest$ = hardwareBackPress$
         .merge(actions.navigatorBackPress$);
   }else{
-    navigatorPopRequest$ = navigatorBackPress$;
+    navigatorPopRequest$ = actions.navigatorBackPress$;
   }
-  // for android end
-    
-    return{
-      searchRequest$: searchRequest$,//request$
-      statusRequest$: statusRequest$,
-      booksWithStatus$: booksWithStatus$,
-      navigator$: navigator$,
-      navigatorPopRequest$: navigatorPopRequest$,
-      navigatorPushRequest$: actions
-        .openBook$
-        .map(i => {
-          if(i.libraryStatus && i.libraryStatus.exist){
-            return i.libraryStatus.reserveUrl
-          }else{
-            return i.thumbnail
-          }})
-        //.map(i => {return i.thumbnail})
-        .do(i => console.log("url:%O", i))
-        //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
-        .map(url => ({
-          title: 'detail',
-          component: BookScreen,
-          passProps: {url: url}
-        }))
-    }
+
+  navigatorPushRequest$ = actions
+              .openBook$
+              .map(i => {
+                if(i.libraryStatus && i.libraryStatus.exist){
+                  return i.libraryStatus.reserveUrl
+                }else{
+                  return i.thumbnail
+                }})
+    //.map(i => {return i.thumbnail})
+              .do(i => console.log("url:%O", i))
+    //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
+              .map(url => ({
+                title: 'detail',
+                component: BookScreen,
+                passProps: {url: url}
+              }))
+
+  return{
+    searchRequest$: searchRequest$,//request$
+    statusRequest$: statusRequest$,
+    booksWithStatus$: booksWithStatus$,
+    navigator$: navigator$,
+    navigatorPopRequest$: navigatorPopRequest$,
+    navigatorPushRequest$: navigatorPushRequest$
+  }
 }
 
 module.exports = model;
