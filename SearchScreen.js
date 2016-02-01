@@ -21,7 +21,39 @@ var {
   // searchBar
   TextInput,
   ToolbarAndroid,
+  Navigator,
+  NavigatorIOS
 } = React;
+
+var GiftedNavigator = React.createClass({
+  componentDidMount: function(){
+    //console.log("nav this:%O", this);
+    //var navigatorDidMount = this.props.navigatorDidMount.bind(this);
+    //navigatorDidMount(this.refs.nav);
+    this.props.navigatorDidMount.call({},this.refs.nav);
+  },
+  render: function() {
+    if (Platform.OS === 'android') {
+      return(
+        <Navigator {...this.props}
+          ref="nav"
+          configureScene={() => Navigator.SceneConfigs.FadeAndroid}
+          renderScene = {(route, navigator, component) =>{
+              //console.log("nav this:%O", this)
+              return React.createElement(route.component,route.passProps)
+            }}
+        />)
+    }
+    else{
+      return (
+        <NavigatorIOS
+            {...this.props}
+            ref="nav"
+            style={styles.container}
+        />)
+    }
+  }
+});
 
 var LibraryStatus = React.createClass({
   render: function() {
@@ -105,6 +137,7 @@ var MovieCell = React.createClass({
       }
     }
   ]
+    //conflict with cell action open state & update
   return(
     <CycleView key = "cell">
       <Swipeout
@@ -138,73 +171,8 @@ var MovieCell = React.createClass({
   )}
 })
 
-var IS_RIPPLE_EFFECT_SUPPORTED = Platform.Version >= 21;
-
-var SearchBar = React.createClass({
-  /* render: function(){
-     generateCycleRender(this.myRender)
-     }, */
-  render: function() {
-    var TouchableElement = TouchableHighlight;
-    if (Platform.OS === 'android') {
-      TouchableElement = TouchableNativeFeedback;
-    }
-    var loadingView;
-    if (this.props.isLoading) {
-      loadingView = (
-        <ProgressBarAndroid
-            styleAttr="Large"
-            style={styles.spinner}
-        />
-      );
-    } else {
-      loadingView = <View style={styles.spinner} />;
-    }
-    return (
-      <CycleView style = {styles.searchBar} key = "search">
-        <TouchableElement
-            onPress={() => this.refs.input && this.refs.input.focus()}>
-          <View>
-            <Image
-                source={require('image!android_search_white')}
-                style={styles.icon}
-            />
-          </View>
-        </TouchableElement>
-        <TextInput
-            ref="input"
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoFocus={true}
-            selector="text-input"
-            placeholder="Search a movie..."
-            placeholderTextColor="rgba(255, 255, 255, 0.5)"
-            style={styles.searchBarInput}
-        />
-        {loadingView}
-      </CycleView>
-    );
-    //onChange={this.props.onSearchChange}
-    //onFocus={this.props.onFocus}
-  }
-});
-
 var dataSource = new ListView.DataSource({
   rowHasChanged: (row1, row2) => row1 !== row2,
-});
-
-var InBoxScreen = React.createClass({
-  render: function(){
-    return(
-      <CycleView style={styles.container}
-                 key = "InBoxScreen">
-        <BookListView
-            dataSource$={this.props.state$.inbox$}
-            actions$={this.props.actions$}
-        />
-      </CycleView>
-    )
-  }
 });
 
 var BookListView = React.createClass({
@@ -249,11 +217,31 @@ var BookListView = React.createClass({
     )
   },
   componentWillMount(){
-    this.props.dataSource$.subscribe((dataSource) =>
+    this.subscription = this.props.dataSource$.subscribe((dataSource) =>
       this.setState({dataSource:dataSource})
+    )
+  },
+  componentWillUnmount(){
+    this.subscription.dispose()
+  }
+});
+
+var InBoxScreen = React.createClass({
+  render: function(){
+    return(
+      <CycleView style={styles.container}
+                 key = "InBoxScreen">
+        <BookListView
+            dataSource$={this.props.state$.inbox$}
+            actions$={this.props.actions$}
+        />
+      </CycleView>
     )
   }
 });
+
+//var SearchBar = require('SearchBar');
+var SearchBar = require('./SearchBar');
 
 var SearchScreen = React.createClass({
   render: function() {
@@ -283,31 +271,6 @@ var styles = StyleSheet.create({
   toolbar: {
     backgroundColor: '#e9eaed',
     height: 56,
-  },
-  //for searchBar
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#a9a9a9',
-    height: 56,
-  },
-  searchBarInput: {
-    flex: 1,
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-    height: 50,
-    padding: 0,
-    backgroundColor: 'transparent'
-  },
-  spinner: {
-    width: 30,
-    height: 30,
-  },
-  icon: {
-    width: 24,
-    height: 24,
-    marginHorizontal: 8,
   },
   iconContainer:{
     /* backgroundColor: 'deepskyblue', */
@@ -385,4 +348,4 @@ var styles = StyleSheet.create({
   },
 });
 
-module.exports = {SearchScreen,InBoxScreen};
+module.exports = {SearchScreen, InBoxScreen, GiftedNavigator};

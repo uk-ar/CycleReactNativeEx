@@ -41,7 +41,7 @@ var {
   AsyncStorage
 } = React;
 
-let {SearchScreen,InBoxScreen} = require('./SearchScreen');
+let {SearchScreen, InBoxScreen, GiftedNavigator} = require('./SearchScreen');
 
 var intent = require('./intent');
 var model = require('./model');
@@ -52,38 +52,15 @@ function main({RN, HTTP}) {
 
   //ぐりとぐら
   //FIXME:Change navigator to stream
-  //actions.openBook$.subscribe()
   //0192521722
   //qwerty
-  const storageRequest$ = actions
-          .inBoxStatus$
-          .flatMap(inbox =>
-            actions.openBook$
-                   .startWith(inbox)
-                   .scan((inbox,book) => {
-                     console.log("inbox1:%O", inbox);
-                     //TODO:use lodash
-                     var result = inbox.filter(inBoxBook => inBoxBook.isbn !== book.isbn);
-                     console.log("result1:%O", result);
-                     result.unshift(book);
-                     console.log("result2:%O", result);
-                     return result;
-                     //return [book].concat(inbox.filter)
-                   }))
-          .do(i => console.log("inbox:%O", i))
-    //output
-          .flatMap(inbox => {
-            return Rx.Observable.fromPromise(AsyncStorage.setItem(STORAGE_KEY,JSON.stringify(inbox)))
-          })
-          //.do(i => console.log("storage set:%O", i))
-    //.subscribe();
-    
-    actions.sortState$
-          .flatMap(e => Rx.Observable.fromPromise(AsyncStorage.getItem(STORAGE_KEY)))
-          .map(i => JSON.parse(i))
-          .do(i => console.log("storage:%O", i))
-          .subscribe();
+  actions.sortState$
+         .flatMap(e => Rx.Observable.fromPromise(AsyncStorage.getItem(STORAGE_KEY)))
+         .map(i => JSON.parse(i))
+         .do(i => console.log("storage:%O", i))
+         .subscribe();
 
+  // for android action
   let navigatorReplaceRequest$ =
   actions.changeScene$
          .map(index =>{
@@ -101,7 +78,7 @@ function main({RN, HTTP}) {
              })
            }
          });
-  // for android action
+
   var RouteMapper = function(navigator) {
     state$.navigator$.onNext(navigator);
     //push & pop is Destructive operations
@@ -113,37 +90,10 @@ function main({RN, HTTP}) {
       navigator.replace(route));
   }
 
-  var MyNavigator = React.createClass({
-    componentDidMount: function(){
-      //console.log("nav this:%O", this);
-      /* var navigatorDidMount = this.props.navigatorDidMount.bind(this);
-         navigatorDidMount(this.refs.nav); */
-      this.props.navigatorDidMount.call({},this.refs.nav);
-    },
-    render: function() {
-      if (Platform.OS === 'android') {
-        return(
-          <Navigator {...this.props}
-          ref="nav"
-          renderScene = {(route, navigator, component) =>{
-            //console.log("nav this:%O", this)
-            return React.createElement(route.component,route.passProps)
-          }}
-          />)}
-      else{
-        return (
-          <NavigatorIOS
-              {...this.props}
-              ref="nav"
-          />)
-      }
-    }
-  });
-
   let SearchView$ = state$.booksWithStatus$
                           .startWith(MOCKED_MOVIES_DATA)
                           .map(i =>
-                            <MyNavigator
+                            <GiftedNavigator
                                 initialRoute = {{
                                     component:SearchScreen,
                                     title: 'search',
@@ -151,20 +101,15 @@ function main({RN, HTTP}) {
                                     {state$: state$, actions$: actions}
                                   }}
                                 navigatorDidMount = {(nav) => {
-                                    console.log("nav this:%O", this);
-                                    console.log("nav ref2:%O", nav);
+                                    //console.log("nav this:%O", this);
                                     RouteMapper(nav);
-                                    //console.log(this.refs);
-                                    //RouteMapper(this.refs.nav)
                                   }}
                             />
-                          )
-                          .do(i => console.log("nav elem:%O", i));
+                          );
 
   return {
     RN: SearchView$,//.merge(DetailView$),
     HTTP: state$.searchRequest$.merge(state$.statusRequest$),
-    //storage: storageRequest$
   };
 }
 
