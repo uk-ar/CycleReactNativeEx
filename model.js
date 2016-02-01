@@ -128,7 +128,43 @@ function model(actions){
                 title: 'detail',
                 component: BookScreen,
                 passProps: {url: url}
-              }))
+              }));
+
+  let inbox=[]
+  //load inbox
+  actions.inBoxStatus$.subscribe((i) => inbox = i);
+  /* var result = inbox.filter(inBoxBook => inBoxBook.isbn !== book.isbn);
+     console.log("result1:%O", result);
+     result.unshift(book);
+     console.log("result2:%O", result);
+     return result; */
+  //.do(i => console.log("addInbox$:%O", i))
+  actions.addInbox$.map(book =>
+    [book].concat(
+      inbox.filter(inBoxBook =>
+        inBoxBook.isbn !== book.isbn)
+    )).subscribe((books) => inbox = books);
+
+  actions.removeInbox$.map(book =>
+    inbox.filter(inBoxBook =>
+      inBoxBook.isbn !== book.isbn)
+  ).subscribe((books) => inbox = books);
+
+  //Rx.Observable.fromPromise(AsyncStorage.removeItem(STORAGE_KEY)).subscribe()
+  let inbox$ = actions.inBoxStatus$
+                      .merge(actions.addInbox$)
+                      .merge(actions.removeInbox$)
+    //TODO:save
+                      .map((i) => inbox)
+                      .do(i => console.log("Inbox$:%O", i))
+                      //.share();
+  //actions.inBoxStatus$.subscribe(inbox$);
+    inbox$.subscribe(e => {
+      return Rx.Observable
+               .fromPromise(
+                 AsyncStorage.setItem(STORAGE_KEY,JSON.stringify(inbox)))
+    })
+
 
   return{
     searchRequest$: searchRequest$,//request$
@@ -136,7 +172,8 @@ function model(actions){
     booksWithStatus$: booksWithStatus$,
     navigator$: navigator$,
     navigatorPopRequest$: navigatorPopRequest$,
-    navigatorPushRequest$: navigatorPushRequest$
+    navigatorPushRequest$: navigatorPushRequest$,
+    inbox$:inbox$
   }
 }
 

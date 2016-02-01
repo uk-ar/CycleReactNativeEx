@@ -5,15 +5,6 @@ var GiftedSpinner = require('react-native-gifted-spinner');
 var Emoji = require('react-native-emoji');
 var Swipeout = require('react-native-swipeout');
 
-var swipeoutBtns = [
-  {
-    //text: 'Button',
-    text: '読みたい',
-    onPress: (e) => console.log("action:%O", e)
-  }
-]
-//Press event to driver or event emitter
-
 var {
   ActivityIndicatorIOS,
   ListView,
@@ -91,49 +82,61 @@ var LibraryStatus = React.createClass({
   },
 });
 
-function renderMovieCell(movie, sectionID, rowID, highlightRowFunc) {
+var MovieCell = React.createClass({
+  render: function(){
+    var movie=this.props.movie;
   var TouchableElement = TouchableHighlight;
   if (Platform.OS === 'android') {
     TouchableElement = TouchableNativeFeedback;
   }
-  {/* onShowUnderlay={()=>highlightRowFunc(sectionID, rowID)}
-      onHideUnderlay={highlightRowFunc(null, null)} */}
-  // control hide or show with filter
-  /*
-     Conflict with TouchableElement?
-   */
-  //        onPress={(e) => console.log("cell action:%O", e)}
+  var swipeoutBtns = [
+    {
+      text: '読みたい',
+      onPress: () => {
+        this.props.actions$.addInbox$.onNext(movie);
+        console.log("add:%O", movie);
+      }
+    },
+    {
+      text: '削除',
+      onPress: () => {
+        this.props.actions$.removeInbox$.onNext(movie);
+        console.log("remove:%O", movie);
+      }
+    }
+  ]
   return(
     <CycleView key = "cell">
-    <Swipeout
-        left={swipeoutBtns}
-        close={true}
-        autoClose={true}
-    >
-    <TouchableElement
-        selector="cell"
-        item={movie}
-        onPress={(e) => console.log("cell action:%O", e)}
-    >
-      <View style={styles.row}>
-        <Image
-            source={{uri: movie.thumbnail}}
-            style={styles.cellImage}
-        />
-        <View style={styles.textContainer}>
-          <Text style={styles.movieTitle} numberOfLines={2}>
-            {movie.title}
-          </Text>
-          <Text style={styles.movieYear} numberOfLines={1}>
-            {movie.author}
-          </Text>
-          <LibraryStatus libraryStatus={movie.libraryStatus}/>
-        </View>
-      </View>
-    </TouchableElement>
-    </Swipeout>
+      <Swipeout
+          left={swipeoutBtns}
+          close={true}
+          autoClose={true}
+      >
+        <TouchableElement
+            selector="cell"
+            item={movie}
+            onPress={(e) => console.log("cell action:%O", e)}
+        >
+          <View style={styles.row}>
+            <Image
+                source={{uri: movie.thumbnail}}
+                style={styles.cellImage}
+            />
+            <View style={styles.textContainer}>
+              <Text style={styles.movieTitle} numberOfLines={2}>
+                {movie.title}
+              </Text>
+              <Text style={styles.movieYear} numberOfLines={1}>
+                {movie.author}
+              </Text>
+              <LibraryStatus libraryStatus={movie.libraryStatus}/>
+            </View>
+          </View>
+        </TouchableElement>
+      </Swipeout>
     </CycleView>
   )}
+})
 
 var IS_RIPPLE_EFFECT_SUPPORTED = Platform.Version >= 21;
 
@@ -196,7 +199,8 @@ var InBoxScreen = React.createClass({
       <CycleView style={styles.container}
                  key = "InBoxScreen">
         <BookListView
-            dataSource$={this.props.state$.inbox}
+            dataSource$={this.props.state$.inbox$}
+            actions$={this.props.actions$}
         />
       </CycleView>
     )
@@ -218,15 +222,19 @@ var BookListView = React.createClass({
                       {title: '読みたい', show: 'always'}]}
           //icon: require('./icon_settings.png'),
           style={styles.toolbar}
+          selector = "toolbar"
           //onActionSelected={this.onActionSelected}
       />
     )
     return(
-      <View style = {styles.container}>
+      <CycleView style = {styles.container}>
       <ListView
           ref="listview"
           dataSource = {dataSource.cloneWithRows(this.state.dataSource)}
-          renderRow ={generateCycleRender(renderMovieCell)}
+          renderRow ={(movie, sectionID, rowID, highlightRowFunc) =>
+            <MovieCell
+                movie={movie}
+                actions$={this.props.actions$}/>}
           automaticallyAdjustContentInsets={false}
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps={true}
@@ -237,7 +245,7 @@ var BookListView = React.createClass({
         <Icon.Button name = "filter" selector = "filter"/>
         <Icon.Button name = "sort" selector = "sort"/>
       </View>
-      </View>
+      </CycleView>
     )
   },
   componentWillMount(){
@@ -258,6 +266,7 @@ var SearchScreen = React.createClass({
             key = "searchBar"/>
         <View style={styles.separator} />
         <BookListView dataSource$={this.props.state$.booksWithStatus$}
+                      actions$={this.props.actions$}
         />
       </CycleView>
     )
@@ -376,4 +385,4 @@ var styles = StyleSheet.create({
   },
 });
 
-module.exports = SearchScreen;
+module.exports = {SearchScreen,InBoxScreen};

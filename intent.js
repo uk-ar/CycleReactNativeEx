@@ -35,6 +35,11 @@ var {
 function intent({RN, HTTP}){
   //Actions
   return{
+    changeScene$: RN.select('toolbar').events('actionSelected')
+                    .map(i=> i.args)
+      ,
+    addInbox$:new Rx.Subject(),
+    removeInbox$:new Rx.Subject(),
     navigatorBackPress$: RN.select('back').events('iconClicked'),
     openBook$: RN.select('cell').events('press')
                  .map(i => i.currentTarget.props.item)

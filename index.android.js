@@ -41,7 +41,7 @@ var {
   AsyncStorage
 } = React;
 
-var SearchScreen = require('./SearchScreen');
+let {SearchScreen,InBoxScreen} = require('./SearchScreen');
 
 var intent = require('./intent');
 var model = require('./model');
@@ -52,7 +52,7 @@ function main({RN, HTTP}) {
 
   //ぐりとぐら
   //FIXME:Change navigator to stream
-
+  //actions.openBook$.subscribe()
   //0192521722
   //qwerty
   const storageRequest$ = actions
@@ -76,13 +76,31 @@ function main({RN, HTTP}) {
             return Rx.Observable.fromPromise(AsyncStorage.setItem(STORAGE_KEY,JSON.stringify(inbox)))
           })
           //.do(i => console.log("storage set:%O", i))
-          //.subscribe();
+    //.subscribe();
+    
     actions.sortState$
           .flatMap(e => Rx.Observable.fromPromise(AsyncStorage.getItem(STORAGE_KEY)))
           .map(i => JSON.parse(i))
           .do(i => console.log("storage:%O", i))
           .subscribe();
 
+  let navigatorReplaceRequest$ =
+  actions.changeScene$
+         .map(index =>{
+           if(index==0){
+             return ({
+               component:SearchScreen,
+               title: 'search',
+               passProps: {state$: state$, actions$: actions}
+             })
+           }else if(index==1){
+             return ({
+               component:InBoxScreen,
+               title: 'inbox',
+               passProps: {state$: state$, actions$: actions}
+             })
+           }
+         });
   // for android action
   var RouteMapper = function(navigator) {
     state$.navigator$.onNext(navigator);
@@ -91,6 +109,8 @@ function main({RN, HTTP}) {
           .subscribe((route) => navigator.push(route));
     state$.navigatorPopRequest$
           .subscribe((_)=>navigator.pop());//need to use canPop?
+    navigatorReplaceRequest$.subscribe((route) =>
+      navigator.replace(route));
   }
 
   var MyNavigator = React.createClass({
@@ -127,7 +147,8 @@ function main({RN, HTTP}) {
                                 initialRoute = {{
                                     component:SearchScreen,
                                     title: 'search',
-                                    passProps: {state$: state$}
+                                    passProps:
+                                    {state$: state$, actions$: actions}
                                   }}
                                 navigatorDidMount = {(nav) => {
                                     console.log("nav this:%O", this);
