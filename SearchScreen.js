@@ -410,7 +410,8 @@ var styles = StyleSheet.create({
   },
   toolbarButton:{
     //width: 50,            //Step 2
-    textAlign:'center'
+    textAlign:'center',
+    flex:1                //Step 3
   },
   toolbarTitle:{
     //alignItems: 'center',
