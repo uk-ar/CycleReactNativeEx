@@ -4,6 +4,7 @@ var Icon = require('react-native-vector-icons/FontAwesome');
 var GiftedSpinner = require('react-native-gifted-spinner');
 var Emoji = require('react-native-emoji');
 var Swipeout = require('react-native-swipeout');
+import { SegmentedControls } from 'react-native-radio-buttons'
 
 var {
   ActivityIndicatorIOS,
@@ -86,6 +87,9 @@ var LibraryStatus = React.createClass({
     }else{
       return (
         <View style = {[styles.rating, styles.row]}>
+          <Text>
+            {"蔵書確認中"}
+          </Text>
           <GiftedSpinner />
         </View>
       )
@@ -178,10 +182,12 @@ var dataSource = new ListView.DataSource({
 var BookListView = React.createClass({
   getInitialState(){
     return {
-      dataSource:[]
+      dataSource:[],
+      selectedOption:null
     }
   },
   render() {
+    //https://facebook.github.io/react-native/docs/toolbarandroid.html
     let MyToolbar = (
       <ToolbarAndroid
           //logo={require('./app_logo.png')}
@@ -193,9 +199,20 @@ var BookListView = React.createClass({
           selector = "toolbar"
           //onActionSelected={this.onActionSelected}
       />
-    )
+    );
+    const options = [
+      'Paid',
+      'Free',
+      'Top grossing',
+    ];
+    function setSelectedOption(selectedOption){
+      this.setState({
+        selectedOption:selectedOption
+      });
+    };
+    //CycleView has not pass key props? bind this?
     return(
-      <CycleView style = {styles.container}>
+      <CycleView style = {styles.container} key="listview">
       <ListView
           ref="listview"
           dataSource = {dataSource.cloneWithRows(this.state.dataSource)}
@@ -209,12 +226,30 @@ var BookListView = React.createClass({
           showsVerticalScrollIndicator={false}
       />
       {MyToolbar}
-      <View style = {styles.row}>
-        <Icon.Button name = "filter" selector = "filter"/>
-        <Icon.Button name = "sort" selector = "sort"/>
-      </View>
+            <View style = {styles.row}>
+              <Icon name = "filter" selector = "filter1"
+                    size = {20}
+                    color = "#007AFF"
+                    style={styles.toolbarButton}
+              />
+              <SegmentedControls
+                  options={ options }
+                  style = {styles.toolbarTitle}
+              />
+              <Text style={styles.toolbarButton}>Like</Text>
+            </View>
       </CycleView>
     )
+    {/*
+        onSelection={ setSelectedOption.bind(this) }
+        selectedOption={ this.state.selectedOption }
+        <Icon.Button name = "filter" selector = "filter"
+        style = {styles.icon}/>
+        <Icon.Button name = "sort" selector = "sort"
+        style = {styles.icon}/>
+
+
+      */}
   },
   componentWillMount(){
     this.subscription = this.props.dataSource$.subscribe((dataSource) =>
@@ -234,6 +269,7 @@ var InBoxScreen = React.createClass({
         <BookListView
             dataSource$={this.props.state$.inbox$}
             actions$={this.props.actions$}
+            key = "inboxlistview"
         />
       </CycleView>
     )
@@ -244,6 +280,26 @@ var InBoxScreen = React.createClass({
 var SearchBar = require('./SearchBar');
 
 var SearchScreen = React.createClass({
+  getInitialState(){
+    return {
+      isLoading:false,
+      isLoadingTail:false,
+      //support pagenation
+      //https://github.com/facebook/react-native/blob/master/Examples/Movies/SearchScreen.js#L81
+      //http://stackoverflow.com/questions/27514310/turning-paginated-requests-into-an-observable-stream-with-rxjs
+    }
+  },
+  componentWillMount(){
+    this.subscription = this.props.state$.searchRequest$.map((_)=> true)
+                            .merge(
+                              this.props.actions$.books$.map((_)=>false))
+                            .subscribe((isLoading) =>
+                              this.setState({isLoading:isLoading})
+                            )
+  },
+  componentWillUnmount(){
+    this.subscription.dispose()
+  },
   render: function() {
     //isLoading={this.state.isLoading}
     //onSearchChange={this.onSearchChange}
@@ -251,18 +307,17 @@ var SearchScreen = React.createClass({
       <CycleView style={styles.container}
                  key = "searchScreen">
         <SearchBar
-            key = "searchBar"/>
+            key="searchBar"
+            isLoading={this.state.isLoading}
+        />
         <View style={styles.separator} />
         <BookListView dataSource$={this.props.state$.booksWithStatus$}
                       actions$={this.props.actions$}
+                      key = "searchlistview"
         />
       </CycleView>
     )
-      ////<Icon.Button name="facebook" backgroundColor="#3b5998">
   }
-  /* componentWillReceiveProps: function(nextProps){
-     console.log("recieve props:%O", nextProps)
-     } */
   //https://github.com/facebook/react-native/blob/master/Examples/Movies/SearchScreen.js
 });
 
@@ -329,7 +384,7 @@ var styles = StyleSheet.create({
     fontSize: 12,
   },
   row: {
-    alignItems: 'center',
+    //alignItems: 'center',
     backgroundColor: 'white',
     flexDirection: 'row',
     padding: 5,
@@ -345,6 +400,23 @@ var styles = StyleSheet.create({
     // Trick to get the thinest line the device can display
     height: 1 / PixelRatio.get(),
     marginLeft: 4,
+  },
+  segmented:{
+    flex: 1,
+    backgroundColor: 'black',
+  },
+  icon:{
+    //width: 50
+  },
+  toolbarButton:{
+    //width: 50,            //Step 2
+    textAlign:'center'
+  },
+  toolbarTitle:{
+    //alignItems: 'center',
+    textAlign:'center',
+    fontWeight:'bold',
+    flex:1                //Step 3
   },
 });
 

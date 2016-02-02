@@ -6,14 +6,22 @@ var {
   TextInput,
   StyleSheet,
   View,
+  Image,
 } = React;
 
 let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
 
 var SearchBar = React.createClass({
   render: function() {
+    //there is a search for ios
+    //https://github.com/umhan35/react-native-search-bar
+    //TODO:Add Icon
     return (
       <CycleView style = {styles.searchBar} key = "search">
+        <Image
+            source={require('image!android_search_white')}
+            style={styles.icon}
+        />
         <TextInput
             autoCapitalize="none"
             autoCorrect={false}
@@ -34,6 +42,8 @@ var SearchBar = React.createClass({
 
 var styles = StyleSheet.create({
   searchBar: {
+    //mergin for status bar?
+    //statusBarFrame.size.height
     marginTop: 64,
     padding: 3,
     paddingLeft: 8,
@@ -47,6 +57,11 @@ var styles = StyleSheet.create({
   },
   spinner: {
     width: 30,
+  },
+  icon: {
+    width: 24,
+    height: 24,
+    marginHorizontal: 8,
   },
 });
 
