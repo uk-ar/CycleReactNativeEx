@@ -211,6 +211,7 @@ var BookListView = React.createClass({
       });
     };
     //CycleView has not pass key props? bind this?
+    //augmentVTreeWithHandlers seems to have problem
     return(
       <CycleView style = {styles.container} key="listview">
       <ListView
@@ -234,13 +235,14 @@ var BookListView = React.createClass({
               />
               <SegmentedControls
                   options={ options }
-                  style = {styles.toolbarTitle}
+                  
               />
               <Text style={styles.toolbarButton}>Like</Text>
             </View>
       </CycleView>
     )
     {/*
+        style = {styles.toolbarTitle}
         onSelection={ setSelectedOption.bind(this) }
         selectedOption={ this.state.selectedOption }
         <Icon.Button name = "filter" selector = "filter"

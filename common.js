@@ -31,10 +31,29 @@ var MOCKED_MOVIES_DATA = [
   //size 200x200 largeImageUrl 64x64
 ];
 
+var EventEmitter = require('EventEmitter');
+let Rx = require('rx');
+
+function makeEventEmitterDriver(){
+  var eventEmitter =new EventEmitter();
+  return function eventEmitterDriver(outgoing$){
+    outgoing$.subscribe(outgoing =>
+      eventEmitter.emit(outgoing.event,outgoing.args))
+      //event is string
+      //args is array
+      return{
+        events: function events(event) {
+          return Rx.Observable.fromEvent(eventEmitter,event)
+        }
+      }
+  }
+}
+
 module.exports = {
   STORAGE_KEY,
   RAKUTEN_SEARCH_API,
   LIBRARY_ID,
   CALIL_STATUS_API,
   MOCKED_MOVIES_DATA,
+  makeEventEmitterDriver,
 }
