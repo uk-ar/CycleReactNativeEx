@@ -201,9 +201,9 @@ var BookListView = React.createClass({
       />
     );
     const options = [
-      'Paid',
-      'Free',
-      'Top grossing',
+      '検索',
+      '読みたい',
+      '読んだ',
     ];
     function setSelectedOption(selectedOption){
       this.setState({
@@ -228,14 +228,15 @@ var BookListView = React.createClass({
       />
       {MyToolbar}
             <View style = {styles.row}>
-              <Icon name = "filter" selector = "filter1"
+              <Icon name = "filter"
+                    selector = "filter"
                     size = {20}
                     color = "#007AFF"
                     style={styles.toolbarButton}
               />
               <SegmentedControls
                   options={ options }
-                  
+                  selector = "segmented"
               />
               <Text style={styles.toolbarButton}>Like</Text>
             </View>

@@ -41,6 +41,10 @@ function intent({RN, HTTP}){
     addInbox$:new Rx.Subject(),
     removeInbox$:new Rx.Subject(),
     navigatorBackPress$: RN.select('back').events('iconClicked'),
+    selectScene$: RN.select('segmented').events('selection')
+                    .map(e => e.args)
+                    .do(i => console.log("select press:%O", i))
+                    .subscribe(),
     openBook$: RN.select('cell').events('press')
                  .map(i => i.currentTarget.props.item)
                  .do(i => console.log("cell press:%O", i)),

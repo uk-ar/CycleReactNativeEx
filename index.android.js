@@ -64,6 +64,7 @@ function main({RN, HTTP, EE}) {
          .do(i => console.log("storage:%O", i))
          .subscribe();
 
+  let sinks = new Rx.ReplaySubject();
   // for android action
   let navigatorReplaceRequest$ =
   actions.changeScene$
@@ -72,8 +73,9 @@ function main({RN, HTTP, EE}) {
              return ({
                component:SearchScreen,
                title: 'search',
-               passProps: {state$: state$, actions$: actions}
-             })
+               passProps:
+               {state$: state$, actions$: actions, sinks: sinks}
+             })//add source$?
            }else if(index==1){
              return ({
                component:InBoxScreen,
@@ -136,7 +138,8 @@ function main({RN, HTTP, EE}) {
                                     component:SearchScreen,
                                     title: 'search',
                                     passProps:
-                                    {state$: state$, actions$: actions}
+                                    {state$: state$, actions$: actions,
+                                     sinks: sinks}
                                   }}
                                 navigatorDidMount = {(nav) => {
                                     //console.log("nav this:%O", this);
@@ -144,11 +147,13 @@ function main({RN, HTTP, EE}) {
                                   }}
                             />
                           );
-
+  sinks.onNext({event: "foo",args:{bar:"baz"}});
   return {
     RN: SearchView$,//.merge(DetailView$),
     HTTP: state$.searchRequest$.merge(state$.statusRequest$),
-    EE: Rx.Observable.just({event: "foo",args:{bar:"baz"}}),
+    EE: sinks,
+    //
+    //sinks.onNext({event: "foo",args:{bar:"baz"}}),
   };
 }
 
