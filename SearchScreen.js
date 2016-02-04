@@ -232,17 +232,18 @@ var BookListView = React.createClass({
                     selector = "filter"
                     size = {20}
                     color = "#007AFF"
-                    style={styles.toolbarButton}
               />
               <SegmentedControls
                   options={ options }
                   selector = "segmented"
+                  style={styles.toolbarButton}
               />
-              <Text style={styles.toolbarButton}>Like</Text>
+              <Text>Like</Text>
             </View>
       </CycleView>
     )
     {/*
+        style={styles.toolbarButton}
         style = {styles.toolbarTitle}
         onSelection={ setSelectedOption.bind(this) }
         selectedOption={ this.state.selectedOption }
@@ -413,7 +414,7 @@ var styles = StyleSheet.create({
   },
   toolbarButton:{
     //width: 50,            //Step 2
-    textAlign:'center',
+    //textAlign:'center',
     flex:1                //Step 3
   },
   toolbarTitle:{
