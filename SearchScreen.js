@@ -1,10 +1,11 @@
 var React = require('react-native');
 let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
-var Icon = require('react-native-vector-icons/FontAwesome');
+var FAIcon = require('react-native-vector-icons/FontAwesome');
+var MIcon = require('react-native-vector-icons/MaterialIcons');
 var GiftedSpinner = require('react-native-gifted-spinner');
 var Emoji = require('react-native-emoji');
 var Swipeout = require('react-native-swipeout');
-import { SegmentedControls } from 'react-native-radio-buttons'
+import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
 
 var {
   ActivityIndicatorIOS,
@@ -203,12 +204,22 @@ var BookListView = React.createClass({
     const options = [
       '検索',
       '読みたい',
-      '読んだ',
+      //'読んだ',
     ];
     function setSelectedOption(selectedOption){
       this.setState({
         selectedOption:selectedOption
       });
+    };
+    const normalStyle = {
+      color: 'white',
+      marginHorizontal: 5
+    };
+
+    const selectedStyle = {
+      color: '#007AFF',//'rgba(0,0,0,1)',//baseColor,
+      //fontWeight: 'bold'
+      marginHorizontal: 5
     };
     //CycleView has not pass key props? bind this?
     //augmentVTreeWithHandlers seems to have problem
@@ -227,22 +238,30 @@ var BookListView = React.createClass({
           showsVerticalScrollIndicator={false}
       />
       {MyToolbar}
-            <View style = {styles.row}>
-              <Icon name = "filter"
+            <View style = {[styles.row,
+                            { justifyContent: "space-between",
+                              alignItems: "center"}]}>
+              <FAIcon name = "filter"
                     selector = "filter"
-                    size = {20}
+                    size = {25}
                     color = "#007AFF"
+                    style={{marginHorizontal: 8}}
               />
               <SegmentedControls
                   options={ options }
                   selector = "segmented"
                   style={styles.toolbarButton}
+                  renderOption={(option,selected)=>{
+                      return <Text allowFontScaling={true} style={selected ? normalStyle : selectedStyle}>{option}</Text>
+                  }}
               />
               <Text>Like</Text>
             </View>
       </CycleView>
     )
     {/*
+        <Text allowFontScaling={scaleFont} style={style}>{label}</Text>}
+        renderOption={RadioButtons.getTextOptionRenderer(normalStyle, selectedStyle, (i) => i)}
         style={styles.toolbarButton}
         style = {styles.toolbarTitle}
         onSelection={ setSelectedOption.bind(this) }

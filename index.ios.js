@@ -46,23 +46,24 @@ function main({RN, HTTP}) {
   const actions = intent({RN:RN, HTTP:HTTP});
   const state$ = model(actions);
 
-  /* let navigatorReplaceRequest$ =
-     actions.changeScene$
-     .map(index =>{
-     if(index==0){
-     return ({
-     component:SearchScreen,
-     title: 'search',
-     passProps: {state$: state$, actions$: actions}
-     })
-     }else if(index==1){
-     return ({
-     component:InBoxScreen,
-     title: 'inbox',
-     passProps: {state$: state$, actions$: actions}
-     })
-     }
-     }); */
+  let navigatorReplaceRequest$ =
+  actions.selectScene$
+         .do(i => console.log("%O", i) )
+         .map(option =>{
+           if(option == "検索"){
+             return ({
+               component:SearchScreen,
+               title: 'search',
+               passProps: {state$: state$, actions$: actions}
+             })
+           }else if(option == "読みたい"){
+             return ({
+               component:InBoxScreen,
+               title: 'inbox',
+               passProps: {state$: state$, actions$: actions}
+             })
+           }
+         });
 
   var RouteMapper = function(navigator) {
     state$.navigator$.onNext(navigator);
@@ -71,8 +72,10 @@ function main({RN, HTTP}) {
           .subscribe((route) => navigator.push(route));
     state$.navigatorPopRequest$
           .subscribe((_)=>navigator.pop());//need to use canPop?
-    /* navigatorReplaceRequest$.subscribe((route) =>
-       navigator.replace(route)); */
+    navigatorReplaceRequest$.subscribe((route) =>
+      navigator.replace(route)
+      //console.log("%O", route)
+    );
   }
 
   let SearchView$ = state$.booksWithStatus$

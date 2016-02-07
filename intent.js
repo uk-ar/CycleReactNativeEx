@@ -44,7 +44,8 @@ function intent({RN, HTTP}){
     selectScene$: RN.select('segmented').events('selection')
                     .map(e => e.args)
                     .do(i => console.log("select press:%O", i))
-                    .subscribe(),
+                    //.subscribe()
+      ,
     openBook$: RN.select('cell').events('press')
                  .map(i => i.currentTarget.props.item)
                  .do(i => console.log("cell press:%O", i)),
