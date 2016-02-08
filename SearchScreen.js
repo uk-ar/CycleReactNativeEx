@@ -143,17 +143,22 @@ var MovieCell = React.createClass({
     }
   ]
     //conflict with cell action open state & update
-    /* <Swipeout
-       left={swipeoutBtns}
-       close={true}
-       autoClose={true}
-       >
-       </Swipeout>
+    /*
        onPress={(e) => console.log("cell action:%O", e)}
        key="cell"
+       close={true}
+       onOpen = {(sectionID, rowID) =>
+       this.props.handleSwipeout(sectionID, rowID)}
      */
   return(
     <CycleView>
+      <Swipeout
+          selector="swipeout"
+          left={swipeoutBtns}
+          close={!movie.active}
+          rowID = {this.props.rowID}
+          autoClose={true}
+      >
       <TouchableElement
           selector="cell"
           item={movie}
@@ -174,6 +179,7 @@ var MovieCell = React.createClass({
           </View>
         </View>
       </TouchableElement>
+      </Swipeout>
     </CycleView>
   )}
 })
@@ -214,7 +220,10 @@ var BookListView = React.createClass({
           renderRow ={(movie, sectionID, rowID, highlightRowFunc) =>
             <MovieCell
                 movie={movie}
-                actions$={this.props.actions$}/>}
+                actions$={this.props.actions$}
+                rowID={rowID}
+                sectionID = {sectionID}
+                            />}
           automaticallyAdjustContentInsets={false}
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps={true}

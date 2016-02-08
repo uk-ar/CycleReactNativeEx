@@ -55,6 +55,12 @@ function intent({RN, HTTP}){
                  .map(i => i.currentTarget.props.item)
                  .do(i => console.log("cell press:%O", i))
       ,
+    openSwipe$: RN.select('swipeout').events('open')
+                  .map(i => i.args[1])
+                  .map(i => parseInt(i, 10))
+                  .do(i => console.log("swipe open:%O", i))
+                  //.subscribe()
+      ,
     inBoxStatus$: Rx.Observable
                     .fromPromise(AsyncStorage.getItem(STORAGE_KEY))
                     .map(i => i ? JSON.parse(i) : [])

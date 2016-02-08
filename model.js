@@ -88,6 +88,13 @@ function model(actions){
         !book.libraryStatus || book.libraryStatus.exist) : books
       //TODO:case for book.libraryStatus is undefined
     })
+    .combineLatest(actions.openSwipe$.startWith(1), (books,rowID) => {
+      for (var i = 0; i < books.length; i++) {
+        if (i != rowID) books[i].active = false
+        else books[i].active = true
+      }
+      return books;
+    })
     .share();
 
   let navigatorPushRequest$ = actions
