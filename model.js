@@ -9,6 +9,7 @@ let {makeHTTPDriver} = require('@cycle/http');
 
 var Icon = require('react-native-vector-icons/FontAwesome');
 var BookScreen = require('./BookScreen');
+let {SearchScreen, InBoxScreen, GiftedNavigator} = require('./SearchScreen');
 
 let {
   STORAGE_KEY,
@@ -88,30 +89,6 @@ function model(actions){
       //TODO:case for book.libraryStatus is undefined
     })
     .share();
-  // for android action
-  function canPop(navigator){
-    return (navigator && navigator.getCurrentRoutes().length > 1)
-  }
-  let navigatorPopRequest$;
-  let navigator$ = new Rx.Subject();
-  if (Platform.OS === 'android') {
-    let _navigator;
-    navigator$.subscribe((navigator) => {
-      _navigator = navigator;
-      console.log("nav mount2")
-    });
-    let hardwareBackPress$ = Rx.Observable.create((observer)=> {
-      BackAndroid.addEventListener('hardwareBackPress', () =>{
-        observer.onNext('hardwareBackPress');
-        console.log("can pop?")
-          return canPop(_navigator);
-      });
-    });
-    navigatorPopRequest$ = hardwareBackPress$
-        .merge(actions.navigatorBackPress$);
-  }else{
-    navigatorPopRequest$ = actions.navigatorBackPress$;
-  }
 
   let navigatorPushRequest$ = actions
               .openBook$
@@ -129,6 +106,31 @@ function model(actions){
                 component: BookScreen,
                 passProps: {url: url}
               }));
+
+  // for android action
+  function canPop(navigator){
+    return (navigator && navigator.getCurrentRoutes().length > 1)
+  }
+  let navigatorPopRequest$;
+  //let navigator$ = new Rx.Subject();
+  if (Platform.OS === 'android') {
+    let _navigator;
+    actions.navigatorMounted$.subscribe((navigator) => {
+      _navigator = navigator;
+      console.log("nav mount2")
+    });
+    let hardwareBackPress$ = Rx.Observable.create((observer)=> {
+      BackAndroid.addEventListener('hardwareBackPress', () =>{
+        observer.onNext('hardwareBackPress');
+        console.log("can pop?");
+        return canPop(_navigator);
+      });
+    });
+    navigatorPopRequest$ = hardwareBackPress$
+        .merge(actions.navigatorBackPress$);
+  }else{
+    navigatorPopRequest$ = actions.navigatorBackPress$;
+  }
 
   let inbox=[]
   //load inbox
@@ -157,24 +159,53 @@ function model(actions){
     //TODO:save
                       .map((i) => inbox)
                       .do(i => console.log("Inbox$:%O", i))
-                      //.share();
-  //actions.inBoxStatus$.subscribe(inbox$);
+    //.share();
+    //actions.inBoxStatus$.subscribe(inbox$);
     inbox$.subscribe(e => {
       return Rx.Observable
                .fromPromise(
                  AsyncStorage.setItem(STORAGE_KEY,JSON.stringify(inbox)))
-    })
+    });
 
-
-  return{
+  var state$ = {
     searchRequest$: searchRequest$,//request$
     statusRequest$: statusRequest$,
     booksWithStatus$: booksWithStatus$,
-    navigator$: navigator$,
-    navigatorPopRequest$: navigatorPopRequest$,
-    navigatorPushRequest$: navigatorPushRequest$,
     inbox$:inbox$
   }
+
+  let navigatorReplaceRequest$ =
+  actions.selectScene$
+         .do(i => console.log("nav rep:%O", i) )
+         .map(option =>{
+           if(option == "検索"){
+             return ({
+               component:SearchScreen,
+               title: 'search',
+               passProps: {state$: state$, actions$: actions}
+             })
+           }else if(option == "読みたい"){
+             return ({
+               component:InBoxScreen,
+               title: 'inbox',
+               passProps: {state$: state$, actions$: actions}
+             })
+           }
+         });
+  //push & pop is Destructive operations
+  let navigator;
+  navigatorPushRequest$
+     .subscribe((route) => navigator.push(route));
+  navigatorPopRequest$
+        .subscribe((_)=>navigator.pop());//need to use canPop?
+  navigatorReplaceRequest$
+        .subscribe((route) => navigator.replace(route));
+
+  actions.navigatorMounted$.subscribe((nav) => {
+    navigator = nav;
+  });
+
+  return state$
 }
 
 module.exports = model;

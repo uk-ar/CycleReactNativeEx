@@ -49,6 +49,40 @@ function makeEventEmitterDriver(){
   }
 }
 
+/* function CycleCompo(source,func){
+     //var value$
+     var compo = React.createClass({
+     getInitialState:function(){
+     return{
+     vtree:React.createElement(View),
+     }
+     source.props$.subscribe(
+     setState{
+     vtree:
+     }) */
+          //func() can use this.props & this.props$
+  //func() returns DOM & value
+  //then subscribe DOM & setstate
+  //and subscribe value & onNext
+          //call func
+          /* const sinks = {
+             compo:compo
+             DOM: vtree,
+             value$,
+             };
+             return sinks; */
+  /* },
+     render():{
+     return this.state.vtree
+     }
+     //func can
+     });
+     return compo
+     }; */
+  /* CycleCompo1 = CycleCompo(source) */
+  /* render=CycleCompo1.DOM */
+  /* FooView=CycleCompo1.Compo */
+
 module.exports = {
   STORAGE_KEY,
   RAKUTEN_SEARCH_API,

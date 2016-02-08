@@ -32,7 +32,7 @@ var GiftedNavigator = React.createClass({
     //console.log("nav this:%O", this);
     //var navigatorDidMount = this.props.navigatorDidMount.bind(this);
     //navigatorDidMount(this.refs.nav);
-    this.props.navigatorDidMount.call({},this.refs.nav);
+    this.props.onNavigatorMounted.call({},this.refs.nav);
   },
   render: function() {
     if (Platform.OS === 'android') {
@@ -122,7 +122,7 @@ var LibraryStatus = React.createClass({
 var MovieCell = React.createClass({
   render: function(){
     var movie=this.props.movie;
-  var TouchableElement = TouchableHighlight;
+    var TouchableElement = TouchableHighlight;
   if (Platform.OS === 'android') {
     TouchableElement = TouchableNativeFeedback;
   }
@@ -143,35 +143,37 @@ var MovieCell = React.createClass({
     }
   ]
     //conflict with cell action open state & update
+    /* <Swipeout
+       left={swipeoutBtns}
+       close={true}
+       autoClose={true}
+       >
+       </Swipeout>
+       onPress={(e) => console.log("cell action:%O", e)}
+       key="cell"
+     */
   return(
-    <CycleView key = "cell">
-      <Swipeout
-          left={swipeoutBtns}
-          close={true}
-          autoClose={true}
+    <CycleView>
+      <TouchableElement
+          selector="cell"
+          item={movie}
       >
-        <TouchableElement
-            selector="cell"
-            item={movie}
-            onPress={(e) => console.log("cell action:%O", e)}
-        >
-          <View style={styles.row}>
-            <Image
-                source={{uri: movie.thumbnail}}
-                style={styles.cellImage}
-            />
-            <View style={styles.textContainer}>
-              <Text style={styles.movieTitle} numberOfLines={2}>
-                {movie.title}
-              </Text>
-              <Text style={styles.movieYear} numberOfLines={1}>
-                {movie.author}
-              </Text>
-              <LibraryStatus libraryStatus={movie.libraryStatus}/>
-            </View>
+        <View style={styles.row}>
+          <Image
+              source={{uri: movie.thumbnail}}
+              style={styles.cellImage}
+          />
+          <View style={styles.textContainer}>
+            <Text style={styles.movieTitle} numberOfLines={2}>
+              {movie.title}
+            </Text>
+            <Text style={styles.movieYear} numberOfLines={1}>
+              {movie.author}
+            </Text>
+            <LibraryStatus libraryStatus={movie.libraryStatus}/>
           </View>
-        </TouchableElement>
-      </Swipeout>
+        </View>
+      </TouchableElement>
     </CycleView>
   )}
 })
@@ -184,33 +186,14 @@ var BookListView = React.createClass({
   getInitialState(){
     return {
       dataSource:[],
-      selectedOption:null
     }
   },
   render() {
-    //https://facebook.github.io/react-native/docs/toolbarandroid.html
-    let MyToolbar = (
-      <ToolbarAndroid
-          //logo={require('./app_logo.png')}
-          title="AwesomeApp"
-          actions = {[{title: '検索', show: 'always'},
-                      {title: '読みたい', show: 'always'}]}
-          //icon: require('./icon_settings.png'),
-          style={styles.toolbar}
-          selector = "toolbar"
-          //onActionSelected={this.onActionSelected}
-      />
-    );
     const options = [
       '検索',
       '読みたい',
       //'読んだ',
     ];
-    function setSelectedOption(selectedOption){
-      this.setState({
-        selectedOption:selectedOption
-      });
-    };
     const normalStyle = {
       color: 'white',
       marginHorizontal: 5
@@ -237,7 +220,6 @@ var BookListView = React.createClass({
           keyboardShouldPersistTaps={true}
           showsVerticalScrollIndicator={false}
       />
-      {MyToolbar}
             <View style = {[styles.row,
                             { justifyContent: "space-between",
                               alignItems: "center"}]}>
@@ -253,7 +235,8 @@ var BookListView = React.createClass({
                   style={styles.toolbarButton}
                   renderOption={(option,selected)=>{
                       return <Text allowFontScaling={true} style={selected ? normalStyle : selectedStyle}>{option}</Text>
-                  }}
+                    }}
+                  selectedOption={this.props.selectedOption}
               />
               <Text>Like</Text>
             </View>
@@ -293,6 +276,7 @@ var InBoxScreen = React.createClass({
             dataSource$={this.props.state$.inbox$}
             actions$={this.props.actions$}
             key = "inboxlistview"
+            selectedOption='読みたい'
         />
       </CycleView>
     )
@@ -337,6 +321,7 @@ var SearchScreen = React.createClass({
         <BookListView dataSource$={this.props.state$.booksWithStatus$}
                       actions$={this.props.actions$}
                       key = "searchlistview"
+                      selectedOption='検索'
         />
       </CycleView>
     )

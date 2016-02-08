@@ -66,74 +66,12 @@ function main({RN, HTTP, EE}) {
 
   let sinks = new Rx.ReplaySubject();
   // for android action
-  let navigatorReplaceRequest$ =
-  actions.changeScene$
-         .map(index =>{
-           if(index==0){
-             return ({
-               component:SearchScreen,
-               title: 'search',
-               passProps:
-               {state$: state$, actions$: actions, sinks: sinks}
-             })//add source$?
-           }else if(index==1){
-             return ({
-               component:InBoxScreen,
-               title: 'inbox',
-               passProps: {state$: state$, actions$: actions}
-             })
-           }
-         });
-
-  var RouteMapper = function(navigator) {
-    state$.navigator$.onNext(navigator);
-    //push & pop is Destructive operations
-    state$.navigatorPushRequest$
-          .subscribe((route) => navigator.push(route));
-    state$.navigatorPopRequest$
-          .subscribe((_)=>navigator.pop());//need to use canPop?
-    navigatorReplaceRequest$.subscribe((route) =>
-      navigator.replace(route));
-  }
-
-  /* function CycleCompo(source,func){
-     //var value$
-     var compo = React.createClass({
-     getInitialState:function(){
-     return{
-     vtree:React.createElement(View),
-     }
-     source.props$.subscribe(
-     setState{
-     vtree:
-     }) */
-          //func() can use this.props & this.props$
-  //func() returns DOM & value
-  //then subscribe DOM & setstate
-  //and subscribe value & onNext
-          //call func
-          /* const sinks = {
-             compo:compo
-             DOM: vtree,
-             value$,
-             };
-             return sinks; */
-  /* },
-     render():{
-     return this.state.vtree
-     }
-     //func can
-     });
-     return compo
-     }; */
-  /* CycleCompo1 = CycleCompo(source) */
-  /* render=CycleCompo1.DOM */
-  /* FooView=CycleCompo1.Compo */
 
   let SearchView$ = state$.booksWithStatus$
                           .startWith(MOCKED_MOVIES_DATA)
                           .map(i =>
                             <GiftedNavigator
+                                selector="nav"
                                 initialRoute = {{
                                     component:SearchScreen,
                                     title: 'search',
@@ -141,12 +79,12 @@ function main({RN, HTTP, EE}) {
                                     {state$: state$, actions$: actions,
                                      sinks: sinks}
                                   }}
-                                navigatorDidMount = {(nav) => {
-                                    //console.log("nav this:%O", this);
-                                    RouteMapper(nav);
-                                  }}
                             />
                           );
+  /* onNavigatorMounted = {(nav) => {
+     console.log("nav mounted this:%O", this);
+     RouteMapper(nav);
+     }} */
   sinks.onNext({event: "foo",args:{bar:"baz"}});
   return {
     RN: SearchView$,//.merge(DetailView$),

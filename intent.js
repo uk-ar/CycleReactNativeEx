@@ -35,6 +35,12 @@ var {
 function intent({RN, HTTP}){
   //Actions
   return{
+    navigatorMounted$: RN.select('nav')
+                         .events('navigatorMounted')
+                         .map(i=> i.args[0])
+                         .do(i => console.log("nav on mount?:%O", i))
+                         //.subscribe()
+                         ,
     changeScene$: RN.select('toolbar').events('actionSelected')
                     .map(i=> i.args)
       ,
@@ -44,11 +50,11 @@ function intent({RN, HTTP}){
     selectScene$: RN.select('segmented').events('selection')
                     .map(e => e.args)
                     .do(i => console.log("select press:%O", i))
-                    //.subscribe()
       ,
     openBook$: RN.select('cell').events('press')
                  .map(i => i.currentTarget.props.item)
-                 .do(i => console.log("cell press:%O", i)),
+                 .do(i => console.log("cell press:%O", i))
+      ,
     inBoxStatus$: Rx.Observable
                     .fromPromise(AsyncStorage.getItem(STORAGE_KEY))
                     .map(i => i ? JSON.parse(i) : [])

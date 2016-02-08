@@ -46,25 +46,6 @@ function main({RN, HTTP}) {
   const actions = intent({RN:RN, HTTP:HTTP});
   const state$ = model(actions);
 
-  let navigatorReplaceRequest$ =
-  actions.selectScene$
-         .do(i => console.log("%O", i) )
-         .map(option =>{
-           if(option == "検索"){
-             return ({
-               component:SearchScreen,
-               title: 'search',
-               passProps: {state$: state$, actions$: actions}
-             })
-           }else if(option == "読みたい"){
-             return ({
-               component:InBoxScreen,
-               title: 'inbox',
-               passProps: {state$: state$, actions$: actions}
-             })
-           }
-         });
-
   var RouteMapper = function(navigator) {
     state$.navigator$.onNext(navigator);
     //push & pop is Destructive operations
@@ -72,7 +53,7 @@ function main({RN, HTTP}) {
           .subscribe((route) => navigator.push(route));
     state$.navigatorPopRequest$
           .subscribe((_)=>navigator.pop());//need to use canPop?
-    navigatorReplaceRequest$.subscribe((route) =>
+    state$.navigatorReplaceRequest$.subscribe((route) =>
       navigator.replace(route)
       //console.log("%O", route)
     );
@@ -88,7 +69,7 @@ function main({RN, HTTP}) {
                                     passProps:
                                     {state$: state$, actions$: actions}
                                   }}
-                                navigatorDidMount = {(nav) => {
+                                onNavigatorMounted = {(nav) => {
                                     //console.log("nav this:%O", this);
                                     RouteMapper(nav);
                                   }}
