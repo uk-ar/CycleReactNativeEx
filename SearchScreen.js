@@ -18,6 +18,7 @@ var {
   Image,
   TouchableHighlight,
   TouchableNativeFeedback,
+  LayoutAnimation,
   // cell
   PixelRatio,
   // searchBar
@@ -149,13 +150,13 @@ var MovieCell = React.createClass({
        close={true}
        onOpen = {(sectionID, rowID) =>
        this.props.handleSwipeout(sectionID, rowID)}
+       close={!movie.active}
      */
   return(
     <CycleView>
       <Swipeout
           selector="swipeout"
           left={swipeoutBtns}
-          close={!movie.active}
           rowID = {this.props.rowID}
           autoClose={true}
       >
@@ -163,7 +164,8 @@ var MovieCell = React.createClass({
           selector="cell"
           item={movie}
       >
-        <View style={styles.row}>
+    <View style = {[styles.row,
+                    !movie.active && {height: 200}]}>
           <Image
               source={{uri: movie.thumbnail}}
               style={styles.cellImage}
@@ -247,7 +249,12 @@ var BookListView = React.createClass({
                     }}
                   selectedOption={this.props.selectedOption}
               />
-              <Text>Like</Text>
+              <FAIcon name = "sort"
+                      selector = "sort"
+                      size = {25}
+                      color = "#007AFF"
+                      style={{marginHorizontal: 8}}
+              />
             </View>
       </CycleView>
     )
@@ -267,8 +274,26 @@ var BookListView = React.createClass({
       */}
   },
   componentWillMount(){
-    this.subscription = this.props.dataSource$.subscribe((dataSource) =>
+    //https://medium.com/@Jpoliachik/react-native-s-layoutanimation-is-awesome-4a4d317afd3e#.9c2mobfa0
+    //http://browniefed.com/blog/2015/08/01/react-native-animated-listview-row-swipe/
+    var CustomLayoutAnimation = {
+      duration: 200,
+      create: {
+        type: LayoutAnimation.Types.linear,
+        property: LayoutAnimation.Properties.opacity,
+      },
+      update: {
+        type: LayoutAnimation.Types.curveEaseInEaseOut,
+      },
+    };
+    LayoutAnimation.spring();
+    this.subscription = this.props.dataSource$.subscribe((dataSource) => {
+      //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      //LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+      //LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
+      //LayoutAnimation.configureNext(CustomLayoutAnimation);
       this.setState({dataSource:dataSource})
+    }
     )
   },
   componentWillUnmount(){

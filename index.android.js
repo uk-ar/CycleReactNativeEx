@@ -58,11 +58,10 @@ function main({RN, HTTP, EE}) {
   //FIXME:Change navigator to stream
   //0192521722
   //qwerty
-  actions.sortState$
-         .flatMap(e => Rx.Observable.fromPromise(AsyncStorage.getItem(STORAGE_KEY)))
-         .map(i => JSON.parse(i))
-         .do(i => console.log("storage:%O", i))
-         .subscribe();
+  /* .flatMap(e => Rx.Observable.fromPromise(AsyncStorage.getItem(STORAGE_KEY)))
+     .map(i => JSON.parse(i))
+     .do(i => console.log("storage:%O", i))
+     .subscribe(); */
 
   let sinks = new Rx.ReplaySubject();
   // for android action

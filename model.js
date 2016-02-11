@@ -76,7 +76,8 @@ function model(actions){
           author: book.author,
           isbn: book.isbn,
           thumbnail: book.largeImageUrl,
-          libraryStatus: book.libraryStatus
+          libraryStatus: book.libraryStatus,
+          active: true
         })
       }
       )
@@ -84,17 +85,20 @@ function model(actions){
     .startWith(MOCKED_MOVIES_DATA)
     .do(i => console.log("booksWithStatus$:%O", i))
     .combineLatest(actions.filterState$,(books,filter)=>{
-      return filter ? books.filter(book =>
-        !book.libraryStatus || book.libraryStatus.exist) : books
-      //TODO:case for book.libraryStatus is undefined
+      return books.map(book => {
+        book.active = filter ? (!book.libraryStatus || book.libraryStatus.exist) :
+                      true;
+        return book
+      })
     })
-    .combineLatest(actions.openSwipe$.startWith(1), (books,rowID) => {
-      for (var i = 0; i < books.length; i++) {
-        if (i != rowID) books[i].active = false
-        else books[i].active = true
-      }
-      return books;
-    })
+    .do(i => console.log("booksWithStatus2$:%O", i))
+    /* .combineLatest(actions.openSwipe$.startWith(1), (books,rowID) => {
+       for (var i = 0; i < books.length; i++) {
+       if (i != rowID) books[i].active = false
+       else books[i].active = true
+       }
+       return books;
+       }) */
     .share();
 
   let navigatorPushRequest$ = actions

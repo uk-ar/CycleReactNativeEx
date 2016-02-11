@@ -73,7 +73,12 @@ function intent({RN, HTTP}){
                     .do(i => console.log("filter change:%O", i)),
     sortState$: RN.select('sort')
                   .events('press')
-                  .do(i => console.log("sort change:%O", i)),
+                  .do(i => console.log("sort change:%O", i))
+      //actions.sortState$
+                  .startWith(false)
+                  .scan((current, event) => !current)
+                  .do(i => console.log("sort:%O", i))
+      ,
     changeSearch$: RN.select('text-input')
                      .events('change')
                      .map(event => event.args[0].nativeEvent.text)
