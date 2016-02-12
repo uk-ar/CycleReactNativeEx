@@ -25,7 +25,9 @@ var {
   TextInput,
   ToolbarAndroid,
   Navigator,
-  NavigatorIOS
+  NavigatorIOS,
+  Animated,
+  UIManager
 } = React;
 
 var GiftedNavigator = React.createClass({
@@ -120,6 +122,8 @@ var LibraryStatus = React.createClass({
   },
 });
 
+UIManager.setLayoutAnimationEnabledExperimental &&   UIManager.setLayoutAnimationEnabledExperimental(true);
+
 var MovieCell = React.createClass({
   render: function(){
     var movie=this.props.movie;
@@ -151,7 +155,26 @@ var MovieCell = React.createClass({
        onOpen = {(sectionID, rowID) =>
        this.props.handleSwipeout(sectionID, rowID)}
        close={!movie.active}
+       // overflow: "hidden" //cannot work with android
      */
+    var content = movie.active ? (
+      <Animated.View style={[styles.row]}>
+      <Image
+          source={{uri: movie.thumbnail}}
+          style={[styles.cellImage]}
+      />
+      <View style={styles.textContainer}>
+        <Text style={styles.movieTitle} numberOfLines={2}>
+          {movie.title}
+        </Text>
+        <Text style={styles.movieYear} numberOfLines={1}>
+          {movie.author}
+        </Text>
+        <LibraryStatus libraryStatus={movie.libraryStatus}/>
+      </View>
+      </Animated.View>
+    ) : <View style={{backgroundColor: "white"}}/>
+
   return(
     <CycleView>
       <Swipeout
@@ -160,30 +183,15 @@ var MovieCell = React.createClass({
           rowID = {this.props.rowID}
           autoClose={true}
       >
-      <TouchableElement
-          selector="cell"
-          item={movie}
-      >
-    <View style = {[styles.row,
-                    !movie.active && {height: 200}]}>
-          <Image
-              source={{uri: movie.thumbnail}}
-              style={styles.cellImage}
-          />
-          <View style={styles.textContainer}>
-            <Text style={styles.movieTitle} numberOfLines={2}>
-              {movie.title}
-            </Text>
-            <Text style={styles.movieYear} numberOfLines={1}>
-              {movie.author}
-            </Text>
-            <LibraryStatus libraryStatus={movie.libraryStatus}/>
-          </View>
-        </View>
+        <TouchableElement
+            selector="cell"
+            item={movie}
+        >
+          {content}
       </TouchableElement>
       </Swipeout>
     </CycleView>
-  )}
+  )} //collapsable={false}
 })
 
 var dataSource = new ListView.DataSource({
@@ -269,29 +277,29 @@ var BookListView = React.createClass({
         style = {styles.icon}/>
         <Icon.Button name = "sort" selector = "sort"
         style = {styles.icon}/>
-
-
       */}
   },
   componentWillMount(){
     //https://medium.com/@Jpoliachik/react-native-s-layoutanimation-is-awesome-4a4d317afd3e#.9c2mobfa0
     //http://browniefed.com/blog/2015/08/01/react-native-animated-listview-row-swipe/
-    var CustomLayoutAnimation = {
-      duration: 200,
+    var CustomLayoutSpring = {
+      duration: 3000,
       create: {
-        type: LayoutAnimation.Types.linear,
+        type: LayoutAnimation.Types.easeInEaseOut,
         property: LayoutAnimation.Properties.opacity,
+        //property: LayoutAnimation.Properties.scaleXY,
       },
       update: {
-        type: LayoutAnimation.Types.curveEaseInEaseOut,
+        type: LayoutAnimation.Types.easeInEaseOut,
       },
+      delete:{
+        type: LayoutAnimation.Types.easeInEaseOut,
+        property: LayoutAnimation.Properties.opacity,
+      }
     };
-    LayoutAnimation.spring();
     this.subscription = this.props.dataSource$.subscribe((dataSource) => {
-      //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      //LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
-      //LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
-      //LayoutAnimation.configureNext(CustomLayoutAnimation);
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      //LayoutAnimation.configureNext(CustomLayoutSpring);
       this.setState({dataSource:dataSource})
     }
     )
