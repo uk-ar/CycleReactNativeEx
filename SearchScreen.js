@@ -61,142 +61,7 @@ var GiftedNavigator = React.createClass({
   }
 });
 
-var LibraryStatus = React.createClass({
-  render: function() {
-    var libraryStatus = this.props.libraryStatus || {};
-
-    var text, name, backgroundColor;
-
-    if(libraryStatus.rentable){
-      text="貸出可"
-      style={backgroundColor: "#03A9F4"} //light blue
-    }else if(libraryStatus.exist){
-      text="貸出中"
-      style={backgroundColor: "#FFC107"} //yellow
-    }else if(libraryStatus.exist !== undefined){
-      text="なし"
-      style={backgroundColor: "#9E9E9E"} //grey
-    }else{
-      //text="取得中"
-    }
-    //http://www.google.com/design/spec/style/color.html#color-color-palette
-    if(text){
-      return (
-        <View style = {[styles.rating, styles.row, style]}
-        >
-          <Text>
-            {text}
-          </Text>
-        </View>
-      );
-    }else{
-      return (
-        <View style = {[styles.rating, styles.row]}>
-          <Text>
-            {"蔵書確認中"}
-          </Text>
-          <GiftedSpinner />
-        </View>
-      )
-    }
-    /*
-       <Icon.Button name="facebook" backgroundColor="#3b5998">
-       </Icon.Button>
-       <Text>
-       <Emoji name = "ok"/>
-       {text}
-       </Text> */
-
-    {/*  <View style = {styles.iconContainer}>
-        <Icon name = "building-o" size = {30}
-        style={styles.libIcon}/>
-        </View>
-        <Icon name = "book" size={30} color="#900"/>
-        <Icon name = "building" size={30} color="#900"/>
-        <Icon name = "archive" size={30} color="#900"/>
-        google icon location city
-      */}
-    {/* <Text style={[styles.ratingValue, getStyleFromScore(criticsScore)]}>
-        {getTextFromScore(criticsScore)}
-        </Text>
-      */}
-  },
-});
-
-UIManager.setLayoutAnimationEnabledExperimental &&   UIManager.setLayoutAnimationEnabledExperimental(true);
-
-var MovieCell = React.createClass({
-  render: function(){
-    var movie=this.props.movie;
-    var TouchableElement = TouchableHighlight;
-  if (Platform.OS === 'android') {
-    TouchableElement = TouchableNativeFeedback;
-  }
-  var swipeoutBtns = [
-    {
-      text: '読みたい',
-      onPress: () => {
-        this.props.actions$.addInbox$.onNext(movie);
-        console.log("add:%O", movie);
-      }
-    },
-    {
-      text: '削除',
-      onPress: () => {
-        this.props.actions$.removeInbox$.onNext(movie);
-        console.log("remove:%O", movie);
-      }
-    }
-  ]
-    //conflict with cell action open state & update
-    /*
-       onPress={(e) => console.log("cell action:%O", e)}
-       key="cell"
-       close={true}
-       onOpen = {(sectionID, rowID) =>
-       this.props.handleSwipeout(sectionID, rowID)}
-       close={!movie.active}
-       // overflow: "hidden" //cannot work with android
-     */
-    var content = movie.active ? (
-      <Swipeout
-          selector="swipeout"
-          left={swipeoutBtns}
-          rowID = {this.props.rowID}
-          autoClose={true}
-      >
-        <TouchableElement
-            selector="cell"
-            item={movie}
-        >
-          <TouchableOpacity>
-            <Animated.View style = {[styles.row]}>
-              <Image
-                  source={{uri: movie.thumbnail}}
-                  style={[styles.cellImage]}
-              />
-              <View style={styles.textContainer}>
-                <Text style={styles.movieTitle} numberOfLines={2}>
-                  {movie.title}
-                </Text>
-                <Text style={styles.movieYear} numberOfLines={1}>
-                  {movie.author}
-                </Text>
-                <LibraryStatus libraryStatus={movie.libraryStatus}/>
-              </View>
-            </Animated.View>
-          </TouchableOpacity>
-        </TouchableElement>
-      </Swipeout>
-    ) : <View style={{backgroundColor: "white"}}/>
-
-  return(
-    <CycleView>
-      {content}
-    </CycleView>
-  )} //collapsable={false}
-  //onPress = {() => console.log("pressed")}
-})
+var BookCell = require('./BookCell');
 
 var dataSource = new ListView.DataSource({
   rowHasChanged: (row1, row2) => row1 !== row2,
@@ -232,7 +97,7 @@ var BookListView = React.createClass({
           ref="listview"
           dataSource = {dataSource.cloneWithRows(this.state.dataSource)}
           renderRow ={(movie, sectionID, rowID, highlightRowFunc) =>
-            <MovieCell
+            <BookCell
                 movie={movie}
                 actions$={this.props.actions$}
                 rowID={rowID}

@@ -39,8 +39,11 @@ var {
   Navigator,
   BackAndroid,
   WebView,
-  AsyncStorage
+  AsyncStorage,
+  UIManager
 } = React;
+
+UIManager.setLayoutAnimationEnabledExperimental &&   UIManager.setLayoutAnimationEnabledExperimental(true);
 
 let {SearchScreen, InBoxScreen, GiftedNavigator} = require('./SearchScreen');
 
