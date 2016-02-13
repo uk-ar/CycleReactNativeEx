@@ -8,6 +8,7 @@ var Swipeout = require('react-native-swipeout');
 import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
 
 var {
+  TouchableOpacity,
   ActivityIndicatorIOS,
   ListView,
   Platform,
@@ -158,25 +159,6 @@ var MovieCell = React.createClass({
        // overflow: "hidden" //cannot work with android
      */
     var content = movie.active ? (
-      <Animated.View style={[styles.row]}>
-      <Image
-          source={{uri: movie.thumbnail}}
-          style={[styles.cellImage]}
-      />
-      <View style={styles.textContainer}>
-        <Text style={styles.movieTitle} numberOfLines={2}>
-          {movie.title}
-        </Text>
-        <Text style={styles.movieYear} numberOfLines={1}>
-          {movie.author}
-        </Text>
-        <LibraryStatus libraryStatus={movie.libraryStatus}/>
-      </View>
-      </Animated.View>
-    ) : <View style={{backgroundColor: "white"}}/>
-
-  return(
-    <CycleView>
       <Swipeout
           selector="swipeout"
           left={swipeoutBtns}
@@ -187,11 +169,33 @@ var MovieCell = React.createClass({
             selector="cell"
             item={movie}
         >
-          {content}
-      </TouchableElement>
+          <TouchableOpacity>
+            <Animated.View style = {[styles.row]}>
+              <Image
+                  source={{uri: movie.thumbnail}}
+                  style={[styles.cellImage]}
+              />
+              <View style={styles.textContainer}>
+                <Text style={styles.movieTitle} numberOfLines={2}>
+                  {movie.title}
+                </Text>
+                <Text style={styles.movieYear} numberOfLines={1}>
+                  {movie.author}
+                </Text>
+                <LibraryStatus libraryStatus={movie.libraryStatus}/>
+              </View>
+            </Animated.View>
+          </TouchableOpacity>
+        </TouchableElement>
       </Swipeout>
+    ) : <View style={{backgroundColor: "white"}}/>
+
+  return(
+    <CycleView>
+      {content}
     </CycleView>
   )} //collapsable={false}
+  //onPress = {() => console.log("pressed")}
 })
 
 var dataSource = new ListView.DataSource({
@@ -360,7 +364,8 @@ var SearchScreen = React.createClass({
             isLoading={this.state.isLoading}
         />
         <View style={styles.separator} />
-        <BookListView dataSource$={this.props.state$.booksWithStatus$}
+        <BookListView dataSource$ = {this.props.state$.booksWithStatus$.merge(
+            this.props.state$.searchRequest$.map((_) => []))}
                       actions$={this.props.actions$}
                       key = "searchlistview"
                       selectedOption='検索'
