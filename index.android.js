@@ -1,6 +1,11 @@
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
+   - fix swipeout
+   - automate webview
+   - support books pagination
+   - add done state
+   - add sort feature
  */
 'use strict';
 
@@ -69,6 +74,7 @@ function main({RN, HTTP, EE}) {
   let sinks = new Rx.ReplaySubject();
   // for android action
 
+  var {AnimatedFlick,BookCell} = require('./BookCell');
   let SearchView$ = state$.booksWithStatus$
                           .startWith(MOCKED_MOVIES_DATA)
                           .map(i =>
@@ -83,11 +89,9 @@ function main({RN, HTTP, EE}) {
                                   }}
                             />
                           );
-  /* onNavigatorMounted = {(nav) => {
-     console.log("nav mounted this:%O", this);
-     RouteMapper(nav);
-     }} */
-  sinks.onNext({event: "foo",args:{bar:"baz"}});
+  /* <AnimatedFlick/> */
+  // http://stackoverflow.com/questions/29756217/react-native-nested-scrollview-locking-up
+
   return {
     RN: SearchView$,//.merge(DetailView$),
     HTTP: state$.searchRequest$.merge(state$.statusRequest$),

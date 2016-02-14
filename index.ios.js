@@ -46,35 +46,31 @@ function main({RN, HTTP}) {
   const actions = intent({RN:RN, HTTP:HTTP});
   const state$ = model(actions);
 
-  var RouteMapper = function(navigator) {
-    state$.navigator$.onNext(navigator);
-    //push & pop is Destructive operations
-    state$.navigatorPushRequest$
-          .subscribe((route) => navigator.push(route));
-    state$.navigatorPopRequest$
-          .subscribe((_)=>navigator.pop());//need to use canPop?
-    state$.navigatorReplaceRequest$.subscribe((route) =>
-      navigator.replace(route)
-      //console.log("%O", route)
-    );
-  }
+  var {AnimatedFlick,BookCell} = require('./BookCell');
+  /* let SearchView$ = state$.booksWithStatus$
+     .startWith(MOCKED_MOVIES_DATA)
+     .map(i =>
+     <AnimatedFlick/>
+     ); */
 
   let SearchView$ = state$.booksWithStatus$
                           .startWith(MOCKED_MOVIES_DATA)
                           .map(i =>
                             <GiftedNavigator
+                                selector="nav"
                                 initialRoute = {{
                                     component:SearchScreen,
                                     title: 'search',
                                     passProps:
                                     {state$: state$, actions$: actions}
                                   }}
-                                onNavigatorMounted = {(nav) => {
-                                    //console.log("nav this:%O", this);
-                                    RouteMapper(nav);
-                                  }}
                             />
                           );
+  /* onNavigatorMounted = {(nav) => {
+     //console.log("nav this:%O", this);
+     RouteMapper(nav);
+     }}
+   */
 
   return {
     RN: SearchView$,//.merge(DetailView$),

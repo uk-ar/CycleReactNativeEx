@@ -28,7 +28,113 @@ var {
   Navigator,
   NavigatorIOS,
   Animated,
+  ScrollView,
 } = React;
+
+var Dimensions = require('Dimensions');
+var {
+  width,
+  height
+} = Dimensions.get('window');
+
+var GREY = 0;
+var GREEN = 1;
+var RED = 2;
+
+var values = [1, 2, 3, 4, 5, 6, 7];
+
+var AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
+
+var AnimatedFlick = React.createClass({
+  getInitialState: function() {
+    return {
+      values: values,
+      colors: values.map( () => new Animated.Value(GREY) )
+    };
+  },
+  _animateScroll: function(index, e) {
+    var threshold = width / 5;
+    var x = e.nativeEvent.contentOffset.x;
+    var target = null;
+    x = x * -1;
+    if (x > -50 && this._target != GREY) {
+      target = GREY;
+    } else if (x < -50 && x > -threshold && this._target != GREEN) {
+      target = GREEN;
+    } else if (x < -threshold && this._target != RED) {
+      target = RED;
+    }
+    if (target !== null) {
+      this._target = target;
+      this._targetIndex = index;
+      Animated.timing(this.state.colors[index], {
+        toValue: target,
+        duration: 180,
+      }).start();
+    }
+  },
+  takeAction: function() {
+    this.setState({
+      action: true
+    });
+  },
+  getActionText: function() {
+    var actionText = '';
+    if (this.state.action) {
+      if (this._target == GREEN) {
+        actionText = 'Save Action';
+      } else if (this._target == RED) {
+        actionText = 'Delete Action'
+      } else {
+        actionText = 'No Action';
+      }
+      return 'You took "' + actionText + '" on the ' + this._targetIndex + ' row';
+    }
+    return 'You have not taken an action yet';
+  },
+  _renderRow: function(value, index) {
+    //render cell
+    //style=
+    var bgColor = this.state.colors[index].interpolate({
+      inputRange: [
+        GREY,
+        GREEN,
+        RED
+      ],
+      outputRange: [
+        'rgb(180, 180, 180)', // GREY
+        'rgb(63, 236, 35)', // GREEN
+        'rgb(233, 19, 19)', // RED
+      ],
+    });
+    return (
+      <View
+          style={styles.row}
+          key={index}
+      >
+        <AnimatedScrollView
+            horizontal={true}
+            directionalLockEnabled={true}
+            style={[{flex: 1, height: 100}, {backgroundColor: bgColor}]}
+            onScroll={this._animateScroll.bind(this, index)}
+            scrollEventThrottle={16}
+            onMomentumScrollBegin={this.takeAction}
+        >
+          <Text>{value + "  <----- Slide the row that way and release"}</Text>
+        </AnimatedScrollView>
+      </View>
+    )
+  },
+  render: function() {
+    return (
+      <View style={styles.container}>
+        <ScrollView style={styles.outerScroll}>
+          {this.state.values.map(this._renderRow, this)}
+        </ScrollView>
+      </View>
+    );
+  }
+});
 
 var LibraryStatus = React.createClass({
   render: function() {
@@ -135,6 +241,7 @@ var BookCell = React.createClass({
         <TouchableElement
             selector="cell"
             item={movie}
+            onPress={(e) => console.log("cell action:%O", e)}
         >
           <TouchableOpacity>
             <Animated.View style = {[styles.row]}>
@@ -156,64 +263,50 @@ var BookCell = React.createClass({
         </TouchableElement>
       </Swipeout>
     ) : <View style={{backgroundColor: "white"}}/>
-
-      return(
-      <CycleView>
-        {content}
-      </CycleView>
-      )} //collapsable={false}
+      //return(<AnimatedFlick/>)}
+  return(
+    <View>
+      <ScrollView horizontal={true}
+                  onPanResponderTerminationRequest={ () => false}>
+        <View style = {{width:320, height:300, backgroundColor:"red"}}/>
+        <View style = {{width:320, height:300, backgroundColor:"green"}}/>
+        <View style = {{width:320, height:300, backgroundColor:"blue"}}/>
+      </ScrollView>
+      <View style={styles.separator}/>
+    </View>
+  )}
+  /* return(
+     <CycleView>
+     {content}
+     </CycleView>
+     )} //collapsable={false} */
   //onPress = {() => console.log("pressed")}
 });
 
 var styles = StyleSheet.create({
-  //for toolBar
-  toolbar: {
-    backgroundColor: '#e9eaed',
-    height: 56,
-  },
-  iconContainer:{
-    /* backgroundColor: 'deepskyblue', */
-    backgroundColor: 'orange',
-    /* borderRadius: 15, */
-    borderRadius: 23,
-    /* padding: 8, */
-    paddingHorizontal: 8,
-    paddingTop: 9,
-    paddingBottom: 7
-  },
-  libIcon: {
-    textAlign: 'center',
-    width: 30,
-    color: "white",
-  },
-  //for listview
+  //for new swipe
+  /* container: {
+     flex: 1,
+     flexDirection: 'column'
+     },
+     outerScroll: {
+     flex: 1,
+     flexDirection: 'column'
+     },
+     row: {
+     flex: 1
+     }, */
   container: {
     flex: 1,
     backgroundColor: 'white',
   },
-  centerText: {
-    alignItems: 'center',
-  },
-  noMoviesText: {
-    marginTop: 80,
-    color: '#888888',
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#eeeeee',
-  },
-  scrollSpinner: {
-    marginVertical: 20,
-  },
-  rowSeparator: {
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    height: 1,
-    marginLeft: 4,
-  },
-  rowSeparatorHide: {
-    opacity: 0.0,
-  },
   //for cell
+  row: {
+    //alignItems: 'center',
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    padding: 5,
+  },
   textContainer: {
     flex: 1,
   },
@@ -226,12 +319,6 @@ var styles = StyleSheet.create({
   movieYear: {
     color: '#999999',
     fontSize: 12,
-  },
-  row: {
-    //alignItems: 'center',
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    padding: 5,
   },
   cellImage: {
     backgroundColor: '#dddddd',
@@ -263,6 +350,10 @@ var styles = StyleSheet.create({
     fontWeight:'bold',
     flex:1                //Step 3
   },
+  separator: {
+    height: 1,
+    backgroundColor: '#CCCCCC',
+  },
 });
 
-module.exports = BookCell;
+module.exports = {AnimatedFlick,BookCell};

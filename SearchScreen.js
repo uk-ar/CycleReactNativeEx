@@ -61,7 +61,7 @@ var GiftedNavigator = React.createClass({
   }
 });
 
-var BookCell = require('./BookCell');
+var {AnimatedFlick,BookCell} = require('./BookCell');
 
 var dataSource = new ListView.DataSource({
   rowHasChanged: (row1, row2) => row1 !== row2,
