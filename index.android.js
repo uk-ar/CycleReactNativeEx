@@ -88,7 +88,8 @@ function main({RN, HTTP, EE}) {
                                      sinks: sinks}
                                   }}
                             />
-                          );
+                          )
+                          //.map(i => <AnimatedFlick/>)
   /* <AnimatedFlick/> */
   // http://stackoverflow.com/questions/29756217/react-native-nested-scrollview-locking-up
 

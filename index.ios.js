@@ -55,6 +55,7 @@ function main({RN, HTTP}) {
 
   let SearchView$ = state$.booksWithStatus$
                           .startWith(MOCKED_MOVIES_DATA)
+                          //.map(i => <AnimatedFlick/>)
                           .map(i =>
                             <GiftedNavigator
                                 selector="nav"

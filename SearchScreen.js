@@ -91,6 +91,7 @@ var BookListView = React.createClass({
     };
     //CycleView has not pass key props? bind this?
     //augmentVTreeWithHandlers seems to have problem
+    //          directionalLockEnabled = {true}
     return(
       <CycleView style = {styles.container} key="listview">
       <ListView
