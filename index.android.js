@@ -1,7 +1,10 @@
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
+TODO:
    - fix swipeout
+     - enable swipe out
+     - fix performance
    - automate webview
    - support books pagination
    - add done state
