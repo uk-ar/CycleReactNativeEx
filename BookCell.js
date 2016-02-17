@@ -339,53 +339,16 @@ var SwipeableElement = React.createClass({
   _handlePanResponderGrant: function() {},
 
   _handlePanResponderMove: function(e, gestureState) {
-    if (!this.refs.mainElement) {
-      return;
-    }
-
-    var dx;
-    var direction = gestureState.dx > 0 ? 'right' : 'left';
-    if (gestureState.dx < -150) {
-      dx = -150;
-    } else if (gestureState.dx > 150) {
-      dx = 150;
-    } else {
-      dx = gestureState.dx;
-    }
-
-    var absdx = dx > 0 ? dx : -dx;
-    var opacity = (absdx / SWIPE_RELEASE_POINT) * 1;
-    var fontSize = 6 + ((opacity > 1 ? 1 : opacity) * 8);
-    var paddingTop = 15 - ((opacity > 1 ? 1 : opacity) * 5);
-    var text;
-    var element;
-
-    var props = {style: { width: absdx*2, opacity, }};
-
-    //this.refs.mainElement.setNativeProps({style: { left: dx }});
-    if (dx > 0) {
-      element = this.refs.leftElement;
-      props.style.left = absdx;
-      text = this.refs.leftText;
-    } else {
-      element = this.refs.rightElement;
-      props.style.right = absdx;
-      text = this.refs.rightText;
-    }
-    //text.setNativeProps({style: { fontSize, paddingTop }});
-    //element.setNativeProps(props);
-
-    this.setState({ dx });
-
     //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     posLeft = this._previousLeft + gestureState.dx
     this._updatePosition(posLeft)
-    this.setState({ dx });//this.state.dx
+    //this.setState({ dx });//this.state.dx
   },
   _updatePosition: function(posLeft){
     var leftWidth  = 0 < posLeft ? posLeft : 0.00001
     var rightWidth = 0 < posLeft ? 0.00001 : -1 * posLeft
 
+    //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     this.refs.leftElement &&
     this.refs.leftElement.setNativeProps(
       {style:{width: leftWidth }});
@@ -398,25 +361,35 @@ var SwipeableElement = React.createClass({
     this.refs.rightElement.setNativeProps(
       {style:{width: rightWidth,
               left: posLeft - leftWidth}});
+    //this._setStatus(posLeft)
   },
-  _handlePanResponderEnd: function(e: Object, gestureState: Object) {
-    if (this.state.dx > SWIPE_RELEASE_POINT) {
-      if (this.props.onSwipeRight) {
-        this.props.onSwipeRight.call();
-      }
-    } else if (this.state.dx < -SWIPE_RELEASE_POINT) {
-      if (this.props.onSwipeLeft) {
-        this.props.onSwipeLeft.call();
-      }
+  getInitialState: function() {
+    return {
+      //"leftOpen" , "leftRelease", "flat",
+      //"rightOpen", "rightRelease"
+      status: "flat"
+    };
+  },
+  _setStatus: function(posLeft){
+    if(posLeft < -1 * this.rightButtonWidth){
+      //this.setState({status:"rightOpen"})
+    }else if((-1 * this.rightButtonWidth < posLeft) && (posLeft < this.leftButtonWidth)){
+      //this.setState({status:"flat"})
+    }else if(this.leftButtonWidth < posLeft){
+      //this.setState({status:"leftOpen"})
     }
+  },
+  _handlePanResponderEnd: function(e: Object, gestureState: Object)
+  {
     posLeft = this._previousLeft + gestureState.dx;
     var newPos;
-    if(posLeft < -50){
-      newPos = -100;//right button size
-    }else if(-50 < posLeft && posLeft < 10){
+    if(posLeft < -1 * this.rightButtonWidth / 2){
+      newPos =  -1 * this.rightButtonWidth;//right button size
+    }else if((-1 * this.rightButtonWidth / 2 < posLeft) && (posLeft < this.leftButtonWidth / 2)){
       newPos = 0;//flat
-    }else if(10 < posLeft){
-      newPos = 100;//left button size
+    }else if(this.leftButtonWidth / 2 < posLeft){
+      newPos = this.leftButtonWidth;//left button size
+      //newPos = 150;//left button size
     }else{
       newPos = 100;
     }
@@ -424,15 +397,6 @@ var SwipeableElement = React.createClass({
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     this._updatePosition(newPos);
     this._previousLeft = newPos;
-      //this._previousLeft += gestureState.dx;
-    //var animations = require('../../TaskList/animations');
-    //LayoutAnimation.configureNext(animations.easeInEaseOut);
-    //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    //this.setState({dx:0,});
-    //this.refs.mainElement && this.refs.mainElement.setNativeProps({style: { left: 0 }});
-    //this.refs.leftElement && this.refs.leftElement.setNativeProps({style: { width: 0, left: 0, }});
-    //expand to max
-    //this.refs.rightElement && this.refs.rightElement.setNativeProps({style: { width: 0, right: 0,}});
     // Reset the left/right values after the animation finishes
     // This feels hacky and I hope there's a better way to do this
     setTimeout(() => {
@@ -442,7 +406,6 @@ var SwipeableElement = React.createClass({
   },
 
   _previousLeft: 0,
-  _mainElementStyles: {},
   componentWillMount: function() {
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
@@ -453,46 +416,27 @@ var SwipeableElement = React.createClass({
       onPanResponderTerminate: this._handlePanResponderEnd,
     });
     this._previousLeft = 0;
-    this._mainElementStyles = {
-      style: {
-        left: this._previousLeft,
-      }
-    };
   },
 
-  getInitialState: function() {
-    return {
-      dx: 0,
-      openedLeft:false,//rename isLeftOpened
-      btnsLeftWidth:0.1,
-      openedRight:false,
-      btnsRightWidth:0.1,
-    };
-  },
-
-  componentDidMount: function() {
-    //this._updatePosition();
-  },
-  /* _updatePosition: function() {
-
-     }, */
+  leftButtonWidth: null,
+  rightButtonWidth: null,
   render: function() {
-    /* var pullOrRelease = (this.state.dx > SWIPE_RELEASE_POINT || this.state.dx < -SWIPE_RELEASE_POINT) ?
-       'Release' :
-       'Pull'; */
     var pullOrRelease = 'Release'
-    {/*
-        <View style={{flex:1,}}></View>
-        <View ref={'leftElement'} style={styles.swipeableLeft}>
-        ok
-        <View style={{width:300,flexDirection:'row',}}>
-      */}
+    console.log("refs:%O:",this.refs);
+    //TODO:support different length text
     return (
       <View style = {{justifyContent:"center",
                       flexDirection:'row'}}>
       <View style={styles.swipeableElementWrapper}>
-        <View ref = {'leftElement'} style = {[styles.swipeableLeft, {width: this.state.btnsLeftWidth}]}>
-
+        <View ref = {'leftElement'} style = {[styles.swipeableLeft]}
+              onLayout= {({ nativeEvent: { layout: { width, height } } }) =>
+                {
+                  if(!this.leftButtonWidth){
+                    this.leftButtonWidth = width;
+                    console.log("www1:%O:",width);
+                  }}
+                }
+          >
           <Text ref={'leftText'} style={styles.leftText}>
               {pullOrRelease} to {this.props.swipeRightTitle}
             </Text>
@@ -501,12 +445,30 @@ var SwipeableElement = React.createClass({
         <View ref={'mainElement'} style={styles.swipeableMain} {...this._panResponder.panHandlers}>
           {this.props.component}
         </View>
-        <View ref={'rightElement'} style={styles.swipeableRight}>
-          <View style={{width:300,overflow:'hidden'}}>
-            <Text ref={'rightText'} style={styles.rightText}>
-              {pullOrRelease} to {this.props.swipeLeftTitle}
-            </Text>
-          </View>
+        <View ref={'rightElement'} style={styles.swipeableRight}
+              onLayout= {({ nativeEvent: { layout: { width, height } } }) =>
+                {
+                  if(!this.rightButtonWidth){
+                    this.rightButtonWidth = width;
+                    console.log("www2:%O:",width);
+                  }}
+                        }
+        >
+          <Text ref={'rightText'}
+                numberOfLines={1}
+                style={[styles.rightText,{backgroundColor:"red"}]}>
+            foo
+          </Text>
+          <Text ref={'rightText'}
+                numberOfLines={1}
+                style={[styles.rightText,{backgroundColor:"green"}]}>
+            bar
+          </Text>
+          <Text ref={'rightText'}
+                numberOfLines={1}
+                style={[styles.rightText,{backgroundColor:"blue"}]}>
+            baz
+          </Text>
         </View>
       </View>
       </View>
@@ -587,14 +549,15 @@ var styles = StyleSheet.create({
   },
   swipeableElementWrapper: {
     //width: SCREEN_WIDTH,
-    width: SCREEN_WIDTH - 100,
+    width: SCREEN_WIDTH - 50,
     flexDirection:'row',
     //alignItems:'stretch'
     //justifyContent:'center',//not to affected by left button string change
   },
   swipeableMain: {
     //width: SCREEN_WIDTH,
-    width: 200,
+    width: 150,
+    //left:40,
     backgroundColor: 'gray',
   },
   swipeableLeft: {
@@ -602,25 +565,35 @@ var styles = StyleSheet.create({
     //width: 100,
     //width: 0.1,
     //flex:1,
-    backgroundColor: 'red',
+    backgroundColor: 'black',
     flexDirection:'row',
     justifyContent:'flex-end',//horizontal
   },
   leftText: {
     color:'#FFFFFF',
     //padding:10,
+    //margin:10,
     //justifyContent:'center',
     //alignSelf:'center',
   },
   swipeableRight: {
     overflow: 'hidden',
-    width: 0.1,
+    //flex:1,
+    //width: 100,
+    flexDirection:'row',
+    justifyContent:'flex-end',
     //flex:1,
     //alignItems: 'flex-end',
-    backgroundColor: 'blue',
+    //backgroundColor: 'blue',
   },
   rightText: {
     color:'#FFFFFF',
+    padding:10,
+    //biblio
+    //flex:1,
+    //flex:null,
+    //https://github.com/facebook/react-native/issues/364
+    //width: '100%'
     //padding:10,
   }
 });
