@@ -323,10 +323,23 @@ var SCREEN_WIDTH = Dimensions.get('window').width;
 var SCREEN_HEIGHT = Dimensions.get('window').height;
 
 var SWIPE_RELEASE_POINT = 70;
+//var PureRenderMixin = require('react-addons-pure-render-mixin');
 
 var SwipeableElement = React.createClass({
-
+  //mixins: [PureRenderMixin],
   _panResponder: {},
+  _previousLeft: 0,
+  componentWillMount: function() {
+    this._panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
+      onMoveShouldSetPanResponder: this._handleMoveShouldSetPanResponder,
+      onPanResponderGrant: this._handlePanResponderGrant,
+      onPanResponderMove: this._handlePanResponderMove,
+      onPanResponderRelease: this._handlePanResponderEnd,
+      onPanResponderTerminate: this._handlePanResponderEnd,
+    });
+    this._previousLeft = 0;
+  },
 
   _handleStartShouldSetPanResponder: function() {
     return true;
@@ -356,12 +369,12 @@ var SwipeableElement = React.createClass({
     this.refs.mainElement.setNativeProps(
       {style:{left: posLeft - leftWidth}});
     //close enable
-    //console.log(rightWidth)
+    console.log("riele:%O",this.refs.rightElement)
     this.refs.rightElement &&
     this.refs.rightElement.setNativeProps(
       {style:{width: rightWidth,
               left: posLeft - leftWidth}});
-    //this._setStatus(posLeft)
+    this._setStatus(posLeft)
   },
   getInitialState: function() {
     return {
@@ -373,8 +386,12 @@ var SwipeableElement = React.createClass({
   _setStatus: function(posLeft){
     if(posLeft < -1 * this.rightButtonWidth){
       //this.setState({status:"rightOpen"})
+      //React.Children.forEach(this.refs.rightElement.props.children,         (elem) => {
+      //})
+        //https://github.com/facebook/react-native/blob/0293def7a9898f25699dcb2685aff2c5cecf152d/Libraries/Components/Touchable/TouchableOpacity.js
     }else if((-1 * this.rightButtonWidth < posLeft) && (posLeft < this.leftButtonWidth)){
       //this.setState({status:"flat"})
+
     }else if(this.leftButtonWidth < posLeft){
       //this.setState({status:"leftOpen"})
     }
@@ -404,26 +421,22 @@ var SwipeableElement = React.createClass({
       //this.refs.rightElement && this.refs.rightElement.setNativeProps({style: { right: null }});
     }, 300);
   },
-
-  _previousLeft: 0,
-  componentWillMount: function() {
-    this._panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
-      onMoveShouldSetPanResponder: this._handleMoveShouldSetPanResponder,
-      onPanResponderGrant: this._handlePanResponderGrant,
-      onPanResponderMove: this._handlePanResponderMove,
-      onPanResponderRelease: this._handlePanResponderEnd,
-      onPanResponderTerminate: this._handlePanResponderEnd,
-    });
-    this._previousLeft = 0;
-  },
-
   leftButtonWidth: null,
   rightButtonWidth: null,
   render: function() {
     var pullOrRelease = 'Release'
     console.log("refs:%O:",this.refs);
     //TODO:support different length text
+    var rightElementStyle;
+    var leftElementStyle;
+    switch(this.state.status){
+      case "rightOpen":
+        rightElementStyle = {flex:null}
+        break;
+      case "flat":
+        rightElementStyle = {flex:1}
+        break;
+    }
     return (
       <View style = {{justifyContent:"center",
                       flexDirection:'row'}}>
@@ -445,9 +458,10 @@ var SwipeableElement = React.createClass({
         <View ref={'mainElement'} style={styles.swipeableMain} {...this._panResponder.panHandlers}>
           {this.props.component}
         </View>
-        <View ref={'rightElement'} style={styles.swipeableRight}
+        <View ref = {'rightElement'}
+              style = {[styles.swipeableRight,]}
               onLayout= {({ nativeEvent: { layout: { width, height } } }) =>
-                {
+                {//rightElementStyle
                   if(!this.rightButtonWidth){
                     this.rightButtonWidth = width;
                     console.log("www2:%O:",width);

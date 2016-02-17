@@ -11,6 +11,7 @@
     "@cycle/react-native": "git+http://github.com/uk-ar/cycle-react-native.git",
     "isbn": "^0.2.0",
     "lodash": "^3.10.1",
+    "react-addons-pure-render-mixin": "^0.14.7",
     "react-native": "^0.20.0",
     "react-native-emoji": "^1.1.1",
     "react-native-gifted-spinner": "0.0.3",
