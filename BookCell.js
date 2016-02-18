@@ -329,13 +329,30 @@ var SwipeableElement = React.createClass({
   //mixins: [PureRenderMixin],
   _panResponder: {},
   _previousLeft: 0,
+
   componentWillMount: function() {
+    this._animatedValue = new Animated.ValueXY();
+    this._value = {x: 0, y: 0};
+
+    this._animatedValue.addListener((value) => this._value = value);
+
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
       onMoveShouldSetPanResponder: this._handleMoveShouldSetPanResponder,
-      onPanResponderGrant: this._handlePanResponderGrant,
-      onPanResponderMove: this._handlePanResponderMove,
-      onPanResponderRelease: this._handlePanResponderEnd,
+      //onPanResponderGrant: this._handlePanResponderGrant,
+      onPanResponderGrant: () => {
+        this._animatedValue.setOffset({x: this._value.x, y: this._value.y});
+        this._animatedValue.setValue({x: 0, y: 0});
+      },
+      //onPanResponderMove: this._handlePanResponderMove,
+      onPanResponderMove: Animated.event([
+          null,
+        {dx: this._animatedValue.x, dy: this._animatedValue.y}
+        ]),
+      //onPanResponderRelease: this._handlePanResponderEnd,
+      onPanResponderRelease: (e,gestureState) =>{
+        this._animatedValue.flattenOffset();
+      },
       onPanResponderTerminate: this._handlePanResponderEnd,
     });
     this._previousLeft = 0;
@@ -380,7 +397,6 @@ var SwipeableElement = React.createClass({
     return {
       //"leftOpen" , "leftRelease", "flat",
       //"rightOpen", "rightRelease"
-      status: "flat"
     };
   },
   _setStatus: function(posLeft){
@@ -421,6 +437,9 @@ var SwipeableElement = React.createClass({
       //this.refs.rightElement && this.refs.rightElement.setNativeProps({style: { right: null }});
     }, 300);
   },
+  //http://browniefed.com/react-native-animation-book/events/SCROLL.html
+  //http://browniefed.com/blog/2015/08/15/react-native-animated-api-with-panresponder/
+  //interface datasource & renderbutton(include default)
   leftButtonWidth: null,
   rightButtonWidth: null,
   render: function() {
@@ -437,6 +456,81 @@ var SwipeableElement = React.createClass({
         rightElementStyle = {flex:1}
         break;
     }
+    this._animateRightButtonsWidth = new Animated.Value(0);
+    //text width not accept shrink
+    //this._animateRightButtonWidth = new Animated.Value(100);
+    var rightButton = (
+      <Animated.View
+             ref = {'rightElement'}
+             style = {[styles.swipeableRight,
+                       {left: this._animatedValue.x,
+                        width: this._animateRightButtonsWidth,
+                        }]}
+             onLayout= {({ nativeEvent: { layout: { width, height } } }) =>
+               {
+                 if(!this.rightButtonWidth){
+                   this.rightButtonWidth = width;
+                   console.log("rightButtonWidth:%O:",width);//124
+                   Animated.timing(
+                     this._animateRightButtonsWidth,{
+                       duration:0,
+                       toValue:
+                       this._animatedValue.x
+                           .interpolate({
+                             inputRange:[
+                            //-1 * this.rightButtonWidth - 1,
+                             -1 * this.rightButtonWidth,
+                              0
+                             ],
+                             outputRange:[
+                              // this.rightButtonWidth,
+                               this.rightButtonWidth,
+                               0,
+                             ]
+                           })
+                     }).start();
+                   //move to children?
+                   {/* Animated.timing(
+                   this._animateRightButtonWidth,{
+                   duration:0,
+                   toValue:
+                   this._animatedValue.x
+                   .interpolate({
+                   inputRange:[
+                   //-1 * this.rightButtonWidth ,
+                   -1 * this.rightButtonWidth / 3,
+                   0
+                   ],
+                   outputRange:[
+                   // this.rightButtonWidth,
+                   //this.rightButtonWidth / 3,
+                   this.rightButtonWidth / 3,
+                   0,
+                   ]
+                   })
+                   }).start() */}
+                 }}}
+      >
+        <Animated.Text ref={'rightText'}
+              numberOfLines={1}
+              style={[styles.rightText,
+                      {backgroundColor:"red",
+                       width: this._animateRightButtonWidth,
+                      }]}>
+          foo
+        </Animated.Text>
+        <Text ref={'rightText'}
+              numberOfLines={1}
+              style={[styles.rightText,{backgroundColor:"green"}]}>
+          bar
+        </Text>
+        <Text ref={'rightText'}
+              numberOfLines={1}
+              style={[styles.rightText,{backgroundColor:"blue"}]}>
+          baz
+        </Text>
+      </Animated.View>
+    )
     return (
       <View style = {{justifyContent:"center",
                       flexDirection:'row'}}>
@@ -454,36 +548,13 @@ var SwipeableElement = React.createClass({
               {pullOrRelease} to {this.props.swipeRightTitle}
             </Text>
           </View>
-
-        <View ref={'mainElement'} style={styles.swipeableMain} {...this._panResponder.panHandlers}>
+          <Animated.View ref={'mainElement'}
+                         style={[styles.swipeableMain,
+                                 {left:this._animatedValue.x }]}
+                         {...this._panResponder.panHandlers}>
           {this.props.component}
-        </View>
-        <View ref = {'rightElement'}
-              style = {[styles.swipeableRight,]}
-              onLayout= {({ nativeEvent: { layout: { width, height } } }) =>
-                {//rightElementStyle
-                  if(!this.rightButtonWidth){
-                    this.rightButtonWidth = width;
-                    console.log("www2:%O:",width);
-                  }}
-                        }
-        >
-          <Text ref={'rightText'}
-                numberOfLines={1}
-                style={[styles.rightText,{backgroundColor:"red"}]}>
-            foo
-          </Text>
-          <Text ref={'rightText'}
-                numberOfLines={1}
-                style={[styles.rightText,{backgroundColor:"green"}]}>
-            bar
-          </Text>
-          <Text ref={'rightText'}
-                numberOfLines={1}
-                style={[styles.rightText,{backgroundColor:"blue"}]}>
-            baz
-          </Text>
-        </View>
+          </Animated.View>
+          {rightButton}
       </View>
       </View>
     );
@@ -604,7 +675,7 @@ var styles = StyleSheet.create({
     color:'#FFFFFF',
     padding:10,
     //biblio
-    //flex:1,
+    flex:1,
     //flex:null,
     //https://github.com/facebook/react-native/issues/364
     //width: '100%'
