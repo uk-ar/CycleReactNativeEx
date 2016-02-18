@@ -330,11 +330,69 @@ var SwipeableElement = React.createClass({
   _panResponder: {},
   _previousLeft: 0,
 
+  getStatus: function(PosX) {
+    if(PosX < -1 * this.rightButtonWidth - styles.swipeableMain){
+      return "releasedLeft"
+    }else if(
+      (-1 * this.rightButtonWidth - styles.swipeableMain < PosX) &&
+      (PosX < -1 * this.rightButtonWidth - styles.swipeableMain/2)
+    )else if(
+      (-1 * this.rightButtonWidth - styles.swipeableMain/2) &&
+      (PosX < -1 * this.rightButtonWidth){
+      //this.setState({status:"rightOpen"})
+      //this._animateRightButtonFlex.setValue(0);//fixed
+      }else if(
+        (-1 * this.rightButtonWidth < PosX) &&
+        (PosX < this.leftButtonWidth)){
+      //this.setState({status:"flat"})
+      //this._animateRightButtonFlex.setValue(1);
+    }else if(this.leftButtonWidth < PosX){
+      //this.setState({status:"leftOpen"})
+    }
+  }
+
   componentWillMount: function() {
     this._animatedValue = new Animated.ValueXY();
     this._value = {x: 0, y: 0};
 
-    this._animatedValue.addListener((value) => this._value = value);
+    this._animatedValue.addListener((value) => {
+      this._value = value
+      console.log("v:%O", value)
+      Animated.timing(
+        this._animateRightButtonsWidth,{
+          duration:0,
+          toValue:
+          this._animatedValue.x
+              .interpolate({
+                inputRange:[
+                  //-1 * this.rightButtonWidth - 1,
+                 -1 * this.rightButtonWidth,
+                  0
+                ],
+                outputRange:[
+                  // this.rightButtonWidth,
+                  this.rightButtonWidth,
+                  0,
+                ]
+              })
+        }).start();
+      /* inputRange:[
+         -1 * this.rightButtonWidth -
+         styles.swipeableMain,
+         -1 * this.rightButtonWidth -
+         styles.swipeableMain / 2,
+         -1 * this.rightButtonWidth,
+         0
+         ],
+         outputRange:[
+         1,
+         0,//fixed
+         0,//fixed
+         1,
+         ] */
+
+      /*  */
+    });
 
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
@@ -457,8 +515,9 @@ var SwipeableElement = React.createClass({
         break;
     }
     this._animateRightButtonsWidth = new Animated.Value(0);
-    //text width not accept shrink
-    //this._animateRightButtonWidth = new Animated.Value(100);
+    //text width can not accept shrink
+    this._animateRightButtonFlex = new Animated.Value(1);
+    this._animateRightButtonEndFlex = new Animated.Value(1);
     var rightButton = (
       <Animated.View
              ref = {'rightElement'}
@@ -471,64 +530,32 @@ var SwipeableElement = React.createClass({
                  if(!this.rightButtonWidth){
                    this.rightButtonWidth = width;
                    console.log("rightButtonWidth:%O:",width);//124
-                   Animated.timing(
-                     this._animateRightButtonsWidth,{
-                       duration:0,
-                       toValue:
-                       this._animatedValue.x
-                           .interpolate({
-                             inputRange:[
-                            //-1 * this.rightButtonWidth - 1,
-                             -1 * this.rightButtonWidth,
-                              0
-                             ],
-                             outputRange:[
-                              // this.rightButtonWidth,
-                               this.rightButtonWidth,
-                               0,
-                             ]
-                           })
-                     }).start();
-                   //move to children?
-                   {/* Animated.timing(
-                   this._animateRightButtonWidth,{
-                   duration:0,
-                   toValue:
-                   this._animatedValue.x
-                   .interpolate({
-                   inputRange:[
-                   //-1 * this.rightButtonWidth ,
-                   -1 * this.rightButtonWidth / 3,
-                   0
-                   ],
-                   outputRange:[
-                   // this.rightButtonWidth,
-                   //this.rightButtonWidth / 3,
-                   this.rightButtonWidth / 3,
-                   0,
-                   ]
-                   })
-                   }).start() */}
                  }}}
       >
         <Animated.Text ref={'rightText'}
               numberOfLines={1}
               style={[styles.rightText,
                       {backgroundColor:"red",
-                       width: this._animateRightButtonWidth,
+                       flex: this._animateRightButtonFlex
                       }]}>
           foo
         </Animated.Text>
-        <Text ref={'rightText'}
-              numberOfLines={1}
-              style={[styles.rightText,{backgroundColor:"green"}]}>
+        <Animated.Text ref={'rightText'}
+                       numberOfLines={1}
+                       style =
+                       {[styles.rightText,
+                         {backgroundColor:"green",
+                          flex: this._animateRightButtonFlex}]}>
           bar
-        </Text>
-        <Text ref={'rightText'}
+        </Animated.Text>
+        <Animated.Text ref={'rightText'}
               numberOfLines={1}
-              style={[styles.rightText,{backgroundColor:"blue"}]}>
+              style =
+              {[styles.rightText,
+                {backgroundColor:"blue",
+                 flex: this._animateRightButtonEndFlex}]}>
           baz
-        </Text>
+        </Animated.Text>
       </Animated.View>
     )
     return (
