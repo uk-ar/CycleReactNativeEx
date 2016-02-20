@@ -360,14 +360,45 @@ var SwipeableElement = React.createClass({
     this._animateRightButtonFlex = new Animated.Value(0);
     this._animateRightButtonEndFlex = new Animated.Value(0);
 
+    this._animateLeftButtonsWidth = new Animated.Value(0);
+    this._animateLeftButtonFlex = new Animated.Value(0);
+    this._animateLeftButtonEndFlex = new Animated.Value(0);
+
+    this._animateMainLeft = new Animated.Value(0);
+
     this._animateRightButtonFlex.addListener((value) => {
       console.log("animateRightButtonFlex:%O", value);
+    });
+
+    this._animateLeftButtonsWidth.addListener((value) => {
+      console.log("animateLeftButtonsWidth:%O", value);
     })
 
     this._animatedValue.addListener((value) => {
       this._value = value
       console.log("v:%O", value);
 
+      Animated.timing(
+        this._animateMainLeft,{
+          duration:0,
+          toValue:
+          this._animatedValue.x
+              .interpolate({
+                inputRange:[
+                 -1 * this.rightButtonWidth,
+                  0,
+                  this.leftButtonWidth
+                ],
+                outputRange:[
+                  -1 * this.rightButtonWidth,
+                  0,
+                  0
+                  //0,this.leftButtonWidth/2
+                ]
+              })
+        }).start();
+
+      //not needed ?
       Animated.timing(
         this._animateRightButtonsWidth,{
           duration:0,
@@ -427,6 +458,49 @@ var SwipeableElement = React.createClass({
                 ]
               })
         }).start();
+
+      //not needed
+      Animated.timing(
+        this._animateLeftButtonsWidth,{
+          duration:0,
+          toValue:
+          this._animatedValue.x
+              .interpolate({
+                inputRange:[
+                  0,
+                  0.1,
+                  this.leftButtonWidth,
+                ],
+                outputRange:[
+                  0.1,
+                  0.1,
+                  this.leftButtonWidth,
+                ]
+              })
+        }).start();
+
+      Animated.timing(
+        this._animateLeftButtonFlex,{
+          duration:0,
+          toValue:
+          this._animatedValue.x
+              .interpolate({
+                inputRange:[
+                  0,
+                  this.leftButtonWidth,
+                  this.leftButtonWidth +
+                  (SWIPEABLE_MAIN_WIDTH - this.leftButtonWidth)/2,
+                  SWIPEABLE_MAIN_WIDTH,
+                ],
+                outputRange:[
+                  // this.rightButtonWidth,
+                  0,
+                  this.leftButtonWidth,
+                  this.leftButtonWidth,
+                  SWIPEABLE_MAIN_WIDTH,
+                ]
+              })
+        }).start();
       /* inputRange:[
          -1 * this.rightButtonWidth -
          styles.swipeableMain,
@@ -450,7 +524,8 @@ var SwipeableElement = React.createClass({
       onMoveShouldSetPanResponder: this._handleMoveShouldSetPanResponder,
       //onPanResponderGrant: this._handlePanResponderGrant,
       onPanResponderGrant: () => {
-        this._animatedValue.setOffset({x: this._value.x, y: this._value.y});
+        this._animatedValue.setOffset({x: this._value.x,
+                                       y: this._value.y});
         this._animatedValue.setValue({x: 0, y: 0});
       },
       //onPanResponderMove: this._handlePanResponderMove,
@@ -628,12 +703,16 @@ var SwipeableElement = React.createClass({
       </Animated.View>
         </Animated.View>
     )
-      //
+      //this._animateLeftButtonsWidth,
     return (
       <View style = {{justifyContent:"center",
                       flexDirection:'row'}}>
       <View style={styles.swipeableElementWrapper}>
-        <View ref = {'leftElement'} style = {[styles.swipeableLeft]}
+        <Animated.View ref = {'leftElement'}
+              style = {[styles.swipeableLeft,
+                        {width: this._animateLeftButtonsWidth,
+                         backgroundColor:"yellow"}
+                ]}
               onLayout= {({ nativeEvent: { layout: { width, height } } }) =>
                 {
                   if(!this.leftButtonWidth){
@@ -641,14 +720,45 @@ var SwipeableElement = React.createClass({
                     console.log("www1:%O:",width);
                   }}
                 }
-          >
-          <Text ref={'leftText'} style={styles.leftText}>
+        >
+          <Animated.View style = {{
+              flex:1
+              //this._animateLeftButtonFlex
+            }}>
+            <Animated.Text ref = {'leftText'}
+                           numberOfLines={1}
+                           style = {[styles.leftText,
+                                     {
+                                       backgroundColor:"black"
+                                     }]}>
               {pullOrRelease} to {this.props.swipeRightTitle}
-            </Text>
-          </View>
-          <Animated.View ref={'mainElement'}
-                         style={[styles.swipeableMain,
-                                 {left:this._animatedValue.x }]}
+            </Animated.Text>
+          </Animated.View>
+          <Animated.View style = {{
+              flex:1
+              //this._animateLeftButtonFlex
+            }}>
+            <Animated.Text ref = {'leftText'}
+                           numberOfLines={1}
+                           style = {[styles.leftText,
+                                     {
+                                       backgroundColor:"orange"
+                                     }]}>
+              bar
+            </Animated.Text>
+          </Animated.View>
+          </Animated.View>
+          <Animated.View
+             ref={'mainElement'}
+             style={[styles.swipeableMain,
+                     {left:
+                      //this._animatedValue.x,
+                      this._animateMainLeft
+                      /* Animated.add(
+                      this._animateLeftButtonsWidth) */
+                     }
+                             //to use negative value
+               ]}
                          {...this._panResponder.panHandlers}>
           {this.props.component}
           </Animated.View>
@@ -656,6 +766,12 @@ var SwipeableElement = React.createClass({
       </View>
       </View>
     );
+    //Animated.multiply(,new Animated.Value(0.5))
+    /* {left:
+       Animated.multiply(
+       this._animatedValue.x,
+       new Animated.Value(0.5))
+       } */
   }
 });
 var SWIPEABLE_MAIN_WIDTH = 150
@@ -744,13 +860,13 @@ var styles = StyleSheet.create({
     backgroundColor: 'gray',
   },
   swipeableLeft: {
-    overflow: 'hidden',
+    //overflow: 'hidden',
     //width: 100,
     //width: 0.1,
     //flex:1,
-    backgroundColor: 'black',
+    //backgroundColor: 'black',
     flexDirection:'row',
-    justifyContent:'flex-end',//horizontal
+    justifyContent:'flex-start',//horizontal
   },
   leftText: {
     color:'#FFFFFF',
