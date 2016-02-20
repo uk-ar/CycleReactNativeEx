@@ -1,208 +1,33 @@
-var React = require('react-native');
-let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
-var FAIcon = require('react-native-vector-icons/FontAwesome');
-var MIcon = require('react-native-vector-icons/MaterialIcons');
-var GiftedSpinner = require('react-native-gifted-spinner');
-var Emoji = require('react-native-emoji');
-var Swipeout = require('react-native-swipeout');
-import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
-
-var {
-  TouchableOpacity,
-  ActivityIndicatorIOS,
-  ListView,
-  Platform,
-  ProgressBarAndroid,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableHighlight,
-  TouchableNativeFeedback,
-  LayoutAnimation,
-  // cell
-  PixelRatio,
-  // searchBar
-  TextInput,
-  ToolbarAndroid,
-  Navigator,
-  NavigatorIOS,
-  Animated,
-  ScrollView,
-  PanResponder,
-} = React;
-
-var Dimensions = require('Dimensions');
-var {
-  width,
-  height
-} = Dimensions.get('window');
-
-var LibraryStatus = React.createClass({
-  render: function() {
-    var libraryStatus = this.props.libraryStatus || {};
-
-    var text, name, backgroundColor;
-
-    if(libraryStatus.rentable){
-      text="貸出可"
-      style={backgroundColor: "#03A9F4"} //light blue
-    }else if(libraryStatus.exist){
-      text="貸出中"
-      style={backgroundColor: "#FFC107"} //yellow
-    }else if(libraryStatus.exist !== undefined){
-      text="なし"
-      style={backgroundColor: "#9E9E9E"} //grey
-    }else{
-      //text="取得中"
-    }
-    //http://www.google.com/design/spec/style/color.html#color-color-palette
-    if(text){
-      return (
-        <View style = {[styles.rating, styles.row, style]}
-        >
-          <Text>
-            {text}
-          </Text>
-        </View>
-      );
-    }else{
-      return (
-        <View style = {[styles.rating, styles.row]}>
-          <Text>
-            {"蔵書確認中"}
-          </Text>
-          <GiftedSpinner />
-        </View>
-      )
-    }
-    /*
-       <Icon.Button name="facebook" backgroundColor="#3b5998">
-       </Icon.Button>
-       <Text>
-       <Emoji name = "ok"/>
-       {text}
-       </Text> */
-
-    {/*  <View style = {styles.iconContainer}>
-        <Icon name = "building-o" size = {30}
-        style={styles.libIcon}/>
-        </View>
-        <Icon name = "book" size={30} color="#900"/>
-        <Icon name = "building" size={30} color="#900"/>
-        <Icon name = "archive" size={30} color="#900"/>
-        google icon location city
-      */}
-    {/* <Text style={[styles.ratingValue, getStyleFromScore(criticsScore)]}>
-        {getTextFromScore(criticsScore)}
-        </Text>
-      */}
-  },
-});
-
-var BookCell = React.createClass({
-  render: function(){
-    var movie=this.props.movie;
-    var TouchableElement = TouchableHighlight;
-    if (Platform.OS === 'android') {
-      TouchableElement = TouchableNativeFeedback;
-    }
-    var swipeoutBtns = [
-      {
-        text: '読みたい',
-        onPress: () => {
-          this.props.actions$.addInbox$.onNext(movie);
-          console.log("add:%O", movie);
-        }
-      },
-      {
-        text: '削除',
-        onPress: () => {
-          this.props.actions$.removeInbox$.onNext(movie);
-          console.log("remove:%O", movie);
-        }
-      }
-    ]
-    //conflict with cell action open state & update
-    /*
-       onPress={(e) => console.log("cell action:%O", e)}
-       key="cell"
-       close={true}
-       onOpen = {(sectionID, rowID) =>
-       this.props.handleSwipeout(sectionID, rowID)}
-       close={!movie.active}
-       // overflow: "hidden" //cannot work with android
-     */
-    var content = movie.active ? (
-      <Swipeout
-          selector="swipeout"
-          left={swipeoutBtns}
-          rowID = {this.props.rowID}
-          autoClose={true}
-      >
-        <TouchableElement
-            selector="cell"
-            item={movie}
-            onPress={(e) => console.log("cell action:%O", e)}
-        >
-          <TouchableOpacity>
-            <Animated.View style = {[styles.row]}>
-              <Image
-                  source={{uri: movie.thumbnail}}
-                  style={[styles.cellImage]}
-              />
-              <View style={styles.textContainer}>
-                <Text style={styles.movieTitle} numberOfLines={2}>
-                  {movie.title}
-                </Text>
-                <Text style={styles.movieYear} numberOfLines={1}>
-                  {movie.author}
-                </Text>
-                <LibraryStatus libraryStatus={movie.libraryStatus}/>
-              </View>
-            </Animated.View>
-          </TouchableOpacity>
-        </TouchableElement>
-      </Swipeout>
-    ) : <View style={{backgroundColor: "white"}}/>
-      //return(<AnimatedFlick/>)}
-  /* return(
-     <CycleView>
-     {content}
-     </CycleView>
-     ) */
-  return(
-    <SwipeableElement
-        component={<Text>{'Some Text'}</Text>}
-        swipeRightTitle={'Delete'}
-        swipeRightTextColor={'#FFFFFF'}
-        swipeRightBackgroundColor={'#000000'}
-        swipeLeftTitle={'Archive'}
-        swipeLeftTextColor={'#FFFFFF'}
-        swipeLeftBackgroundColor={'#FF0000'}
-        onSwipeRight={() => {
-            // Handle swipe
-          }}
-        onSwipeLeft={() => {
-            // Swipe left
-          }} />
-  )
-}, //collapsable={false}
-});
-
-var Dimensions = require('Dimensions');
-
-var SCREEN_WIDTH = Dimensions.get('window').width;
-var SCREEN_HEIGHT = Dimensions.get('window').height;
-var SWIPEABLE_MAIN_WIDTH = 150
-
 var SwipeableElement = React.createClass({
+  //mixins: [PureRenderMixin],
   _panResponder: {},
   _previousLeft: 0,
+
+  /* getStatus: function(PosX) {
+     if(PosX < -1 * this.rightButtonWidth - styles.swipeableMain){
+     return "releasedLeft"
+     }else if(
+     (-1 * this.rightButtonWidth - styles.swipeableMain < PosX) &&
+     (PosX < -1 * this.rightButtonWidth - styles.swipeableMain/2)
+     )else if(
+     (-1 * this.rightButtonWidth - styles.swipeableMain/2) &&
+     (PosX < -1 * this.rightButtonWidth){
+     //this.setState({status:"rightOpen"})
+     //this._animateRightButtonFlex.setValue(0);//fixed
+     }else if(
+     (-1 * this.rightButtonWidth < PosX) &&
+     (PosX < this.leftButtonWidth)){
+     //this.setState({status:"flat"})
+     //this._animateRightButtonFlex.setValue(1);
+     }else if(this.leftButtonWidth < PosX){
+     //this.setState({status:"leftOpen"})
+     }
+     } */
 
   componentWillMount: function() {
     this._animatedValue = new Animated.ValueXY();
     this._value = {x: 0, y: 0};
+    console.log("wiw:%O", styles);
 
     this._animateRightButtonsWidth = new Animated.Value(0);
     this._animateRightButtonFlex = new Animated.Value(0);
@@ -233,12 +58,12 @@ var SwipeableElement = React.createClass({
             this._animatedValue.x
                 .interpolate({
                   inputRange:[
-               -1 * this.rightButtonWidth,
+                -1 * this.rightButtonWidth,
                     0,
                     this.leftButtonWidth
                   ],
                   outputRange:[
-                -1 * this.rightButtonWidth,
+                 -1 * this.rightButtonWidth,
                     0,
                     0
                     //0,this.leftButtonWidth/2
@@ -273,9 +98,9 @@ var SwipeableElement = React.createClass({
             this._animatedValue.x
                 .interpolate({
                   inputRange:[
+                      -1 * SWIPEABLE_MAIN_WIDTH,
                      -1 * SWIPEABLE_MAIN_WIDTH,
-                    -1 * SWIPEABLE_MAIN_WIDTH,
-                    -1 * this.rightButtonWidth,
+                     -1 * this.rightButtonWidth,
                     0
                   ],
                   outputRange:[
@@ -294,8 +119,8 @@ var SwipeableElement = React.createClass({
             this._animatedValue.x
                 .interpolate({
                   inputRange:[
-             -1 * SWIPEABLE_MAIN_WIDTH,
-            -1 * this.rightButtonWidth,
+              -1 * SWIPEABLE_MAIN_WIDTH,
+             -1 * this.rightButtonWidth,
                     0
                   ],
                   outputRange:[
@@ -337,7 +162,7 @@ var SwipeableElement = React.createClass({
                     0,
                     this.leftButtonWidth,
                     this.leftButtonWidth +
-                    (SWIPEABLE_MAIN_WIDTH - this.leftButtonWidth)/2,
+                   (SWIPEABLE_MAIN_WIDTH - this.leftButtonWidth)/2,
                     SWIPEABLE_MAIN_WIDTH,
                   ],
                   outputRange:[
@@ -349,20 +174,39 @@ var SwipeableElement = React.createClass({
                   ]
                 })
           }).start();
+        /* inputRange:[
+           -1 * this.rightButtonWidth -
+           styles.swipeableMain,
+           -1 * this.rightButtonWidth -
+           styles.swipeableMain / 2,
+           -1 * this.rightButtonWidth,
+           0
+           ],
+           outputRange:[
+           1,
+           0,//fixed
+           0,//fixed
+           1,
+           ] */
+
+        /*  */
       });
 
     this._panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
+      onMoveShouldSetPanResponder: this._handleMoveShouldSetPanResponder,
+      //onPanResponderGrant: this._handlePanResponderGrant,
       onPanResponderGrant: () => {
         this._animatedValue.setOffset({x: this._value.x,
                                        y: this._value.y});
         this._animatedValue.setValue({x: 0, y: 0});
       },
+      //onPanResponderMove: this._handlePanResponderMove,
       onPanResponderMove: Animated.event([
         null,
         {dx: this._animatedValue.x, dy: this._animatedValue.y}
       ]),
+      //onPanResponderRelease: this._handlePanResponderEnd,
       onPanResponderRelease: (e,gestureState) =>{
         this._animatedValue.flattenOffset();
       },
@@ -371,6 +215,22 @@ var SwipeableElement = React.createClass({
     this._previousLeft = 0;
   },
 
+  _handleStartShouldSetPanResponder: function() {
+    return true;
+  },
+
+  _handleMoveShouldSetPanResponder: function() {
+    return true;
+  },
+
+  _handlePanResponderGrant: function() {},
+
+  _handlePanResponderMove: function(e, gestureState) {
+    //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    posLeft = this._previousLeft + gestureState.dx
+    this._updatePosition(posLeft)
+      //this.setState({ dx });//this.state.dx
+  },
   _updatePosition: function(posLeft){
     var leftWidth  = 0 < posLeft ? posLeft : 0.00001
     var rightWidth = 0 < posLeft ? 0.00001 : -1 * posLeft
@@ -713,5 +573,3 @@ var styles = StyleSheet.create({
     //padding:10,
   }
 });
-
-module.exports = {BookCell};
