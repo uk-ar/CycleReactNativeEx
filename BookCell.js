@@ -210,7 +210,7 @@ var SwipeableElement = React.createClass({
     this._animateLeftButtonsWidth = new Animated.Value(0);
     //used by main left
     this._animateMainLeft = new Animated.Value(0);
-
+    //this._animatedValue.interpolate
     this._animatedValue.addListener(({value:value}) => {
       console.log("v:%O", value);
       this._value = value;
@@ -237,78 +237,48 @@ var SwipeableElement = React.createClass({
       ]),
       onPanResponderRelease: (e,gestureState) =>{
         this._animatedValue.flattenOffset();
-        //this._updatePosition(gestureState.dx + this._value)
+        LayoutAnimation.configureNext(
+          LayoutAnimation.Presets.easeInEaseOut);
+        this._animatedValue
+            .setValue(
+              this._calcPosition(gestureState.dx + this._value));
       },
       //onPanResponderTerminate: this._handlePanResponderEnd,
     });
     //this._previousLeft = 0;
   },
-  _updatePosition: function(posLeft){
-
-  },
-  getInitialState: function() {
-    return {
-      //"leftOpen" , "leftRelease", "flat",
-      //"rightOpen", "rightRelease"
-    };
-  },
-  _setStatus: function(posLeft){
-    if(posLeft < -1 * this.rightButtonWidth){
-      //this.setState({status:"rightOpen"})
-      //React.Children.forEach(this.refs.rightElement.props.children,         (elem) => {
-      //})
-      //https://github.com/facebook/react-native/blob/0293def7a9898f25699dcb2685aff2c5cecf152d/Libraries/Components/Touchable/TouchableOpacity.js
-    }else if((-1 * this.rightButtonWidth < posLeft) && (posLeft < this.leftButtonWidth)){
-      //this.setState({status:"flat"})
-
-    }else if(this.leftButtonWidth < posLeft){
-      //this.setState({status:"leftOpen"})
-    }
-  },
-  _handlePanResponderEnd: function(e: Object, gestureState: Object)
-  {
-    posLeft = this._previousLeft + gestureState.dx;
+  leftButtonWidth: null,
+  rightButtonWidth: null,
+  _calcPosition: function(posLeft){
     var newPos;
-    if(posLeft < -1 * this.rightButtonWidth / 2){
-      newPos =  -1 * this.rightButtonWidth;//right button size
-    }else if((-1 * this.rightButtonWidth / 2 < posLeft) && (posLeft < this.leftButtonWidth / 2)){
+    var rightReleasePos = this.leftButtonWidth/2 + Math.min(this.leftButtonWidth, SWIPEABLE_MAIN_WIDTH/2);
+    var leftReleasePos = - this.rightButtonWidth/2 - Math.min(this.rightButtonWidth, SWIPEABLE_MAIN_WIDTH/2);
+
+    if(posLeft < leftReleasePos){
+      newPos = - SWIPEABLE_MAIN_WIDTH;
+    }else if((posLeft < - this.rightButtonWidth / 2) &&
+             (leftReleasePos < posLeft)){
+      newPos = - this.rightButtonWidth;//right button size
+    }else if((- this.rightButtonWidth / 2 < posLeft) &&
+             (posLeft < this.leftButtonWidth / 2)){
       newPos = 0;//flat
-    }else if(this.leftButtonWidth / 2 < posLeft){
+    }else if((this.leftButtonWidth / 2 < posLeft) &&
+             (posLeft < rightReleasePos)){
       newPos = this.leftButtonWidth;//left button size
-      //newPos = 150;//left button size
-    }else{
-      newPos = 100;
+    }else if(rightReleasePos < posLeft ){
+      newPos = SWIPEABLE_MAIN_WIDTH;
     }
-    console.log("pos:%O",newPos)
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    this._updatePosition(newPos);
-    this._previousLeft = newPos;
-    // Reset the left/right values after the animation finishes
-    // This feels hacky and I hope there's a better way to do this
-    setTimeout(() => {
-      //this.refs.leftElement && this.refs.leftElement.setNativeProps({style: { left: null }});
-      //this.refs.rightElement && this.refs.rightElement.setNativeProps({style: { right: null }});
-    }, 300);
+    return newPos;
   },
   //http://browniefed.com/react-native-animation-book/events/SCROLL.html
   //http://browniefed.com/blog/2015/08/15/react-native-animated-api-with-panresponder/
   //interface datasource & renderbutton(include default)
-  leftButtonWidth: null,
-  rightButtonWidth: null,
   render: function() {
     var pullOrRelease = 'Release'
     console.log("refs:%O:",this.refs);
     //TODO:support different length text
     var rightElementStyle;
     var leftElementStyle;
-    switch(this.state.status){
-      case "rightOpen":
-        rightElementStyle = {flex:null}
-        break;
-      case "flat":
-        rightElementStyle = {flex:1}
-        break;
-    }
 
     var rightButton = (
       <Animated.View
@@ -320,8 +290,9 @@ var SwipeableElement = React.createClass({
                        }]}
              onLayout= {({ nativeEvent: { layout: { width, height } } })=>
                    {if(!this.rightButtonWidth){
-                       this.rightButtonWidth = width;
-                       console.log("rightButtonWidth:%O:",width);//124
+                     this.rightButtonWidth = width;
+                     console.log("rightButtonWidth:%O:",width);//124
+                     this._animatedValue.setValue(0);
                    }}}
       >
         <Animated.View style = {{backgroundColor:"red",
@@ -381,10 +352,13 @@ var SwipeableElement = React.createClass({
             >
               <Animated.View style = {{padding:10,
                                        backgroundColor:"black",
+                                       flex:1,
+                                       flexDirection:'row',
+                                       justifyContent:"flex-end"
                 }}>
                 <Text ref = {'leftText'}
-                               style = {[styles.leftText,
-                                         ]}>
+        style = {[styles.leftText,]}
+        numberOfLines = {1}>
                   {pullOrRelease} to {this.props.swipeRightTitle}
                 </Text>
               </Animated.View>
@@ -403,12 +377,6 @@ var SwipeableElement = React.createClass({
              ref={'mainElement'}
              style={[styles.swipeableMain,
                      {left: this._animateMainLeft}
-                     /*{left:
-                     //this._animatedValue.x,
-                        this._animateMainLeft
-                     /* Animated.add(
-                     this._animateLeftButtonsWidth)
-                     */
                  //to use negative value
                ]}
              >
@@ -418,12 +386,6 @@ var SwipeableElement = React.createClass({
           </View>
         </View>
       );
-    //Animated.multiply(,new Animated.Value(0.5))
-    /* {left:
-       Animated.multiply(
-       this._animatedValue.x,
-       new Animated.Value(0.5))
-       } */
   }
 });
 
