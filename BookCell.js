@@ -194,15 +194,15 @@ var Dimensions = require('Dimensions');
 
 var SCREEN_WIDTH = Dimensions.get('window').width;
 var SCREEN_HEIGHT = Dimensions.get('window').height;
-var SWIPEABLE_MAIN_WIDTH = 150
+var SWIPEABLE_MAIN_WIDTH = 300;
 
 var SwipeableElement = React.createClass({
   _panResponder: {},
   _previousLeft: 0,
 
   componentWillMount: function() {
-    this._animatedValue = new Animated.ValueXY();
-    this._value = {x: 0, y: 0};
+    this._animatedValue = new Animated.Value(0);
+    this._value = 0;
 
     //used by right width
     this._animateRightButtonsWidth = new Animated.Value(0);
@@ -211,114 +211,40 @@ var SwipeableElement = React.createClass({
     //used by main left
     this._animateMainLeft = new Animated.Value(0);
 
-    this._animatedValue.addListener((value) => {
+    this._animatedValue.addListener(({value:value}) => {
+      console.log("v:%O", value);
       this._value = value;
 
-      var leftWidth  = 0 < value ? value : 0.00001
-      var rightWidth = 0 < value ? 0.00001 : -1 * value
-      var left = 0 < value ? 0 : value
+      var leftWidth  = 0 < value ? value : 0.00001 //limit min value
+      var rightWidth = 0 < value ? 0.00001 : - value //invert value
+      var mainLeft = 0 < value ? 0 : value //limit max value
 
-      //limit max value
-      Animated.timing(
-        this._animateMainLeft,{
-          duration:0,
-          toValue:
-          this._animatedValue.x
-              .interpolate({
-                inputRange:[
-        -1 * this.rightButtonWidth,
-                  0,
-                  this.leftButtonWidth
-                ],
-                outputRange:[
-        -1 * this.rightButtonWidth,
-                  0,
-                  0
-                ]
-              })
-        }).start();
-
-        //revert value
-        Animated.timing(
-          this._animateRightButtonsWidth,{
-            duration:0,
-            toValue:
-            this._animatedValue.x
-                .interpolate({
-                  inputRange:[
-                   -1 * this.rightButtonWidth,
-                    0
-                  ],
-                  outputRange:[
-                    this.rightButtonWidth,
-                    0,
-                  ]
-                })
-          }).start();
-
-        //setting zero
-        Animated.timing(
-          this._animateLeftButtonsWidth,{
-            duration:0,
-            toValue:
-            this._animatedValue.x
-                .interpolate({
-                  inputRange:[
-                    0,
-                    0.1,
-                    this.leftButtonWidth,
-                  ],
-                  outputRange:[
-                    0.1,
-                    0.1,
-                    this.leftButtonWidth,
-                  ]
-                })
-          }).start();
-
+      this._animateMainLeft.setValue(mainLeft);
+      this._animateLeftButtonsWidth.setValue(leftWidth);
+      this._animateRightButtonsWidth.setValue(rightWidth);
       });
 
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
-        this._animatedValue.setOffset({x: this._value.x,
-                                       y: this._value.y});
-        this._animatedValue.setValue({x: 0, y: 0});
+        this._animatedValue.setOffset(this._value);
+        this._animatedValue.setValue(0);
       },
       onPanResponderMove: Animated.event([
         null,
-        {dx: this._animatedValue.x, dy: this._animatedValue.y}
+        {dx: this._animatedValue}
       ]),
       onPanResponderRelease: (e,gestureState) =>{
         this._animatedValue.flattenOffset();
-        this._updatePosition(gestureState.dx + this._value.x)
+        //this._updatePosition(gestureState.dx + this._value)
       },
-      onPanResponderTerminate: this._handlePanResponderEnd,
+      //onPanResponderTerminate: this._handlePanResponderEnd,
     });
     //this._previousLeft = 0;
   },
   _updatePosition: function(posLeft){
 
-  },
-  _updatePosition_old: function(posLeft){
-    var leftWidth  = 0 < posLeft ? posLeft : 0.00001
-    var rightWidth = 0 < posLeft ? 0.00001 : -1 * posLeft
-
-    //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    this.refs.leftElement &&
-                     this.refs.leftElement.setNativeProps(
-                       {style:{width: leftWidth }});
-    this.refs.mainElement &&
-                     this.refs.mainElement.setNativeProps(
-                       {style:{left: posLeft - leftWidth}});
-    //close enable
-    console.log("riele:%O",this.refs.rightElement)
-      this.refs.rightElement &&
-                     this.refs.rightElement.setNativeProps(
-                       {style:{width: rightWidth,
-                               left: posLeft - leftWidth}});
-    this._setStatus(posLeft)
   },
   getInitialState: function() {
     return {
@@ -388,8 +314,9 @@ var SwipeableElement = React.createClass({
       <Animated.View
              ref = {'rightElement'}
              style = {[styles.swipeableRight,
-                       {left: this._animatedValue.x,
-                        width: this._animateRightButtonsWidth,
+                       {
+                         left: this._animateMainLeft,
+                         width: this._animateRightButtonsWidth,
                        }]}
              onLayout= {({ nativeEvent: { layout: { width, height } } })=>
                    {if(!this.rightButtonWidth){
@@ -419,7 +346,8 @@ var SwipeableElement = React.createClass({
           </Animated.Text>
         </Animated.View>
         <Animated.View style = {{backgroundColor:"blue",
-                               padding:10,
+                                 padding:10,
+                                 flex:1
                                }}>
           <Animated.Text ref={'rightText'}
                          numberOfLines={1}
@@ -440,7 +368,9 @@ var SwipeableElement = React.createClass({
             <Animated.View
                 ref = {'leftElement'}
                 style = {[styles.swipeableLeft,
-                          {width:this._animateLeftButtonsWidth}
+                          {
+                            width:this._animateLeftButtonsWidth
+                          }
                   ]}
                 onLayout= {({nativeEvent:{layout:{width,height}}}) =>
                              {
@@ -472,12 +402,13 @@ var SwipeableElement = React.createClass({
             <Animated.View
              ref={'mainElement'}
              style={[styles.swipeableMain,
-                     {left:
-                      //this._animatedValue.x,
-                      this._animateMainLeft
-                       /* Animated.add(
-                          this._animateLeftButtonsWidth) */
-                     }
+                     {left: this._animateMainLeft}
+                     /*{left:
+                     //this._animatedValue.x,
+                        this._animateMainLeft
+                     /* Animated.add(
+                     this._animateLeftButtonsWidth)
+                     */
                  //to use negative value
                ]}
              >
