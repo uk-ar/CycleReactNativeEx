@@ -175,10 +175,10 @@ var BookCell = React.createClass({
     <SwipeableElement
         rightButtonSource ={[
             {text: "foo", backgroundColor: "red"},
-            {text: "bar", backgroundColor: "green"},
+            {text: "ba", backgroundColor: "green"},
             //{text: "baz", backgroundColor: "blue", type:"destructive"},
             //type: close cell or close button or limit
-            {text: "baz", backgroundColor: "blue", type:"de"},
+            {text: "b", backgroundColor: "blue", type:"de"},
           ]}
         leftButtonSource = {[
             {text: "foo", backgroundColor: "black"},
@@ -240,18 +240,19 @@ var SwipeableElement = React.createClass({
         {dx: this._animatedValue}
       ]),
       onPanResponderRelease: (e,gestureState) =>{
-        //this._value += gestureState.dx;//not work
         this._animatedValue.flattenOffset();
         LayoutAnimation.configureNext(
           LayoutAnimation.Presets.easeInEaseOut
           //LayoutAnimation.Presets.linear
         );
-        //console.log("th:%O:ges:%O", this._value, gestureState.dx)
         this._animatedValue
             .setValue(
               this._calcPosition(this._value)
             );
       },
+      //https://github.com/facebook/react-native/issues/1046#issuecomment-176744577
+      /* onPanResponderTerminationRequest: () => false,
+         onStartShouldSetPanResponderCapture: () => true, */
       //onPanResponderTerminate: this._handlePanResponderEnd,
     });
     //this._previousLeft = 0;
@@ -260,11 +261,14 @@ var SwipeableElement = React.createClass({
     //https://github.com/CEWendel/SWTableViewCell
     //https://github.com/MortimerGoro/MGSwipeTableCell
     //https://github.com/alikaragoz/MCSwipeTableViewCell
+    //http://koze.hatenablog.jp/entry/2015/06/16/220000
+    //fixed width problem -> cannot detect releasing or not
     if(!this.rightReleasePos){
-      this.rightReleasePos = this.leftButtonWidth + Math.min(this.leftButtonWidth/2, SWIPEABLE_MAIN_WIDTH/4);
-      this.leftReleasePos = - this.rightButtonWidth - Math.min(this.rightButtonWidth/2, SWIPEABLE_MAIN_WIDTH/4);
+      this.rightReleasePos = this.leftButtonWidth
+                           + Math.min(this.leftButtonWidth/2, SWIPEABLE_MAIN_WIDTH/4);
+      this.leftReleasePos = - this.rightButtonWidth
+                          - Math.min(this.rightButtonWidth/2, SWIPEABLE_MAIN_WIDTH/4);
       //console.log("r:%O,l:%O,w:%O",this.rightReleasePos,this.leftReleasePos,SWIPEABLE_MAIN_WIDTH);//336,-248,360
-
       this._animatedValue.interpolate(
         {inputRange:
          [this.canReleaseLeft ? this.leftReleasePos : - this.rightButtonWidth - SWIPEABLE_MAIN_WIDTH,
@@ -281,39 +285,47 @@ var SwipeableElement = React.createClass({
         this._value = value;
 
         var leftWidth  = 0 < value ? value : 0.00001 //limit min value
-        var rightWidth = 0 < value ? 0.00001 : - value //invert value
-        /* var lastButtonFlex = this.leftButtonWidth < value ? 1
-           : value < - this.rightButtonWidth ? 1
+        var rightWidth = 0 <= value ? 0.00001 : - value //invert value
+        /* var lastButtonFlex = this.leftButtonWidth < value ? value
+           : value < - this.rightButtonWidth ? - value
            : 0 */
         /* var buttonFlex = this.leftButtonWidth < value ? value
            : value < - this.rightButtonWidth ? -value
            : 0 */
-        
+        var lastButtonFlex = 0 < value ? value : - value //add zero
+
+        console.log("rightWidth:%O",rightWidth);
         this._animateMainLeft.setValue(value);
         this._animateLeftButtonsWidth.setValue(leftWidth);
         this._animateRightButtonsWidth.setValue(rightWidth);
-        //this._animateLastButtonflex.setValue(100000);
-        //this._animateButtonflex.setValue(0.0001);
+        this._animateLastButtonflex.setValue(lastButtonFlex);
+        console.log("lastButtonFlex:%O",lastButtonFlex);
+        //this._animateButtonflex.setValue(this.rightButtonWidth);
       });
-      /* Animated.timing(this._animateLastButtonflex, {
-         duration:0,
-         toValue: this._animatedValue.interpolate({
-         inputRange: [this.leftReleasePos, - this.rightButtonWidth,
-         this.leftButtonWidth,  this.rightReleasePos],
-         outputRange: [1,0,0,1],
-         }),
-         }).start();
-         Animated.timing(this._animateButtonflex, {
-         duration:0,
-         toValue: this._animatedValue.interpolate({
-         inputRange: [- SWIPEABLE_MAIN_WIDTH,
-         this.leftReleasePos, - this.rightButtonWidth,
-         this.leftButtonWidth,  this.rightReleasePos,
-         SWIPEABLE_MAIN_WIDTH],
-         outputRange: [0.00000000000000000001,1,0,0,1,0.00000000000001],
-         }),
-         }).start();//flex is not bind to minimum? */
-      //TODO:stop when release gesture
+      Animated.timing(this._animateButtonflex, {
+        duration:0,
+        toValue: this._animatedValue.interpolate({
+          inputRange: [- SWIPEABLE_MAIN_WIDTH,
+                       this.leftReleasePos - 10,
+                       this.leftReleasePos,
+                       0,
+                       this.rightReleasePos,
+                       this.rightReleasePos + 10,
+                       SWIPEABLE_MAIN_WIDTH,
+          ],
+          outputRange: [0.1,
+                        0.1,
+                        - this.leftReleasePos,
+                        0.1,
+                        this.rightReleasePos,
+                        0.1,
+                        0.1],
+        }),
+      }).start();//TODO:stop when release gesture
+
+      this._animateButtonflex.addListener(({value:value}) => {
+        console.log("this._animateButtonflex:%O", value);
+      })
       this._animatedValue.setValue(0);
     }
   },
@@ -325,21 +337,21 @@ var SwipeableElement = React.createClass({
     //_calcPosition: function(dx,prev){
     //var posLeft=dx+prev;
     var newPos = 0;
-    if((posLeft < this.leftReleasePos)
-    ){
-      newPos = - SWIPEABLE_MAIN_WIDTH - this.rightButtonWidth;
+    if((posLeft < this.leftReleasePos)){
+      //newPos = - SWIPEABLE_MAIN_WIDTH - this.rightButtonWidth;//fixed width
+      newPos = - SWIPEABLE_MAIN_WIDTH;
     }else if((posLeft < - this.rightButtonWidth / 2) &&
-             (this.leftReleasePos < posLeft)
-    ){
-      newPos = - this.rightButtonWidth;//right button size
+             (this.leftReleasePos < posLeft)){
+      newPos = - this.rightButtonWidth;//need offset??
     }else if((- this.rightButtonWidth / 2 < posLeft) &&
              (posLeft < this.leftButtonWidth / 2)){
-               newPos = 0;//flat
+      newPos = 0;//flat
     }else if((this.leftButtonWidth / 2 < posLeft) &&
              (posLeft < this.rightReleasePos)){
-      newPos = this.leftButtonWidth;//left button size
+      newPos = this.leftButtonWidth;//need offset??
     }else if((this.rightReleasePos < posLeft )){
-      newPos = SWIPEABLE_MAIN_WIDTH + this.leftButtonWidth;
+      newPos = SWIPEABLE_MAIN_WIDTH + this.leftButtonWidth;//fixed width
+      newPos = SWIPEABLE_MAIN_WIDTH;
     }
     return newPos;
   },
@@ -353,15 +365,24 @@ var SwipeableElement = React.createClass({
         <Animated.View style = {[
             {
               backgroundColor:buttonParam.backgroundColor,
-              padding:10,
+              //padding:10,//FIXME: cannot shrink when padding
+              //flex: 1,
+              flex: this._animateButtonflex,
+              /* flexDirection:'column',
+              alignItems:'center' */
             },//user value
-            {
-              //flex: this._animateButtonflex,
-              width: 1
-            }
+            /* {
+
+            //width: 1
+            } */
           ]}>
           <Animated.Text numberOfLines={1}
-                         style={[styles.rightText,
+                         style = {[styles.rightText,
+                                   {
+                                     padding:10,//expand width for flex
+                                     margin:10,//actual space for flex
+                                     textAlign:"center",
+                                   }
                            ]}>
             {buttonParam.text}
           </Animated.Text>
@@ -378,12 +399,13 @@ var SwipeableElement = React.createClass({
 
   render: function() {
     //TODO:support different length text
-    /* <View style = {{
-        justifyContent:"center",
-        flexDirection:'row'}}
-        >
+    /*
+       <View style = {{
+       justifyContent:"center",
+       flexDirection:'row'}}
+       >
        </View>*/
-      return (
+    return (
           <View style={styles.swipeableElementWrapper}
                 onLayout = {() => this._onLayout()}
                 {...this._panResponder.panHandlers}>
@@ -411,6 +433,7 @@ var SwipeableElement = React.createClass({
                          position:"absolute",
                          right: 0,
                          width: this._animateRightButtonsWidth,
+                         //width: ,
                        }]}
              onLayout= {({nativeEvent:{layout:{width,height}}})=>
                {if(!this.rightButtonWidth){
@@ -509,7 +532,7 @@ var styles = StyleSheet.create({
   },
   swipeableElementWrapper: {
     //width: SCREEN_WIDTH,
-    width: SCREEN_WIDTH,
+    width: SWIPEABLE_MAIN_WIDTH,
     flexDirection:'row',
     backgroundColor:'rgba(0,0,0,0)',//transparent
     //alignItems:'stretch'
