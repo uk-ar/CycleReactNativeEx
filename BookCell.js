@@ -173,19 +173,25 @@ var BookCell = React.createClass({
      ) */
   return(
     <SwipeableElement
-        component={<Text>{'Some Text'}</Text>}
-        swipeRightTitle={'Delete'}
-        swipeRightTextColor={'#FFFFFF'}
-        swipeRightBackgroundColor={'#000000'}
-        swipeLeftTitle={'Archive'}
-        swipeLeftTextColor={'#FFFFFF'}
-        swipeLeftBackgroundColor={'#FF0000'}
+        rightButtonSource ={[
+            {text: "foo", backgroundColor: "red"},
+            {text: "bar", backgroundColor: "green"},
+            //{text: "baz", backgroundColor: "blue", type:"destructive"},
+            //type: close cell or close button or limit
+            {text: "baz", backgroundColor: "blue", type:"de"},
+          ]}
+        leftButtonSource = {[
+            {text: "foo", backgroundColor: "black"},
+            {text: "bar", backgroundColor: "orange",type:"destructive"},
+          ]}
         onSwipeRight={() => {
             // Handle swipe
           }}
         onSwipeLeft={() => {
             // Swipe left
-          }} />
+          }}>
+      <Text>{'Some Text'}</Text>
+    </SwipeableElement>
   )
 }, //collapsable={false}
 });
@@ -216,22 +222,11 @@ var SwipeableElement = React.createClass({
     this._animateMainLeft = new Animated.Value(0);
     //used by right & left last button flex
     this._animateLastButtonflex = new Animated.Value(0);
+    this._animateButtonflex = new Animated.Value(0);
 
-    //TODO:props
-    this.rightButtons = [
-      {text: "foo", backgroundColor: "red"},
-      {text: "bar", backgroundColor: "green"},
-      //{text: "baz", backgroundColor: "blue", type:"destructive"},
-      //type: close cell or close button or limit
-      {text: "baz", backgroundColor: "blue", type:"de"},
-    ]
-    this.canReleaseLeft = this._canRelease(this.rightButtons);
+    this.canReleaseLeft = true;
 
-    this.leftButtons = [
-      {text: "foo", backgroundColor: "black"},
-      {text: "bar", backgroundColor: "orange",type:"destructive"},
-    ]
-    this.canReleaseRight = this._canRelease(this.leftButtons);
+    this.canReleaseRight = true;
 
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -262,6 +257,9 @@ var SwipeableElement = React.createClass({
     //this._previousLeft = 0;
   },
   _onLayout:function(){
+    //https://github.com/CEWendel/SWTableViewCell
+    //https://github.com/MortimerGoro/MGSwipeTableCell
+    //https://github.com/alikaragoz/MCSwipeTableViewCell
     if(!this.rightReleasePos){
       this.rightReleasePos = this.leftButtonWidth + Math.min(this.leftButtonWidth/2, SWIPEABLE_MAIN_WIDTH/4);
       this.leftReleasePos = - this.rightButtonWidth - Math.min(this.rightButtonWidth/2, SWIPEABLE_MAIN_WIDTH/4);
@@ -273,7 +271,7 @@ var SwipeableElement = React.createClass({
         - this.rightButtonWidth,
           this.leftButtonWidth,
           this.canReleaseRight ? this.rightReleasePos : this.leftButtonWidth + SWIPEABLE_MAIN_WIDTH,
-          ],
+         ],
          outputRange:
          [this.leftReleasePos, - this.rightButtonWidth,
           this.leftButtonWidth, this.rightReleasePos]
@@ -284,20 +282,38 @@ var SwipeableElement = React.createClass({
 
         var leftWidth  = 0 < value ? value : 0.00001 //limit min value
         var rightWidth = 0 < value ? 0.00001 : - value //invert value
-        var lastButtonFlex = this.leftButtonWidth < value ? value
-                 : value < - this.rightButtonWidth ? -value
-                 : 0
-
+        /* var lastButtonFlex = this.leftButtonWidth < value ? 1
+           : value < - this.rightButtonWidth ? 1
+           : 0 */
         /* var buttonFlex = this.leftButtonWidth < value ? value
            : value < - this.rightButtonWidth ? -value
            : 0 */
-
+        
         this._animateMainLeft.setValue(value);
         this._animateLeftButtonsWidth.setValue(leftWidth);
         this._animateRightButtonsWidth.setValue(rightWidth);
-        this._animateLastButtonflex.setValue(lastButtonFlex);
-        //this._animateButtonflex.setValue(0);
+        //this._animateLastButtonflex.setValue(100000);
+        //this._animateButtonflex.setValue(0.0001);
       });
+      /* Animated.timing(this._animateLastButtonflex, {
+         duration:0,
+         toValue: this._animatedValue.interpolate({
+         inputRange: [this.leftReleasePos, - this.rightButtonWidth,
+         this.leftButtonWidth,  this.rightReleasePos],
+         outputRange: [1,0,0,1],
+         }),
+         }).start();
+         Animated.timing(this._animateButtonflex, {
+         duration:0,
+         toValue: this._animatedValue.interpolate({
+         inputRange: [- SWIPEABLE_MAIN_WIDTH,
+         this.leftReleasePos, - this.rightButtonWidth,
+         this.leftButtonWidth,  this.rightReleasePos,
+         SWIPEABLE_MAIN_WIDTH],
+         outputRange: [0.00000000000000000001,1,0,0,1,0.00000000000001],
+         }),
+         }).start();//flex is not bind to minimum? */
+      //TODO:stop when release gesture
       this._animatedValue.setValue(0);
     }
   },
@@ -311,7 +327,7 @@ var SwipeableElement = React.createClass({
     var newPos = 0;
     if((posLeft < this.leftReleasePos)
     ){
-      newPos = - SWIPEABLE_MAIN_WIDTH;
+      newPos = - SWIPEABLE_MAIN_WIDTH - this.rightButtonWidth;
     }else if((posLeft < - this.rightButtonWidth / 2) &&
              (this.leftReleasePos < posLeft)
     ){
@@ -323,7 +339,7 @@ var SwipeableElement = React.createClass({
              (posLeft < this.rightReleasePos)){
       newPos = this.leftButtonWidth;//left button size
     }else if((this.rightReleasePos < posLeft )){
-      newPos = SWIPEABLE_MAIN_WIDTH;
+      newPos = SWIPEABLE_MAIN_WIDTH + this.leftButtonWidth;
     }
     return newPos;
   },
@@ -339,6 +355,10 @@ var SwipeableElement = React.createClass({
               backgroundColor:buttonParam.backgroundColor,
               padding:10,
             },//user value
+            {
+              //flex: this._animateButtonflex,
+              width: 1
+            }
           ]}>
           <Animated.Text numberOfLines={1}
                          style={[styles.rightText,
@@ -350,7 +370,7 @@ var SwipeableElement = React.createClass({
     buttonElems[left ? 0 : buttonElems.length - 1].props.style.push({
       flex: this._animateLastButtonflex,
       flexDirection:'row',
-      justifyContent: left ? "flex-start" : "flex-end",
+      justifyContent: left ? "flex-end" : "flex-start",
     });
     console.log("be:%O", buttonElems);
     return buttonElems;
@@ -381,7 +401,7 @@ var SwipeableElement = React.createClass({
                       console.log("www1:%O:",width);
                     }}}
             >
-              {this._renderButtons(this.leftButtons, true)}
+              {this._renderButtons(this.props.leftButtonSource, true)}
             </Animated.View>
             <Animated.View
              ref = {'rightElement' //for z-index
@@ -398,7 +418,7 @@ var SwipeableElement = React.createClass({
                  console.log("rightButtonWidth:%O:",width);//124
                }}}
             >
-              {this._renderButtons(this.rightButtons, false)}
+              {this._renderButtons(this.props.rightButtonSource, false)}
             </Animated.View>
             <Animated.View
              ref={'mainElement'}
@@ -409,7 +429,7 @@ var SwipeableElement = React.createClass({
                  //to use negative value
                ]}
              >
-              {this.props.component}
+              {this.props.children}
             </Animated.View>
           </View>
       );
