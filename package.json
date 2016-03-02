@@ -12,7 +12,7 @@
     "isbn": "^0.2.0",
     "lodash": "^3.10.1",
     "react-addons-pure-render-mixin": "^0.14.7",
-    "react-native": "^0.20.0",
+    "react-native": "^0.21.0",
     "react-native-emoji": "^1.1.1",
     "react-native-gifted-spinner": "0.0.3",
     "react-native-radio-buttons": "git+http://github.com/uk-ar/react-native-radio-buttons.git",
