@@ -387,12 +387,8 @@ var SwipeableElement = React.createClass({
             } */
           ]}>
           <Animated.Text numberOfLines={1}
-                         style = {[styles.rightText,
-                                   {
-                                     padding:5,//expand width for flex
-                                     margin:5,//actual space for flex
-                                     textAlign:"center",
-                                   }
+                         style = {[styles.Text,
+
                            ]}>
             {buttonParam.text}
           </Animated.Text>
@@ -401,6 +397,7 @@ var SwipeableElement = React.createClass({
     buttonElems[left ? 0 : buttonElems.length - 1].props.style.push({
       flex: this._animateLastButtonflex,
       flexDirection:'row',
+      //height:40,
       justifyContent: left ? "flex-end" : "flex-start",
     });
     console.log("be:%O", buttonElems);
@@ -544,34 +541,47 @@ var styles = StyleSheet.create({
     //width: SCREEN_WIDTH,
     width: SWIPEABLE_MAIN_WIDTH,
     flexDirection:'row',
-    backgroundColor:'rgba(0,0,0,0)',//transparent
-    alignItems:'center',
+    //backgroundColor:'rgba(0,0,0,0)',//transparent
+    backgroundColor:'yellow',//transparent
+    //alignItems:'flex-end',//vertical
+    //alignItems:'stretch',//vertical,
     //justifyContent:'center',//not to affected by left button string change
   },
   swipeableMain: {
     //width: SCREEN_WIDTH,
     width: SWIPEABLE_MAIN_WIDTH,
     backgroundColor: 'gray',
-    padding:10,
+    height:60,
+    //padding:1,
   },
   swipeableLeft: {
     flexDirection:'row',
-    alignItems:'flex-end',
+    //height:40,
+    //alignItems:'flex-end',
+    alignItems:'center',
+    //alignSelf:'flex-end',
     //alignItems:'stretch',
+    backgroundColor:'green',
     //justifyContent:'flex-start',//horizontal
   },
-  leftText: {
-    color:'#FFFFFF',
-    textAlign:'center',
-  },
+  /* leftText: {
+     color:'#FFFFFF',
+     textAlign:'center',//horizontal
+     }, */
   swipeableRight: {
     flexDirection:'row',
     justifyContent:'flex-end',
   },
-  rightText: {
+  Text: {
     color:'#FFFFFF',
-    //textAlign:'center',
+    height:30,
+    width:30,
+    textAlignVertical:"bottom",
+    textAlign:'right',//ok
     //biblio
+    //padding:5,//expand width for flex
+    //margin:5,//actual space for flex
+    //textAlign:"center",
   }
 });
 
