@@ -174,10 +174,12 @@ var BookCell = React.createClass({
   return(
     <SwipeableElement
         rightButtonSource ={[
+            {text: "long long long", backgroundColor: "blue", type:"de"},//invalid
             {text: "foo", backgroundColor: "red"},
             {text: "ba", backgroundColor: "green"},
             //{text: "baz", backgroundColor: "blue", type:"destructive"},
             //type: close cell or close button or limit
+            //{text: "long long long", backgroundColor: "blue", type:"de"},
             {text: "b", backgroundColor: "blue", type:"de"},
           ]}
         leftButtonSource = {[
@@ -265,22 +267,24 @@ var SwipeableElement = React.createClass({
     //fixed width problem -> cannot detect releasing or not
     if(!this.rightReleasePos){
       this.rightReleasePos = this.leftButtonWidth
-                           + Math.min(this.leftButtonWidth/2, SWIPEABLE_MAIN_WIDTH/4);
+                           + Math.min(this.leftButtonWidth/4, SWIPEABLE_MAIN_WIDTH/4);
       this.leftReleasePos = - this.rightButtonWidth
-                          - Math.min(this.rightButtonWidth/2, SWIPEABLE_MAIN_WIDTH/4);
+                          - Math.min(this.rightButtonWidth/4, SWIPEABLE_MAIN_WIDTH/4);
       //console.log("r:%O,l:%O,w:%O",this.rightReleasePos,this.leftReleasePos,SWIPEABLE_MAIN_WIDTH);//336,-248,360
-      this._animatedValue.interpolate(
-        {inputRange:
+      this._animatedValue
+      /* .interpolate(
+         {inputRange:
          [this.canReleaseLeft ? this.leftReleasePos : - this.rightButtonWidth - SWIPEABLE_MAIN_WIDTH,
-        - this.rightButtonWidth,
-          this.leftButtonWidth,
-          this.canReleaseRight ? this.rightReleasePos : this.leftButtonWidth + SWIPEABLE_MAIN_WIDTH,
+         - this.rightButtonWidth,
+         this.leftButtonWidth,
+         this.canReleaseRight ? this.rightReleasePos : this.leftButtonWidth + SWIPEABLE_MAIN_WIDTH,
          ],
          outputRange:
          [this.leftReleasePos, - this.rightButtonWidth,
-          this.leftButtonWidth, this.rightReleasePos]
-        }
-      ).addListener(({value:value}) => {
+         this.leftButtonWidth, this.rightReleasePos]
+         }
+         ) */
+               .addListener(({value:value}) => {
         //console.log("v:%O", value);
         this._value = value;
 
@@ -292,7 +296,10 @@ var SwipeableElement = React.createClass({
         /* var buttonFlex = this.leftButtonWidth < value ? value
            : value < - this.rightButtonWidth ? -value
            : 0 */
-        var lastButtonFlex = 0 < value ? value : - value //add zero
+        //var lastButtonFlex = 0 <= value ? value : - value //add zero
+        var lastButtonFlex = 0 < value ? value
+                           : value == 0 ? 0.1
+                           : - value //add zero
 
         console.log("rightWidth:%O",rightWidth);
         this._animateMainLeft.setValue(value);
@@ -302,20 +309,23 @@ var SwipeableElement = React.createClass({
         console.log("lastButtonFlex:%O",lastButtonFlex);
         //this._animateButtonflex.setValue(this.rightButtonWidth);
       });
+      //FIXME:error on long button
       Animated.timing(this._animateButtonflex, {
         duration:0,
         toValue: this._animatedValue.interpolate({
-          inputRange: [- SWIPEABLE_MAIN_WIDTH,
-                       this.leftReleasePos - 10,
+          inputRange: [- this.rightButtonWidth - SWIPEABLE_MAIN_WIDTH,
+                       this.leftReleasePos -
+                       Math.min(10, Math.abs(SWIPEABLE_MAIN_WIDTH + this.leftReleasePos)),
                        this.leftReleasePos,
                        0,
                        this.rightReleasePos,
-                       this.rightReleasePos + 10,
-                       SWIPEABLE_MAIN_WIDTH,
+                       this.rightReleasePos +
+                       Math.min(10, Math.abs(SWIPEABLE_MAIN_WIDTH + this.rightReleasePos)),
+                       this.rightButtonWidth + SWIPEABLE_MAIN_WIDTH
           ],
           outputRange: [0.1,
                         0.1,
-                        - this.leftReleasePos,
+                      - this.leftReleasePos,
                         0.1,
                         this.rightReleasePos,
                         0.1,
@@ -379,8 +389,8 @@ var SwipeableElement = React.createClass({
           <Animated.Text numberOfLines={1}
                          style = {[styles.rightText,
                                    {
-                                     padding:10,//expand width for flex
-                                     margin:10,//actual space for flex
+                                     padding:5,//expand width for flex
+                                     margin:5,//actual space for flex
                                      textAlign:"center",
                                    }
                            ]}>
@@ -535,7 +545,7 @@ var styles = StyleSheet.create({
     width: SWIPEABLE_MAIN_WIDTH,
     flexDirection:'row',
     backgroundColor:'rgba(0,0,0,0)',//transparent
-    //alignItems:'stretch'
+    alignItems:'center',
     //justifyContent:'center',//not to affected by left button string change
   },
   swipeableMain: {
@@ -546,12 +556,13 @@ var styles = StyleSheet.create({
   },
   swipeableLeft: {
     flexDirection:'row',
+    alignItems:'flex-end',
     //alignItems:'stretch',
     //justifyContent:'flex-start',//horizontal
   },
   leftText: {
     color:'#FFFFFF',
-    //textAlign:'center',
+    textAlign:'center',
   },
   swipeableRight: {
     flexDirection:'row',
