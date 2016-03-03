@@ -245,16 +245,23 @@ var SwipeableElement = React.createClass({
       ]),
       onPanResponderRelease: (e,gestureState) =>{
         this._animatedValue.flattenOffset();
-        LayoutAnimation.configureNext(
-          LayoutAnimation.Presets.easeInEaseOut,
-          //LayoutAnimation.Presets.linear
-        );
-        this._animatedValue
-            .setValue(
-              this._calcPosition(this._value)
-            );
+        /* LayoutAnimation.configureNext(
+           LayoutAnimation.Presets.easeInEaseOut,
+           //LayoutAnimation.Presets.linear
+           ); */
+        Animated.sequence([
+          Animated.timing(
+            this._animatedValue,
+            {toValue:this._calcPosition(this._value)}
+          ),
+          Animated.timing(
+            this._height,
+            {toValue: 0.01 }
+          ),
+        ])
+        .start();
         //if released
-        this._height.setValue(0.01)
+        //this._height.setValue(0.01)
         //this._height.setValue(0.01);
       },
       //https://github.com/facebook/react-native/issues/1046#issuecomment-176744577
@@ -276,7 +283,7 @@ var SwipeableElement = React.createClass({
                            + Math.min(this.leftButtonWidth/4, SWIPEABLE_MAIN_WIDTH/4);
       this.leftReleasePos = - this.rightButtonWidth
                           - Math.min(this.rightButtonWidth/4, SWIPEABLE_MAIN_WIDTH/4);
-      
+
       //console.log("r:%O,l:%O,w:%O",this.rightReleasePos,this.leftReleasePos,SWIPEABLE_MAIN_WIDTH);//336,-248,360
       this._animatedValue
       /* .interpolate(
@@ -367,7 +374,7 @@ var SwipeableElement = React.createClass({
              (posLeft < this.rightReleasePos)){
       newPos = this.leftButtonWidth;//need offset??
     }else if((this.rightReleasePos < posLeft )){
-      newPos = SWIPEABLE_MAIN_WIDTH + this.leftButtonWidth;//fixed width
+      //newPos = SWIPEABLE_MAIN_WIDTH + this.leftButtonWidth;//fixed width
       newPos = SWIPEABLE_MAIN_WIDTH;
     }
     return newPos;
