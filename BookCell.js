@@ -183,6 +183,7 @@ var BookCell = React.createClass({
             {text: "b", backgroundColor: "blue", type:"de"},
           ]}
         leftButtonSource = {[
+            //{text: "Some Text", backgroundColor: "black"},
             {text: "foo", backgroundColor: "black"},
             {text: "bar", backgroundColor: "orange",type:"destructive"},
           ]}
@@ -225,6 +226,7 @@ var SwipeableElement = React.createClass({
     //used by right & left last button flex
     this._animateLastButtonflex = new Animated.Value(0);
     this._animateButtonflex = new Animated.Value(0);
+    this._height = new Animated.Value(0);
 
     this.canReleaseLeft = true;
 
@@ -244,13 +246,16 @@ var SwipeableElement = React.createClass({
       onPanResponderRelease: (e,gestureState) =>{
         this._animatedValue.flattenOffset();
         LayoutAnimation.configureNext(
-          LayoutAnimation.Presets.easeInEaseOut
+          LayoutAnimation.Presets.easeInEaseOut,
           //LayoutAnimation.Presets.linear
         );
         this._animatedValue
             .setValue(
               this._calcPosition(this._value)
             );
+        //if released
+        this._height.setValue(0.01)
+        //this._height.setValue(0.01);
       },
       //https://github.com/facebook/react-native/issues/1046#issuecomment-176744577
       /* onPanResponderTerminationRequest: () => false,
@@ -259,17 +264,19 @@ var SwipeableElement = React.createClass({
     });
     //this._previousLeft = 0;
   },
-  _onLayout:function(){
+  _onLayout:function({nativeEvent:{layout:{width,height}}}){
     //https://github.com/CEWendel/SWTableViewCell
     //https://github.com/MortimerGoro/MGSwipeTableCell
     //https://github.com/alikaragoz/MCSwipeTableViewCell
     //http://koze.hatenablog.jp/entry/2015/06/16/220000
     //fixed width problem -> cannot detect releasing or not
     if(!this.rightReleasePos){
+      this._height.setValue(height);
       this.rightReleasePos = this.leftButtonWidth
                            + Math.min(this.leftButtonWidth/4, SWIPEABLE_MAIN_WIDTH/4);
       this.leftReleasePos = - this.rightButtonWidth
                           - Math.min(this.rightButtonWidth/4, SWIPEABLE_MAIN_WIDTH/4);
+      
       //console.log("r:%O,l:%O,w:%O",this.rightReleasePos,this.leftReleasePos,SWIPEABLE_MAIN_WIDTH);//336,-248,360
       this._animatedValue
       /* .interpolate(
@@ -368,7 +375,7 @@ var SwipeableElement = React.createClass({
   //http://browniefed.com/react-native-animation-book/events/SCROLL.html
   //http://browniefed.com/blog/2015/08/15/react-native-animated-api-with-panresponder/
   //interface datasource & renderbutton(include default)
-  _renderButtons: function(buttonParams, left){
+  _renderButtons: function(buttonParams,left){
     var buttonElems =
     buttonParams.map((buttonParam, index, buttonParams) => {
       return (
@@ -377,7 +384,14 @@ var SwipeableElement = React.createClass({
               backgroundColor:buttonParam.backgroundColor,
               //padding:10,//FIXME: cannot shrink when padding
               //flex: 1,
-              flex: this._animateButtonflex,
+              flex: this._animateButtonflex,//TODO:remove self
+              flexDirection:'row',
+              alignItems:"center",
+              justifyContent:"center",
+              //paddingHorizontal: 10,
+              //marginHorizontal: 10,
+              height: this._height,
+              //height: 60,
               /* flexDirection:'column',
               alignItems:'center' */
             },//user value
@@ -388,7 +402,11 @@ var SwipeableElement = React.createClass({
           ]}>
           <Animated.Text numberOfLines={1}
                          style = {[styles.Text,
-
+                                   {//backgroundColor:"purple",
+                                     margin:10,//TODO:
+                                     //padding:10,
+                                     //flex:1,
+                                   }
                            ]}>
             {buttonParam.text}
           </Animated.Text>
@@ -396,7 +414,6 @@ var SwipeableElement = React.createClass({
     });
     buttonElems[left ? 0 : buttonElems.length - 1].props.style.push({
       flex: this._animateLastButtonflex,
-      flexDirection:'row',
       //height:40,
       justifyContent: left ? "flex-end" : "flex-start",
     });
@@ -414,7 +431,7 @@ var SwipeableElement = React.createClass({
        </View>*/
     return (
           <View style={styles.swipeableElementWrapper}
-                onLayout = {() => this._onLayout()}
+                onLayout = {(e) => this._onLayout(e)}
                 {...this._panResponder.panHandlers}>
             <Animated.View
                 ref = {'leftElement'}
@@ -454,7 +471,12 @@ var SwipeableElement = React.createClass({
              ref={'mainElement'}
              style={[styles.swipeableMain,
                      {left: this._animateMainLeft,
-                      overflow:"visible"}
+                      overflow:"visible",
+                      flexDirection: "row",
+                      //padding: 10,
+                      alignItems: "center",
+                      height: this._height,
+                     }
                  //this._animatedValue
                  //to use negative value
                ]}
@@ -488,7 +510,7 @@ var styles = StyleSheet.create({
     //alignItems: 'center',
     backgroundColor: 'white',
     flexDirection: 'row',
-    padding: 5,
+    //padding: 5,
   },
   textContainer: {
     flex: 1,
@@ -551,7 +573,7 @@ var styles = StyleSheet.create({
     //width: SCREEN_WIDTH,
     width: SWIPEABLE_MAIN_WIDTH,
     backgroundColor: 'gray',
-    height:60,
+    //height:70,
     //padding:1,
   },
   swipeableLeft: {
@@ -574,10 +596,9 @@ var styles = StyleSheet.create({
   },
   Text: {
     color:'#FFFFFF',
-    height:30,
-    width:30,
-    textAlignVertical:"bottom",
-    textAlign:'right',//ok
+    //width:30,
+    //textAlignVertical:"bottom",//not working?
+    //textAlign:'center',//ok
     //biblio
     //padding:5,//expand width for flex
     //margin:5,//actual space for flex
