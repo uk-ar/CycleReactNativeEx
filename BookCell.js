@@ -172,6 +172,70 @@ var BookCell = React.createClass({
      </CycleView>
      ) */
   return(
+      <View style={{
+          flexDirection: "row",
+          backgroundColor: "yellow",
+          borderColor: "black",
+          borderWidth: 1,
+          //flex:1,
+          //height:90,
+          alignItems:"center",
+          //alignItems:"stretch",
+          //alignItems:"flex-end",
+          //alignItems:"stretch",//not working?
+          //height:60,
+        }}>
+        <View key="buttons" style={{
+            backgroundColor: "red",
+            flexDirection: "row",
+            alignItems:"center",
+            //width:100,
+            //alignSelf:"stretch",
+            //flex:1,
+            /* transform:[
+            {scaleX:2.0}
+            ] */
+            //height:60,
+          }}>
+          <View key="button" style={{
+              backgroundColor: "purple",
+              //flex:10,
+            }}>
+            <Text style={{
+                //margin: 10,
+              }}>{'b1'}</Text>
+          </View>
+          <View style={{
+              backgroundColor: "blue",
+              //flex:0.1,
+            }}>
+            <View style={{
+                padding:10,
+              }}>
+            <Text style={{
+                margin: 10,
+              }}>{'b2'}</Text>
+            </View>
+          </View>
+        </View>
+        <View key="main" style={{
+            backgroundColor: "green",
+            height:80,
+            //mergin:10,
+            padding: 10,
+            flexDirection: "row",
+            alignItems:"center",
+            //alignSelf:"stretch",
+            //flex:1,
+          }}>
+          <Text style={{
+              //height:40,
+              //padding: 10,
+            }}>{'b3'}</Text>
+        </View>
+      </View>
+  )
+  return(
     <SwipeableElement
         rightButtonSource ={[
             {text: "long long long", backgroundColor: "blue", type:"de"},//invalid
@@ -192,8 +256,14 @@ var BookCell = React.createClass({
           }}
         onSwipeLeft={() => {
             // Swipe left
-          }}>
-      <Text>{'Some Text'}</Text>
+          }}
+        style={{
+            backgroundColor:"pink",
+            padding:10,//not work
+            //margin:10,
+          }}
+    >
+      <Text>{'Some Other Text'}</Text>
     </SwipeableElement>
   )
 }, //collapsable={false}
@@ -249,18 +319,18 @@ var SwipeableElement = React.createClass({
            LayoutAnimation.Presets.easeInEaseOut,
            //LayoutAnimation.Presets.linear
            ); */
-        Animated.sequence([
+        var animations = [
           Animated.timing(
             this._animatedValue,
             {toValue:this._calcPosition(this._value)}
-          ),
-          Animated.timing(
+          )]
+        if(Math.abs(this._calcPosition(this._value)) == SWIPEABLE_MAIN_WIDTH){
+          animations.push(Animated.timing(
             this._height,
             {toValue: 0.01 }
-          ),
-        ])
-        .start();
-        //if released
+          ))
+        }
+        Animated.sequence(animations).start();
         //this._height.setValue(0.01)
         //this._height.setValue(0.01);
       },
@@ -437,7 +507,12 @@ var SwipeableElement = React.createClass({
        >
        </View>*/
     return (
-          <View style={styles.swipeableElementWrapper}
+      <Animated.View style={
+        [styles.swipeableElementWrapper,
+         {height: this._height,
+         },
+        ]
+                  }
                 onLayout = {(e) => this._onLayout(e)}
                 {...this._panResponder.panHandlers}>
             <Animated.View
@@ -482,15 +557,15 @@ var SwipeableElement = React.createClass({
                       flexDirection: "row",
                       //padding: 10,
                       alignItems: "center",
-                      height: this._height,
-                     }
+                     },
+                     this.props.style,
                  //this._animatedValue
                  //to use negative value
                ]}
              >
               {this.props.children}
             </Animated.View>
-          </View>
+          </Animated.View>
       );
   }
 });
@@ -579,7 +654,7 @@ var styles = StyleSheet.create({
   swipeableMain: {
     //width: SCREEN_WIDTH,
     width: SWIPEABLE_MAIN_WIDTH,
-    backgroundColor: 'gray',
+    //backgroundColor: 'gray',
     //height:70,
     //padding:1,
   },
