@@ -100,6 +100,29 @@ var LibraryStatus = React.createClass({
   },
 });
 
+var ButtonContainer = React.createClass({
+  getInitialState() {
+    return { flex: 0, }
+  },
+  getWidth(){
+    return this.state.flex;
+  },
+  render() {
+    return (
+      /* how to set flex value from parent? */
+      <View style = {[{flex: this.state.flex}, this.props.style]}
+            onLayout = {({nativeEvent:{layout:{width, height}}}) => {
+                if(!this.state.flex){
+                  //this.state.flex = width;
+                  this.setState({flex:width});
+                }}}
+      >
+        {this.props.children}
+      </View>
+    )
+  }
+})
+
 var BookCell = React.createClass({
   render: function(){
     var movie=this.props.movie;
@@ -191,23 +214,26 @@ var BookCell = React.createClass({
             alignItems:"center",
             //width:100,
             //alignSelf:"stretch",
-            //flex:1,
+            flex:1,
             /* transform:[
             {scaleX:2.0}
             ] */
             //height:60,
           }}>
-          <View key="button" style={{
+          <ButtonContainer key="button" style={{
               backgroundColor: "purple",
               //flex:10,
             }}>
             <Text style={{
                 //margin: 10,
-              }}>{'b1'}</Text>
-          </View>
-          <View style={{
+              }}>{'long long long'}</Text>
+          </ButtonContainer>
+          <ButtonContainer style={{
               backgroundColor: "blue",
               //flex:0.1,
+              //flex:1000,
+              //width:100,
+              //minWidth:50,
             }}>
             <View style={{
                 padding:10,
@@ -216,7 +242,7 @@ var BookCell = React.createClass({
                 margin: 10,
               }}>{'b2'}</Text>
             </View>
-          </View>
+          </ButtonContainer>
         </View>
         <View key="main" style={{
             backgroundColor: "green",
