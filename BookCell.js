@@ -100,30 +100,39 @@ var LibraryStatus = React.createClass({
   },
 });
 
-var ButtonContainer = React.createClass({
+var FlexWidth = React.createClass({
   getInitialState() {
-    return { flex: 0, }
+    return { contentWidth: 0, }
   },
-  getWidth(){
-    return this.state.flex;
-  },
+  /* getContentWidth(){
+     return this.state.flex;
+     }, */
   render() {
     return (
-      /* how to set flex value from parent? */
-      <View style = {[{flex: this.state.flex}, this.props.style]}
+      <Animated.View style = {[{flex: this.state.contentWidth}, this.props.style]}
             onLayout = {({nativeEvent:{layout:{width, height}}}) => {
-                if(!this.state.flex){
-                  //this.state.flex = width;
-                  this.setState({flex:width});
+                if(!this.state.contentWidth){
+                  //this.state.contentWidth = width;
+                  this.setState({contentWidth:width});
+                  //this.setNativeProps({contentWidth:width});
+                  this.props.onFirstLayout &&
+                  this.props.onFirstLayout(
+                    {nativeEvent:{layout:{width, height}}});
                 }}}
       >
         {this.props.children}
-      </View>
+      </Animated.View>
     )
   }
-})
+});
+Animated.FlexWidth = Animated.createAnimatedComponent(FlexWidth);
 
 var BookCell = React.createClass({
+  /* componentDidMount(){
+     console.log(this);
+     //refs["long button"].getWidth();
+     //refs["long button"].state.flex;
+     }, */
   render: function(){
     var movie=this.props.movie;
     var TouchableElement = TouchableHighlight;
@@ -194,7 +203,7 @@ var BookCell = React.createClass({
      {content}
      </CycleView>
      ) */
-  return(
+  /* return(
       <View style={{
           flexDirection: "row",
           backgroundColor: "yellow",
@@ -215,20 +224,18 @@ var BookCell = React.createClass({
             //width:100,
             //alignSelf:"stretch",
             flex:1,
-            /* transform:[
-            {scaleX:2.0}
-            ] */
+            // transform:[{scaleX:2.0}]
             //height:60,
           }}>
-          <ButtonContainer key="button" style={{
+          <FlexWidth ref="long button" style={{
               backgroundColor: "purple",
               //flex:10,
             }}>
             <Text style={{
                 //margin: 10,
               }}>{'long long long'}</Text>
-          </ButtonContainer>
-          <ButtonContainer style={{
+          </FlexWidth>
+          <FlexWidth style={{
               backgroundColor: "blue",
               //flex:0.1,
               //flex:1000,
@@ -242,7 +249,7 @@ var BookCell = React.createClass({
                 margin: 10,
               }}>{'b2'}</Text>
             </View>
-          </ButtonContainer>
+          </FlexWidth>
         </View>
         <View key="main" style={{
             backgroundColor: "green",
@@ -260,7 +267,7 @@ var BookCell = React.createClass({
             }}>{'b3'}</Text>
         </View>
       </View>
-  )
+  )*/
   return(
     <SwipeableElement
         rightButtonSource ={[
@@ -374,6 +381,10 @@ var SwipeableElement = React.createClass({
     //http://koze.hatenablog.jp/entry/2015/06/16/220000
     //fixed width problem -> cannot detect releasing or not
     if(!this.rightReleasePos){
+      console.log(this.refs);
+      //this.rightButtonWidth = this.refs['rightElement'].state.contentWidth;
+      //this.leftButtonWidth = this.refs['leftElement'].state.contentWidth;
+
       this._height.setValue(height);
       this.rightReleasePos = this.leftButtonWidth
                            + Math.min(this.leftButtonWidth/4, SWIPEABLE_MAIN_WIDTH/4);
@@ -482,12 +493,12 @@ var SwipeableElement = React.createClass({
     var buttonElems =
     buttonParams.map((buttonParam, index, buttonParams) => {
       return (
-        <Animated.View style = {[
+        //Setting for flexbox
+        <Animated.FlexWidth style = {[
             {
-              backgroundColor:buttonParam.backgroundColor,
               //padding:10,//FIXME: cannot shrink when padding
               //flex: 1,
-              flex: this._animateButtonflex,//TODO:remove self
+              //flex: this._animateButtonflex,//TODO:remove self
               flexDirection:'row',
               alignItems:"center",
               justifyContent:"center",
@@ -503,20 +514,27 @@ var SwipeableElement = React.createClass({
             //width: 1
             } */
           ]}>
-          <Animated.Text numberOfLines={1}
-                         style = {[styles.Text,
-                                   {//backgroundColor:"purple",
-                                     margin:10,//TODO:
-                                     //padding:10,
-                                     //flex:1,
-                                   }
-                           ]}>
-            {buttonParam.text}
-          </Animated.Text>
-        </Animated.View>)
+          {/*Setting for container*/}
+          <Animated.View style={{
+                      backgroundColor: buttonParam.backgroundColor,
+                               padding:10,
+                               flex:1,//expand to parent
+                      }}>
+            <Animated.Text numberOfLines={1}
+                           style = {[styles.Text,
+                                     {//backgroundColor:"purple",
+                                       //margin:10,//TODO:
+                                      //padding:10,
+                                      //flex:1,
+                                     }
+                             ]}>
+              {buttonParam.text}
+            </Animated.Text>
+          </Animated.View>
+        </Animated.FlexWidth>)
     });
     buttonElems[left ? 0 : buttonElems.length - 1].props.style.push({
-      flex: this._animateLastButtonflex,
+      //flex: this._animateLastButtonflex,
       //height:40,
       justifyContent: left ? "flex-end" : "flex-start",
     });
@@ -557,9 +575,9 @@ var SwipeableElement = React.createClass({
             >
               {this._renderButtons(this.props.leftButtonSource, true)}
             </Animated.View>
+            {/* for z-index order */}
             <Animated.View
-             ref = {'rightElement' //for z-index
-                   }
+             ref = {'rightElement'}
              style = {[styles.swipeableRight,
                        {
                          position:"absolute",
