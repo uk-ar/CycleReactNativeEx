@@ -107,21 +107,31 @@ var FlexWidth = React.createClass({
   /* getContentWidth(){
      return this.state.flex;
      }, */
+  _getContentWidth(){
+    return this.state.contentWidth;
+  },
+  _onLayout({nativeEvent:{layout:{width, height}}}){
+    if(!this.state.contentWidth){
+      //this.state.contentWidth = width;
+      this.setState({contentWidth:width});
+      //this.setNativeProps({contentWidth:width});
+      this.props.onFirstLayout &&
+      this.props.onFirstLayout(
+        {nativeEvent:{layout:{width, height}}});
+      this._root.setNativeProps({flex:width})
+    }
+  },
   render() {
     return (
-      <Animated.View style = {[{flex: this.state.contentWidth}, this.props.style]}
-            onLayout = {({nativeEvent:{layout:{width, height}}}) => {
-                if(!this.state.contentWidth){
-                  //this.state.contentWidth = width;
-                  this.setState({contentWidth:width});
-                  //this.setNativeProps({contentWidth:width});
-                  this.props.onFirstLayout &&
-                  this.props.onFirstLayout(
-                    {nativeEvent:{layout:{width, height}}});
-                }}}
+      /*...this.props
+       */
+      <View style={[{flex: this.state.contentWidth},
+                             this.props.style]}
+                     onLayout={this.props.onLayout || this._onLayout}
+                     ref={(component) => this._root = component}
       >
         {this.props.children}
-      </Animated.View>
+      </View>
     )
   }
 });
@@ -381,7 +391,12 @@ var SwipeableElement = React.createClass({
     //http://koze.hatenablog.jp/entry/2015/06/16/220000
     //fixed width problem -> cannot detect releasing or not
     if(!this.rightReleasePos){
-      console.log(this.refs);
+      console.log("refs:%O",this.refs);
+      //Animated.View has not measure function
+      /* this.refs['rightElement'].measure((x, y, width, height, pageX, pageY)=>{
+         console.log("width r:%O", width);
+         }) */
+      //console.log("width:%O", this.refs['rightElement'].getContentWidth());
       //this.rightButtonWidth = this.refs['rightElement'].state.contentWidth;
       //this.leftButtonWidth = this.refs['leftElement'].state.contentWidth;
 
@@ -559,30 +574,34 @@ var SwipeableElement = React.createClass({
                   }
                 onLayout = {(e) => this._onLayout(e)}
                 {...this._panResponder.panHandlers}>
-            <Animated.View
+            <Animated.FlexWidth
                 ref = {'leftElement'}
                 style = {[styles.swipeableLeft,
                           {
                             position:"absolute",
                             width:this._animateLeftButtonsWidth,
+                            //flex:0,
                           }]}
                 onLayout= {({nativeEvent:{layout:{width,height}}}) =>
                   {
+                    //Animated view has not measure function and cannot read
+                    //state
                     if(!this.leftButtonWidth){
                       this.leftButtonWidth = width;
                       console.log("www1:%O:",width);
                     }}}
             >
               {this._renderButtons(this.props.leftButtonSource, true)}
-            </Animated.View>
+            </Animated.FlexWidth>
             {/* for z-index order */}
-            <Animated.View
+            <Animated.FlexWidth
              ref = {'rightElement'}
              style = {[styles.swipeableRight,
                        {
                          position:"absolute",
                          right: 0,
                          width: this._animateRightButtonsWidth,
+                         //flex:0,
                          //width: ,
                        }]}
              onLayout= {({nativeEvent:{layout:{width,height}}})=>
@@ -592,7 +611,7 @@ var SwipeableElement = React.createClass({
                }}}
             >
               {this._renderButtons(this.props.rightButtonSource, false)}
-            </Animated.View>
+            </Animated.FlexWidth>
             <Animated.View
              ref={'mainElement'}
              style={[styles.swipeableMain,
