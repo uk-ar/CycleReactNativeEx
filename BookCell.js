@@ -100,7 +100,10 @@ var LibraryStatus = React.createClass({
   },
 });
 
-var FlexWidth = React.createClass({
+var MeasurableWidth = React.createClass({
+  getDefaultProps() {
+    return { flexEnabled: false }
+  },
   getInitialState() {
     return { contentWidth: 0, }
   },
@@ -123,12 +126,10 @@ var FlexWidth = React.createClass({
   },*/
   render() {
     return (
-      /*...this.props
-         onLayout={this.props.onLayout || this._onLayout}
-         this.props.setFlex flexEnabled
-       */
-      <Animated.View style={[{flex: this.state.contentWidth},
-                    this.props.style]}
+      //TODO:...this.props
+      <Animated.View style = {[this.props.flexEnabled &&
+                               {flex: this.state.contentWidth},
+                               this.props.style]}
             ref={(component) => this._root = component}
             onLayout={this.props.onLayout || this._onLayout}
       >
@@ -137,7 +138,8 @@ var FlexWidth = React.createClass({
     )
   }
 });
-Animated.FlexWidth = Animated.createAnimatedComponent(FlexWidth);
+//cannot access state & function from AnimatedComponent
+//Animated.MeasurableWidth = Animated.createAnimatedComponent(MeasurableWidth);
 
 var BookCell = React.createClass({
   /* componentDidMount(){
@@ -239,15 +241,15 @@ var BookCell = React.createClass({
             // transform:[{scaleX:2.0}]
             //height:60,
           }}>
-          <FlexWidth ref="long button" style={{
+          <MeasurableWidth ref="long button" style={{
               backgroundColor: "purple",
               //flex:10,
             }}>
             <Text style={{
                 //margin: 10,
               }}>{'long long long'}</Text>
-          </FlexWidth>
-          <FlexWidth style={{
+          </MeasurableWidth>
+          <MeasurableWidth style={{
               backgroundColor: "blue",
               //flex:0.1,
               //flex:1000,
@@ -261,7 +263,7 @@ var BookCell = React.createClass({
                 margin: 10,
               }}>{'b2'}</Text>
             </View>
-          </FlexWidth>
+          </MeasurableWidth>
         </View>
         <View key="main" style={{
             backgroundColor: "green",
@@ -510,57 +512,52 @@ var SwipeableElement = React.createClass({
   //http://browniefed.com/blog/2015/08/15/react-native-animated-api-with-panresponder/
   //interface datasource & renderbutton(include default)
   _renderButtons: function(buttonParams,left){
+    //TODO:Support 0 or 1 element situation
     var buttonElems =
     buttonParams.map((buttonParam, index, buttonParams) => {
       return (
         //Setting for flexbox
-        <Animated.FlexWidth style = {[
-            {
-              //padding:10,//FIXME: cannot shrink when padding
+        <MeasurableWidth
+        flexEnabled={true}
+        style = {[
+          {
+              //padding:10,//cannot shrink when padding
               //flex: 1,
               //flex: this._animateButtonflex,//TODO:remove self
               flexDirection:'row',
               alignItems:"center",
               justifyContent:"center",
-              //paddingHorizontal: 10,
-              //marginHorizontal: 10,
               height: this._height,
               //height: 60,
               /* flexDirection:'column',
               alignItems:'center' */
             },//user value
-            /* {
-
-            //width: 1
-            } */
           ]}>
           {/*Setting for container*/}
           <Animated.View style={{
-                      backgroundColor: buttonParam.backgroundColor,
-                               padding:10,
-                               flex:1,//expand to parent
-                      }}>
+              backgroundColor: buttonParam.backgroundColor,
+              padding:10,
+              flex:1,//expand to parent
+            }}>
             <Animated.Text numberOfLines={1}
                            style = {[styles.Text,
-                                     {//backgroundColor:"purple",
-                                       //margin:10,//TODO:
-                                      //padding:10,
-                                      //flex:1,
-                                     }
                              ]}>
               {buttonParam.text}
             </Animated.Text>
           </Animated.View>
-        </Animated.FlexWidth>)
+        </MeasurableWidth>)
     });
     buttonElems[left ? 0 : buttonElems.length - 1].props.style.push({
       //flex: this._animateLastButtonflex,
       //height:40,
       justifyContent: left ? "flex-end" : "flex-start",
     });
+
     console.log("be:%O", buttonElems);
     //To fix warning
-    return React.Children.toArray(buttonElems);
+    return React.Children.toArray(
+      buttonElems
+    );
   },
 
   render: function() {
@@ -571,6 +568,42 @@ var SwipeableElement = React.createClass({
        flexDirection:'row'}}
        >
        </View>*/
+    var leftButtons, rightbuttons;
+    var start, end, rest, rest2;
+    [start, ...rest] = this._renderButtons(this.props.leftButtonSource, true);
+    leftButtons = (
+    <MeasurableWidth
+        ref = {'leftElement'}
+        style = {[styles.swipeableLeft,
+                  {
+                    //Because mainElement should move to minus point
+                    position:"absolute",
+                    width:this._animateLeftButtonsWidth,
+                  }]}
+    >
+      {start}
+      <View>
+        {rest}
+      </View>
+    </MeasurableWidth>);
+    //[...rest2, end] = //invalid
+    rightButtons = (
+      <MeasurableWidth
+          ref = {'rightElement'}
+          style = {[styles.swipeableRight,
+                    {
+                      position:"absolute",
+                      right: 0,
+                      width: this._animateRightButtonsWidth,
+                    }]}
+      >
+        {this._renderButtons(this.props.rightButtonSource, false)}
+        {/* <View>
+        {rest}
+        </View>
+        {end} */}
+      </MeasurableWidth>
+    )
     return (
       <Animated.View style={
         [styles.swipeableElementWrapper,
@@ -579,33 +612,10 @@ var SwipeableElement = React.createClass({
         ]
                   }
                 onLayout = {(e) => this._onLayout(e)}
-                {...this._panResponder.panHandlers}>
-            <FlexWidth
-                ref = {'leftElement'}
-                style = {[styles.swipeableLeft,
-                          {
-                            // because mainElement should move to minus point
-                            position:"absolute",
-                            width:this._animateLeftButtonsWidth,
-                            flex:0,
-                          }]}
-            >
-              {this._renderButtons(this.props.leftButtonSource, true)}
-            </FlexWidth>
-            {/* for z-index order */}
-            <FlexWidth
-             ref = {'rightElement'}
-             style = {[styles.swipeableRight,
-                       {
-                         position:"absolute",
-                         right: 0,
-                         width: this._animateRightButtonsWidth,
-                         flex:0,
-                         //width: ,
-                       }]}
-            >
-              {this._renderButtons(this.props.rightButtonSource, false)}
-            </FlexWidth>
+                     {...this._panResponder.panHandlers}>
+        {leftButtons}
+        {/* for z-index order */}
+        {rightButtons}
             <Animated.View
              ref={'mainElement'}
              style={[styles.swipeableMain,
