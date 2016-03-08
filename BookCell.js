@@ -104,34 +104,36 @@ var FlexWidth = React.createClass({
   getInitialState() {
     return { contentWidth: 0, }
   },
-  /* getContentWidth(){
-     return this.state.flex;
-     }, */
-  _getContentWidth(){
-    return this.state.contentWidth;
-  },
   _onLayout({nativeEvent:{layout:{width, height}}}){
     if(!this.state.contentWidth){
       //this.state.contentWidth = width;
+      //this._root.setNativeProps({style:{flex:width}})
+
       this.setState({contentWidth:width});
-      //this.setNativeProps({contentWidth:width});
       this.props.onFirstLayout &&
       this.props.onFirstLayout(
         {nativeEvent:{layout:{width, height}}});
-      this._root.setNativeProps({flex:width})
     }
   },
+  //cannot measure Animated.View
+  /* componentDidMount(){
+     this._root.measure((x,y,width,height,pageX,pageY)=>
+       this.setState({contentWidth:width})
+       )
+  },*/
   render() {
     return (
       /*...this.props
+         onLayout={this.props.onLayout || this._onLayout}
+         this.props.setFlex flexEnabled
        */
-      <View style={[{flex: this.state.contentWidth},
-                             this.props.style]}
-                     onLayout={this.props.onLayout || this._onLayout}
-                     ref={(component) => this._root = component}
+      <Animated.View style={[{flex: this.state.contentWidth},
+                    this.props.style]}
+            ref={(component) => this._root = component}
+            onLayout={this.props.onLayout || this._onLayout}
       >
         {this.props.children}
-      </View>
+      </Animated.View>
     )
   }
 });
@@ -373,6 +375,7 @@ var SwipeableElement = React.createClass({
             {toValue: 0.01 }
           ))
         }
+        //Animated seems to disable when chrome debugging in windows
         Animated.sequence(animations).start();
         //this._height.setValue(0.01)
         //this._height.setValue(0.01);
@@ -391,7 +394,9 @@ var SwipeableElement = React.createClass({
     //http://koze.hatenablog.jp/entry/2015/06/16/220000
     //fixed width problem -> cannot detect releasing or not
     if(!this.rightReleasePos){
-      console.log("refs:%O",this.refs);
+      //console.log("refs:%O", this.refs);//log when onLayout is expensive
+      this.rightButtonWidth = this.refs['rightElement'].state.contentWidth;
+      this.leftButtonWidth = this.refs['leftElement'].state.contentWidth;
       //Animated.View has not measure function
       /* this.refs['rightElement'].measure((x, y, width, height, pageX, pageY)=>{
          console.log("width r:%O", width);
@@ -554,7 +559,8 @@ var SwipeableElement = React.createClass({
       justifyContent: left ? "flex-end" : "flex-start",
     });
     console.log("be:%O", buttonElems);
-    return buttonElems;
+    //To fix warning
+    return React.Children.toArray(buttonElems);
   },
 
   render: function() {
@@ -574,44 +580,32 @@ var SwipeableElement = React.createClass({
                   }
                 onLayout = {(e) => this._onLayout(e)}
                 {...this._panResponder.panHandlers}>
-            <Animated.FlexWidth
+            <FlexWidth
                 ref = {'leftElement'}
                 style = {[styles.swipeableLeft,
                           {
+                            // because mainElement should move to minus point
                             position:"absolute",
                             width:this._animateLeftButtonsWidth,
-                            //flex:0,
+                            flex:0,
                           }]}
-                onLayout= {({nativeEvent:{layout:{width,height}}}) =>
-                  {
-                    //Animated view has not measure function and cannot read
-                    //state
-                    if(!this.leftButtonWidth){
-                      this.leftButtonWidth = width;
-                      console.log("www1:%O:",width);
-                    }}}
             >
               {this._renderButtons(this.props.leftButtonSource, true)}
-            </Animated.FlexWidth>
+            </FlexWidth>
             {/* for z-index order */}
-            <Animated.FlexWidth
+            <FlexWidth
              ref = {'rightElement'}
              style = {[styles.swipeableRight,
                        {
                          position:"absolute",
                          right: 0,
                          width: this._animateRightButtonsWidth,
-                         //flex:0,
+                         flex:0,
                          //width: ,
                        }]}
-             onLayout= {({nativeEvent:{layout:{width,height}}})=>
-               {if(!this.rightButtonWidth){
-                 this.rightButtonWidth = width;
-                 console.log("rightButtonWidth:%O:",width);//124
-               }}}
             >
               {this._renderButtons(this.props.rightButtonSource, false)}
-            </Animated.FlexWidth>
+            </FlexWidth>
             <Animated.View
              ref={'mainElement'}
              style={[styles.swipeableMain,
