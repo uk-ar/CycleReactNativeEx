@@ -283,7 +283,7 @@ var BookCell = React.createClass({
       </View>
   )*/
   return(
-    <SwipeableElement
+    <SwipeableRow
         rightButtonSource ={[
             {text: "long long long", backgroundColor: "blue", type:"de"},//invalid
             {text: "foo", backgroundColor: "red"},
@@ -311,17 +311,118 @@ var BookCell = React.createClass({
           }}
     >
       <Text>{'Some Other Text'}</Text>
-    </SwipeableElement>
+    </SwipeableRow>
   )
 }, //collapsable={false}
 });
+
+var SwipeableRow = React.createClass({
+  _previousLeft: 0,
+  componentWillMount: function() {
+    this._panX = new Animated.Value(0);
+    //this.leftBackGroundColor.setValue("#0000ff");
+    this.leftBackGroundColor = this._panX.interpolate({
+      inputRange:[50,
+                  99,
+                  100,
+                  149,
+                  150,
+                  200,
+      ],
+      outputRange:['rgb(0, 0, 0)',//black
+                   'rgb(0, 0, 0)',//black
+                   'rgb(255, 0, 0)',//red
+                   'rgb(255, 0, 0)',//red
+                   'rgb(0, 0, 255)',//blue
+                   'rgb(0, 0, 255)',//blue
+      ]
+    });
+    //AddListener timing
+    this._panResponder = PanResponder.create({
+      // Ask to be the responder:
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+
+      onPanResponderGrant: (evt, gestureState) => {
+        this._panX.setOffset(this._previousLeft);
+        this._panX.setValue(0);
+      },
+      onPanResponderMove: Animated.event([
+        null,
+        {dx: this._panX}
+      ]),
+      onPanResponderTerminationRequest: (evt, gestureState) => true,
+      onPanResponderRelease: (evt, gestureState) => {
+        //this._previousLeft += gestureState.dx;
+        //this._panX.setValue(0);
+        Animated.parallel([
+          Animated.decay(this._panX, {
+            velocity:gestureState.vx,
+          }),
+          Animated.spring(this._panX, {
+            toValue: 0,
+          })
+        ]).start();
+      },
+
+      onPanResponderTerminate: (evt, gestureState) => {
+        // Another component has become the responder, so this gesture
+        // should be cancelled
+      },
+      onShouldBlockNativeResponder: (evt, gestureState) => {
+        // Returns whether this component should block native components from becoming the JS
+        // responder. Returns true by default. Is currently only supported on android.
+        return true;
+      },
+    });
+  },
+
+  render(){
+    leftButtons = (
+      <Animated.View style = {[{backgroundColor:this.leftBackGroundColor}]}>
+        <Text>
+          foo
+        </Text>
+      </Animated.View>);
+
+    return(
+      //{height: this._height},
+      <View style={
+        [styles.swipeableElementWrapper,
+        ]}>
+        {leftButtons}
+        <Animated.View
+      ref={'mainElement'}
+      style={[styles.swipeableMain,
+              {left: this._panX},
+              /*overflow:"visible",
+              flexDirection: "row",
+              //padding: 10,
+              alignItems: "center",
+              } */
+              this.props.style,
+              //this._animatedValue
+              //to use negative value
+        ]}
+      {...this._panResponder.panHandlers}
+        >
+          {this.props.children}
+        </Animated.View>
+      </View>
+    )
+  },
+})
 
 var Dimensions = require('Dimensions');
 
 var SCREEN_WIDTH = Dimensions.get('window').width;
 var SCREEN_HEIGHT = Dimensions.get('window').height;
-//var SWIPEABLE_MAIN_WIDTH = 300;
-var SWIPEABLE_MAIN_WIDTH = SCREEN_WIDTH;
+
+//variable for debug layout
+var SWIPEABLE_MAIN_WIDTH = 300;
+//var SWIPEABLE_MAIN_WIDTH = SCREEN_WIDTH;
 
 var SwipeableElement = React.createClass({
   _panResponder: {},
@@ -616,7 +717,7 @@ var SwipeableElement = React.createClass({
         {leftButtons}
         {/* for z-index order */}
         {rightButtons}
-            <Animated.View
+        <Animated.View
              ref={'mainElement'}
              style={[styles.swipeableMain,
                      {left: this._animateMainLeft,
