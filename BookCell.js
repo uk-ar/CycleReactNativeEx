@@ -321,22 +321,66 @@ var SwipeableRow = React.createClass({
   componentWillMount: function() {
     this._panX = new Animated.Value(0);
     //this.leftBackGroundColor.setValue("#0000ff");
-    this.leftBackGroundColor = this._panX.interpolate({
-      inputRange:[50,
-                  99,
-                  100,
-                  149,
-                  150,
-                  200,
-      ],
-      outputRange:['rgb(0, 0, 0)',//black
-                   'rgb(0, 0, 0)',//black
-                   'rgb(255, 0, 0)',//red
-                   'rgb(255, 0, 0)',//red
-                   'rgb(0, 0, 255)',//blue
-                   'rgb(0, 0, 255)',//blue
+    var GREY = 0
+    var GREEN = 1
+    var RED = 2
+    //this._color = new Animated.Value(GREY);
+    this._color = GREY
+    this._animatedColor = new Animated.Value(this._color);
+    //this.leftBackGroundColor = new Animated.Value('rgb(255, 0, 0)');
+    this.leftBackGroundColor = this._animatedColor.interpolate({
+      inputRange:[GREY, GREEN, RED],
+      outputRange:[
+        'rgb(180, 180, 180)',
+        'rgb(63, 236, 35)',
+        'rgb(233, 19, 19)',
       ]
     });
+
+    this._panX.addListener(({value:value}) => {
+      //console.log("v:%O", value)
+      /* if(30 < value){
+         Animated.timing(this.leftBackGroundColor, {
+         toValue: 'rgb(0, 0, 255)',//blue
+         duration: 30,
+         }).start(); */
+      //console.log("start anim");
+      var nextColor = null;
+      //if (value > -50 && this._color != GREY) {
+      if (value < 50  && this._color != GREY) {
+        nextColor = GREY;
+      //} else if (value < -50 && value > -threshold && this._color != GREEN) {
+      } else if (50 < value && value < 100 && this._color != GREEN) {
+        nextColor = GREEN;
+      } else if (100 < value && this._color != RED) {
+        nextColor = RED;
+      }
+      if (nextColor !== null) {
+        this._color = nextColor;
+        Animated.timing(this._animatedColor, {
+          toValue: nextColor,
+          duration: 180,
+        }).start();
+      }
+    }
+      //this.leftBackGroundColor.setValue('rgb(0, 0, 255)')
+    );
+    /* this.leftBackGroundColor = this._panX.interpolate({
+       inputRange:[50,
+       99,
+       100,
+       149,
+       150,
+       200,
+       ],
+       outputRange:['rgb(0, 0, 0)',//black
+       'rgb(0, 0, 0)',//black
+       'rgb(255, 0, 0)',//red
+       'rgb(255, 0, 0)',//red
+       'rgb(0, 0, 255)',//blue
+       'rgb(0, 0, 255)',//blue
+       ]
+       }); */
     //AddListener timing
     this._panResponder = PanResponder.create({
       // Ask to be the responder:
