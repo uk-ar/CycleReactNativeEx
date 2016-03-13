@@ -318,16 +318,17 @@ var BookCell = React.createClass({
 
 var SwipeableRow = React.createClass({
   _previousLeft: 0,
+  getInitialState() {
+    return { text:"foo" }
+  },
   componentWillMount: function() {
     this._panX = new Animated.Value(0);
-    //this.leftBackGroundColor.setValue("#0000ff");
     var GREY = 0
     var GREEN = 1
     var RED = 2
     //this._color = new Animated.Value(GREY);
     this._color = GREY
     this._animatedColor = new Animated.Value(this._color);
-    //this.leftBackGroundColor = new Animated.Value('rgb(255, 0, 0)');
     this.leftBackGroundColor = this._animatedColor.interpolate({
       inputRange:[GREY, GREEN, RED],
       outputRange:[
@@ -336,24 +337,31 @@ var SwipeableRow = React.createClass({
         'rgb(233, 19, 19)',
       ]
     });
-
+    //this.leftBackGroundColor = new Animated.Value('rgb(233, 19, 19)');//ok
+    this.opacity = new Animated.Value(1);//text color
+    //this.text = "foo"
     this._panX.addListener(({value:value}) => {
       //console.log("v:%O", value)
-      /* if(30 < value){
-         Animated.timing(this.leftBackGroundColor, {
+      //Not working
+      /* Animated.timing(this.leftBackGroundColor, {
          toValue: 'rgb(0, 0, 255)',//blue
          duration: 30,
          }).start(); */
       //console.log("start anim");
+      //https://github.com/facebook/react-native/issues/2072#issuecomment-123778910
       var nextColor = null;
+      var nextText = null;
       //if (value > -50 && this._color != GREY) {
       if (value < 50  && this._color != GREY) {
         nextColor = GREY;
+        nextText = "grey";
       //} else if (value < -50 && value > -threshold && this._color != GREEN) {
       } else if (50 < value && value < 100 && this._color != GREEN) {
         nextColor = GREEN;
+        nextText = "green";
       } else if (100 < value && this._color != RED) {
         nextColor = RED;
+        nextText = "red";
       }
       if (nextColor !== null) {
         this._color = nextColor;
@@ -361,26 +369,13 @@ var SwipeableRow = React.createClass({
           toValue: nextColor,
           duration: 180,
         }).start();
+        //LayoutAnimation.linear();
+        this.setState({text:nextText})//It's hard to change opacity
       }
     }
       //this.leftBackGroundColor.setValue('rgb(0, 0, 255)')
     );
-    /* this.leftBackGroundColor = this._panX.interpolate({
-       inputRange:[50,
-       99,
-       100,
-       149,
-       150,
-       200,
-       ],
-       outputRange:['rgb(0, 0, 0)',//black
-       'rgb(0, 0, 0)',//black
-       'rgb(255, 0, 0)',//red
-       'rgb(255, 0, 0)',//red
-       'rgb(0, 0, 255)',//blue
-       'rgb(0, 0, 255)',//blue
-       ]
-       }); */
+
     //AddListener timing
     this._panResponder = PanResponder.create({
       // Ask to be the responder:
@@ -425,10 +420,13 @@ var SwipeableRow = React.createClass({
 
   render(){
     leftButtons = (
-      <Animated.View style = {[{backgroundColor:this.leftBackGroundColor}]}>
-        <Text>
-          foo
-        </Text>
+      <Animated.View style = {
+        {backgroundColor: this.leftBackGroundColor,
+         width: this._panX,
+        }}>
+        <Animated.Text style={{opacity: this.opacity}}>
+          {this.state.text}
+        </Animated.Text>
       </Animated.View>);
 
     return(
@@ -440,12 +438,15 @@ var SwipeableRow = React.createClass({
         <Animated.View
       ref={'mainElement'}
       style={[styles.swipeableMain,
-              {left: this._panX},
+              {left: this._panX,
+               position:"absolute",
+              },
               /*overflow:"visible",
               flexDirection: "row",
               //padding: 10,
               alignItems: "center",
-              } */
+                 } */
+
               this.props.style,
               //this._animatedValue
               //to use negative value
