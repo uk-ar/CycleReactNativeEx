@@ -100,6 +100,38 @@ var LibraryStatus = React.createClass({
   },
 });
 
+var MeasurableView = React.createClass({
+  getInitialState() {
+    return { contentWidth:  0,
+             contentHeight: 0,}
+  },
+  _onLayout({nativeEvent:{layout:{width, height}}}){
+    if(!this.state.contentWidth){
+      //this.state.contentWidth = width;
+      //this._root.setNativeProps({style:{flex:width}})
+
+      this.setState({contentWidth:width,
+                     contentHeight:height});
+      this.props.onFirstLayout &&
+      this.props.onFirstLayout(
+        {nativeEvent:{layout:{width, height}}});
+    }
+  },
+  //cannot measure Animated.View
+  render() {
+    return (
+      //TODO:...this.props
+      <Animated.View style = {[this.props.flexEnabled &&
+                               {flex: this.state.contentWidth},
+                               this.props.style]}
+                     onLayout={this.props.onLayout || this._onLayout}
+      >
+        {this.props.children}
+      </Animated.View>
+    )
+  }
+});
+
 var MeasurableWidth = React.createClass({
   getDefaultProps() {
     return { flexEnabled: false }
@@ -321,6 +353,17 @@ var SwipeableRow = React.createClass({
   getInitialState() {
     return { text:"foo" }
   },
+  componentDidMount(){
+    //console.log("ref will:%O", this.refs);
+    //Animated.View cannot measure
+    /* setTimeout(() => {
+       this.refs['mainElement']
+       .measure((x, y, width, height, pageX, pageY)=>{
+       console.log("hei:%O", height);
+       this.height.setValue(height);
+       })
+       }) */
+  },
   componentWillMount: function() {
     this._panX = new Animated.Value(0);
     var GREY = 0
@@ -340,6 +383,13 @@ var SwipeableRow = React.createClass({
     //this.leftBackGroundColor = new Animated.Value('rgb(233, 19, 19)');//ok
     this.opacity = new Animated.Value(1);//text color
     //this.text = "foo"
+    this.height = new Animated.Value(0);
+    console.log("ref:%O", this.refs);
+    /* setTimeout(this.refs['mainElement']
+       .measure((x, y, width, height, pageX, pageY)=>{
+       //console.log("width r:%O", width);
+       this.height.setValue(height);
+       })) */
     this._panX.addListener(({value:value}) => {
       //console.log("v:%O", value)
       //Not working
@@ -396,6 +446,8 @@ var SwipeableRow = React.createClass({
       onPanResponderRelease: (evt, gestureState) => {
         //this._previousLeft += gestureState.dx;
         //this._panX.setValue(0);
+        //{this.height.setValue(height)}
+        Animated.sequence()
         Animated.parallel([
           Animated.decay(this._panX, {
             velocity:gestureState.vx,
@@ -417,23 +469,30 @@ var SwipeableRow = React.createClass({
       },
     });
   },
-
   render(){
     leftButtons = (
       <Animated.View style = {
         {backgroundColor: this.leftBackGroundColor,
          width: this._panX,
-        }}>
-        <Animated.Text style={{opacity: this.opacity}}>
-          {this.state.text}
-        </Animated.Text>
+         padding:10,
+        }}
+      >
+        <Animated.Text style={{opacity: this.opacity}}
+                       numberOfLines={1}>
+            {this.state.text}
+          </Animated.Text>
       </Animated.View>);
 
     return(
       //{height: this._height},
-      <View style={
+      <MeasurableView style={
         [styles.swipeableElementWrapper,
-        ]}>
+         {height:this.height,
+         }
+        ]}
+                      onFirstLayout={({nativeEvent:{layout:{width, height}}})=>
+                        {this.height.setValue(height)}}
+      >
         {leftButtons}
         <Animated.View
       ref={'mainElement'}
@@ -455,7 +514,7 @@ var SwipeableRow = React.createClass({
         >
           {this.props.children}
         </Animated.View>
-      </View>
+      </MeasurableView>
     )
   },
 })
