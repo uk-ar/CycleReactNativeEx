@@ -353,25 +353,18 @@ var SwipeableRow = React.createClass({
   getInitialState() {
     return { text:"foo" }
   },
-  componentDidMount(){
-    //console.log("ref will:%O", this.refs);
-    //Animated.View cannot measure
-    /* setTimeout(() => {
-       this.refs['mainElement']
-       .measure((x, y, width, height, pageX, pageY)=>{
-       console.log("hei:%O", height);
-       this.height.setValue(height);
-       })
-       }) */
-  },
   componentWillMount: function() {
+    this.height = new Animated.Value(0);
+
     this._panX = new Animated.Value(0);
+    /* leftButtonSource = [
+       {text: "foo", backgroundColor: 'rgb(63, 236, 35)'},
+       {text: "bar", backgroundColor: 'rgb(233, 19, 19)'},
+       ] */
     var GREY = 0
     var GREEN = 1
     var RED = 2
-    //this._color = new Animated.Value(GREY);
-    this._color = GREY
-    this._animatedColor = new Animated.Value(this._color);
+    this._animatedColor = new Animated.Value(GREY);
     this.leftBackGroundColor = this._animatedColor.interpolate({
       inputRange:[GREY, GREEN, RED],
       outputRange:[
@@ -380,53 +373,36 @@ var SwipeableRow = React.createClass({
         'rgb(233, 19, 19)',
       ]
     });
-    //this.leftBackGroundColor = new Animated.Value('rgb(233, 19, 19)');//ok
-    this.opacity = new Animated.Value(1);//text color
-    //this.text = "foo"
-    this.height = new Animated.Value(0);
-    console.log("ref:%O", this.refs);
-    /* setTimeout(this.refs['mainElement']
-       .measure((x, y, width, height, pageX, pageY)=>{
-       //console.log("width r:%O", width);
-       this.height.setValue(height);
-       })) */
     this._panX.addListener(({value:value}) => {
-      //console.log("v:%O", value)
+      //this.leftBackGroundColor = new Animated.Value('rgb(233, 19, 19)');//ok
       //Not working
       /* Animated.timing(this.leftBackGroundColor, {
          toValue: 'rgb(0, 0, 255)',//blue
          duration: 30,
          }).start(); */
-      //console.log("start anim");
       //https://github.com/facebook/react-native/issues/2072#issuecomment-123778910
       var nextColor = null;
       var nextText = null;
-      //if (value > -50 && this._color != GREY) {
-      if (value < 50  && this._color != GREY) {
+      if (value < 50  && this.state.text !== "grey") {
         nextColor = GREY;
         nextText = "grey";
-      //} else if (value < -50 && value > -threshold && this._color != GREEN) {
-      } else if (50 < value && value < 100 && this._color != GREEN) {
+      } else if (50 < value && value < 100 && this.state.text !== "green") {
         nextColor = GREEN;
         nextText = "green";
-      } else if (100 < value && this._color != RED) {
+      } else if (100 < value && this.state.text !== "red") {
         nextColor = RED;
         nextText = "red";
       }
       if (nextColor !== null) {
-        this._color = nextColor;
         Animated.timing(this._animatedColor, {
           toValue: nextColor,
           duration: 180,
         }).start();
-        //LayoutAnimation.linear();
         this.setState({text:nextText})//It's hard to change opacity
       }
     }
-      //this.leftBackGroundColor.setValue('rgb(0, 0, 255)')
     );
 
-    //AddListener timing
     this._panResponder = PanResponder.create({
       // Ask to be the responder:
       onStartShouldSetPanResponder: (evt, gestureState) => true,
@@ -447,13 +423,16 @@ var SwipeableRow = React.createClass({
         //this._previousLeft += gestureState.dx;
         //this._panX.setValue(0);
         //{this.height.setValue(height)}
-        Animated.sequence()
+        //Animated.sequence()
         Animated.parallel([
           Animated.decay(this._panX, {
             velocity:gestureState.vx,
           }),
           Animated.spring(this._panX, {
             toValue: 0,
+          }),
+          Animated.timing(this.height, {
+            toValue: 0.1,
           })
         ]).start();
       },
@@ -475,10 +454,10 @@ var SwipeableRow = React.createClass({
         {backgroundColor: this.leftBackGroundColor,
          width: this._panX,
          padding:10,
+         height:this.height,
         }}
       >
-        <Animated.Text style={{opacity: this.opacity}}
-                       numberOfLines={1}>
+        <Animated.Text numberOfLines={1}>
             {this.state.text}
           </Animated.Text>
       </Animated.View>);
