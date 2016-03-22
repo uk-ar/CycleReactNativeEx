@@ -6,6 +6,7 @@ var GiftedSpinner = require('react-native-gifted-spinner');
 var Emoji = require('react-native-emoji');
 var Swipeout = require('react-native-swipeout');
 import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
+var _ = require('lodash');
 
 var {
   TouchableOpacity,
@@ -357,21 +358,20 @@ var SwipeableRow = React.createClass({
     this.height = new Animated.Value(0);
 
     this._panX = new Animated.Value(0);
-    /* leftButtonSource = [
-       {text: "foo", backgroundColor: 'rgb(63, 236, 35)'},
-       {text: "bar", backgroundColor: 'rgb(233, 19, 19)'},
-       ] */
+    var leftButtonSource = [
+      {text: "grey", backgroundColor: 'rgb(180, 180, 180)'},
+      {text: "green", backgroundColor: 'rgb(63, 236, 35)'},
+      {text: "red", backgroundColor: 'rgb(233, 19, 19)'},
+    ]
     var GREY = 0
     var GREEN = 1
     var RED = 2
+    console.log("arr:%O", Array.from(Array(leftButtonSource.length).keys()))
+    //http://rochefort.hatenablog.com/entry/2015/01/08/005043
     this._animatedColor = new Animated.Value(GREY);
     this.leftBackGroundColor = this._animatedColor.interpolate({
-      inputRange:[GREY, GREEN, RED],
-      outputRange:[
-        'rgb(180, 180, 180)',
-        'rgb(63, 236, 35)',
-        'rgb(233, 19, 19)',
-      ]
+      inputRange: _.range(leftButtonSource.length),//Cannot use ES6 method e.g.Array.from(Array(3).keys())
+      outputRange: leftButtonSource.map((elem) => elem.backgroundColor),
     });
     this._panX.addListener(({value:value}) => {
       //this.leftBackGroundColor = new Animated.Value('rgb(233, 19, 19)');//ok
@@ -384,14 +384,14 @@ var SwipeableRow = React.createClass({
       var nextColor = null;
       var nextText = null;
       if (value < 50  && this.state.text !== "grey") {
-        nextColor = GREY;
-        nextText = "grey";
+        nextColor = 0;
+        nextText = leftButtonSource[0].text;
       } else if (50 < value && value < 100 && this.state.text !== "green") {
-        nextColor = GREEN;
-        nextText = "green";
+        nextColor = 1;
+        nextText = leftButtonSource[1].text;
       } else if (100 < value && this.state.text !== "red") {
-        nextColor = RED;
-        nextText = "red";
+        nextColor = 2;
+        nextText = leftButtonSource[2].text;
       }
       if (nextColor !== null) {
         Animated.timing(this._animatedColor, {
@@ -449,7 +449,7 @@ var SwipeableRow = React.createClass({
     });
   },
   render(){
-    leftButtons = (
+    var leftButtons = (
       <Animated.View style = {
         {backgroundColor: this.leftBackGroundColor,
          width: this._panX,
