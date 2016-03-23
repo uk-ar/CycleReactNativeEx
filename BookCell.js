@@ -348,27 +348,56 @@ var BookCell = React.createClass({
   )
 }, //collapsable={false}
 });
+var SwipeableButton = React.createClass({
+  render(){
+    return(
+      //style={{mergin:10}}
+      <View style={{flexDirection: 'row',
+                    alignItems: "center",
+                    padding:10,
+                    //alignItems: "flex-end",
+                    justifyContent:"flex-end",
+        }}>
+        <FAIcon name = "rocket" color = "white" style ={{
+            //padding:10,
+            //mergin:10,
+            //flex:1,
+            //color container(icon & text) vs width container(text only)
+            //try setNativeProps(AnimatedValue)
+            //right:0,
+            //textAlign:"right"
+          }}/>
+        {/*<Animated.Text numberOfLines = {1} style = {{
+            //mergin:10,
+            flex:1,
+          }}>
+          {this.props.text}
+        </Animated.Text>*/}
+      </View>)
+  }
+})
 
 var SwipeableRow = React.createClass({
   _previousLeft: 0,
   getInitialState() {
-    return { text:"foo" }
+    return { text:<SwipeableButton text="foo" /> }
   },
   componentWillMount: function() {
     this.height = new Animated.Value(0);
 
     this._panX = new Animated.Value(0);
+    //https://www.google.com/design/spec/style/color.html#color-color-palette
+    //http://www.kitaq.net/lib/rgb/16to10.cgi
+    var blue=(<SwipeableButton text="blue" />);
+    var green=(<SwipeableButton text="green" />)
+      //string or component
     var leftButtonSource = [
-      {text: "grey", backgroundColor: 'rgb(180, 180, 180)'},
-      {text: "green", backgroundColor: 'rgb(63, 236, 35)'},
-      {text: "red", backgroundColor: 'rgb(233, 19, 19)'},
+      //{text: "grey", backgroundColor: 'rgb(158, 158, 158)'},
+      {text: blue, backgroundColor: 'rgb(33,150,243)'},
+      {text: green, backgroundColor: 'rgb(76, 175, 80)'},
     ]
-    var GREY = 0
-    var GREEN = 1
-    var RED = 2
-    console.log("arr:%O", Array.from(Array(leftButtonSource.length).keys()))
     //http://rochefort.hatenablog.com/entry/2015/01/08/005043
-    this._animatedColor = new Animated.Value(GREY);
+    this._animatedColor = new Animated.Value(0);
     this.leftBackGroundColor = this._animatedColor.interpolate({
       inputRange: _.range(leftButtonSource.length),//Cannot use ES6 method e.g.Array.from(Array(3).keys())
       outputRange: leftButtonSource.map((elem) => elem.backgroundColor),
@@ -381,19 +410,15 @@ var SwipeableRow = React.createClass({
          duration: 30,
          }).start(); */
       //https://github.com/facebook/react-native/issues/2072#issuecomment-123778910
-      var nextColor = null;
+      var threshold = SWIPEABLE_MAIN_WIDTH / leftButtonSource.length
+      var nextColor = Math.abs(Math.floor(value / threshold));
+      //var nextText = null;
       var nextText = null;
-      if (value < 50  && this.state.text !== "grey") {
-        nextColor = 0;
-        nextText = leftButtonSource[0].text;
-      } else if (50 < value && value < 100 && this.state.text !== "green") {
-        nextColor = 1;
-        nextText = leftButtonSource[1].text;
-      } else if (100 < value && this.state.text !== "red") {
-        nextColor = 2;
-        nextText = leftButtonSource[2].text;
+
+      if (this.state.text !== leftButtonSource[nextColor].text){
+        nextText = leftButtonSource[nextColor].text;
       }
-      if (nextColor !== null) {
+      if (nextText !== null) {
         Animated.timing(this._animatedColor, {
           toValue: nextColor,
           duration: 180,
@@ -453,13 +478,11 @@ var SwipeableRow = React.createClass({
       <Animated.View style = {
         {backgroundColor: this.leftBackGroundColor,
          width: this._panX,
-         padding:10,
+         //padding:10,
          height:this.height,
         }}
       >
-        <Animated.Text numberOfLines={1}>
             {this.state.text}
-          </Animated.Text>
       </Animated.View>);
 
     return(
@@ -482,7 +505,7 @@ var SwipeableRow = React.createClass({
               /*overflow:"visible",
               flexDirection: "row",
               //padding: 10,
-              alignItems: "center",
+                 alignItems: "center",
                  } */
 
               this.props.style,
