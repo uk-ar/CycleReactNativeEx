@@ -339,11 +339,33 @@ var BookCell = React.createClass({
           }}
         style={{
             backgroundColor:"pink",
-            padding:10,//not work
+            //padding:10,//not work
             //margin:10,
           }}
     >
-      <Text>{'Some Other Text'}</Text>
+      <View style={{flexDirection:"row",
+                    alignItems:"center",//vertical
+                    padding:10,
+                    justifyContent:"flex-end"
+        }}>
+        <FAIcon name="rocket" color="white"
+        style={{
+            backgroundColor:"green",
+            marginRight:10,
+            width:10,
+            textAlign:"right"
+          }}/>
+        <Text style={{
+            //backgroundColor:"red",
+            paddingHorizontal:10,
+            flex:1,
+            //width:0,
+          }}
+              numberOfLines={1}
+        >
+          {'Some Other Text'}
+        </Text>
+      </View>
     </SwipeableRow>
   )
 }, //collapsable={false}
@@ -353,27 +375,28 @@ var SwipeableButton = React.createClass({
     return(
       //style={{mergin:10}}
       <View style={{flexDirection: 'row',
-                    alignItems: "center",
+                    alignItems: "center",//vertical
                     padding:10,
-                    //alignItems: "flex-end",
                     justifyContent:"flex-end",
         }}>
         <FAIcon name = "rocket" color = "white" style ={{
-            //padding:10,
-            //mergin:10,
-            //flex:1,
             //color container(icon & text) vs width container(text only)
             //try setNativeProps(AnimatedValue)
-            //right:0,
-            //textAlign:"right"
+            marginRight:10,
+            //backgroundColor:"green",
           }}/>
-        {/*<Animated.Text numberOfLines = {1} style = {{
+        <Animated.Text numberOfLines = {1} style = {{
             //mergin:10,
+            //backgroundColor:"red",
+            //paddingHorizontal:10,
             flex:1,
           }}>
           {this.props.text}
-        </Animated.Text>*/}
+        </Animated.Text>
       </View>)
+      //pass panx as props?
+      /* <View style={{flex:1}}>
+         </View> */
   }
 })
 
@@ -445,21 +468,21 @@ var SwipeableRow = React.createClass({
       ]),
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
-        //this._previousLeft += gestureState.dx;
+        this._previousLeft += gestureState.dx;
         //this._panX.setValue(0);
         //{this.height.setValue(height)}
         //Animated.sequence()
-        Animated.parallel([
-          Animated.decay(this._panX, {
-            velocity:gestureState.vx,
-          }),
-          Animated.spring(this._panX, {
-            toValue: 0,
-          }),
-          Animated.timing(this.height, {
-            toValue: 0.1,
-          })
-        ]).start();
+        /* Animated.parallel([
+           Animated.decay(this._panX, {
+           velocity:gestureState.vx,
+           }),
+           Animated.spring(this._panX, {
+           toValue: 0,
+           }),
+           Animated.timing(this.height, {
+           toValue: 0.1,
+           })
+           ]).start(); */
       },
 
       onPanResponderTerminate: (evt, gestureState) => {
@@ -499,8 +522,9 @@ var SwipeableRow = React.createClass({
         <Animated.View
       ref={'mainElement'}
       style={[styles.swipeableMain,
-              {left: this._panX,
-               position:"absolute",
+              {
+                //left: this._panX,
+               //position:"absolute",
               },
               /*overflow:"visible",
               flexDirection: "row",
@@ -527,7 +551,7 @@ var SCREEN_WIDTH = Dimensions.get('window').width;
 var SCREEN_HEIGHT = Dimensions.get('window').height;
 
 //variable for debug layout
-var SWIPEABLE_MAIN_WIDTH = 300;
+var SWIPEABLE_MAIN_WIDTH = 100;
 //var SWIPEABLE_MAIN_WIDTH = SCREEN_WIDTH;
 
 var SwipeableElement = React.createClass({
