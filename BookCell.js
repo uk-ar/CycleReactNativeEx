@@ -39,6 +39,10 @@ var {
   height
 } = Dimensions.get('window');
 
+//variable for debug layout
+var SWIPEABLE_MAIN_WIDTH = 200;
+//var SWIPEABLE_MAIN_WIDTH = SCREEN_WIDTH;
+
 var MeasurableView = React.createClass({
   getInitialState() {
     return { contentWidth:  0,
@@ -54,6 +58,7 @@ var MeasurableView = React.createClass({
     }
   },
   //cannot measure Animated.View
+  //hide(opacity:0) until measure
   render() {
     return (
       //TODO:...this.props
@@ -139,15 +144,33 @@ var SwipeableButton = React.createClass({
             //width:30
             //backgroundColor:"green",
           }}/>
-        <Animated.Text numberOfLines = {1} style = {{
-            //mergin:10,
-            //backgroundColor:"red",
-            //paddingHorizontal:10,
-            flex:1,
+        <View style={{flexDirection: 'row',
+                      justifyContent:"flex-end",
           }}>
-          {this.props.text}
-        </Animated.Text>
-      </View>)
+
+          <Animated.Text numberOfLines = {1} style = {{
+              //mergin:10,
+              //backgroundColor:"red",
+              //paddingHorizontal:10,
+              //flex:1,
+              //overflow:"hidden"
+            }}>
+            {this.props.text}
+          </Animated.Text>
+          <View style={{flexDirection: 'row',
+                        justifyContent:"flex-end",
+            }}>
+
+            <View style = {{
+                backgroundColor:"red",
+                flex:1,
+                padding:10,
+              }}>
+            </View>
+          </View>
+        </View>
+      </View>
+    )
       //pass panx as props?
       /* <View style={{flex:1}}>
          </View> */
@@ -190,7 +213,6 @@ var SwipeableRow = React.createClass({
       //https://github.com/facebook/react-native/issues/2072#issuecomment-123778910
       var threshold = SWIPEABLE_MAIN_WIDTH / leftButtonSource.length
       var nextColor = Math.abs(Math.floor(value / threshold));
-      //var nextText = null;
       var nextText = null;
 
       if (this.state.text !== leftButtonSource[nextColor].text){
@@ -225,19 +247,6 @@ var SwipeableRow = React.createClass({
       onPanResponderRelease: (evt, gestureState) => {
         this._previousLeft += gestureState.dx;
         //this._panX.setValue(0);
-        //{this.height.setValue(height)}
-        //Animated.sequence()
-        /* Animated.parallel([
-           Animated.decay(this._panX, {
-           velocity:gestureState.vx,
-           }),
-           Animated.spring(this._panX, {
-           toValue: 0,
-           }),
-           Animated.timing(this.height, {
-           toValue: 0.1,
-           })
-           ]).start(); */
       },
 
       onPanResponderTerminate: (evt, gestureState) => {
@@ -255,7 +264,7 @@ var SwipeableRow = React.createClass({
     var leftButtons = (
       <Animated.View style = {
         {backgroundColor: this.leftBackGroundColor,
-         width: this._panX < 0 ? 0.01 : this._panX,
+         width: this._panX <= 0 ? 0.01 : this._panX,
          //padding:10,
          height:this.height,
         }}
@@ -266,7 +275,15 @@ var SwipeableRow = React.createClass({
     return(
       //{height: this._height},
       <MeasurableView style={
-        [styles.swipeableElementWrapper,
+        [{
+          //width: SCREEN_WIDTH,
+          width: SWIPEABLE_MAIN_WIDTH,
+          flexDirection:'row',
+          backgroundColor:'yellow',
+          //alignItems:'flex-end',//vertical
+          //alignItems:'stretch',//vertical,
+          //justifyContent:'center',//not to affected by left button string change
+        },
          {height:this.height,
          }
         ]}
@@ -276,10 +293,18 @@ var SwipeableRow = React.createClass({
         {leftButtons}
         <Animated.View
       ref={'mainElement'}
-      style={[styles.swipeableMain,
-              {
-                //left: this._panX,
-               //position:"absolute",
+      style={[
+        {
+          //width: SCREEN_WIDTH,
+          width: SWIPEABLE_MAIN_WIDTH,
+          //backgroundColor: 'gray',
+          //height:70,
+          //padding:1,
+        },
+              {/*
+               left: this._panX,
+               position:"absolute",
+               */
               },
               /*overflow:"visible",
               flexDirection: "row",
@@ -299,15 +324,6 @@ var SwipeableRow = React.createClass({
     )
   },
 })
-
-var Dimensions = require('Dimensions');
-
-var SCREEN_WIDTH = Dimensions.get('window').width;
-var SCREEN_HEIGHT = Dimensions.get('window').height;
-
-//variable for debug layout
-var SWIPEABLE_MAIN_WIDTH = 200;
-//var SWIPEABLE_MAIN_WIDTH = SCREEN_WIDTH;
 
 var styles = StyleSheet.create({
   //for new swipe
@@ -379,41 +395,6 @@ var styles = StyleSheet.create({
   separator: {
     height: 1,
     backgroundColor: '#CCCCCC',
-  },
-  swipeableElementWrapper: {
-    //width: SCREEN_WIDTH,
-    width: SWIPEABLE_MAIN_WIDTH,
-    flexDirection:'row',
-    //backgroundColor:'rgba(0,0,0,0)',//transparent
-    backgroundColor:'yellow',//transparent
-    //alignItems:'flex-end',//vertical
-    //alignItems:'stretch',//vertical,
-    //justifyContent:'center',//not to affected by left button string change
-  },
-  swipeableMain: {
-    //width: SCREEN_WIDTH,
-    width: SWIPEABLE_MAIN_WIDTH,
-    //backgroundColor: 'gray',
-    //height:70,
-    //padding:1,
-  },
-  swipeableLeft: {
-    flexDirection:'row',
-    //height:40,
-    //alignItems:'flex-end',
-    alignItems:'center',
-    //alignSelf:'flex-end',
-    //alignItems:'stretch',
-    backgroundColor:'green',
-    //justifyContent:'flex-start',//horizontal
-  },
-  /* leftText: {
-     color:'#FFFFFF',
-     textAlign:'center',//horizontal
-     }, */
-  swipeableRight: {
-    flexDirection:'row',
-    justifyContent:'flex-end',
   },
   Text: {
     color:'#FFFFFF',
