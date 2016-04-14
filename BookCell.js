@@ -46,25 +46,31 @@ var SWIPEABLE_MAIN_WIDTH = 200;
 var MeasurableView = React.createClass({
   getInitialState() {
     return { contentWidth:  0,
-             contentHeight: 0,}
+             contentHeight: 0,
+             //measured: false,
+    }
   },
-  _onLayout({nativeEvent:{layout:{width, height}}}){
+  _onLayout({nativeEvent:{layout:{x, y, width, height}}}){
     if(!this.state.contentWidth){
-      this.setState({contentWidth:width,
-                     contentHeight:height});
       this.props.onFirstLayout &&
       this.props.onFirstLayout(
-        {nativeEvent:{layout:{width, height}}});
+        {nativeEvent:{layout:{x, y, width, height}}});
+      this.setState({contentWidth:width,
+                     contentHeight:height,
+                     //measured:true,
+      });
+
     }
   },
   //cannot measure Animated.View
-  //hide(opacity:0) until measure
+  //hide(opacity:0) until measure is not mean because measure time is not large
   render() {
     return (
       //TODO:...this.props
       <Animated.View {...this.props}
                      style={[/* this.props.flexEnabled &&
                                 {flex: this.state.contentWidth}, */
+                         //this.state.measured ? null : {opacity:0},
                          this.props.style]}
                      onLayout={this._onLayout}
       >
@@ -136,39 +142,44 @@ var SwipeableButton = React.createClass({
                     padding:10,
                     justifyContent:"flex-end",
         }}>
-        <FAIcon name = "rocket" color = "white" style ={{
-            //color container(icon & text) vs width container(text only)
-            //try setNativeProps(AnimatedValue)
-            marginRight:10,
-            //fixed width & flex cannot work correctory for justifyContent
-            //width:30
-            //backgroundColor:"green",
-          }}/>
-        <View style={{flexDirection: 'row',
-                      justifyContent:"flex-end",
-          }}>
-
           <Animated.Text numberOfLines = {1} style = {{
               //mergin:10,
               //backgroundColor:"red",
               //paddingHorizontal:10,
               //flex:1,
               //overflow:"hidden"
-            }}>
+              //marginLeft:10,
+              position:"absolute"
+            }}
+                         onLayout={({nativeEvent:
+                                     {layout:{x,y,width, height}}})=>{
+                                       console.log("text:%O",x);
+                                     }}
+          >
             {this.props.text}
           </Animated.Text>
-          <View style={{flexDirection: 'row',
-                        justifyContent:"flex-end",
-            }}>
-
-            <View style = {{
-                backgroundColor:"red",
-                flex:1,
-                padding:10,
-              }}>
-            </View>
-          </View>
-        </View>
+          <View style={{flex:1}} />
+          <FAIcon name = "rocket" color = "white" style ={{
+              //color container(icon & text) vs width container(text only)
+              //try setNativeProps(AnimatedValue)
+              //marginHorizontal:10,
+              //margin:10,
+              //fixed width & flex cannot work correctory for justifyContent
+              //width:30
+              //backgroundColor:"green",
+              //position:"absolute",
+            }}
+                  onLayout={({nativeEvent:
+                              {layout:{x,y,width, height}}})=>{
+                                //console.log("icon:%O",x);
+                              }}
+          />
+          {/* <View style = {{
+          backgroundColor:"red",
+          flex:1,
+          padding:10,
+          }}>
+          </View> */}
       </View>
     )
       //pass panx as props?
@@ -204,27 +215,7 @@ var SwipeableRow = React.createClass({
       outputRange: leftButtonSource.map((elem) => elem.backgroundColor),
     });
     this._panX.addListener(({value:value}) => {
-      //this.leftBackGroundColor = new Animated.Value('rgb(233, 19, 19)');//ok
-      //Not working
-      /* Animated.timing(this.leftBackGroundColor, {
-         toValue: 'rgb(0, 0, 255)',//blue
-         duration: 30,
-         }).start(); */
-      //https://github.com/facebook/react-native/issues/2072#issuecomment-123778910
-      var threshold = SWIPEABLE_MAIN_WIDTH / leftButtonSource.length
-      var nextColor = Math.abs(Math.floor(value / threshold));
-      var nextText = null;
-
-      if (this.state.text !== leftButtonSource[nextColor].text){
-        nextText = leftButtonSource[nextColor].text;
-      }
-      if (nextText !== null) {
-        Animated.timing(this._animatedColor, {
-          toValue: nextColor,
-          duration: 180,
-        }).start();
-        this.setState({text:nextText})//It's hard to change opacity
-      }
+      console.log("v:%O",value);
     }
     );
 
@@ -265,15 +256,17 @@ var SwipeableRow = React.createClass({
       <Animated.View style = {
         {backgroundColor: this.leftBackGroundColor,
          width: this._panX <= 0 ? 0.01 : this._panX,
+         //right & left cannot effect 'mainElement'
+         //right: -1 * this._panX,
+         //left: this._panX,
          //padding:10,
-         height:this.height,
+         //height:this.height,
         }}
       >
             {this.state.text}
       </Animated.View>);
 
     return(
-      //{height: this._height},
       <MeasurableView style={
         [{
           //width: SCREEN_WIDTH,
