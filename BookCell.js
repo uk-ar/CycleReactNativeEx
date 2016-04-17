@@ -133,6 +133,8 @@ var BookCell = React.createClass({
   )
 }, //collapsable={false}
 });
+
+//TODO:remove
 var SwipeableButton = React.createClass({
   render(){
     return(
@@ -191,29 +193,24 @@ var SwipeableButton = React.createClass({
 var SwipeableRow = React.createClass({
   _previousLeft: 0,
   getInitialState() {
-    return { text:<SwipeableButton text="foo" /> }
+    return {
+      rightComponent:(
+        <Animated.Text>
+          right
+        </Animated.Text>
+      ),
+      leftComponent:(
+        <Animated.Text>
+          left
+        </Animated.Text>
+      ),
+    }
   },
   componentWillMount: function() {
     this.height = new Animated.Value(0);
 
     this._panX = new Animated.Value(0);
-    //https://www.google.com/design/spec/style/color.html#color-color-palette
-    //http://www.kitaq.net/lib/rgb/16to10.cgi
-    var blue=(<SwipeableButton text="blue" />);
-    var green = (<SwipeableButton text = "green" />);
-    var grey = (<SwipeableButton text = "grey" />);
-      //string or component
-    var leftButtonSource = [
-      {text: grey, backgroundColor: 'rgb(158, 158, 158)'},
-      {text: blue, backgroundColor: 'rgb(33,150,243)'},
-      {text: green, backgroundColor: 'rgb(76, 175, 80)'},
-    ]
-    //http://rochefort.hatenablog.com/entry/2015/01/08/005043
-    this._animatedColor = new Animated.Value(0);
-    this.leftBackGroundColor = this._animatedColor.interpolate({
-      inputRange: _.range(leftButtonSource.length),//Cannot use ES6 method e.g.Array.from(Array(3).keys())
-      outputRange: leftButtonSource.map((elem) => elem.backgroundColor),
-    });
+    this.leftBackGroundColor = new Animated.Value('rgb(158, 158, 158)');
     this._panX.addListener(({value:value}) => {
       console.log("v:%O",value);
     }
@@ -253,6 +250,9 @@ var SwipeableRow = React.createClass({
   },
   render(){
     var leftButtons = (
+      <View/>
+    );
+    var leftButtonsContainer = (
       <Animated.View style = {
         {backgroundColor: this.leftBackGroundColor,
          width: this._panX <= 0 ? 0.01 : this._panX,
@@ -261,9 +261,27 @@ var SwipeableRow = React.createClass({
          //left: this._panX,
          //padding:10,
          //height:this.height,
+         //https://js.coach/react-native?sort=popular&filters=android.ios
+         flexDirection: 'row',
+         alignItems: "center",//vertical
+         //padding:10,
         }}
       >
-            {this.state.text}
+        <View style={{flex:1}} />
+        <View>
+          {this.state.rightComponent}
+        </View>
+        <View style={{position:"absolute",
+                      backgroundColor:"green",
+                      left:0,
+                      //center in vertical
+                      top:0,
+                      bottom:0,
+                      flexDirection: 'row',
+                      alignItems: "center",
+          }}>
+          {this.state.leftComponent}
+        </View>
       </Animated.View>);
 
     return(
@@ -283,7 +301,7 @@ var SwipeableRow = React.createClass({
                       onFirstLayout={({nativeEvent:{layout:{width, height}}})=>
                         {this.height.setValue(height)}}
       >
-        {leftButtons}
+        {leftButtonsContainer}
         <Animated.View
       ref={'mainElement'}
       style={[
