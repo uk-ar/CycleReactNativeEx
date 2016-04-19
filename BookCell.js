@@ -45,6 +45,7 @@ var SWIPEABLE_MAIN_WIDTH = 200;
 
 var MeasurableView = React.createClass({
   getInitialState() {
+    //TODO:remove contentWidth
     return { contentWidth:  0,
              contentHeight: 0,
              //measured: false,
@@ -52,15 +53,17 @@ var MeasurableView = React.createClass({
   },
   _onLayout({nativeEvent:{layout:{x, y, width, height}}}){
     if(!this.state.contentWidth){
-      this.props.onFirstLayout &&
-      this.props.onFirstLayout(
-        {nativeEvent:{layout:{x, y, width, height}}});
       this.setState({contentWidth:width,
                      contentHeight:height,
                      //measured:true,
       });
-
+      this.props.onFirstLayout &&
+      this.props.onFirstLayout(
+        {nativeEvent:{layout:{x, y, width, height}}});
     }
+    this.props.onLayout &&
+    this.props.onLayout(
+      {nativeEvent:{layout:{x, y, width, height}}});
   },
   //cannot measure Animated.View
   //hide(opacity:0) until measure is not mean because measure time is not large
@@ -80,56 +83,183 @@ var MeasurableView = React.createClass({
   }
 });
 
+//Expandable
+//render with original width then
+//shrink to given width
+//set call back
+
+var Expandable = React.createClass({
+  getInitialState(){
+    return{
+      end:2,
+      style:[this.props.style,{width:null}],
+    }
+  },
+  render: function(){
+    var components=[
+      <View style={{flexDirection:"row"}}>
+        <View style={{flex:1}}/><Text>1</Text></View>,
+      <View><Text>2</Text></View>,
+    ]
+    console.log("render expandable");
+    return(
+      //this.props.style
+      <MeasurableView
+      ref="root"
+      style={this.state.style}
+      onFirstLayout={
+        ({nativeEvent:{layout:{width, height}}})=>{
+          this.original_width = width;
+          this.original_height = height;
+          this.setState({style:[this.props.style,
+                                //{width: 4,
+                                {//width: 0.01,
+                                 backgroundColor:"pink"}
+          ]});//TODO:remove width */
+        }}
+      onLayout={
+        ({nativeEvent:{layout:{width, height}}})=>{
+          console.log("ori wid:%O;real wid:%O",this.original_width,width);
+          if(width < this.original_width){
+            //ok
+          }else if(this.original_width < width){
+            //ng?
+          }
+            /* if(!this.previousWidth){
+             //setWidth
+             this.previousWidth = this.refs.root.contentWidth;
+             return;
+             }else if(this.props.onExpand &&
+             (this.refs.root.contentWidth < this.previousWidth)){
+             this.props.onExpand();
+             }else if(this.props.onShrink &&
+             (this.refs.root.contentWidth > this.previousWidth)){
+             this.props.onShrink();
+             }
+             this.previousWidth = this.refs.root.contentWidth; */
+          //console.log("left width:%O",width);
+          /* this.setState({style:[this.props.style,
+             {width: 0.01}]})//TODO:remove width */
+        }
+      }
+      >
+      {components.slice(0,this.state.end)}
+      </MeasurableView>
+      //components
+    )
+  }
+})
+
 var BookCell = React.createClass({
+  /* getInitialState() {
+     return {
+     _panX: new Animated.Value(0),
+     }
+     }, */
+  componentWillMount: function() {
+    //this._panX = new Animated.Value(0.1);
+    this._panX = new Animated.Value(1);//OK
+    this._previousLeft = 0;
+
+    this._panResponder = PanResponder.create({
+      // Ask to be the responder:
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+
+      onPanResponderGrant: (evt, gestureState) => {
+        this._panX.setOffset(this._previousLeft);
+        this._panX.setValue(0);
+      },
+      onPanResponderMove: Animated.event([
+        null,
+        {dx: this._panX}
+      ]),
+      onPanResponderTerminationRequest: (evt, gestureState) => true,
+      onPanResponderRelease: (evt, gestureState) => {
+        this._previousLeft += gestureState.dx;
+        //this._panx.setValue(0);
+      },
+
+      onShouldBlockNativeResponder: (evt, gestureState) => {
+        return true;
+      },
+    });
+    //console.log("created");
+    this._panX.addListener(({value:value}) => {
+      //console.log("v:%O",value);
+    }
+    );
+  },
   render: function(){
     var movie=this.props.movie;
     var TouchableElement = TouchableHighlight;
     if (Platform.OS === 'android') {
       TouchableElement = TouchableNativeFeedback;
     }
-  return(
-    <SwipeableRow
-        rightButtonSource ={[
-          //{text: "long long long", backgroundColor: "blue"},
-          {text: "foo", backgroundColor: "red"},
-          {text: "ba", backgroundColor: "green"},
-          {text: "b", backgroundColor: "blue", type:"de"},
-          ]}
-        leftButtonSource = {[
-            //{text: "Some Text", backgroundColor: "black"},
-            {text: "foo", backgroundColor: "black"},
-            {text: "bar", backgroundColor: "orange",type:"destructive"},
-          ]}
-        style={{
-            backgroundColor:"pink",
-            //padding:10,//not work
-            //margin:10,
-          }}
-    >
-      <View style={{flexDirection:"row",
-                    alignItems:"center",//vertical
-                    padding:10,
-                    justifyContent:"flex-end"
-        }}>
-        <FAIcon name="rocket" color="white"
-        style={{
-            backgroundColor:"green",
-            marginRight:10,
-            width:10,
-            textAlign:"right"
+    //console.log("wid?:%O",this._panx <= 0 ? 0.01 : this._panx)
+    return(
+      <Animated.View style={{
+          flexDirection:"row",
+          //left:10,
+          //width:this._panX,
+          //left:this._panX,
+        }}
+      >
+        <Expandable style={{
+            width:this._panX,
+            flexDirection:"row",            
+            justifyContent:"flex-end",
           }}/>
+        {/* expandable */}
+        {/* <MeasurableView style={{
+        //width:5,
+        //width: this._panx <= 0 ? 0.01 : this._panx,//cannot compare animatedvalue
+        //width:this._panx,
+        //width:0.01,
+        //flex:1,
+        flexDirection:"row",
+        justifyContent:"flex-end",
+        //to flex-start
+        }}
+        onFirstLayout={({nativeEvent:
+        {layout:{width, height}}})=>
+        {console.log("left width:%O",width)}
+        //20.33333396911621
+        }
+        >
+        <Text 
+            style={{
+                  //width:3,
+                  //numberOfLines={1}
+                  }}>
+          left
+        </Text>
+        </MeasurableView> */}
+        <Animated.View
+            style={{
+                  backgroundColor:"transparent",
+                  opacity:0.5,
+                  //left:10,
+                  }}
+            {...this._panResponder.panHandlers}
+        >
         <Text style={{
             //backgroundColor:"red",
+            backgroundColor:"transparent",
+            borderWidth: 2,
             paddingHorizontal:10,
             flex:1,
             //width:0,
           }}
               numberOfLines={1}
+              
         >
-          {'Some Other Text'}
+          {'main?'}
         </Text>
-      </View>
-    </SwipeableRow>
+        </Animated.View>
+      </Animated.View>
   )
 }, //collapsable={false}
 });
@@ -151,7 +281,7 @@ var SwipeableButton = React.createClass({
               //flex:1,
               //overflow:"hidden"
               //marginLeft:10,
-              position:"absolute"
+              //position:"absolute"
             }}
                          onLayout={({nativeEvent:
                                      {layout:{x,y,width, height}}})=>{
@@ -194,16 +324,6 @@ var SwipeableRow = React.createClass({
   _previousLeft: 0,
   getInitialState() {
     return {
-      rightComponent:(
-        <Animated.Text>
-          right
-        </Animated.Text>
-      ),
-      leftComponent:(
-        <Animated.Text>
-          left
-        </Animated.Text>
-      ),
     }
   },
   componentWillMount: function() {
@@ -254,8 +374,9 @@ var SwipeableRow = React.createClass({
     );
     var leftButtonsContainer = (
       <Animated.View style = {
-        {backgroundColor: this.leftBackGroundColor,
-         width: this._panX <= 0 ? 0.01 : this._panX,
+        {//backgroundColor: this.leftBackGroundColor,
+          //width: this._panX <= 0 ? 0.01 : this._panX,
+         width: 0.01,
          //right & left cannot effect 'mainElement'
          //right: -1 * this._panX,
          //left: this._panX,
@@ -267,21 +388,9 @@ var SwipeableRow = React.createClass({
          //padding:10,
         }}
       >
-        <View style={{flex:1}} />
-        <View>
-          {this.state.rightComponent}
-        </View>
-        <View style={{position:"absolute",
-                      backgroundColor:"green",
-                      left:0,
-                      //center in vertical
-                      top:0,
-                      bottom:0,
-                      flexDirection: 'row',
-                      alignItems: "center",
-          }}>
-          {this.state.leftComponent}
-        </View>
+        {/* <Animated.Text numberOfLines={1}>
+        right
+        </Animated.Text> */}
       </Animated.View>);
 
     return(
@@ -290,7 +399,8 @@ var SwipeableRow = React.createClass({
           //width: SCREEN_WIDTH,
           width: SWIPEABLE_MAIN_WIDTH,
           flexDirection:'row',
-          backgroundColor:'yellow',
+          justifyContent:"flex-end",
+          //backgroundColor:'yellow',
           //alignItems:'flex-end',//vertical
           //alignItems:'stretch',//vertical,
           //justifyContent:'center',//not to affected by left button string change
@@ -301,7 +411,11 @@ var SwipeableRow = React.createClass({
                       onFirstLayout={({nativeEvent:{layout:{width, height}}})=>
                         {this.height.setValue(height)}}
       >
-        {leftButtonsContainer}
+      {/*leftButtonsContainer*/}
+      <Text numberOfLines={1}>
+      right
+      </Text>
+
         <Animated.View
       ref={'mainElement'}
       style={[
@@ -309,6 +423,7 @@ var SwipeableRow = React.createClass({
           //width: SCREEN_WIDTH,
           width: SWIPEABLE_MAIN_WIDTH,
           //backgroundColor: 'gray',
+          borderWidth: 2,
           //height:70,
           //padding:1,
         },
@@ -323,7 +438,7 @@ var SwipeableRow = React.createClass({
                  alignItems: "center",
                  } */
 
-              this.props.style,
+        //this.props.style,
               //this._animatedValue
               //to use negative value
         ]}
@@ -351,12 +466,12 @@ var styles = StyleSheet.create({
      }, */
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    //backgroundColor: 'white',
   },
   //for cell
   row: {
     //alignItems: 'center',
-    backgroundColor: 'white',
+    //backgroundColor: 'white',
     flexDirection: 'row',
     //padding: 5,
   },
@@ -374,20 +489,20 @@ var styles = StyleSheet.create({
     fontSize: 12,
   },
   cellImage: {
-    backgroundColor: '#dddddd',
+    //backgroundColor: '#dddddd',
     height: 93,
     marginRight: 10,
     width: 60,
   },
   cellBorder: {
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    //backgroundColor: 'rgba(0, 0, 0, 0.1)',
     // Trick to get the thinest line the device can display
     height: 1 / PixelRatio.get(),
     marginLeft: 4,
   },
   segmented:{
     flex: 1,
-    backgroundColor: 'black',
+    //backgroundColor: 'black',
   },
   icon:{
     //width: 50
@@ -405,7 +520,7 @@ var styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: '#CCCCCC',
+    //backgroundColor: '#CCCCCC',
   },
   Text: {
     color:'#FFFFFF',
