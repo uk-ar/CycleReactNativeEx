@@ -137,37 +137,35 @@ var BookCell = React.createClass({
       <Animated.View style={{
           flexDirection:"row",
           //left:this._panX,
+          //padding:10,
         }}
                      {...this._panResponder.panHandlers}
       >
         <MeasurableView
             style={{
                 flexDirection:"row",
-                justifyContent:"flex-end",
                 backgroundColor:"red",
-                //left:this.state.left,
-                width:this._panX
+                width:this.state.left,
+                justifyContent:(this.leftWidth < this.state.left) ?
+                "flex-start": "flex-end",
               }}
             onFirstLayout={
               ({nativeEvent:{layout:{width, height}}})=>{
-                //this.leftWidth = width;
-                console.log("layouted w:%O", width);
-                //setNativeProps? for not rerender
-                /* this._panX.setOffset(-1 * width);
-                this._panX.setValue(0); */
-                /* this._panX.setValue(-1 * width);
-                20.33333396911621 */
+                this.leftWidth = width;
               }}
         >
           <Animated.Text
               style={{
-                  //right:0,
-                  //width:3,
-                  //numberOfLines={1}
                   color:"yellow",
-                  backgroundColor:"green",
                 }}>
             left
+          </Animated.Text>
+          <Animated.Text
+              style={{
+                  position:"absolute",
+                  color:"yellow",
+                }}>
+            right
           </Animated.Text>
         </MeasurableView>
         <Animated.View
@@ -176,7 +174,7 @@ var BookCell = React.createClass({
                 backgroundColor:"blue",
                 position:"absolute",
                 //opacity:0.5,
-                left:this._panX,
+                left:this.state.left,
                 borderWidth: 2,
               }}>
           <Text style={{
