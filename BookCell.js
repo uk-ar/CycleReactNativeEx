@@ -46,17 +46,11 @@ var SWIPEABLE_MAIN_WIDTH = 200;
 var MeasurableView = React.createClass({
   getInitialState() {
     //TODO:remove contentWidth
-    return { contentWidth:  0,
-             contentHeight: 0,
-             //measured: false,
-    }
+    return { measured: false }
   },
   _onLayout({nativeEvent:{layout:{x, y, width, height}}}){
-    if(!this.state.contentWidth){
-      this.setState({contentWidth:width,
-                     contentHeight:height,
-                     //measured:true,
-      });
+    if(!this.state.measured){
+      this.setState({measured:true,});
       this.props.onFirstLayout &&
       this.props.onFirstLayout(
         {nativeEvent:{layout:{x, y, width, height}}});
@@ -71,10 +65,11 @@ var MeasurableView = React.createClass({
     return (
       //TODO:...this.props
       <Animated.View {...this.props}
-                     style={[/* this.props.flexEnabled &&
-                                {flex: this.state.contentWidth}, */
-                         //this.state.measured ? null : {opacity:0},
-                         this.props.style]}
+                     style={[
+                       this.props.style,
+                       this.state.measured ? null :
+                       {width:null, height:null},
+                     ]}
                      onLayout={this._onLayout}
       >
         {this.props.children}
@@ -83,83 +78,12 @@ var MeasurableView = React.createClass({
   }
 });
 
-//Expandable
-//render with original width then
-//shrink to given width
-//set call back
-
-var Expandable = React.createClass({
-  getInitialState(){
-    return{
-      end:2,
-      style:[this.props.style,{width:null}],
-    }
-  },
-  render: function(){
-    var components=[
-      <View style={{flexDirection:"row"}}>
-        <View style={{flex:1}}/><Text>1</Text></View>,
-      <View><Text>2</Text></View>,
-    ]
-    console.log("render expandable");
-    return(
-      //this.props.style
-      <MeasurableView
-      ref="root"
-      style={this.state.style}
-      onFirstLayout={
-        ({nativeEvent:{layout:{width, height}}})=>{
-          this.original_width = width;
-          this.original_height = height;
-          this.setState({style:[this.props.style,
-                                //{width: 4,
-                                {//width: 0.01,
-                                 backgroundColor:"pink"}
-          ]});//TODO:remove width */
-        }}
-      onLayout={
-        ({nativeEvent:{layout:{width, height}}})=>{
-          console.log("ori wid:%O;real wid:%O",this.original_width,width);
-          if(width < this.original_width){
-            //ok
-          }else if(this.original_width < width){
-            //ng?
-          }
-            /* if(!this.previousWidth){
-             //setWidth
-             this.previousWidth = this.refs.root.contentWidth;
-             return;
-             }else if(this.props.onExpand &&
-             (this.refs.root.contentWidth < this.previousWidth)){
-             this.props.onExpand();
-             }else if(this.props.onShrink &&
-             (this.refs.root.contentWidth > this.previousWidth)){
-             this.props.onShrink();
-             }
-             this.previousWidth = this.refs.root.contentWidth; */
-          //console.log("left width:%O",width);
-          /* this.setState({style:[this.props.style,
-             {width: 0.01}]})//TODO:remove width */
-        }
-      }
-      >
-      {components.slice(0,this.state.end)}
-      </MeasurableView>
-      //components
-    )
-  }
-})
-
 var BookCell = React.createClass({
-  /* getInitialState() {
-     return {
-     _panX: new Animated.Value(0),
-     }
-     }, */
   componentWillMount: function() {
-    //this._panX = new Animated.Value(0.1);
-    this._panX = new Animated.Value(1);//OK
-    this._previousLeft = 0;
+    //this._panX = new Animated.Value(0.1);//NG for frex-end.OK for flex-start
+    //this._panX = new Animated.Value(-30);//OK
+    this._panX = new Animated.Value(0);//?
+    //this._previousLeft = 0;
 
     this._panResponder = PanResponder.create({
       // Ask to be the responder:
@@ -169,8 +93,8 @@ var BookCell = React.createClass({
       onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
 
       onPanResponderGrant: (evt, gestureState) => {
-        this._panX.setOffset(this._previousLeft);
-        this._panX.setValue(0);
+        //this._panX.setOffset(this._previousLeft);
+        //this._panX.setValue(0);
       },
       onPanResponderMove: Animated.event([
         null,
@@ -178,8 +102,8 @@ var BookCell = React.createClass({
       ]),
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
-        this._previousLeft += gestureState.dx;
-        //this._panx.setValue(0);
+        //this._previousLeft += gestureState.dx;
+        this._panX.setValue(0);
       },
 
       onShouldBlockNativeResponder: (evt, gestureState) => {
@@ -187,77 +111,86 @@ var BookCell = React.createClass({
       },
     });
     //console.log("created");
+    console.log("will m");
     this._panX.addListener(({value:value}) => {
-      //console.log("v:%O",value);
+      console.log("v:%O",value);
+      this.setState({
+        left: value,
+      });
+    });
+  },
+  getInitialState: function() {
+    return {
+      left:0,
     }
-    );
+  },
+  componentDidMount: function(){
+    //this._panX.setValue(0.1);
+    console.log("did m");
+    /* this._panX.setOffset(-30);//why works?
+     */
+    //this._panX.setValue(0.1);
   },
   render: function(){
-    var movie=this.props.movie;
-    var TouchableElement = TouchableHighlight;
-    if (Platform.OS === 'android') {
-      TouchableElement = TouchableNativeFeedback;
-    }
-    //console.log("wid?:%O",this._panx <= 0 ? 0.01 : this._panx)
+    console.log("render");
     return(
       <Animated.View style={{
           flexDirection:"row",
-          //left:10,
-          //width:this._panX,
           //left:this._panX,
         }}
+                     {...this._panResponder.panHandlers}
       >
-        <Expandable style={{
-            width:this._panX,
-            flexDirection:"row",            
-            justifyContent:"flex-end",
-          }}/>
-        {/* expandable */}
-        {/* <MeasurableView style={{
-        //width:5,
-        //width: this._panx <= 0 ? 0.01 : this._panx,//cannot compare animatedvalue
-        //width:this._panx,
-        //width:0.01,
-        //flex:1,
-        flexDirection:"row",
-        justifyContent:"flex-end",
-        //to flex-start
-        }}
-        onFirstLayout={({nativeEvent:
-        {layout:{width, height}}})=>
-        {console.log("left width:%O",width)}
-        //20.33333396911621
-        }
-        >
-        <Text 
+        <MeasurableView
             style={{
+                flexDirection:"row",
+                justifyContent:"flex-end",
+                backgroundColor:"red",
+                //left:this.state.left,
+                width:this._panX
+              }}
+            onFirstLayout={
+              ({nativeEvent:{layout:{width, height}}})=>{
+                //this.leftWidth = width;
+                console.log("layouted w:%O", width);
+                //setNativeProps? for not rerender
+                /* this._panX.setOffset(-1 * width);
+                this._panX.setValue(0); */
+                /* this._panX.setValue(-1 * width);
+                20.33333396911621 */
+              }}
+        >
+          <Animated.Text
+              style={{
+                  //right:0,
                   //width:3,
                   //numberOfLines={1}
-                  }}>
-          left
-        </Text>
-        </MeasurableView> */}
+                  color:"yellow",
+                  backgroundColor:"green",
+                }}>
+            left
+          </Animated.Text>
+        </MeasurableView>
         <Animated.View
             style={{
-                  backgroundColor:"transparent",
-                  opacity:0.5,
-                  //left:10,
-                  }}
-            {...this._panResponder.panHandlers}
-        >
-        <Text style={{
-            //backgroundColor:"red",
-            backgroundColor:"transparent",
-            borderWidth: 2,
-            paddingHorizontal:10,
-            flex:1,
-            //width:0,
-          }}
-              numberOfLines={1}
-              
-        >
-          {'main?'}
-        </Text>
+                //backgroundColor:"transparent",
+                backgroundColor:"blue",
+                position:"absolute",
+                //opacity:0.5,
+                left:this._panX,
+                borderWidth: 2,
+              }}>
+          <Text style={{
+              //backgroundColor:"red",
+              //backgroundColor:"transparent",
+              //paddingHorizontal:10,
+              //flex:1,
+              //width:0,
+            }}
+                numberOfLines={1}
+
+          >
+            {'main?'}
+          </Text>
         </Animated.View>
       </Animated.View>
   )
@@ -420,29 +353,10 @@ var SwipeableRow = React.createClass({
       ref={'mainElement'}
       style={[
         {
-          //width: SCREEN_WIDTH,
           width: SWIPEABLE_MAIN_WIDTH,
-          //backgroundColor: 'gray',
           borderWidth: 2,
-          //height:70,
-          //padding:1,
         },
-              {/*
-               left: this._panX,
-               position:"absolute",
-               */
-              },
-              /*overflow:"visible",
-              flexDirection: "row",
-              //padding: 10,
-                 alignItems: "center",
-                 } */
-
-        //this.props.style,
-              //this._animatedValue
-              //to use negative value
         ]}
-      {...this._panResponder.panHandlers}
         >
           {this.props.children}
         </Animated.View>

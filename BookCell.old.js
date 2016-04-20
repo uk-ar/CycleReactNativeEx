@@ -871,6 +871,74 @@ var SwipeableElement = React.createClass({
   }
 });
 
+
+//Expandable
+//render with original width then
+//shrink to given width
+//set call back
+
+var Expandable = React.createClass({
+  getInitialState(){
+    return{
+      end:2,
+      style:[this.props.style,{width:null}],
+    }
+  },
+  render: function(){
+    var components=[
+      <View style={{flexDirection:"row"}}>
+        <View style={{flex:1}}/><Text>1</Text></View>,
+      <View><Text>2</Text></View>,
+    ]
+    console.log("render expandable");
+    return(
+      //this.props.style
+      <MeasurableView
+      ref="root"
+      style={this.state.style}
+      onFirstLayout={
+        ({nativeEvent:{layout:{width, height}}})=>{
+          this.original_width = width;
+          this.original_height = height;
+          this.setState({style:[this.props.style,
+                                //{width: 4,
+                                {//width: 0.01,
+                                  backgroundColor:"pink"}
+          ]});//TODO:remove width */
+        }}
+      onLayout={
+        ({nativeEvent:{layout:{width, height}}})=>{
+          console.log("ori wid:%O;real wid:%O",this.original_width,width);
+          if(width < this.original_width){
+            //ok
+          }else if(this.original_width < width){
+            //ng?
+          }
+          /* if(!this.previousWidth){
+             //setWidth
+             this.previousWidth = this.refs.root.contentWidth;
+             return;
+             }else if(this.props.onExpand &&
+             (this.refs.root.contentWidth < this.previousWidth)){
+             this.props.onExpand();
+             }else if(this.props.onShrink &&
+             (this.refs.root.contentWidth > this.previousWidth)){
+             this.props.onShrink();
+             }
+             this.previousWidth = this.refs.root.contentWidth; */
+          //console.log("left width:%O",width);
+          /* this.setState({style:[this.props.style,
+             {width: 0.01}]})//TODO:remove width */
+        }
+      }
+      >
+      {components.slice(0,this.state.end)}
+      </MeasurableView>
+      //components
+    )
+  }
+})
+
 var styles = StyleSheet.create({
   //for new swipe
   /* container: {
