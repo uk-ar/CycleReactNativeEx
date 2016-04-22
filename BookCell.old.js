@@ -939,6 +939,174 @@ var Expandable = React.createClass({
   }
 })
 
+var BookCell = React.createClass({
+  componentWillMount: function() {
+    this._panX = new Animated.Value(0);
+
+    this._panResponder = PanResponder.create({
+      // Ask to be the responder:
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+
+      onPanResponderGrant: (evt, gestureState) => {
+        //this._panX.setOffset(this._previousLeft);
+        //this._panX.setValue(0);
+      },
+      onPanResponderMove: Animated.event([
+        null,
+        {dx: this._panX}
+      ]),
+      onPanResponderTerminationRequest: (evt, gestureState) => true,
+      onPanResponderRelease: (evt, gestureState) => {
+        //this._previousLeft += gestureState.dx;
+        Animated.timing(
+          this._panX,
+          {toValue: this.ReleaseTo ,
+           duration: 180,}
+        ).start();
+      },
+
+      onShouldBlockNativeResponder: (evt, gestureState) => {
+        return true;
+      },
+    });
+    //console.log("created");
+    console.log("will m");
+    this._panX.addListener(({value:value}) => {
+      this.setState({left: value,})
+    });
+    this.colorIndex = new Animated.Value(0);
+  },
+  getInitialState: function() {
+    return {
+      left:0,
+    }
+  },
+  componentDidMount: function(){
+    console.log("did m");
+  },
+  render: function(){//left is like argument
+    //console.log("render:%O",this);
+    var nextColorIndex = 0;
+    var colors = [
+      'rgb(158, 158, 158)',//grey
+      'rgb(33,150,243)',//blue
+      'rgb(76, 175, 80)',//green
+    ];
+    //left
+    if ((0 <= this.state.left) &&
+        (this.state.left < this.leftWidth)){
+          nextColorIndex=0;
+          this.ReleaseTo=0;
+    }else if(( this.leftWidth <= this.state.left) &&
+             ( this.state.left < SWIPEABLE_MAIN_WIDTH/2 )){
+               nextColorIndex=1;
+               this.ReleaseTo=SWIPEABLE_MAIN_WIDTH;
+    }else if( SWIPEABLE_MAIN_WIDTH/2 <= this.state.left ){
+      nextColorIndex=2;
+      this.ReleaseTo=SWIPEABLE_MAIN_WIDTH;
+    }
+    //right
+    Animated.timing(
+      this.colorIndex,
+      {toValue: nextColorIndex,//interpolate?
+       //https://facebook.github.io/react-native/docs/animations.html
+       duration: 90,}
+    ).start();
+
+    return(
+      <Animated.View style={{
+          flexDirection:"row",
+        }}
+                     {...this._panResponder.panHandlers}
+      >
+        <MeasurableView
+            style={{
+                flexDirection:"row",
+                //backgroundColor:this.backgroundColor,
+                backgroundColor:this.colorIndex.interpolate({
+                  //Cannot use ES6 method e.g.Array.from(Array(3).keys())
+                  inputRange: _.range(colors.length),
+                  outputRange: colors,
+                }),
+                width:this.state.left,
+                justifyContent:(this.leftWidth < this.state.left) ?
+                "flex-start": "flex-end",
+              }}
+            onFirstLayout={
+              ({nativeEvent:{layout:{width, height}}})=>{
+                this.leftWidth = width;
+              }}
+        >
+          <Animated.Text
+              style={{
+                  color:"yellow",
+                }}>
+            l:left
+          </Animated.Text>
+          <Animated.Text
+              style={{
+                  position:"absolute",
+                  color:"yellow",
+                }}>
+            l:right
+          </Animated.Text>
+        </MeasurableView>
+        <MeasurableView
+            style={{
+                position:"absolute",
+                flexDirection:"row",
+                right:0,
+                width:-1 * this.state.left,
+                //left:this.state.left,
+                backgroundColor:"orange",
+                justifyContent:(this.rightWidth < -1 * this.state.left) ?
+                "flex-end":"flex-start",
+              }}
+            onFirstLayout={
+              ({nativeEvent:{layout:{width, height}}})=>{
+                this.rightWidth = width;
+              }}
+        >
+          {
+            (this.rightWidth < -1 * this.state.left) ?
+            <Animated.Text
+          style={{
+              color:"yellow",
+            }}>
+              r:left
+            </Animated.Text> : null
+          }
+            <Animated.Text
+          style={{
+              color:"yellow",
+            }}>
+              r:right
+            </Animated.Text>
+        </MeasurableView>
+        <Animated.View
+            style={{
+                backgroundColor:"blue",
+                position:"absolute",
+                left:this.state.left,
+                borderWidth: 2,
+              }}>
+          <Text style={{
+              width: SWIPEABLE_MAIN_WIDTH,
+            }}
+                numberOfLines={1}
+
+          >
+            {'main?'}
+          </Text>
+        </Animated.View>
+      </Animated.View>
+    )
+  },
+});
+
 var styles = StyleSheet.create({
   //for new swipe
   /* container: {

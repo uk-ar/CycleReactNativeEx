@@ -59,6 +59,11 @@ var MeasurableView = React.createClass({
     this.props.onLayout(
       {nativeEvent:{layout:{x, y, width, height}}});
   },
+  componentWillReceiveProps: function(nextProps) {
+    if(nextProps.children!==this.props.children){
+      this._onChangedChilden();
+    }
+  },
   //cannot measure Animated.View
   //hide(opacity:0) until measure is not mean because measure time is not large
   render() {
@@ -78,12 +83,66 @@ var MeasurableView = React.createClass({
   }
 });
 
+var Expandable = React.createClass({
+  getInitialState: function() {
+    return {
+      index:0,
+    }
+  },
+  componentWillMount: function(){
+    this.thresholds=[];
+    this.components=[
+      <View style={{
+          flexDirection:"row",
+          justifyContent:"flex-end",
+        }}>
+        <Text>l:left</Text>
+      </View>,
+      <View style={{
+          flexDirection:"row",
+          width:SWIPEABLE_MAIN_WIDTH/2,
+        }}>
+        <Text>l:left</Text>
+        <Text>l:right</Text>
+      </View>,
+      <View style={{
+          flexDirection:"row",
+          width:SWIPEABLE_MAIN_WIDTH,
+        }}>
+        <Text>nl:left</Text>
+        <Text>nl:right</Text>
+      </View>,
+    ]
+  },
+  render: function(){
+    //componentWillReceiveProps
+    /* onFirstLayout={({nativeEvent:{layout:{width, height}}})=>{
+       this.thresholds[this.state.index] = width;
+       console.log("first!:%O",this.state.index)
+       }}
+       onLayout={({nativeEvent:{layout:{width, height}}})=>{
+       if(this.thresholds[this.state.index] < width){
+       this.setState({index: this.state.index + 1});
+       console.log("set:%O",this.state.index)
+       }
+     */
+
+    return(
+      <MeasurableView
+          style={this.props.style}
+          onChangedChilden={(x,y,width,height,pageX,pageY)=>{
+              console.log("w:%O",width);
+            }}
+      >
+        {this.components[this.state.index]}
+      </MeasurableView>
+    )
+  }
+});
+
 var BookCell = React.createClass({
   componentWillMount: function() {
-    //this._panX = new Animated.Value(0.1);//NG for frex-end.OK for flex-start
-    //this._panX = new Animated.Value(-30);//OK
-    this._panX = new Animated.Value(0);//?
-    //this._previousLeft = 0;
+    this._panX = new Animated.Value(0);
 
     this._panResponder = PanResponder.create({
       // Ask to be the responder:
@@ -130,104 +189,17 @@ var BookCell = React.createClass({
     console.log("did m");
   },
   render: function(){//left is like argument
-    //console.log("render:%O",this);
-    var nextColorIndex = 0;
-    var colors = [
-      'rgb(158, 158, 158)',//grey
-      'rgb(33,150,243)',//blue
-      'rgb(76, 175, 80)',//green
-    ];
-    //left
-    if ((0 <= this.state.left) &&
-        (this.state.left < this.leftWidth)){
-          nextColorIndex=0;
-          this.ReleaseTo=0;
-    }else if(( this.leftWidth <= this.state.left) &&
-             ( this.state.left < SWIPEABLE_MAIN_WIDTH/2 )){
-               nextColorIndex=1;
-               this.ReleaseTo=SWIPEABLE_MAIN_WIDTH;
-    }else if( SWIPEABLE_MAIN_WIDTH/2 <= this.state.left ){
-      nextColorIndex=2;
-      this.ReleaseTo=SWIPEABLE_MAIN_WIDTH;
-    }
-    //right
-    Animated.timing(
-      this.colorIndex,
-      {toValue: nextColorIndex,//interpolate?
-       //https://facebook.github.io/react-native/docs/animations.html
-       duration: 90,}
-    ).start();
-
     return(
       <Animated.View style={{
           flexDirection:"row",
         }}
                      {...this._panResponder.panHandlers}
       >
-        <MeasurableView
+        <Expandable
             style={{
-                flexDirection:"row",
-                //backgroundColor:this.backgroundColor,
-                backgroundColor:this.colorIndex.interpolate({
-                  //Cannot use ES6 method e.g.Array.from(Array(3).keys())
-                  inputRange: _.range(colors.length),
-                  outputRange: colors,
-                }),
                 width:this.state.left,
-                justifyContent:(this.leftWidth < this.state.left) ?
-                "flex-start": "flex-end",
               }}
-            onFirstLayout={
-              ({nativeEvent:{layout:{width, height}}})=>{
-                this.leftWidth = width;
-              }}
-        >
-          <Animated.Text
-              style={{
-                  color:"yellow",
-                }}>
-            l:left
-          </Animated.Text>
-          <Animated.Text
-              style={{
-                  position:"absolute",
-                  color:"yellow",
-                }}>
-            l:right
-          </Animated.Text>
-        </MeasurableView>
-        <MeasurableView
-            style={{
-                position:"absolute",
-                flexDirection:"row",
-                right:0,
-                width:-1 * this.state.left,
-                //left:this.state.left,
-                backgroundColor:"orange",
-                justifyContent:(this.rightWidth < -1 * this.state.left) ?
-                "flex-end":"flex-start",
-              }}
-            onFirstLayout={
-              ({nativeEvent:{layout:{width, height}}})=>{
-                this.rightWidth = width;
-              }}
-        >
-          {
-            (this.rightWidth < -1 * this.state.left) ?
-            <Animated.Text
-          style={{
-              color:"yellow",
-            }}>
-              r:left
-            </Animated.Text> : null
-          }
-            <Animated.Text
-          style={{
-              color:"yellow",
-            }}>
-              r:right
-            </Animated.Text>
-        </MeasurableView>
+        />
         <Animated.View
             style={{
                 backgroundColor:"blue",
