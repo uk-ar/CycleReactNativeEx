@@ -103,7 +103,11 @@ var BookCell = React.createClass({
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
         //this._previousLeft += gestureState.dx;
-        this._panX.setValue(0);
+        Animated.timing(
+          this._panX,
+          {toValue: this.ReleaseTo ,
+           duration: 180,}
+        ).start();
       },
 
       onShouldBlockNativeResponder: (evt, gestureState) => {
@@ -113,11 +117,9 @@ var BookCell = React.createClass({
     //console.log("created");
     console.log("will m");
     this._panX.addListener(({value:value}) => {
-      console.log("v:%O",value);
-      this.setState({
-        left: value,
-      });
+      this.setState({left: value,})
     });
+    this.colorIndex = new Animated.Value(0);
   },
   getInitialState: function() {
     return {
@@ -125,26 +127,52 @@ var BookCell = React.createClass({
     }
   },
   componentDidMount: function(){
-    //this._panX.setValue(0.1);
     console.log("did m");
-    /* this._panX.setOffset(-30);//why works?
-     */
-    //this._panX.setValue(0.1);
   },
-  render: function(){
-    console.log("render");
+  render: function(){//left is like argument
+    //console.log("render:%O",this);
+    var nextColorIndex = 0;
+    var colors = [
+      'rgb(158, 158, 158)',//grey
+      'rgb(33,150,243)',//blue
+      'rgb(76, 175, 80)',//green
+    ];
+    //left
+    if ((0 <= this.state.left) &&
+        (this.state.left < this.leftWidth)){
+          nextColorIndex=0;
+          this.ReleaseTo=0;
+    }else if(( this.leftWidth <= this.state.left) &&
+             ( this.state.left < SWIPEABLE_MAIN_WIDTH/2 )){
+               nextColorIndex=1;
+               this.ReleaseTo=SWIPEABLE_MAIN_WIDTH;
+    }else if( SWIPEABLE_MAIN_WIDTH/2 <= this.state.left ){
+      nextColorIndex=2;
+      this.ReleaseTo=SWIPEABLE_MAIN_WIDTH;
+    }
+    //right
+    Animated.timing(
+      this.colorIndex,
+      {toValue: nextColorIndex,//interpolate?
+       //https://facebook.github.io/react-native/docs/animations.html
+       duration: 90,}
+    ).start();
+
     return(
       <Animated.View style={{
           flexDirection:"row",
-          //left:this._panX,
-          //padding:10,
         }}
                      {...this._panResponder.panHandlers}
       >
         <MeasurableView
             style={{
                 flexDirection:"row",
-                backgroundColor:"red",
+                //backgroundColor:this.backgroundColor,
+                backgroundColor:this.colorIndex.interpolate({
+                  //Cannot use ES6 method e.g.Array.from(Array(3).keys())
+                  inputRange: _.range(colors.length),
+                  outputRange: colors,
+                }),
                 width:this.state.left,
                 justifyContent:(this.leftWidth < this.state.left) ?
                 "flex-start": "flex-end",
@@ -158,31 +186,57 @@ var BookCell = React.createClass({
               style={{
                   color:"yellow",
                 }}>
-            left
+            l:left
           </Animated.Text>
           <Animated.Text
               style={{
                   position:"absolute",
                   color:"yellow",
                 }}>
-            right
+            l:right
           </Animated.Text>
+        </MeasurableView>
+        <MeasurableView
+            style={{
+                position:"absolute",
+                flexDirection:"row",
+                right:0,
+                width:-1 * this.state.left,
+                //left:this.state.left,
+                backgroundColor:"orange",
+                justifyContent:(this.rightWidth < -1 * this.state.left) ?
+                "flex-end":"flex-start",
+              }}
+            onFirstLayout={
+              ({nativeEvent:{layout:{width, height}}})=>{
+                this.rightWidth = width;
+              }}
+        >
+          {
+            (this.rightWidth < -1 * this.state.left) ?
+            <Animated.Text
+          style={{
+              color:"yellow",
+            }}>
+              r:left
+            </Animated.Text> : null
+          }
+            <Animated.Text
+          style={{
+              color:"yellow",
+            }}>
+              r:right
+            </Animated.Text>
         </MeasurableView>
         <Animated.View
             style={{
-                //backgroundColor:"transparent",
                 backgroundColor:"blue",
                 position:"absolute",
-                //opacity:0.5,
                 left:this.state.left,
                 borderWidth: 2,
               }}>
           <Text style={{
-              //backgroundColor:"red",
-              //backgroundColor:"transparent",
-              //paddingHorizontal:10,
-              //flex:1,
-              //width:0,
+              width: SWIPEABLE_MAIN_WIDTH,
             }}
                 numberOfLines={1}
 
@@ -192,7 +246,7 @@ var BookCell = React.createClass({
         </Animated.View>
       </Animated.View>
   )
-}, //collapsable={false}
+},
 });
 
 //TODO:remove
