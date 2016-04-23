@@ -45,23 +45,23 @@ var SWIPEABLE_MAIN_WIDTH = 200;
 
 var MeasurableView = React.createClass({
   getInitialState() {
-    //TODO:remove contentWidth
-    return { measured: false }
+    return { measuring: true }
   },
   _onLayout({nativeEvent:{layout:{x, y, width, height}}}){
-    if(!this.state.measured){
-      this.setState({measured:true,});
-      this.props.onFirstLayout &&
-      this.props.onFirstLayout(
+    if(this.state.measuring){
+      this.props.onChildenChange &&
+      this.props.onChildenChange(x, y, width, height);
+      this.setState({measuring:false,});
+    }else{
+      this.props.onLayout &&
+      this.props.onLayout(
         {nativeEvent:{layout:{x, y, width, height}}});
     }
-    this.props.onLayout &&
-    this.props.onLayout(
-      {nativeEvent:{layout:{x, y, width, height}}});
   },
   componentWillReceiveProps: function(nextProps) {
     if(nextProps.children!==this.props.children){
-      this._onChangedChilden();
+      //this._onChildenChange();
+      this.setState({measuring:true,});
     }
   },
   //cannot measure Animated.View
@@ -70,11 +70,9 @@ var MeasurableView = React.createClass({
     return (
       //TODO:...this.props
       <Animated.View {...this.props}
-                     style={[
-                       this.props.style,
-                       this.state.measured ? null :
-                       {width:null, height:null},
-                     ]}
+                     style={
+                       this.state.measuring ? null : this.props.style
+                     }
                      onLayout={this._onLayout}
       >
         {this.props.children}
@@ -115,23 +113,21 @@ var Expandable = React.createClass({
     ]
   },
   render: function(){
-    //componentWillReceiveProps
-    /* onFirstLayout={({nativeEvent:{layout:{width, height}}})=>{
-       this.thresholds[this.state.index] = width;
-       console.log("first!:%O",this.state.index)
-       }}
-       onLayout={({nativeEvent:{layout:{width, height}}})=>{
-       if(this.thresholds[this.state.index] < width){
-       this.setState({index: this.state.index + 1});
-       console.log("set:%O",this.state.index)
-       }
-     */
-
     return(
       <MeasurableView
           style={this.props.style}
-          onChangedChilden={(x,y,width,height,pageX,pageY)=>{
-              console.log("w:%O",width);
+          onChildenChange={(x,y,width,height)=>{
+              this.thresholds[this.state.index] = width;
+              this.props.onResize && this.props.onResize(this.state.index);
+            }}
+          onLayout={({nativeEvent:{layout:{width, height}}})=>{
+              if((this.thresholds[this.state.index] < width) &&
+                 (this.state.index < this.components.length - 1)){
+                   this.setState({index: this.state.index + 1});
+              }else if((0 < this.state.index) &&
+                       (width < this.thresholds[this.state.index - 1] )){
+                         this.setState({index: this.state.index - 1});
+              }
             }}
       >
         {this.components[this.state.index]}
@@ -164,7 +160,7 @@ var BookCell = React.createClass({
         //this._previousLeft += gestureState.dx;
         Animated.timing(
           this._panX,
-          {toValue: this.ReleaseTo ,
+          {toValue: this.releaseTo ,
            duration: 180,}
         ).start();
       },
@@ -198,6 +194,13 @@ var BookCell = React.createClass({
         <Expandable
             style={{
                 width:this.state.left,
+              }}
+            onResize={(i)=>{
+                if(i == 0){
+                  this.releaseTo = 0;
+                }else{
+                  this.releaseTo = SWIPEABLE_MAIN_WIDTH;
+                }
               }}
         />
         <Animated.View
