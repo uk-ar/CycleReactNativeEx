@@ -59,9 +59,11 @@ var MeasurableView = React.createClass({
     }
   },
   componentWillReceiveProps: function(nextProps) {
-    if(nextProps.children!==this.props.children){
+    console.log("next:%O,this:%O,eq:%O,json:%O", nextProps.children, this.props.children, nextProps.children != this.props.children)
+    if(nextProps.children!=this.props.children){
       //this._onChildenChange();
       this.setState({measuring:true,});
+      //console.log("recP:")
     }
   },
   //cannot measure Animated.View
@@ -89,28 +91,6 @@ var Expandable = React.createClass({
   },
   componentWillMount: function(){
     this.thresholds=[];
-    this.components=[
-      <View style={{
-          flexDirection:"row",
-          justifyContent:"flex-end",
-        }}>
-        <Text>l:left</Text>
-      </View>,
-      <View style={{
-          flexDirection:"row",
-          width:SWIPEABLE_MAIN_WIDTH/2,
-        }}>
-        <Text>l:left</Text>
-        <Text>l:right</Text>
-      </View>,
-      <View style={{
-          flexDirection:"row",
-          width:SWIPEABLE_MAIN_WIDTH,
-        }}>
-        <Text>nl:left</Text>
-        <Text>nl:right</Text>
-      </View>,
-    ]
   },
   render: function(){
     return(
@@ -119,10 +99,11 @@ var Expandable = React.createClass({
           onChildenChange={(x,y,width,height)=>{
               this.thresholds[this.state.index] = width;
               this.props.onResize && this.props.onResize(this.state.index);
+              //console.log("oncc:")
             }}
           onLayout={({nativeEvent:{layout:{width, height}}})=>{
               if((this.thresholds[this.state.index] < width) &&
-                 (this.state.index < this.components.length - 1)){
+                 (this.state.index < this.props.components.length - 1)){
                    this.setState({index: this.state.index + 1});
               }else if((0 < this.state.index) &&
                        (width < this.thresholds[this.state.index - 1] )){
@@ -130,7 +111,7 @@ var Expandable = React.createClass({
               }
             }}
       >
-        {this.components[this.state.index]}
+        {this.props.components[this.state.index]}
       </MeasurableView>
     )
   }
@@ -196,12 +177,35 @@ var BookCell = React.createClass({
                 width:this.state.left,
               }}
             onResize={(i)=>{
+                //console.log("onre:")
                 if(i == 0){
                   this.releaseTo = 0;
                 }else{
                   this.releaseTo = SWIPEABLE_MAIN_WIDTH;
                 }
               }}
+            components={[
+              <View style={{
+                  flexDirection:"row",
+                  justifyContent:"flex-end",
+                }}>
+                <Text>l:left</Text>
+              </View>,
+              <View style={{
+                  flexDirection:"row",
+                  width:SWIPEABLE_MAIN_WIDTH/2,
+                }}>
+                <Text>l:left</Text>
+                <Text>l:right</Text>
+              </View>,
+              <View style={{
+                  flexDirection:"row",
+                  width:SWIPEABLE_MAIN_WIDTH,
+                }}>
+                <Text>nl:left</Text>
+                <Text>nl:right</Text>
+              </View>,
+            ]}
         />
         <Animated.View
             style={{
