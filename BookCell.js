@@ -59,16 +59,28 @@ var MeasurableView = React.createClass({
     }
   },
   componentWillReceiveProps: function(nextProps) {
-    console.log("next:%O,this:%O,eq:%O,json:%O", nextProps.children, this.props.children, nextProps.children != this.props.children)
+    //console.log("next:%O,this:%O,eq:%O,json:%O", nextProps.children, this.props.children, nextProps.children != this.props.children)
+    //console.log("this.props:%O", this.props);
+    var c1 = React.Children.toArray(nextProps.children);
+    var c2 = React.Children.toArray(this.props.children);
+    /* console.log("children:%O,==:%O,===:%O,js:%O", c1,
+       c1 == c2,
+       c1 === c2,
+       //JSON.stringify(c1)
+       ); */
+    /* this.props.children,
+     nextProps.children == this.props.children,
+       nextProps.children === this.props.children */
     if(nextProps.children!=this.props.children){
       //this._onChildenChange();
-      this.setState({measuring:true,});
+      //this.setState({measuring:true,});
       //console.log("recP:")
     }
   },
   //cannot measure Animated.View
   //hide(opacity:0) until measure is not mean because measure time is not large
   render() {
+    //console.log("rend mea")
     return (
       //TODO:...this.props
       <Animated.View {...this.props}
@@ -91,28 +103,50 @@ var Expandable = React.createClass({
   },
   componentWillMount: function(){
     this.thresholds=[];
-  },
-  render: function(){
-    return(
+    this.component = (
       <MeasurableView
-          style={this.props.style}
           onChildenChange={(x,y,width,height)=>{
               this.thresholds[this.state.index] = width;
               this.props.onResize && this.props.onResize(this.state.index);
-              //console.log("oncc:")
-            }}
-          onLayout={({nativeEvent:{layout:{width, height}}})=>{
-              if((this.thresholds[this.state.index] < width) &&
-                 (this.state.index < this.props.components.length - 1)){
-                   this.setState({index: this.state.index + 1});
-              }else if((0 < this.state.index) &&
-                       (width < this.thresholds[this.state.index - 1] )){
-                         this.setState({index: this.state.index - 1});
-              }
-            }}
-      >
+            }}>
         {this.props.components[this.state.index]}
-      </MeasurableView>
+      </MeasurableView>)
+  },
+  render: function(){
+    //console.log("renderEx:") //call according to width
+    return(
+      <View style={this.props.style}
+            onLayout={({nativeEvent:{layout:{width, height}}})=>{
+                if((this.thresholds[this.state.index] < width) &&
+                   (this.state.index < this.props.components.length - 1)){
+                     this.setState({index: this.state.index + 1});
+                     console.log("set+1");
+                     this.component = (
+                       <MeasurableView
+          onChildenChange={(x,y,width,height)=>{
+              this.thresholds[this.state.index] = width;
+              this.props.onResize && this.props.onResize(this.state.index);
+            }}>
+                          {this.props.components[this.state.index]}
+                       </MeasurableView>)
+                }else if((0 < this.state.index) &&
+                         (width < this.thresholds[this.state.index - 1] )){
+                           this.setState({index: this.state.index - 1});
+                           console.log("set-1")
+                           this.component = (
+                             <MeasurableView
+          onChildenChange={(x,y,width,height)=>{
+              this.thresholds[this.state.index] = width;
+              this.props.onResize && this.props.onResize(this.state.index);
+            }}>
+                          {this.props.components[this.state.index]}
+                             </MeasurableView>)
+                }else{
+                  this.component = this.props.components[this.state.index]
+                }
+              }}>
+        {this.component}
+      </View>
     )
   }
 });
