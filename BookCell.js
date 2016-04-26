@@ -49,32 +49,15 @@ var MeasurableView = React.createClass({
   },
   _onLayout({nativeEvent:{layout:{x, y, width, height}}}){
     if(this.state.measuring){
-      this.props.onChildenChange &&
-      this.props.onChildenChange(x, y, width, height);
+      console.log("fi:")
+      this.props.onFirstLayout &&
+      this.props.onFirstLayout(x, y, width, height);
       this.setState({measuring:false,});
     }else{
+      console.log("oth:")
       this.props.onLayout &&
       this.props.onLayout(
         {nativeEvent:{layout:{x, y, width, height}}});
-    }
-  },
-  componentWillReceiveProps: function(nextProps) {
-    //console.log("next:%O,this:%O,eq:%O,json:%O", nextProps.children, this.props.children, nextProps.children != this.props.children)
-    //console.log("this.props:%O", this.props);
-    var c1 = React.Children.toArray(nextProps.children);
-    var c2 = React.Children.toArray(this.props.children);
-    /* console.log("children:%O,==:%O,===:%O,js:%O", c1,
-       c1 == c2,
-       c1 === c2,
-       //JSON.stringify(c1)
-       ); */
-    /* this.props.children,
-     nextProps.children == this.props.children,
-       nextProps.children === this.props.children */
-    if(nextProps.children!=this.props.children){
-      //this._onChildenChange();
-      //this.setState({measuring:true,});
-      //console.log("recP:")
     }
   },
   //cannot measure Animated.View
@@ -102,50 +85,56 @@ var Expandable = React.createClass({
     }
   },
   componentWillMount: function(){
-    this.thresholds=[];
-    this.component = (
-      <MeasurableView
-          onChildenChange={(x,y,width,height)=>{
-              this.thresholds[this.state.index] = width;
-              this.props.onResize && this.props.onResize(this.state.index);
-            }}>
-        {this.props.components[this.state.index]}
-      </MeasurableView>)
+    this.thresholds = [];
+    this.previousIndex = -1;
   },
   render: function(){
-    //console.log("renderEx:") //call according to width
-    return(
-      <View style={this.props.style}
-            onLayout={({nativeEvent:{layout:{width, height}}})=>{
-                if((this.thresholds[this.state.index] < width) &&
-                   (this.state.index < this.props.components.length - 1)){
-                     this.setState({index: this.state.index + 1});
-                     console.log("set+1");
-                     this.component = (
-                       <MeasurableView
-          onChildenChange={(x,y,width,height)=>{
-              this.thresholds[this.state.index] = width;
-              this.props.onResize && this.props.onResize(this.state.index);
-            }}>
-                          {this.props.components[this.state.index]}
-                       </MeasurableView>)
-                }else if((0 < this.state.index) &&
-                         (width < this.thresholds[this.state.index - 1] )){
-                           this.setState({index: this.state.index - 1});
-                           console.log("set-1")
-                           this.component = (
-                             <MeasurableView
-          onChildenChange={(x,y,width,height)=>{
-              this.thresholds[this.state.index] = width;
-              this.props.onResize && this.props.onResize(this.state.index);
-            }}>
-                          {this.props.components[this.state.index]}
-                             </MeasurableView>)
-                }else{
-                  this.component = this.props.components[this.state.index]
-                }
+    //called according to width
+    var children;
+    if(this.previousIndex != this.state.index){
+      console.log("me")
+      children = (
+        <MeasurableView
+            onFirstLayout={(x,y,width,height)=>{
+                console.log("lay")
+                this.thresholds[this.state.index] = width;
+                this.props.onResize && this.props.onResize(this.state.index);
               }}>
-        {this.component}
+          {this.props.components[this.state.index]}
+        </MeasurableView>
+      )
+    }else{
+      //not layout yet...
+      console.log("not me")
+      children = this.props.components[this.state.index]
+    }
+    console.log("i:%O,%O,%O",
+                this.previousIndex,
+                this.state.index,
+                this.previousIndex != this.state.index
+    )
+    this.previousIndex = this.state.index;
+    return(
+      <View
+          style={this.props.style}
+          onLayout={({nativeEvent:{layout:{width, height}}})=>{
+              if((this.thresholds[this.state.index] < width) &&
+                 (this.state.index < this.props.components.length - 1)){
+                   this.setState({index: this.state.index + 1});
+                   console.log("set+1");
+                   //console.log("ref:%O", this.refs.root);
+                   //measure again
+              }else if((0 < this.state.index) &&
+                       (width < this.thresholds[this.state.index - 1] )){
+                         this.setState({index: this.state.index - 1});
+                         console.log("set-1")
+                         //measure again
+              }else{
+                //this.component = this.props.components[this.state.index]
+              }
+            }}
+      >
+        {children}
       </View>
     )
   }
