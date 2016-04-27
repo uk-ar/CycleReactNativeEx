@@ -49,16 +49,19 @@ var MeasurableView = React.createClass({
   },
   _onLayout({nativeEvent:{layout:{x, y, width, height}}}){
     if(this.state.measuring){
-      console.log("fi:")
-      this.props.onFirstLayout &&
-      this.props.onFirstLayout(x, y, width, height);
+      //console.log("fi:")
+      this.props.onChildrenChange &&
+      this.props.onChildrenChange(x, y, width, height);
       this.setState({measuring:false,});
     }else{
-      console.log("oth:")
+      //console.log("oth:")
       this.props.onLayout &&
       this.props.onLayout(
         {nativeEvent:{layout:{x, y, width, height}}});
     }
+  },
+  childrenChange(){
+    this.setState({measuring:true,});
   },
   //cannot measure Animated.View
   //hide(opacity:0) until measure is not mean because measure time is not large
@@ -66,14 +69,15 @@ var MeasurableView = React.createClass({
     //console.log("rend mea")
     return (
       //TODO:...this.props
-      <Animated.View {...this.props}
+      <View {...this.props}
                      style={
                        this.state.measuring ? null : this.props.style
                      }
                      onLayout={this._onLayout}
+                     ref="root"
       >
         {this.props.children}
-      </Animated.View>
+      </View>
     )
   }
 });
@@ -86,59 +90,41 @@ var Expandable = React.createClass({
   },
   componentWillMount: function(){
     this.thresholds = [];
-    this.previousIndex = -1;
   },
   render: function(){
     //called according to width
-    var children;
-    if(this.previousIndex != this.state.index){
-      console.log("me")
-      children = (
-        <MeasurableView
-            onFirstLayout={(x,y,width,height)=>{
-                console.log("lay")
-                this.thresholds[this.state.index] = width;
-                this.props.onResize && this.props.onResize(this.state.index);
-              }}>
-          {this.props.components[this.state.index]}
-        </MeasurableView>
-      )
-    }else{
-      //not layout yet...
-      console.log("not me")
-      children = this.props.components[this.state.index]
-    }
-    console.log("i:%O,%O,%O",
-                this.previousIndex,
-                this.state.index,
-                this.previousIndex != this.state.index
-    )
-    this.previousIndex = this.state.index;
     return(
       <View
-          style={this.props.style}
           onLayout={({nativeEvent:{layout:{width, height}}})=>{
               if((this.thresholds[this.state.index] < width) &&
                  (this.state.index < this.props.components.length - 1)){
                    this.setState({index: this.state.index + 1});
-                   console.log("set+1");
-                   //console.log("ref:%O", this.refs.root);
-                   //measure again
+                   this.refs.root.childrenChange();
+                   //
               }else if((0 < this.state.index) &&
                        (width < this.thresholds[this.state.index - 1] )){
                          this.setState({index: this.state.index - 1});
-                         console.log("set-1")
-                         //measure again
-              }else{
-                //this.component = this.props.components[this.state.index]
+                         this.refs.root.childrenChange();
               }
             }}
       >
-        {children}
+        <MeasurableView
+            ref="root"
+            style={this.props.style}
+            onChildrenChange={(x,y,width,height)=>{
+                if(!this.thresholds[this.state.index]){
+                  this.thresholds[this.state.index] = width;
+                }
+                this.props.onResize && this.props.onResize(this.state.index);
+              }}>
+          {this.props.components[this.state.index]}
+        </MeasurableView>
       </View>
     )
   }
 });
+
+Animated.Expandable = Animated.createAnimatedComponent(Expandable)
 
 var BookCell = React.createClass({
   componentWillMount: function() {
@@ -188,24 +174,35 @@ var BookCell = React.createClass({
   componentDidMount: function(){
     console.log("did m");
   },
-  render: function(){//left is like argument
-    return(
-      <Animated.View style={{
-          flexDirection:"row",
-        }}
-                     {...this._panResponder.panHandlers}
-      >
-        <Expandable
+  render: function(){
+
+    var colors = [
+      'rgb(158, 158, 158)',//grey
+      'rgb(33,150,243)',//blue
+      'rgb(76, 175, 80)',//green
+    ];
+    this.colorIndex = new Animated.Value(0);
+
+    var leftButtons=(
+      <Animated.Expandable
             style={{
-                width:this.state.left,
+                //width:this.state.left,
+                width:this._panX,
+                backgroundColor:this.backgroundColor,
               }}
             onResize={(i)=>{
-                //console.log("onre:")
+                console.log("onre:%O", i)
                 if(i == 0){
                   this.releaseTo = 0;
                 }else{
                   this.releaseTo = SWIPEABLE_MAIN_WIDTH;
                 }
+                this.backgroundColor = colors[i];
+                Animated.timing(
+                  this.colorIndex,
+                  {toValue: i,//interpolate?
+                   duration: 90,}
+                ).start();
               }}
             components={[
               <View style={{
@@ -229,7 +226,16 @@ var BookCell = React.createClass({
                 <Text>nl:right</Text>
               </View>,
             ]}
-        />
+      />
+    )
+
+    return(
+      <Animated.View style={{
+          flexDirection:"row",
+        }}
+                     {...this._panResponder.panHandlers}
+      >
+        {leftButtons}
         <Animated.View
             style={{
                 backgroundColor:"blue",
