@@ -85,7 +85,8 @@ var MeasurableView = React.createClass({
 var Expandable = React.createClass({
   getInitialState: function() {
     return {
-      index:0,
+      index:null,
+      init:true,
     }
   },
   componentWillMount: function(){
@@ -93,34 +94,51 @@ var Expandable = React.createClass({
   },
   render: function(){
     //called according to width
-    return(
-      <View
-          onLayout={({nativeEvent:{layout:{width, height}}})=>{
-              if((this.thresholds[this.state.index] < width) &&
-                 (this.state.index < this.props.components.length - 1)){
-                   this.setState({index: this.state.index + 1});
-                   this.refs.root.childrenChange();
-                   //
-              }else if((0 < this.state.index) &&
-                       (width < this.thresholds[this.state.index - 1] )){
-                         this.setState({index: this.state.index - 1});
-                         this.refs.root.childrenChange();
-              }
-            }}
-      >
-        <MeasurableView
-            ref="root"
-            style={this.props.style}
-            onChildrenChange={(x,y,width,height)=>{
-                if(!this.thresholds[this.state.index]){
-                  this.thresholds[this.state.index] = width;
-                }
-                this.props.onResize && this.props.onResize(this.state.index);
-              }}>
-          {this.props.components[this.state.index]}
-        </MeasurableView>
-      </View>
-    )
+    var content =
+    this.state.init ?
+    //! this.state.index ?
+    (<View onLayout={()=> this.setState({index:0,init:false})}>
+        {this.props.components.map((elem,i)=>{
+           return (
+             <View
+                 key={i}
+                 style={{position:"absolute"}}
+                 onLayout={({nativeEvent:{layout:{width, height}}})=>{
+                     console.log("i:%O,w:%O",i,width);
+                     //style={[this.props.style,{position:"absolute"}]}
+                     //style={[this.props.style]}
+                     //{padding:10,margin:7,position:"absolute"}47,120,220
+                     //{padding:10,position:"absolute"}47,120,220
+                     //{position:"absolute"}27,100,200
+                     this.thresholds[i] = width;
+                   }}>
+               {elem}
+             </View>
+           )})}
+    </View>)
+      :
+    (<View
+         style={this.props.style}
+         onLayout={({nativeEvent:{layout:{width, height}}})=>{
+             //console.log("onlay",width,height)
+             if((this.thresholds[this.state.index] < width) &&
+                (this.state.index < this.props.components.length - 1)){
+                  this.setState({index: this.state.index + 1});
+                  console.log("set+1");
+                  this.props.onResize &&
+                  this.props.onResize(this.state.index);                    
+             }else if((0 < this.state.index) &&
+                      (width < this.thresholds[this.state.index - 1] )){
+                        this.setState({index: this.state.index - 1});
+                        console.log("set-1");
+                        this.props.onResize &&
+                        this.props.onResize(this.state.index);
+             }
+           }}>
+      {this.props.components[this.state.index]}
+    </View>)
+
+      return(content)
   }
 });
 
@@ -175,20 +193,33 @@ var BookCell = React.createClass({
     console.log("did m");
   },
   render: function(){
-
     var colors = [
       'rgb(158, 158, 158)',//grey
       'rgb(33,150,243)',//blue
       'rgb(76, 175, 80)',//green
     ];
-    this.colorIndex = new Animated.Value(0);
-
+    //console.log("left:",10 < this.state.left ? this.state.left : 0)
     var leftButtons=(
       <Animated.Expandable
             style={{
-                //width:this.state.left,
-                width:this._panX,
-                backgroundColor:this.backgroundColor,
+                width:this.state.left,//width cannot shrink under padding
+                //width:2,
+                //left:10 < this.state.left ? this.state.left : null,
+                //left: this.state.left + 5,
+                //left: this.state.left - 5,
+                //right:-1 * this.state.left + 5,
+                //left:0,
+                //left:-10,
+                //right:0,
+                //width:this._panX,
+                //backgroundColor:this.backgroundColor,
+                //position:"absolute",
+                backgroundColor:this.colorIndex.interpolate({
+                  inputRange: _.range(colors.length),
+                  outputRange: colors,
+                }),
+                //margin:5,
+                //padding:10,
               }}
             onResize={(i)=>{
                 console.log("onre:%O", i)
@@ -197,23 +228,27 @@ var BookCell = React.createClass({
                 }else{
                   this.releaseTo = SWIPEABLE_MAIN_WIDTH;
                 }
-                this.backgroundColor = colors[i];
+                //this.backgroundColor = colors[i];
                 Animated.timing(
                   this.colorIndex,
                   {toValue: i,//interpolate?
-                   duration: 90,}
+                   duration: 180,}
                 ).start();
+                //this.colorIndex.setValue(i);
               }}
             components={[
               <View style={{
                   flexDirection:"row",
                   justifyContent:"flex-end",
                 }}>
-                <Text>l:left</Text>
+                <Text style={{marginVertical:10,
+                              marginLeft:10}}>l:left</Text>
               </View>,
               <View style={{
                   flexDirection:"row",
                   width:SWIPEABLE_MAIN_WIDTH/2,
+                  padding:10,
+                  //style={{marginRight:10}}
                 }}>
                 <Text>l:left</Text>
                 <Text>l:right</Text>
