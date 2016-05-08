@@ -3,7 +3,7 @@ let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/re
 var FAIcon = require('react-native-vector-icons/FontAwesome');
 var MIcon = require('react-native-vector-icons/MaterialIcons');
 var GiftedSpinner = require('react-native-gifted-spinner');
-var Emoji = require('react-native-emoji');
+
 var Swipeout = require('react-native-swipeout');
 import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
 var _ = require('lodash');
@@ -81,7 +81,6 @@ var LibraryStatus = React.createClass({
        <Icon.Button name="facebook" backgroundColor="#3b5998">
        </Icon.Button>
        <Text>
-       <Emoji name = "ok"/>
        {text}
        </Text> */
 

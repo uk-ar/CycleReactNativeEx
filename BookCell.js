@@ -271,6 +271,7 @@ var BookCell = React.createClass({
                      {...this._panResponder.panHandlers}
       >
         {leftButtons}
+        <Text>foo</Text>
         <Animated.View
             style={{
                 backgroundColor:"blue",
