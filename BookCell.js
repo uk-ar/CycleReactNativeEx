@@ -126,7 +126,7 @@ var Expandable = React.createClass({
                   this.setState({index: this.state.index + 1});
                   console.log("set+1");
                   this.props.onResize &&
-                  this.props.onResize(this.state.index);                    
+                  this.props.onResize(this.state.index);
              }else if((0 < this.state.index) &&
                       (width < this.thresholds[this.state.index - 1] )){
                         this.setState({index: this.state.index - 1});
