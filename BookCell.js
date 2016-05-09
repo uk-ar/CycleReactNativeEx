@@ -241,7 +241,7 @@ var BookCell = React.createClass({
                   flexDirection:"row",
                   justifyContent:"flex-end",
                   padding:10,
-                  //FIXME:calc offset for padding
+                  //FIXME:RN bug:clipped padding
                 }}>
                           {/* <Text style={{marginVertical:10,
                           marginLeft:10}}>l:left</Text> */}
