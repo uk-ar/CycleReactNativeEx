@@ -96,7 +96,10 @@ var BookListView = React.createClass({
       <CycleView style = {styles.container} key="listview">
       <ListView
           ref="listview"
-          dataSource = {dataSource.cloneWithRows(this.state.dataSource)}
+          dataSource = {
+            //FIXME:
+            /* dataSource.cloneWithRows(this.state.dataSource) */
+            dataSource.cloneWithRows(['row 1', 'row 2'])}
           renderRow ={(movie, sectionID, rowID, highlightRowFunc) =>
             <BookCell
                 movie={movie}

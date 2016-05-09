@@ -240,9 +240,12 @@ var BookCell = React.createClass({
               <View style={{
                   flexDirection:"row",
                   justifyContent:"flex-end",
+                  padding:10,
+                  //FIXME:calc offset for padding
                 }}>
-                <Text style={{marginVertical:10,
-                              marginLeft:10}}>l:left</Text>
+                          {/* <Text style={{marginVertical:10,
+                          marginLeft:10}}>l:left</Text> */}
+                <Text>l:left</Text>
               </View>,
               <View style={{
                   flexDirection:"row",
@@ -271,7 +274,6 @@ var BookCell = React.createClass({
                      {...this._panResponder.panHandlers}
       >
         {leftButtons}
-        <Text>foo</Text>
         <Animated.View
             style={{
                 backgroundColor:"blue",
