@@ -43,45 +43,6 @@ var {
 var SWIPEABLE_MAIN_WIDTH = 300;
 //var SWIPEABLE_MAIN_WIDTH = SCREEN_WIDTH;
 
-var MeasurableView = React.createClass({
-  getInitialState() {
-    return { measuring: true }
-  },
-  _onLayout({nativeEvent:{layout:{x, y, width, height}}}){
-    if(this.state.measuring){
-      //console.log("fi:")
-      this.props.onChildrenChange &&
-      this.props.onChildrenChange(x, y, width, height);
-      this.setState({measuring:false,});
-    }else{
-      //console.log("oth:")
-      this.props.onLayout &&
-      this.props.onLayout(
-        {nativeEvent:{layout:{x, y, width, height}}});
-    }
-  },
-  childrenChange(){
-    this.setState({measuring:true,});
-  },
-  //cannot measure Animated.View
-  //hide(opacity:0) until measure is not mean because measure time is not large
-  render() {
-    //console.log("rend mea")
-    return (
-      //TODO:...this.props
-      <View {...this.props}
-                     style={
-                       this.state.measuring ? null : this.props.style
-                     }
-                     onLayout={this._onLayout}
-                     ref="root"
-      >
-        {this.props.children}
-      </View>
-    )
-  }
-});
-
 var Expandable = React.createClass({
   getInitialState: function() {
     return {
@@ -143,6 +104,54 @@ var Expandable = React.createClass({
 });
 
 Animated.Expandable = Animated.createAnimatedComponent(Expandable)
+
+var AnimatableBackGroundColor = React.createClass({
+  componentWillMount: function() {
+    this.colorIndex = new Animated.Value(this.props.colorIndex);
+  },
+  /* getInitialState: function() {
+     return {
+     left:0,
+     }
+     }, */
+  /* componentWillReceiveProps: function(nextProps) {
+     //animated
+     if(nextProps.colorIndex != this.props.colorIndex){
+     Animated.timing(
+     this.colorIndex,
+     {toValue: nextProps.colorIndex,//interpolate?
+     duration: 180,} //TODO:add props
+     ).start();
+     } */
+    /* this.setState({
+       likesIncreasing: nextProps.colorIndex > this.props.colorIndex
+       }); */
+  //},
+  render: function(){
+    /* Animated.timing(
+       this.colorIndex,
+       {toValue: this.props.colorIndex,//interpolate?
+       duration: 180,} //TODO:add props
+       ).start(); *///Error
+    /*
+       backgroundColor:this.colorIndex.interpolate({
+       inputRange: _.range(this.props.colors.length),
+       outputRange: this.props.colors,
+       }),
+     */
+    return(
+      <Animated.View {...this.props} style = {[this.props.style,{
+          //backgroundColor:this.props.colors[this.props.colorIndex]
+          backgroundColor:this.colorIndex.interpolate({
+            inputRange: _.range(this.props.colors.length),
+            outputRange: this.props.colors,
+          }),
+        },
+        ]}>
+        {this.props.children}
+      </Animated.View>)
+  }
+})
 
 var BookCell = React.createClass({
   componentWillMount: function() {
@@ -299,7 +308,7 @@ var BookCell = React.createClass({
                 <Text style={{margin:10,marginRight:0}}>
                   r1:left</Text>
                 <Text style={{margin:10,marginLeft:5}}>
-                  r1:right</Text>              
+                  r1:right</Text>
               </View>,
               <View style={{
                   width:SWIPEABLE_MAIN_WIDTH,
@@ -314,8 +323,23 @@ var BookCell = React.createClass({
               </View>,
               ]}
       />
-    )      
-      
+    )
+    return(
+      <AnimatableBackGroundColor
+          colors={colors}
+          colorIndex={
+            //0
+            this.state.left
+                     }
+      >
+        <Text onPress = {() => {
+            console.log("press")
+            this.setState({
+              left:this.state.left + 1
+            })
+          }}>foo</Text>
+      </AnimatableBackGroundColor>
+    )
 
     return(
       <Animated.View style={{
