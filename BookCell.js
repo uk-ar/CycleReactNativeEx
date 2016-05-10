@@ -40,7 +40,7 @@ var {
 } = Dimensions.get('window');
 
 //variable for debug layout
-var SWIPEABLE_MAIN_WIDTH = 200;
+var SWIPEABLE_MAIN_WIDTH = 300;
 //var SWIPEABLE_MAIN_WIDTH = SCREEN_WIDTH;
 
 var MeasurableView = React.createClass({
@@ -202,24 +202,14 @@ var BookCell = React.createClass({
     var leftButtons=(
       <Animated.Expandable
             style={{
-                width:this.state.left,//width cannot shrink under padding
-                //width:2,
-                //left:10 < this.state.left ? this.state.left : null,
-                //left: this.state.left + 5,
-                //left: this.state.left - 5,
-                //right:-1 * this.state.left + 5,
-                //left:0,
-                //left:-10,
-                //right:0,
-                //width:this._panX,
-                //backgroundColor:this.backgroundColor,
-                //position:"absolute",
+                //width cannot shrink under padding
+                width: 0 < this.state.left ? this.state.left : 0.01,
                 backgroundColor:this.colorIndex.interpolate({
                   inputRange: _.range(colors.length),
                   outputRange: colors,
                 }),
-                //margin:5,
-                //padding:10,
+                height:50,//TODO:support height centering
+                justifyContent:"center",
               }}
             onResize={(i)=>{
                 console.log("onre:%O", i)
@@ -228,7 +218,6 @@ var BookCell = React.createClass({
                 }else{
                   this.releaseTo = SWIPEABLE_MAIN_WIDTH;
                 }
-                //this.backgroundColor = colors[i];
                 Animated.timing(
                   this.colorIndex,
                   {toValue: i,//interpolate?
@@ -240,55 +229,126 @@ var BookCell = React.createClass({
               <View style={{
                   flexDirection:"row",
                   justifyContent:"flex-end",
-                  padding:10,
-                  //FIXME:RN bug:clipped padding
+                  //alignSelf:"center",
+                  //padding:10,//RN bug:clipped padding
                 }}>
-                          {/* <Text style={{marginVertical:10,
-                          marginLeft:10}}>l:left</Text> */}
-                <Text>l:left</Text>
+                <Text style={{margin:10,marginRight:5}}>
+                  l1:left</Text>
               </View>,
               <View style={{
                   flexDirection:"row",
                   width:SWIPEABLE_MAIN_WIDTH/2,
-                  padding:10,
-                  //style={{marginRight:10}}
                 }}>
-                <Text>l:left</Text>
-                <Text>l:right</Text>
+              <Text style={{margin:10,marginRight:5}}>
+                l1:left</Text>
+              <Text style={{margin:10,marginLeft:0}}>
+                l1:right</Text>
               </View>,
               <View style={{
                   flexDirection:"row",
                   width:SWIPEABLE_MAIN_WIDTH,
                 }}>
-                <Text>nl:left</Text>
-                <Text>nl:right</Text>
+                <Text style={{margin:10,marginRight:5}}>
+                  l2:left</Text>
+                <Text style={{margin:10,marginLeft:0}}>
+                  l2:right</Text>
               </View>,
             ]}
       />
-    )
+    );
+    var rightButtons=(
+      <Animated.Expandable
+            style={{
+                width: -this.state.left,//width cannot shrink under padding
+                backgroundColor:this.colorIndex.interpolate({
+                  inputRange: _.range(colors.length),
+                  outputRange: colors,
+                }),
+                //position:"absolute",
+              right:0,
+              justifyContent:"center",
+              }}
+            onResize={(i)=>{
+                console.log("onre:%O", i)
+                  if(i == 0){
+                    this.releaseTo = 0;
+                  }else{
+                    this.releaseTo = - SWIPEABLE_MAIN_WIDTH;
+                  }
+                Animated.timing(
+                  this.colorIndex,
+                  {toValue: i,//interpolate?
+                   duration: 180,}
+                ).start();
+                //this.colorIndex.setValue(i);
+              }}
+            components={[
+                <View style={{
+                    flexDirection:"row",
+                    //padding:10,//RN bug:clipped padding
+                  }}>
+                  <Text style={{margin:10,marginLeft:5}}>
+                              r1:right</Text>
+                </View>,
+              <View style={{
+                  width:SWIPEABLE_MAIN_WIDTH/2,
+                  flexDirection:"row",
+                  justifyContent:"flex-end",
+                  alignSelf:"flex-end",
+                }}>
+                <Text style={{margin:10,marginRight:0}}>
+                  r1:left</Text>
+                <Text style={{margin:10,marginLeft:5}}>
+                  r1:right</Text>              
+              </View>,
+              <View style={{
+                  width:SWIPEABLE_MAIN_WIDTH,
+                  flexDirection:"row",
+                  justifyContent:"flex-end",
+                  alignSelf:"flex-end",
+                }}>
+                <Text style={{margin:10,marginRight:0}}>
+                  r2:left</Text>
+                <Text style={{margin:10,marginLeft:5}}>
+                  r2:right</Text>
+              </View>,
+              ]}
+      />
+    )      
+      
 
     return(
       <Animated.View style={{
           flexDirection:"row",
+          width:SWIPEABLE_MAIN_WIDTH,
+          //height:30,//TODO:adjust
         }}
                      {...this._panResponder.panHandlers}
       >
         {leftButtons}
+        <View style={{flex:1}}></View>
+        {rightButtons}
         <Animated.View
             style={{
-                backgroundColor:"blue",
                 position:"absolute",
                 left:this.state.left,
-                borderWidth: 2,
+                width: SWIPEABLE_MAIN_WIDTH,
+                //height:50,//TODO:adjust
               }}>
-          <Text style={{
-              width: SWIPEABLE_MAIN_WIDTH,
-            }}
-                numberOfLines={1}
-
-          >
-            {'main?'}
-          </Text>
+          <View style={{
+              backgroundColor:"blue",
+              borderWidth: 2,
+              flex:1,
+              flexDirection: 'column',
+              justifyContent:"center",
+            }}>
+            <Text style={{
+              }}
+                  numberOfLines={1}
+            >
+              {'main?'}
+            </Text>
+          </View>
         </Animated.View>
       </Animated.View>
   )
