@@ -47,7 +47,6 @@ var Expandable = React.createClass({
   getInitialState: function() {
     return {
       index:null,
-      init:true,
     }
   },
   componentWillMount: function(){
@@ -56,9 +55,8 @@ var Expandable = React.createClass({
   render: function(){
     //called according to width
     var content =
-    this.state.init ?
-    //! this.state.index ?
-    (<View onLayout={()=> this.setState({index:0,init:false})}>
+    this.thresholds.length == 0 ?
+    (<View onLayout={()=> this.setState({index:0})}>
         {this.props.components.map((elem,i)=>{
            return (
              <View
@@ -81,9 +79,10 @@ var Expandable = React.createClass({
     (<View
          style={this.props.style}
          onLayout={({nativeEvent:{layout:{width, height}}})=>{
+             if(this.props.lock){return};
              //console.log("onlay",width,height)
-             if((this.thresholds[this.state.index] < width) &&
-                (this.state.index < this.props.components.length - 1)){
+             if((this.state.index < this.props.components.length - 1) &&
+                (this.thresholds[this.state.index] < width)){
                   this.setState({index: this.state.index + 1});
                   console.log("set+1");
                   this.props.onResize &&
@@ -103,45 +102,36 @@ var Expandable = React.createClass({
   }
 });
 
-Animated.Expandable = Animated.createAnimatedComponent(Expandable)
+Animated.Expandable = Animated.createAnimatedComponent(Expandable);
+
+/* usage:
+<AnimatableBackGroundColor
+   colors={colors}
+   colorIndex={this.state.left}>
+   <Text onPress = {() => {
+   this.setState({
+   left:this.state.left + 1
+   })
+   }}>foo</Text>
+   </AnimatableBackGroundColor> */
 
 var AnimatableBackGroundColor = React.createClass({
   componentWillMount: function() {
     this.colorIndex = new Animated.Value(this.props.colorIndex);
   },
-  /* getInitialState: function() {
-     return {
-     left:0,
-     }
-     }, */
-  /* componentWillReceiveProps: function(nextProps) {
-     //animated
-     if(nextProps.colorIndex != this.props.colorIndex){
-     Animated.timing(
-     this.colorIndex,
-     {toValue: nextProps.colorIndex,//interpolate?
-     duration: 180,} //TODO:add props
-     ).start();
-     } */
-    /* this.setState({
-       likesIncreasing: nextProps.colorIndex > this.props.colorIndex
-       }); */
-  //},
+  componentWillReceiveProps: function(nextProps) {
+    //animated
+    if(nextProps.colorIndex != this.props.colorIndex){
+      Animated.timing(
+        this.colorIndex,
+        {toValue: nextProps.colorIndex,//interpolate?
+         duration: 180,} //TODO:add props
+      ).start();
+    }
+  },
   render: function(){
-    /* Animated.timing(
-       this.colorIndex,
-       {toValue: this.props.colorIndex,//interpolate?
-       duration: 180,} //TODO:add props
-       ).start(); *///Error
-    /*
-       backgroundColor:this.colorIndex.interpolate({
-       inputRange: _.range(this.props.colors.length),
-       outputRange: this.props.colors,
-       }),
-     */
     return(
       <Animated.View {...this.props} style = {[this.props.style,{
-          //backgroundColor:this.props.colors[this.props.colorIndex]
           backgroundColor:this.colorIndex.interpolate({
             inputRange: _.range(this.props.colors.length),
             outputRange: this.props.colors,
@@ -156,6 +146,7 @@ var AnimatableBackGroundColor = React.createClass({
 var BookCell = React.createClass({
   componentWillMount: function() {
     this._panX = new Animated.Value(0);
+    this.releasing = false;
 
     this._panResponder = PanResponder.create({
       // Ask to be the responder:
@@ -167,6 +158,7 @@ var BookCell = React.createClass({
       onPanResponderGrant: (evt, gestureState) => {
         //this._panX.setOffset(this._previousLeft);
         //this._panX.setValue(0);
+        this.releasing = false;
       },
       onPanResponderMove: Animated.event([
         null,
@@ -180,6 +172,7 @@ var BookCell = React.createClass({
           {toValue: this.releaseTo ,
            duration: 180,}
         ).start();
+        this.releasing = true;
       },
 
       onShouldBlockNativeResponder: (evt, gestureState) => {
@@ -191,35 +184,34 @@ var BookCell = React.createClass({
     this._panX.addListener(({value:value}) => {
       this.setState({left: value,})
     });
-    this.colorIndex = new Animated.Value(0);
   },
   getInitialState: function() {
     return {
-      left:0,
+      left:0,//changed when move & release
+      componentIndex:0,
     }
   },
   componentDidMount: function(){
     console.log("did m");
   },
   render: function(){
-    var colors = [
-      'rgb(158, 158, 158)',//grey
-      'rgb(33,150,243)',//blue
-      'rgb(76, 175, 80)',//green
-    ];
-    //console.log("left:",10 < this.state.left ? this.state.left : 0)
+    //genButton([a,b,c,d],left)
     var leftButtons=(
+      <AnimatableBackGroundColor
+          colors={[
+              'rgb(158, 158, 158)',//grey
+              'rgb(33,150,243)',//blue
+              'rgb(76, 175, 80)',//green
+            ]}
+          colorIndex={this.state.componentIndex}>
       <Animated.Expandable
             style={{
                 //width cannot shrink under padding
                 width: 0 < this.state.left ? this.state.left : 0.01,
-                backgroundColor:this.colorIndex.interpolate({
-                  inputRange: _.range(colors.length),
-                  outputRange: colors,
-                }),
                 height:50,//TODO:support height centering
                 justifyContent:"center",
               }}
+            lock={this.releasing}
             onResize={(i)=>{
                 console.log("onre:%O", i)
                 if(i == 0){
@@ -227,12 +219,7 @@ var BookCell = React.createClass({
                 }else{
                   this.releaseTo = SWIPEABLE_MAIN_WIDTH;
                 }
-                Animated.timing(
-                  this.colorIndex,
-                  {toValue: i,//interpolate?
-                   duration: 180,}
-                ).start();
-                //this.colorIndex.setValue(i);
+                this.setState({componentIndex:i})
               }}
             components={[
               <View style={{
@@ -264,19 +251,25 @@ var BookCell = React.createClass({
               </View>,
             ]}
       />
+      </AnimatableBackGroundColor>
     );
+    //button input color, component, release action
+    //close flag is parent props
     var rightButtons=(
+      <AnimatableBackGroundColor
+          colors={[
+              'rgb(158, 158, 158)',//grey
+              '#9C27B0',//purple
+              '#F44336',//red
+            ]}
+          colorIndex={this.state.componentIndex}>
       <Animated.Expandable
             style={{
                 width: -this.state.left,//width cannot shrink under padding
-                backgroundColor:this.colorIndex.interpolate({
-                  inputRange: _.range(colors.length),
-                  outputRange: colors,
-                }),
-                //position:"absolute",
               right:0,
               justifyContent:"center",
               }}
+            lock={this.releasing}
             onResize={(i)=>{
                 console.log("onre:%O", i)
                   if(i == 0){
@@ -284,12 +277,7 @@ var BookCell = React.createClass({
                   }else{
                     this.releaseTo = - SWIPEABLE_MAIN_WIDTH;
                   }
-                Animated.timing(
-                  this.colorIndex,
-                  {toValue: i,//interpolate?
-                   duration: 180,}
-                ).start();
-                //this.colorIndex.setValue(i);
+                this.setState({componentIndex:i})
               }}
             components={[
                 <View style={{
@@ -323,23 +311,8 @@ var BookCell = React.createClass({
               </View>,
               ]}
       />
-    )
-    return(
-      <AnimatableBackGroundColor
-          colors={colors}
-          colorIndex={
-            //0
-            this.state.left
-                     }
-      >
-        <Text onPress = {() => {
-            console.log("press")
-            this.setState({
-              left:this.state.left + 1
-            })
-          }}>foo</Text>
       </AnimatableBackGroundColor>
-    )
+    );
 
     return(
       <Animated.View style={{
