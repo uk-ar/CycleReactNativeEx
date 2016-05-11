@@ -53,8 +53,10 @@ var Expandable = React.createClass({
     this.thresholds = [];
   },
   render: function(){
-    //called according to width
-    var content =
+    //render method called according to width
+
+    //this.child exposed to parent
+    this.child =
     this.thresholds.length == 0 ?
     (<View onLayout={()=> this.setState({index:0})}>
         {this.props.components.map((elem,i)=>{
@@ -63,7 +65,7 @@ var Expandable = React.createClass({
                  key={i}
                  style={{position:"absolute"}}
                  onLayout={({nativeEvent:{layout:{width, height}}})=>{
-                     console.log("i:%O,w:%O",i,width);
+                     //console.log("i:%O,w:%O",i,width);
                      //style={[this.props.style,{position:"absolute"}]}
                      //style={[this.props.style]}
                      //{padding:10,margin:7,position:"absolute"}47,120,220
@@ -95,14 +97,12 @@ var Expandable = React.createClass({
                         this.props.onResize(this.state.index);
              }
            }}>
-      {this.props.components[this.state.index]}
+      {//cloneElement
+        this.props.components[this.state.index]}
     </View>)
-
-      return(content)
+      return(this.child)
   }
 });
-
-Animated.Expandable = Animated.createAnimatedComponent(Expandable);
 
 /* usage:
 <AnimatableBackGroundColor
@@ -151,9 +151,9 @@ var BookCell = React.createClass({
     this._panResponder = PanResponder.create({
       // Ask to be the responder:
       onStartShouldSetPanResponder: (evt, gestureState) => true,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      //onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+      //onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
 
       onPanResponderGrant: (evt, gestureState) => {
         //this._panX.setOffset(this._previousLeft);
@@ -164,7 +164,7 @@ var BookCell = React.createClass({
         null,
         {dx: this._panX}
       ]),
-      onPanResponderTerminationRequest: (evt, gestureState) => true,
+      //onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
         //this._previousLeft += gestureState.dx;
         Animated.timing(
@@ -192,10 +192,11 @@ var BookCell = React.createClass({
     }
   },
   componentDidMount: function(){
-    console.log("did m");
+    console.log("did m:%O", this);
   },
   render: function(){
     //genButton([a,b,c,d],left)
+    var closes = [false, true, true]
     var leftButtons=(
       <AnimatableBackGroundColor
           colors={[
@@ -204,7 +205,8 @@ var BookCell = React.createClass({
               'rgb(76, 175, 80)',//green
             ]}
           colorIndex={this.state.componentIndex}>
-      <Animated.Expandable
+        <Expandable
+            ref = "left"
             style={{
                 //width cannot shrink under padding
                 width: 0 < this.state.left ? this.state.left : 0.01,
@@ -214,15 +216,15 @@ var BookCell = React.createClass({
             lock={this.releasing}
             onResize={(i)=>{
                 console.log("onre:%O", i)
-                if(i == 0){
-                  this.releaseTo = 0;
-                }else{
+                if(closes[i]){
                   this.releaseTo = SWIPEABLE_MAIN_WIDTH;
+                }else{
+                  this.releaseTo = 0;
                 }
                 this.setState({componentIndex:i})
               }}
             components={[
-              <View style={{
+              <View ref="1" style={{
                   flexDirection:"row",
                   justifyContent:"flex-end",
                   //alignSelf:"center",
@@ -263,7 +265,7 @@ var BookCell = React.createClass({
               '#F44336',//red
             ]}
           colorIndex={this.state.componentIndex}>
-      <Animated.Expandable
+      <Expandable
             style={{
                 width: -this.state.left,//width cannot shrink under padding
               right:0,
@@ -313,7 +315,12 @@ var BookCell = React.createClass({
       />
       </AnimatableBackGroundColor>
     );
-
+    /* return(
+      <View ref="1">
+        <Text onPress = {() => {
+            console.log("t:%O",this)
+          }} ref="2">foo</Text>
+      </View>) */
     return(
       <Animated.View style={{
           flexDirection:"row",
