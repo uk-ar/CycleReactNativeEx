@@ -1,4 +1,5 @@
-var React = require('react-native');
+
+import React, { Component } from 'react';
 let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
 var FAIcon = require('react-native-vector-icons/FontAwesome');
 var MIcon = require('react-native-vector-icons/MaterialIcons');
@@ -8,7 +9,7 @@ var Swipeout = require('react-native-swipeout');
 import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
 var _ = require('lodash');
 
-var {
+import {
   TouchableOpacity,
   ActivityIndicatorIOS,
   ListView,
@@ -31,7 +32,7 @@ var {
   Animated,
   ScrollView,
   PanResponder,
-} = React;
+} from 'react-native';
 
 var Dimensions = require('Dimensions');
 var {
@@ -58,6 +59,7 @@ var Expandable = React.createClass({
     //this.child exposed to parent
     this.child =
     this.thresholds.length == 0 ?
+    //TODO:...this.props
     (<View onLayout={()=> this.setState({index:0})}>
         {this.props.components.map((elem,i)=>{
            return (
@@ -81,8 +83,8 @@ var Expandable = React.createClass({
     (<View
          style={this.props.style}
          onLayout={({nativeEvent:{layout:{width, height}}})=>{
+             //console.log("onlay", width, height, this)
              if(this.props.lock){return};
-             //console.log("onlay",width,height)
              if((this.state.index < this.props.components.length - 1) &&
                 (this.thresholds[this.state.index] < width)){
                   this.setState({index: this.state.index + 1});
@@ -97,8 +99,8 @@ var Expandable = React.createClass({
                         this.props.onResize(this.state.index);
              }
            }}>
-      {//cloneElement
-        this.props.components[this.state.index]}
+      { React.cloneElement(this.props.components[this.state.index],
+                           {ref:(c) => {this.child = c }})}
     </View>)
       return(this.child)
   }
@@ -141,12 +143,91 @@ var AnimatableBackGroundColor = React.createClass({
         {this.props.children}
       </Animated.View>)
   }
+});
+
+var SwipeableButton = React.createClass({
+  getInitialState: function() {
+    return {
+      componentIndex:0,
+    }
+  },
+  componentWillMount: function() {
+    this.releasing = false;
+    this.releaseTo = 0;
+  },
+  //shuld handle in parent
+  /* release: function(){
+     //this.releasing = true;
+     //anmation
+     //this.refs.left.child.props.onRelease()
+     //this.releasing = false;
+  }, */
+  render: function(){
+    var closes = [false, true, true]
+    return(
+      <AnimatableBackGroundColor {...this.props}
+               colors={[
+                 'rgb(158, 158, 158)',//grey
+                 'rgb(33,150,243)',//blue
+                 'rgb(76, 175, 80)',//green
+               ]}
+               colorIndex={this.state.componentIndex}>
+      <Expandable
+          style={{
+              //width cannot shrink under padding
+              //width: 0 < this.state.left ? this.state.left : 0.01,
+              height:50,//TODO:support height centering
+              justifyContent:"center",
+            }}
+          lock={this.props.lock}
+          onResize={(i)=>{
+              //TODO:shuld call from first time?
+              //console.log("onre:%O", i)
+              this.setState({componentIndex:i});
+              this.releaseTo = closes[i] ? SWIPEABLE_MAIN_WIDTH : 0;
+            }}
+          components={[
+            <View onRelease={()=> console.log("1")}
+                      style={{
+                          flexDirection:"row",
+                          justifyContent:"flex-end",
+                          //alignSelf:"center",
+                          //padding:10,//RN bug:clipped padding
+                        }}>
+              <Text style={{margin:10,marginRight:5}}>
+                          l1:left</Text>
+            </View>,
+            <View onRelease={()=> console.log("2")}
+                      style={{
+                          flexDirection:"row",
+                          width:SWIPEABLE_MAIN_WIDTH/2,
+                        }}>
+              <Text style={{margin:10,marginRight:5}}>
+                          l1:left</Text>
+              <Text style={{margin:10,marginLeft:0}}>
+                          l1:right</Text>
+            </View>,
+            <View onRelease={()=> console.log("3")}
+                      style={{
+                          flexDirection:"row",
+                          width:SWIPEABLE_MAIN_WIDTH,
+                        }}>
+              <Text style={{margin:10,marginRight:5}}>
+                          l2:left</Text>
+              <Text style={{margin:10,marginLeft:0}}>
+                          l2:right</Text>
+            </View>,
+          ]}
+      />
+    </AnimatableBackGroundColor>)
+  },
 })
 
 var BookCell = React.createClass({
   componentWillMount: function() {
     this._panX = new Animated.Value(0);
     this.releasing = false;
+    this.releaseTo = 0;
 
     this._panResponder = PanResponder.create({
       // Ask to be the responder:
@@ -167,6 +248,9 @@ var BookCell = React.createClass({
       //onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
         //this._previousLeft += gestureState.dx;
+        //this.refs.left.child.props.onRelease();
+
+        //TODO:add swipeout method or props to buttons
         Animated.timing(
           this._panX,
           {toValue: this.releaseTo ,
@@ -196,64 +280,14 @@ var BookCell = React.createClass({
   },
   render: function(){
     //genButton([a,b,c,d],left)
-    var closes = [false, true, true]
     var leftButtons=(
-      <AnimatableBackGroundColor
-          colors={[
-              'rgb(158, 158, 158)',//grey
-              'rgb(33,150,243)',//blue
-              'rgb(76, 175, 80)',//green
-            ]}
-          colorIndex={this.state.componentIndex}>
-        <Expandable
-            ref = "left"
-            style={{
-                //width cannot shrink under padding
-                width: 0 < this.state.left ? this.state.left : 0.01,
-                height:50,//TODO:support height centering
-                justifyContent:"center",
-              }}
-            lock={this.releasing}
-            onResize={(i)=>{
-                console.log("onre:%O", i)
-                if(closes[i]){
-                  this.releaseTo = SWIPEABLE_MAIN_WIDTH;
-                }else{
-                  this.releaseTo = 0;
-                }
-                this.setState({componentIndex:i})
-              }}
-            components={[
-              <View ref="1" style={{
-                  flexDirection:"row",
-                  justifyContent:"flex-end",
-                  //alignSelf:"center",
-                  //padding:10,//RN bug:clipped padding
-                }}>
-                <Text style={{margin:10,marginRight:5}}>
-                  l1:left</Text>
-              </View>,
-              <View style={{
-                  flexDirection:"row",
-                  width:SWIPEABLE_MAIN_WIDTH/2,
-                }}>
-              <Text style={{margin:10,marginRight:5}}>
-                l1:left</Text>
-              <Text style={{margin:10,marginLeft:0}}>
-                l1:right</Text>
-              </View>,
-              <View style={{
-                  flexDirection:"row",
-                  width:SWIPEABLE_MAIN_WIDTH,
-                }}>
-                <Text style={{margin:10,marginRight:5}}>
-                  l2:left</Text>
-                <Text style={{margin:10,marginLeft:0}}>
-                  l2:right</Text>
-              </View>,
-            ]}
+      <SwipeableButton ref="left"
+                       lock={this.releasing}
+                       style={{
+                           width: 0 < this.state.left ? this.state.left : 0.01,
+                           //width: this.state.left
+                         }}
       />
-      </AnimatableBackGroundColor>
     );
     //button input color, component, release action
     //close flag is parent props
@@ -264,11 +298,15 @@ var BookCell = React.createClass({
               '#9C27B0',//purple
               '#F44336',//red
             ]}
-          colorIndex={this.state.componentIndex}>
+          colorIndex={this.state.componentIndex}
+          style={{
+              width: this.state.left < 0 ? -this.state.left : 0.01,//width cannot shrink under padding
+            }}
+      >
       <Expandable
             style={{
-                width: -this.state.left,//width cannot shrink under padding
-              right:0,
+                //width: -this.state.left,//width cannot shrink under padding
+              //right:0,
               justifyContent:"center",
               }}
             lock={this.releasing}
@@ -315,28 +353,25 @@ var BookCell = React.createClass({
       />
       </AnimatableBackGroundColor>
     );
-    /* return(
-      <View ref="1">
-        <Text onPress = {() => {
-            console.log("t:%O",this)
-          }} ref="2">foo</Text>
-      </View>) */
     return(
-      <Animated.View style={{
+      <View style={{
           flexDirection:"row",
           width:SWIPEABLE_MAIN_WIDTH,
-          //height:30,//TODO:adjust
+          justifyContent: 0 < this.state.left ? "flex-start" : "flex-end",
         }}
-                     {...this._panResponder.panHandlers}
-      >
+            {...this._panResponder.panHandlers}>
+        {/* <View style={{
+        backgroundColor:"blue",
+        width:this.state.left,
+        height:10,
+        }}/> */}
         {leftButtons}
-        <View style={{flex:1}}></View>
-        {rightButtons}
         <Animated.View
             style={{
-                position:"absolute",
-                left:this.state.left,
+                //position:"absolute",
+                //left:this.state.left,
                 width: SWIPEABLE_MAIN_WIDTH,
+                height:30,
                 //height:50,//TODO:adjust
               }}>
           <View style={{
@@ -354,66 +389,56 @@ var BookCell = React.createClass({
             </Text>
           </View>
         </Animated.View>
+        {/* <View style={{
+        backgroundColor:"green",
+        width:SWIPEABLE_MAIN_WIDTH,
+        }}/> */}
+        {/* <View style={{
+        backgroundColor:"red",
+        width:-this.state.left,
+        }}/> */}
+        {rightButtons}
+      </View>)
+    return(
+      <Animated.View style={{
+          flexDirection:"row",
+          width:SWIPEABLE_MAIN_WIDTH,
+          //justifyContent:"flex-end",
+          //justifyContent:"center",
+          //height:30,//TODO:adjust
+        }}
+                     {...this._panResponder.panHandlers}
+      >
+        {leftButtons}
+        <View style={{flex:1}}></View>
+        <Animated.View
+            style={{
+                //position:"absolute",
+                //left:this.state.left,
+                width: SWIPEABLE_MAIN_WIDTH,
+                height:30,
+                //height:50,//TODO:adjust
+              }}>
+          <View style={{
+              backgroundColor:"blue",
+              borderWidth: 2,
+              flex:1,
+              flexDirection: 'column',
+              justifyContent:"center",
+            }}>
+            <Text style={{
+              }}
+                  numberOfLines={1}
+            >
+              {'main?'}
+            </Text>
+          </View>
+        </Animated.View>
+        {rightButtons}
       </Animated.View>
   )
 },
 });
-
-//TODO:remove
-var SwipeableButton = React.createClass({
-  render(){
-    return(
-      //style={{mergin:10}}
-      <View style={{flexDirection: 'row',
-                    alignItems: "center",//vertical
-                    padding:10,
-                    justifyContent:"flex-end",
-        }}>
-          <Animated.Text numberOfLines = {1} style = {{
-              //mergin:10,
-              //backgroundColor:"red",
-              //paddingHorizontal:10,
-              //flex:1,
-              //overflow:"hidden"
-              //marginLeft:10,
-              //position:"absolute"
-            }}
-                         onLayout={({nativeEvent:
-                                     {layout:{x,y,width, height}}})=>{
-                                       console.log("text:%O",x);
-                                     }}
-          >
-            {this.props.text}
-          </Animated.Text>
-          <View style={{flex:1}} />
-          <FAIcon name = "rocket" color = "white" style ={{
-              //color container(icon & text) vs width container(text only)
-              //try setNativeProps(AnimatedValue)
-              //marginHorizontal:10,
-              //margin:10,
-              //fixed width & flex cannot work correctory for justifyContent
-              //width:30
-              //backgroundColor:"green",
-              //position:"absolute",
-            }}
-                  onLayout={({nativeEvent:
-                              {layout:{x,y,width, height}}})=>{
-                                //console.log("icon:%O",x);
-                              }}
-          />
-          {/* <View style = {{
-          backgroundColor:"red",
-          flex:1,
-          padding:10,
-          }}>
-          </View> */}
-      </View>
-    )
-      //pass panx as props?
-      /* <View style={{flex:1}}>
-         </View> */
-  }
-})
 
 var SwipeableRow = React.createClass({
   _previousLeft: 0,

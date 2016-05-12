@@ -1145,6 +1145,61 @@ var MeasurableView = React.createClass({
   }
 });
 
+//TODO:remove
+var SwipeableButton = React.createClass({
+  render(){
+    return(
+      //style={{mergin:10}}
+      <View style={{flexDirection: 'row',
+                    alignItems: "center",//vertical
+                    padding:10,
+                    justifyContent:"flex-end",
+        }}>
+        <Animated.Text numberOfLines = {1} style = {{
+            //mergin:10,
+            //backgroundColor:"red",
+            //paddingHorizontal:10,
+            //flex:1,
+            //overflow:"hidden"
+            //marginLeft:10,
+            //position:"absolute"
+          }}
+                       onLayout={({nativeEvent:
+                                   {layout:{x,y,width, height}}})=>{
+                                     console.log("text:%O",x);
+                                   }}
+        >
+          {this.props.text}
+        </Animated.Text>
+        <View style={{flex:1}} />
+        <FAIcon name = "rocket" color = "white" style ={{
+            //color container(icon & text) vs width container(text only)
+            //try setNativeProps(AnimatedValue)
+            //marginHorizontal:10,
+            //margin:10,
+            //fixed width & flex cannot work correctory for justifyContent
+            //width:30
+            //backgroundColor:"green",
+            //position:"absolute",
+          }}
+                onLayout={({nativeEvent:
+                            {layout:{x,y,width, height}}})=>{
+                              //console.log("icon:%O",x);
+                            }}
+        />
+        {/* <View style = {{
+        backgroundColor:"red",
+        flex:1,
+        padding:10,
+        }}>
+        </View> */}
+      </View>
+    )
+      //pass panx as props?
+      /* <View style={{flex:1}}>
+         </View> */
+  }
+})
 
 var styles = StyleSheet.create({
   //for new swipe
