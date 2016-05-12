@@ -283,6 +283,7 @@ var BookCell = React.createClass({
     var leftButtons=(
       <SwipeableButton ref="left"
                        lock={this.releasing}
+                       width={this.state.left}
                        style={{
                            width: 0 < this.state.left ? this.state.left : 0.01,
                            //width: this.state.left
@@ -360,24 +361,14 @@ var BookCell = React.createClass({
           justifyContent: 0 < this.state.left ? "flex-start" : "flex-end",
         }}
             {...this._panResponder.panHandlers}>
-        {/* <View style={{
-        backgroundColor:"blue",
-        width:this.state.left,
-        height:10,
-        }}/> */}
         {leftButtons}
-        <Animated.View
+        <View
             style={{
-                //position:"absolute",
-                //left:this.state.left,
                 width: SWIPEABLE_MAIN_WIDTH,
-                height:30,
-                //height:50,//TODO:adjust
               }}>
           <View style={{
               backgroundColor:"blue",
               borderWidth: 2,
-              flex:1,
               flexDirection: 'column',
               justifyContent:"center",
             }}>
@@ -388,55 +379,10 @@ var BookCell = React.createClass({
               {'main?'}
             </Text>
           </View>
-        </Animated.View>
-        {/* <View style={{
-        backgroundColor:"green",
-        width:SWIPEABLE_MAIN_WIDTH,
-        }}/> */}
-        {/* <View style={{
-        backgroundColor:"red",
-        width:-this.state.left,
-        }}/> */}
+        </View>
         {rightButtons}
-      </View>)
-    return(
-      <Animated.View style={{
-          flexDirection:"row",
-          width:SWIPEABLE_MAIN_WIDTH,
-          //justifyContent:"flex-end",
-          //justifyContent:"center",
-          //height:30,//TODO:adjust
-        }}
-                     {...this._panResponder.panHandlers}
-      >
-        {leftButtons}
-        <View style={{flex:1}}></View>
-        <Animated.View
-            style={{
-                //position:"absolute",
-                //left:this.state.left,
-                width: SWIPEABLE_MAIN_WIDTH,
-                height:30,
-                //height:50,//TODO:adjust
-              }}>
-          <View style={{
-              backgroundColor:"blue",
-              borderWidth: 2,
-              flex:1,
-              flexDirection: 'column',
-              justifyContent:"center",
-            }}>
-            <Text style={{
-              }}
-                  numberOfLines={1}
-            >
-              {'main?'}
-            </Text>
-          </View>
-        </Animated.View>
-        {rightButtons}
-      </Animated.View>
-  )
+      </View>
+    )
 },
 });
 
