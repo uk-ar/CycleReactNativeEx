@@ -53,9 +53,16 @@ var Expandable = React.createClass({
   componentWillMount: function(){
     this.thresholds = [];
   },
+  componentWillReceiveProps: function(nextProps) {
+    if((nextProps.width != this.props.width) &&
+       //TODO:
+    ){
+
+    }
+  }
   render: function(){
     //render method called according to width
-
+    console.log("this.props:%O", this.props)
     //this.child exposed to parent
     this.child =
     this.thresholds.length == 0 ?
@@ -83,7 +90,7 @@ var Expandable = React.createClass({
     (<View
          style={this.props.style}
          onLayout={({nativeEvent:{layout:{width, height}}})=>{
-             //console.log("onlay", width, height, this)
+             console.log("onlay", width, height, this)
              if(this.props.lock){return};
              if((this.state.index < this.props.components.length - 1) &&
                 (this.thresholds[this.state.index] < width)){
@@ -156,23 +163,29 @@ var SwipeableButton = React.createClass({
     this.releaseTo = 0;
   },
   //shuld handle in parent
-  /* release: function(){
-     //this.releasing = true;
-     //anmation
-     //this.refs.left.child.props.onRelease()
-     //this.releasing = false;
-  }, */
+  release: function(){
+    //this.releasing = true;
+    //anmation
+    //this.refs.left.child.props.onRelease()
+    //this.releasing = false;
+  },
   render: function(){
     var closes = [false, true, true]
+    //
+    var {width, ...props} = this.props;
+    //{...props}...
+    //style={{width:}}
+    //console.log("wi:%O", width);
     return(
-      <AnimatableBackGroundColor {...this.props}
+      <AnimatableBackGroundColor {...props}
                colors={[
                  'rgb(158, 158, 158)',//grey
                  'rgb(33,150,243)',//blue
                  'rgb(76, 175, 80)',//green
                ]}
                colorIndex={this.state.componentIndex}>
-      <Expandable
+        <Expandable
+            width={width}
           style={{
               //width cannot shrink under padding
               //width: 0 < this.state.left ? this.state.left : 0.01,
@@ -281,15 +294,15 @@ var BookCell = React.createClass({
   render: function(){
     //genButton([a,b,c,d],left)
     var leftButtons=(
-      <SwipeableButton ref="left"
-                       lock={this.releasing}
+      //lock={this.releasing}
+      //
+      <SwipeableButton ref = "left"
                        width={this.state.left}
                        style={{
-                           width: 0 < this.state.left ? this.state.left : 0.01,
+                           //width: 0 < this.state.left ? this.state.left : 0.01,
                            //width: this.state.left
                          }}
-      />
-    );
+      />);
     //button input color, component, release action
     //close flag is parent props
     var rightButtons=(
@@ -301,57 +314,57 @@ var BookCell = React.createClass({
             ]}
           colorIndex={this.state.componentIndex}
           style={{
-              width: this.state.left < 0 ? -this.state.left : 0.01,//width cannot shrink under padding
+              //width: this.state.left < 0 ? -this.state.left : 0.01,//width cannot shrink under padding
             }}
       >
-      <Expandable
-            style={{
-                //width: -this.state.left,//width cannot shrink under padding
-              //right:0,
-              justifyContent:"center",
-              }}
-            lock={this.releasing}
-            onResize={(i)=>{
-                console.log("onre:%O", i)
-                  if(i == 0){
-                    this.releaseTo = 0;
-                  }else{
-                    this.releaseTo = - SWIPEABLE_MAIN_WIDTH;
-                  }
-                this.setState({componentIndex:i})
-              }}
-            components={[
-                <View style={{
-                    flexDirection:"row",
-                    //padding:10,//RN bug:clipped padding
-                  }}>
-                  <Text style={{margin:10,marginLeft:5}}>
-                              r1:right</Text>
-                </View>,
-              <View style={{
-                  width:SWIPEABLE_MAIN_WIDTH/2,
-                  flexDirection:"row",
-                  justifyContent:"flex-end",
-                  alignSelf:"flex-end",
-                }}>
-                <Text style={{margin:10,marginRight:0}}>
-                  r1:left</Text>
-                <Text style={{margin:10,marginLeft:5}}>
-                  r1:right</Text>
-              </View>,
-              <View style={{
-                  width:SWIPEABLE_MAIN_WIDTH,
-                  flexDirection:"row",
-                  justifyContent:"flex-end",
-                  alignSelf:"flex-end",
-                }}>
-                <Text style={{margin:10,marginRight:0}}>
-                  r2:left</Text>
-                <Text style={{margin:10,marginLeft:5}}>
-                  r2:right</Text>
-              </View>,
-              ]}
-      />
+        {/* <Expandable
+        style={{
+        //width: -this.state.left,//width cannot shrink under padding
+        //right:0,
+        justifyContent:"center",
+        }}
+        lock={this.releasing}
+        onResize={(i)=>{
+        console.log("onre:%O", i)
+        if(i == 0){
+        this.releaseTo = 0;
+        }else{
+        this.releaseTo = - SWIPEABLE_MAIN_WIDTH;
+        }
+        this.setState({componentIndex:i})
+        }}
+        components={[
+        <View style={{
+        flexDirection:"row",
+        //padding:10,//RN bug:clipped padding
+        }}>
+        <Text style={{margin:10,marginLeft:5}}>
+        r1:right</Text>
+        </View>,
+        <View style={{
+        width:SWIPEABLE_MAIN_WIDTH/2,
+        flexDirection:"row",
+        justifyContent:"flex-end",
+        alignSelf:"flex-end",
+        }}>
+        <Text style={{margin:10,marginRight:0}}>
+        r1:left</Text>
+        <Text style={{margin:10,marginLeft:5}}>
+        r1:right</Text>
+        </View>,
+        <View style={{
+        width:SWIPEABLE_MAIN_WIDTH,
+        flexDirection:"row",
+        justifyContent:"flex-end",
+        alignSelf:"flex-end",
+        }}>
+        <Text style={{margin:10,marginRight:0}}>
+        r2:left</Text>
+        <Text style={{margin:10,marginLeft:5}}>
+        r2:right</Text>
+        </View>,
+        ]}
+        /> */}
       </AnimatableBackGroundColor>
     );
     return(
