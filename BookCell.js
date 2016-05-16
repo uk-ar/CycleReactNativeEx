@@ -48,26 +48,41 @@ var Expandable = React.createClass({
   getInitialState: function() {
     return {
       index:null,
+      width:0.01,
     }
   },
   componentWillMount: function(){
     this.thresholds = [];
   },
   componentWillReceiveProps: function(nextProps) {
-    if((nextProps.width != this.props.width) &&
-       //TODO:
-    ){
-
+    //console.log("next:%O",nextProps);
+    var width = nextProps.width;
+    this.setState({width: width});
+    if(this.props.lock){return};
+    //this.width = width;
+    if((this.state.index < this.props.components.length - 1) &&
+       (this.thresholds[this.state.index] < width)){
+         this.setState({index: this.state.index + 1});
+         //console.log("set+1");
+         this.props.onResize &&
+         this.props.onResize(this.state.index+1);
+    }else if((0 < this.state.index) &&
+             (width < this.thresholds[this.state.index - 1] )){
+               this.setState({index: this.state.index - 1});
+               //console.log("set-1");
+               this.props.onResize &&
+               this.props.onResize(this.state.index-1);
     }
-  }
+  },
   render: function(){
     //render method called according to width
-    console.log("this.props:%O", this.props)
+    //console.log("this.props:%O", this.props)
     //this.child exposed to parent
-    this.child =
+
+    return(
     this.thresholds.length == 0 ?
     //TODO:...this.props
-    (<View onLayout={()=> this.setState({index:0})}>
+    <View onLayout={()=> this.setState({index:0})}>
         {this.props.components.map((elem,i)=>{
            return (
              <View
@@ -85,31 +100,15 @@ var Expandable = React.createClass({
                {elem}
              </View>
            )})}
-    </View>)
+    </View>
       :
-    (<View
-         style={this.props.style}
-         onLayout={({nativeEvent:{layout:{width, height}}})=>{
-             console.log("onlay", width, height, this)
-             if(this.props.lock){return};
-             if((this.state.index < this.props.components.length - 1) &&
-                (this.thresholds[this.state.index] < width)){
-                  this.setState({index: this.state.index + 1});
-                  console.log("set+1");
-                  this.props.onResize &&
-                  this.props.onResize(this.state.index);
-             }else if((0 < this.state.index) &&
-                      (width < this.thresholds[this.state.index - 1] )){
-                        this.setState({index: this.state.index - 1});
-                        console.log("set-1");
-                        this.props.onResize &&
-                        this.props.onResize(this.state.index);
-             }
-           }}>
+    <View
+         style={[this.props.style,{width: this.state.width}]}
+     >
       { React.cloneElement(this.props.components[this.state.index],
                            {ref:(c) => {this.child = c }})}
     </View>)
-      return(this.child)
+      //return(this.child)
   }
 });
 
@@ -156,26 +155,52 @@ var SwipeableButton = React.createClass({
   getInitialState: function() {
     return {
       componentIndex:0,
+      width:0,
+      releasing:false,
     }
   },
   componentWillMount: function() {
-    this.releasing = false;
-    this.releaseTo = 0;
+    //this.releasing = false;
+    //Width cannot be animated value, because of children method call.
+    //this.width = 0;
+    this.closes = [false, true, true];
   },
-  //shuld handle in parent
+  componentWillReceiveProps: function(nextProps) {
+    //setState(this.props);
+    if(nextProps.width != this.props.width){
+      this.setState({width: nextProps.width});
+    }
+  },
+  //shuld handle in parent?
   release: function(){
     //this.releasing = true;
+    this.setState({releasing:true});
     //anmation
     //this.refs.left.child.props.onRelease()
-    //this.releasing = false;
+    this.refs.root.child.props.onRelease();
+    //this.releaseTo = this.closes[i] ? SWIPEABLE_MAIN_WIDTH : 0;
+    var animatedWidth = new Animated.Value(this.props.width);
+    Animated.timing(
+      animatedWidth,
+      {toValue: this.closes[this.state.componentIndex] ?
+       SWIPEABLE_MAIN_WIDTH : 0.01,
+       duration: 180,}
+    ).start()//(e)=> this.releasing = false);
+    animatedWidth.addListener(({value:value}) => {
+      //this.setState({left: value,})
+      this.setState({width: value});
+      //this.width = value;
+    });
+    
   },
   render: function(){
-    var closes = [false, true, true]
+    //console.log("this",this);
     //
     var {width, ...props} = this.props;
     //{...props}...
     //style={{width:}}
     //console.log("wi:%O", width);
+    console.log("re:%O", this.releasing);
     return(
       <AnimatableBackGroundColor {...props}
                colors={[
@@ -185,19 +210,19 @@ var SwipeableButton = React.createClass({
                ]}
                colorIndex={this.state.componentIndex}>
         <Expandable
-            width={width}
-          style={{
+            ref="root"
+            width={this.state.width}
+            style={{
               //width cannot shrink under padding
               //width: 0 < this.state.left ? this.state.left : 0.01,
               height:50,//TODO:support height centering
               justifyContent:"center",
             }}
-          lock={this.props.lock}
+          lock={this.state.releasing}
           onResize={(i)=>{
               //TODO:shuld call from first time?
               //console.log("onre:%O", i)
               this.setState({componentIndex:i});
-              this.releaseTo = closes[i] ? SWIPEABLE_MAIN_WIDTH : 0;
             }}
           components={[
             <View onRelease={()=> console.log("1")}
@@ -264,12 +289,13 @@ var BookCell = React.createClass({
         //this.refs.left.child.props.onRelease();
 
         //TODO:add swipeout method or props to buttons
-        Animated.timing(
+        /* Animated.timing(
           this._panX,
           {toValue: this.releaseTo ,
            duration: 180,}
-        ).start();
-        this.releasing = true;
+        ).start();*/
+        //this.releasing = true;
+        this.refs.left.release();
       },
 
       onShouldBlockNativeResponder: (evt, gestureState) => {
