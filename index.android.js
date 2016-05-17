@@ -12,7 +12,7 @@ TODO:
  */
 'use strict';
 
-let React = require('react-native');
+import React, { Component } from 'react';
 let Rx = require('rx');
 var _ = require('lodash');
 let {run} = require('@cycle/core');
@@ -32,24 +32,31 @@ let {
   makeEventEmitterDriver,
 } = require('./common');
 
-var {
-  AppRegistry,
+import {
+  TouchableOpacity,
+  ActivityIndicatorIOS,
+  ListView,
+  Platform,
+  ProgressBarAndroid,
   StyleSheet,
   Text,
-  Image,
-  ListView,
   View,
-  Platform,
+  Image,
   TouchableHighlight,
   TouchableNativeFeedback,
-  ToastAndroid,
+  LayoutAnimation,
+  // cell
+  PixelRatio,
+  // searchBar
+  TextInput,
   ToolbarAndroid,
   Navigator,
-  BackAndroid,
-  WebView,
-  AsyncStorage,
-  UIManager
-} = React;
+  NavigatorIOS,
+  Animated,
+  ScrollView,
+  PanResponder,
+  UIManager,
+} from 'react-native';
 
 UIManager.setLayoutAnimationEnabledExperimental &&   UIManager.setLayoutAnimationEnabledExperimental(true);
 

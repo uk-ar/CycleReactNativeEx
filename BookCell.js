@@ -5,7 +5,7 @@ var FAIcon = require('react-native-vector-icons/FontAwesome');
 var MIcon = require('react-native-vector-icons/MaterialIcons');
 var GiftedSpinner = require('react-native-gifted-spinner');
 var Emoji = require('react-native-emoji');
-var Swipeout = require('react-native-swipeout');
+
 import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
 var _ = require('lodash');
 
@@ -104,9 +104,8 @@ var Expandable = React.createClass({
       :
     <View
          style={[this.props.style,{width: this.state.width}]}
-     >
-      { React.cloneElement(this.props.components[this.state.index],
-                           {ref:(c) => {this.child = c }})}
+    >
+      {this.props.components[this.state.index]}
     </View>)
       //return(this.child)
   }
@@ -151,19 +150,20 @@ var AnimatableBackGroundColor = React.createClass({
   }
 });
 
-var SwipeableButton = React.createClass({
+var SwipeableButtons = React.createClass({
   getInitialState: function() {
     return {
       componentIndex:0,
-      width:0,
-      releasing:false,
+      width:0.01,
     }
   },
   componentWillMount: function() {
-    //this.releasing = false;
+    this.releasing = false;
     //Width cannot be animated value, because of children method call.
-    //this.width = 0;
-    this.closes = [false, true, true];
+    this.onRelease = this.props.buttons[0].props.onRelease;
+    //this.colors = this.props.buttons.map((elem,i)=> elem.props.backgroundColor);
+    this.colors = this.props.buttons.map(
+      (elem,i)=> elem.props.backgroundColor);
   },
   componentWillReceiveProps: function(nextProps) {
     //setState(this.props);
@@ -173,44 +173,61 @@ var SwipeableButton = React.createClass({
   },
   //shuld handle in parent?
   release: function(){
-    //this.releasing = true;
-    this.setState({releasing:true});
+    this.onRelease && this.onRelease();
     //anmation
-    //this.refs.left.child.props.onRelease()
-    this.refs.root.child.props.onRelease();
-    //this.releaseTo = this.closes[i] ? SWIPEABLE_MAIN_WIDTH : 0;
     var animatedWidth = new Animated.Value(this.props.width);
+    this.releasing = true;
+    var close = this.props.buttons[this.state.componentIndex].props.close;
     Animated.timing(
       animatedWidth,
-      {toValue: this.closes[this.state.componentIndex] ?
-       SWIPEABLE_MAIN_WIDTH : 0.01,
+      {toValue: close ? SWIPEABLE_MAIN_WIDTH : 0.01,
        duration: 180,}
-    ).start()//(e)=> this.releasing = false);
-    animatedWidth.addListener(({value:value}) => {
-      //this.setState({left: value,})
-      this.setState({width: value});
-      //this.width = value;
+    ).start((e)=> {
+      this.releasing = false;
+      if(!close){ this.setState({componentIndex:0})};
     });
-    
+    animatedWidth.addListener(({value:value}) => {
+      this.setState({width: value});
+    });
   },
   render: function(){
-    //console.log("this",this);
-    //
+    var styles = this.props.direction == "left" ? [{
+      flexDirection:"row",
+      justifyContent:"flex-end",
+      backgroundColor:null,
+      //padding:10,//RN bug:clipped padding
+    },{
+      flexDirection:"row",
+      width:SWIPEABLE_MAIN_WIDTH/2,
+      backgroundColor:null,
+    },{
+      flexDirection:"row",
+      width:SWIPEABLE_MAIN_WIDTH,
+      backgroundColor:null,
+    }] : [{
+      flexDirection:"row",
+      backgroundColor:null,
+      //padding:10,//RN bug:clipped padding
+    },{
+      width:SWIPEABLE_MAIN_WIDTH/2,
+      flexDirection:"row",
+      justifyContent:"flex-end",
+      alignSelf:"flex-end",
+      backgroundColor:null,
+    },{
+      width:SWIPEABLE_MAIN_WIDTH,
+      flexDirection:"row",
+      justifyContent:"flex-end",
+      alignSelf:"flex-end",
+      backgroundColor:null,
+    }];
     var {width, ...props} = this.props;
-    //{...props}...
-    //style={{width:}}
-    //console.log("wi:%O", width);
-    console.log("re:%O", this.releasing);
+    //               colors={this.props.colors}
     return(
       <AnimatableBackGroundColor {...props}
-               colors={[
-                 'rgb(158, 158, 158)',//grey
-                 'rgb(33,150,243)',//blue
-                 'rgb(76, 175, 80)',//green
-               ]}
+               colors={this.colors}
                colorIndex={this.state.componentIndex}>
         <Expandable
-            ref="root"
             width={this.state.width}
             style={{
               //width cannot shrink under padding
@@ -218,53 +235,29 @@ var SwipeableButton = React.createClass({
               height:50,//TODO:support height centering
               justifyContent:"center",
             }}
-          lock={this.state.releasing}
-          onResize={(i)=>{
-              //TODO:shuld call from first time?
-              //console.log("onre:%O", i)
-              this.setState({componentIndex:i});
-            }}
-          components={[
-            <View onRelease={()=> console.log("1")}
-                      style={{
-                          flexDirection:"row",
-                          justifyContent:"flex-end",
-                          //alignSelf:"center",
-                          //padding:10,//RN bug:clipped padding
-                        }}>
-              <Text style={{margin:10,marginRight:5}}>
-                          l1:left</Text>
-            </View>,
-            <View onRelease={()=> console.log("2")}
-                      style={{
-                          flexDirection:"row",
-                          width:SWIPEABLE_MAIN_WIDTH/2,
-                        }}>
-              <Text style={{margin:10,marginRight:5}}>
-                          l1:left</Text>
-              <Text style={{margin:10,marginLeft:0}}>
-                          l1:right</Text>
-            </View>,
-            <View onRelease={()=> console.log("3")}
-                      style={{
-                          flexDirection:"row",
-                          width:SWIPEABLE_MAIN_WIDTH,
-                        }}>
-              <Text style={{margin:10,marginRight:5}}>
-                          l2:left</Text>
-              <Text style={{margin:10,marginLeft:0}}>
-                          l2:right</Text>
-            </View>,
-          ]}
-      />
-    </AnimatableBackGroundColor>)
+            lock={this.releasing}
+            onResize={(i)=>{
+                //TODO:shuld call from first time?
+                this.onRelease = this.props.buttons[i].props.onRelease;
+                this.setState({componentIndex:i});
+              }}
+            components={this.props.buttons.map((elem,i)=>{
+                //TODO:can remove flatten?
+                return(React.cloneElement(
+                  elem,
+                  {style:[
+                    StyleSheet.flatten(elem.props.style),
+                    styles[i]
+                  ]}))//need merge backgroundColor
+              })}
+        />
+      </AnimatableBackGroundColor>)
   },
 })
 
 var BookCell = React.createClass({
   componentWillMount: function() {
     this._panX = new Animated.Value(0);
-    this.releasing = false;
     this.releaseTo = 0;
 
     this._panResponder = PanResponder.create({
@@ -274,36 +267,19 @@ var BookCell = React.createClass({
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
       //onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
 
-      onPanResponderGrant: (evt, gestureState) => {
-        //this._panX.setOffset(this._previousLeft);
-        //this._panX.setValue(0);
-        this.releasing = false;
-      },
+      onPanResponderGrant: (evt, gestureState) => {},
       onPanResponderMove: Animated.event([
         null,
         {dx: this._panX}
       ]),
       //onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
-        //this._previousLeft += gestureState.dx;
-        //this.refs.left.child.props.onRelease();
-
-        //TODO:add swipeout method or props to buttons
-        /* Animated.timing(
-          this._panX,
-          {toValue: this.releaseTo ,
-           duration: 180,}
-        ).start();*/
-        //this.releasing = true;
-        this.refs.left.release();
+        this.refs.leftButtons.release();
+        this.refs.rightButtons.release();
       },
 
-      onShouldBlockNativeResponder: (evt, gestureState) => {
-        return true;
-      },
+      onShouldBlockNativeResponder: (evt, gestureState) => true,
     });
-    //console.log("created");
-    console.log("will m");
     this._panX.addListener(({value:value}) => {
       this.setState({left: value,})
     });
@@ -320,78 +296,70 @@ var BookCell = React.createClass({
   render: function(){
     //genButton([a,b,c,d],left)
     var leftButtons=(
-      //lock={this.releasing}
-      //
-      <SwipeableButton ref = "left"
-                       width={this.state.left}
-                       style={{
-                           //width: 0 < this.state.left ? this.state.left : 0.01,
-                           //width: this.state.left
-                         }}
+      <SwipeableButtons
+          ref="leftButtons"
+          direction="left"
+          width={this.state.left}
+          buttons={[
+              <View onRelease={()=> console.log("1")}
+                    close={false}
+                    backgroundColor='rgb(158, 158, 158)'
+                                     >
+                <Text style={{margin:10,marginRight:5}}>
+                            l1:left</Text>
+              </View>,
+              <View onRelease={()=> console.log("2")}
+                    close={true}
+                    backgroundColor='rgb(33,150,243)'
+                                     >
+                <Text style={{margin:10,marginRight:5}}>
+                            l1:left</Text>
+                <Text style={{margin:10,marginLeft:0}}>
+                            l1:right</Text>
+              </View>,
+              <View onRelease={()=> console.log("3")}
+                    close={true}
+                    backgroundColor='rgb(76, 175, 80)'
+                                     >
+                <Text style={{margin:10,marginRight:5}}>
+                            l2:left</Text>
+                <Text style={{margin:10,marginLeft:0}}>
+                            l2:right</Text>
+              </View>,
+            ]}
       />);
     //button input color, component, release action
     //close flag is parent props
     var rightButtons=(
-      <AnimatableBackGroundColor
-          colors={[
-              'rgb(158, 158, 158)',//grey
-              '#9C27B0',//purple
-              '#F44336',//red
+      <SwipeableButtons
+          ref="rightButtons"
+          direction="right"
+          width={this.state.left < 0 ? -this.state.left : 0.01}
+          buttons={[
+              <View onRelease={()=> console.log("r1")}
+                    backgroundColor='rgb(158, 158, 158)'
+                    close={false}>
+                <Text style={{margin:10,marginLeft:5}}>
+                            r1:right</Text>
+              </View>,
+              <View onRelease={()=> console.log("r2")}
+                    backgroundColor='#9C27B0'
+                    close={true}>
+                <Text style={{margin:10,marginRight:0}}>
+                            r1:left</Text>
+                <Text style={{margin:10,marginLeft:5}}>
+                            r1:right</Text>
+              </View>,
+              <View onRelease={()=> console.log("r3")}
+                    backgroundColor='#F44336'
+                    close={true}>
+                <Text style={{margin:10,marginRight:0}}>
+                            r2:left</Text>
+                <Text style={{margin:10,marginLeft:5}}>
+                            r2:right</Text>
+              </View>,
             ]}
-          colorIndex={this.state.componentIndex}
-          style={{
-              //width: this.state.left < 0 ? -this.state.left : 0.01,//width cannot shrink under padding
-            }}
-      >
-        {/* <Expandable
-        style={{
-        //width: -this.state.left,//width cannot shrink under padding
-        //right:0,
-        justifyContent:"center",
-        }}
-        lock={this.releasing}
-        onResize={(i)=>{
-        console.log("onre:%O", i)
-        if(i == 0){
-        this.releaseTo = 0;
-        }else{
-        this.releaseTo = - SWIPEABLE_MAIN_WIDTH;
-        }
-        this.setState({componentIndex:i})
-        }}
-        components={[
-        <View style={{
-        flexDirection:"row",
-        //padding:10,//RN bug:clipped padding
-        }}>
-        <Text style={{margin:10,marginLeft:5}}>
-        r1:right</Text>
-        </View>,
-        <View style={{
-        width:SWIPEABLE_MAIN_WIDTH/2,
-        flexDirection:"row",
-        justifyContent:"flex-end",
-        alignSelf:"flex-end",
-        }}>
-        <Text style={{margin:10,marginRight:0}}>
-        r1:left</Text>
-        <Text style={{margin:10,marginLeft:5}}>
-        r1:right</Text>
-        </View>,
-        <View style={{
-        width:SWIPEABLE_MAIN_WIDTH,
-        flexDirection:"row",
-        justifyContent:"flex-end",
-        alignSelf:"flex-end",
-        }}>
-        <Text style={{margin:10,marginRight:0}}>
-        r2:left</Text>
-        <Text style={{margin:10,marginLeft:5}}>
-        r2:right</Text>
-        </View>,
-        ]}
-        /> */}
-      </AnimatableBackGroundColor>
+      />
     );
     return(
       <View style={{
@@ -399,30 +367,28 @@ var BookCell = React.createClass({
           width:SWIPEABLE_MAIN_WIDTH,
           justifyContent: 0 < this.state.left ? "flex-start" : "flex-end",
         }}
-            {...this._panResponder.panHandlers}>
+            {...this._panResponder.panHandlers}      
+      >
         {leftButtons}
         <View
-            style={{
+            style={[{
+                flexDirection:"row",
+                alignItems:"center",
+                justifyContent:"center",
+                backgroundColor:"green",
+                borderWidth: 2,
+              },{
                 width: SWIPEABLE_MAIN_WIDTH,
-              }}>
-          <View style={{
-              backgroundColor:"blue",
-              borderWidth: 2,
-              flexDirection: 'column',
-              justifyContent:"center",
-            }}>
-            <Text style={{
-              }}
-                  numberOfLines={1}
-            >
+              }]}>          
+            <Text>
               {'main?'}
             </Text>
-          </View>
+            <FAIcon name="rocket" size={30}/>
         </View>
         {rightButtons}
       </View>
-    )
-},
+    )      
+  },
 });
 
 var SwipeableRow = React.createClass({

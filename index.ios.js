@@ -4,7 +4,7 @@
  */
 'use strict';
 
-let React = require('react-native');
+import React, { Component } from 'react';
 let Rx = require('rx');
 var _ = require('lodash');
 let {run} = require('@cycle/core');
@@ -21,21 +21,30 @@ let {
   MOCKED_MOVIES_DATA,
 } = require('./common');
 
-var {
-  AppRegistry,
+import {
+  TouchableOpacity,
+  ActivityIndicatorIOS,
+  ListView,
+  Platform,
+  ProgressBarAndroid,
   StyleSheet,
   Text,
-  Image,
-  ListView,
   View,
-  Platform,
-  ToastAndroid,
+  Image,
+  TouchableHighlight,
+  TouchableNativeFeedback,
+  LayoutAnimation,
+  // cell
+  PixelRatio,
+  // searchBar
+  TextInput,
   ToolbarAndroid,
   Navigator,
-  BackAndroid,
-  WebView,
-  AsyncStorage
-} = React;
+  NavigatorIOS,
+  Animated,
+  ScrollView,
+  PanResponder,
+} from 'react-native';
 
 let {SearchScreen, InBoxScreen, GiftedNavigator} = require('./SearchScreen');
 

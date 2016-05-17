@@ -1,6 +1,6 @@
 'use strict';
 
-let React = require('react-native');
+import React, { Component } from 'react';
 let Rx = require('rx');
 var _ = require('lodash');
 let {run} = require('@cycle/core');
@@ -19,23 +19,32 @@ let {
   MOCKED_MOVIES_DATA,
 } = require('./common');
 
-var {
-  AppRegistry,
+import {
+  TouchableOpacity,
+  ActivityIndicatorIOS,
+  ListView,
+  Platform,
+  ProgressBarAndroid,
   StyleSheet,
   Text,
-  Image,
-  ListView,
   View,
-  Platform,
+  Image,
   TouchableHighlight,
   TouchableNativeFeedback,
-  ToastAndroid,
+  LayoutAnimation,
+  // cell
+  PixelRatio,
+  // searchBar
+  TextInput,
   ToolbarAndroid,
   Navigator,
+  NavigatorIOS,
+  Animated,
+  ScrollView,
+  PanResponder,
   BackAndroid,
-  WebView,
-  AsyncStorage
-} = React;
+  AsyncStorage,
+} from 'react-native';
 
 function model(actions){
   const searchRequest$ = actions.changeSearch$.debounce(500)

@@ -1,13 +1,12 @@
-var React = require('react-native');
+import React, { Component } from 'react';
 let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
 var FAIcon = require('react-native-vector-icons/FontAwesome');
 var MIcon = require('react-native-vector-icons/MaterialIcons');
 var GiftedSpinner = require('react-native-gifted-spinner');
 
-var Swipeout = require('react-native-swipeout');
 import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
 
-var {
+import {
   TouchableOpacity,
   ActivityIndicatorIOS,
   ListView,
@@ -28,8 +27,9 @@ var {
   Navigator,
   NavigatorIOS,
   Animated,
-  UIManager
-} = React;
+  ScrollView,
+  PanResponder,
+} from 'react-native';
 
 var GiftedNavigator = React.createClass({
   componentDidMount: function(){
@@ -99,7 +99,7 @@ var BookListView = React.createClass({
           dataSource = {
             //FIXME:
             /* dataSource.cloneWithRows(this.state.dataSource) */
-            dataSource.cloneWithRows(['row 1', 'row 2'])}
+            dataSource.cloneWithRows(['row 1', 'row 2','row 3'])}
           renderRow ={(movie, sectionID, rowID, highlightRowFunc) =>
             <BookCell
                 movie={movie}

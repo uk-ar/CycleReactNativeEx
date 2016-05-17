@@ -1,26 +1,35 @@
-var React = require('react-native');
+
+import React, { Component } from 'react';
 let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
 var Icon = require('react-native-vector-icons/FontAwesome');
 var GiftedSpinner = require('react-native-gifted-spinner');
 var Emoji = require('react-native-emoji');
 
-var {
-  AppRegistry,
+import {
+  TouchableOpacity,
+  ActivityIndicatorIOS,
+  ListView,
+  Platform,
+  ProgressBarAndroid,
   StyleSheet,
   Text,
-  Image,
-  ListView,
   View,
-  Platform,
+  Image,
   TouchableHighlight,
   TouchableNativeFeedback,
-  ToastAndroid,
+  LayoutAnimation,
+  // cell
+  PixelRatio,
+  // searchBar
+  TextInput,
   ToolbarAndroid,
   Navigator,
-  BackAndroid,
-  WebView,
-  AsyncStorage
-} = React;
+  NavigatorIOS,
+  Animated,
+  ScrollView,
+  PanResponder,
+} from 'react-native';
+
 //rx js output confusing message when component not imported
 
 var BookScreen = React.createClass({

@@ -1,13 +1,30 @@
 'use strict';
 
-var React = require('react-native');
-var {
+import React, { Component } from 'react';
+import {
+  TouchableOpacity,
   ActivityIndicatorIOS,
-  TextInput,
+  ListView,
+  Platform,
+  ProgressBarAndroid,
   StyleSheet,
+  Text,
   View,
   Image,
-} = React;
+  TouchableHighlight,
+  TouchableNativeFeedback,
+  LayoutAnimation,
+  // cell
+  PixelRatio,
+  // searchBar
+  TextInput,
+  ToolbarAndroid,
+  Navigator,
+  NavigatorIOS,
+  Animated,
+  ScrollView,
+  PanResponder,
+} from 'react-native';
 
 let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
 
