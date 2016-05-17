@@ -33,23 +33,27 @@ var IS_RIPPLE_EFFECT_SUPPORTED = Platform.Version >= 21;
 var SearchBar = React.createClass({
   render: function() {
     var loadingView;
+    //FIXME:dynamic view and cycle view?
     if (this.props.isLoading) {
       loadingView = (
         <ProgressBarAndroid
+          key="loadingView"
           styleAttr="Large"
           style={styles.spinner}
         />
       );
     } else {
-      loadingView = <View style={styles.spinner} />;
+      loadingView = <View
+                        key = "loadingView"
+                        style={styles.spinner} />;
     }
     var background = IS_RIPPLE_EFFECT_SUPPORTED ?
       TouchableNativeFeedback.SelectableBackgroundBorderless() :
       TouchableNativeFeedback.SelectableBackground();
     return (
-
       <CycleView style = {styles.searchBar} key = "search">
         <TouchableNativeFeedback
+            key = "bar"
             background={background}
             onPress={() => this.refs.input && this.refs.input.focus()}>
           <View>
@@ -60,6 +64,7 @@ var SearchBar = React.createClass({
           </View>
         </TouchableNativeFeedback>
         <TextInput
+          key="input"
           ref="input"
           autoCapitalize="none"
           autoCorrect={false}
