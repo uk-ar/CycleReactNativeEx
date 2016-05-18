@@ -32,6 +32,7 @@ import {
   Animated,
   ScrollView,
   PanResponder,
+  ToastAndroid,
 } from 'react-native';
 
 var Dimensions = require('Dimensions');
@@ -231,11 +232,17 @@ var SwipeableButtons = React.createClass({
       <AnimatableBackGroundColor {...props}
                colors={this.colors}
                colorIndex={this.state.componentIndex}>
+        <ToggleView
+            hidden={false}
+            horizontal={true}
+            onAnimationEnd={(e)=>
+              ToastAndroid.show('anim done', ToastAndroid.SHORT)
+                           }
+        >
         <Expandable
             width={this.state.width}
             style={{
               //width cannot shrink under padding
-              //width: 0 < this.state.left ? this.state.left : 0.01,
               height:50,//TODO:support height centering
               justifyContent:"center",
             }}
@@ -254,6 +261,7 @@ var SwipeableButtons = React.createClass({
                   ]})) //for merge backgroundColor
               })}
         />
+        </ToggleView>
       </AnimatableBackGroundColor>)
   },
 });
@@ -294,8 +302,7 @@ var ToggleView = React.createClass({
           {toValue: this.props.opacity ? 0 : 1 }
         )
       ]).start((e)=>{
-        //this.props.onAnimationEnd
-        console.log("ev:",e,this);
+        this.props.onAnimationEnd && this.props.onAnimationEnd(e)
         this.animating=false;
       })
     }
@@ -432,14 +439,15 @@ var BookCell = React.createClass({
       />
     );
     return(
-      <ToggleView hidden={this.state.hidden}
-                  vertical={true}
-                  style={{
-                      flexDirection:"row",
-                      width:SWIPEABLE_MAIN_WIDTH,
-                      justifyContent: 0 < this.state.left ? "flex-start" : "flex-end",
-                    }}
-                  {...this._panResponder.panHandlers}
+      <ToggleView
+          hidden={this.state.hidden}
+          vertical={true}
+          style={{
+              flexDirection:"row",
+              width:SWIPEABLE_MAIN_WIDTH,
+              justifyContent: 0 < this.state.left ? "flex-start" : "flex-end",
+            }}
+          {...this._panResponder.panHandlers}
       >
         {leftButtons}
         <View
