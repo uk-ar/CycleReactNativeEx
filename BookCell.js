@@ -271,7 +271,7 @@ var ToggleView = React.createClass({
   },
   _onLayout: function({nativeEvent: { layout: {x, y, width, height}}}){
     if(this.animating || this.props.hidden){return};
-    console.log("onlay:%O,%O",this.animating,height);
+    //console.log("onlay:%O,%O",this.animating,height);
     this.contentHeight = height;
     this.contentWidth = width;
   },
@@ -301,17 +301,19 @@ var ToggleView = React.createClass({
     }
   },
   render: function(){
+    //drop own props
     var {hidden, opacity, ...props} = this.props;
 
     return(
-      <Animated.View {...props}
-                     onLayout={this._onLayout}
-                     style={[this.props.style,
-                             {width:this.state.value.x,
-                              height:this.state.value.y,
-                              opacity:this.state.opacity}
-                       ]}>
-        {this.props.children}
+      <Animated.View
+      {...props}
+      onLayout={this._onLayout}
+      style={[this.props.style,
+              this.props.horizontal ? {width:this.state.value.x} : null,
+              this.props.vertical ? {height:this.state.value.y} : null,
+              this.props.opacity ? {opacity:this.state.opacity} :null,
+      ]}>
+      {this.props.children}
       </Animated.View>
     )
   }
@@ -430,17 +432,14 @@ var BookCell = React.createClass({
       />
     );
     return(
-      //horizontal={true}
-      //vertical={true}
       <ToggleView hidden={this.state.hidden}
-                  opacity={true}
-      >
-      <View style={{
-          flexDirection:"row",
-          width:SWIPEABLE_MAIN_WIDTH,
-          justifyContent: 0 < this.state.left ? "flex-start" : "flex-end",
-        }}
-            {...this._panResponder.panHandlers}
+                  vertical={true}
+                  style={{
+                      flexDirection:"row",
+                      width:SWIPEABLE_MAIN_WIDTH,
+                      justifyContent: 0 < this.state.left ? "flex-start" : "flex-end",
+                    }}
+                  {...this._panResponder.panHandlers}
       >
         {leftButtons}
         <View
@@ -463,7 +462,6 @@ var BookCell = React.createClass({
             <FAIcon name="rocket" size={30}/>
         </View>
         {rightButtons}
-      </View>
       </ToggleView>
     )
   },
