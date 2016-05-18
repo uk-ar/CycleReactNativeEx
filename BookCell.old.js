@@ -1200,6 +1200,68 @@ var SwipeableButton = React.createClass({
   }
 })
 
+  //Visible toggle hidden display
+  var ToggleView = React.createClass({
+    getInitialState: function() {
+      return {
+        //height:new Animated.Value(0),
+        animating:false,
+      }
+    },
+    componentWillMount: function() {
+      //this.animating = false;
+      this.height = new Animated.Value(0);
+      this.height.addListener(({value:value}) => {
+        console.log("this.height:",value)
+      });
+    },
+    _onLayout: function({nativeEvent: { layout: {x, y, width, height}}}){
+      //this.props.onLayout &&
+      if(this.animating){return}
+      //this.contentWidth = width;
+      this.height.setValue(height);
+      //this.contentHeight = height;
+    },
+    componentWillReceiveProps: function(nextProps) {
+      if (nextProps.hidden !== this.props.hidden) {
+        this.setState({animating: true});
+        //console.log("nextProps.hidden:%O",nextProps.hidden);
+        Animated.timing(
+          this.height,
+          {toValue: 0,
+           duration: 180,}
+        ).start((e)=>{
+          console.log("ev:",e);
+          this.setState({animating: false});
+        })
+          //this.height.setValue(this.contentHeight);
+          /* this.setState(
+             {height:this.contentHeight},()=>{
+             console.log("this.state.height:%O",this.state.height);
+             Animated.timing(
+             this.state.height,
+             {toValue: 0,
+             duration: 180,}
+             ).start()
+             }) */
+      }
+    },
+    render: function(){
+      //console.log(this);
+      var {hidden, ...props} = this.props;
+      return(
+        <Animated.View {...this.props}
+                     onLayout={this._onLayout}
+                     style={[this.props.style,
+                             //TODO:width
+                             {height:this.state.animating ?
+                              this.height : null}]}>
+          {this.props.children}
+        </Animated.View>
+      )
+    }
+  })
+  
 var styles = StyleSheet.create({
   //for new swipe
   /* container: {

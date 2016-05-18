@@ -133,11 +133,12 @@ var AnimatableBackGroundColor = React.createClass({
         this.colorIndex,
         {toValue: nextProps.colorIndex,//interpolate?
          duration: 180,} //TODO:add props
-      ).start();
+      ).start()
     }
   },
   render: function(){
     return(
+      //AnimatableBackGroundColor and children can expose method?
       <Animated.View {...this.props} style = {[this.props.style,{
           backgroundColor:this.colorIndex.interpolate({
             inputRange: _.range(this.props.colors.length),
@@ -172,7 +173,9 @@ var SwipeableButtons = React.createClass({
     }
   },
   //shuld handle in parent?
-  release: function(){
+  release: function(callback){
+    //need release listener?
+    //Execute button action
     this.onRelease && this.onRelease();
     //anmation
     var animatedWidth = new Animated.Value(this.props.width);
@@ -185,6 +188,7 @@ var SwipeableButtons = React.createClass({
     ).start((e)=> {
       this.releasing = false;
       if(!close){ this.setState({componentIndex:0})};
+      callback && callback(close);
     });
     animatedWidth.addListener(({value:value}) => {
       this.setState({width: value});
@@ -242,23 +246,65 @@ var SwipeableButtons = React.createClass({
                 this.setState({componentIndex:i});
               }}
             components={this.props.buttons.map((elem,i)=>{
-                //TODO:can remove flatten?
                 return(React.cloneElement(
                   elem,
                   {style:[
-                    StyleSheet.flatten(elem.props.style),
+                    elem.props.style,
                     styles[i]
-                  ]}))//need merge backgroundColor
+                  ]})) //for merge backgroundColor
               })}
         />
       </AnimatableBackGroundColor>)
   },
+});
+
+//Visible toggle hidden display
+var ToggleView = React.createClass({
+  getInitialState: function() {
+    return {
+      height:new Animated.Value(null),
+    }
+  },
+  componentWillMount: function() {
+    this.animating=false;
+  },
+  _onLayout: function({nativeEvent: { layout: {x, y, width, height}}}){
+    if(this.animating || this.props.hidden){return};
+    console.log("onlay:%O,%O",this.animating,height);
+    this.contentHeight=height;
+  },
+  componentWillReceiveProps: function(nextProps) {
+    if (nextProps.hidden !== this.props.hidden) {
+      this.animating=true;
+      this.state.height.setValue(this.contentHeight);
+
+      Animated.timing(
+        this.state.height,
+        {toValue: 0.01,
+        }//duration: 400,
+      ).start((e)=>{
+        console.log("ev:",e,this);
+        this.animating=false;
+      })
+    }
+  },
+  render: function(){
+    var {hidden, ...props} = this.props;
+    return(
+      <Animated.View {...this.props}
+                     onLayout={this._onLayout}
+                     style={[this.props.style,
+                             //TODO:width
+                             {height:this.state.height}]}>
+        {this.props.children}
+      </Animated.View>
+    )
+  }
 })
 
 var BookCell = React.createClass({
   componentWillMount: function() {
     this._panX = new Animated.Value(0);
-    this.releaseTo = 0;
 
     this._panResponder = PanResponder.create({
       // Ask to be the responder:
@@ -274,8 +320,14 @@ var BookCell = React.createClass({
       ]),
       //onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
-        this.refs.leftButtons.release();
-        this.refs.rightButtons.release();
+        this.refs.leftButtons.release((close)=>{
+          if(close){this.setState({hidden:true})}
+        }
+        );
+        this.refs.rightButtons.release((close)=>{
+          if(close){this.setState({hidden:true})}
+        }
+        );
       },
 
       onShouldBlockNativeResponder: (evt, gestureState) => true,
@@ -288,6 +340,7 @@ var BookCell = React.createClass({
     return {
       left:0,//changed when move & release
       componentIndex:0,
+      hidden:false,
     }
   },
   componentDidMount: function(){
@@ -312,7 +365,7 @@ var BookCell = React.createClass({
                     close={true}
                     backgroundColor='rgb(33,150,243)'
                                      >
-                <Text style={{margin:10,marginRight:5}}>
+                <Text style={[{margin:10},{marginRight:5}]}>
                             l1:left</Text>
                 <Text style={{margin:10,marginLeft:0}}>
                             l1:right</Text>
@@ -362,12 +415,13 @@ var BookCell = React.createClass({
       />
     );
     return(
+      <ToggleView hidden={this.state.hidden}>
       <View style={{
           flexDirection:"row",
           width:SWIPEABLE_MAIN_WIDTH,
           justifyContent: 0 < this.state.left ? "flex-start" : "flex-end",
         }}
-            {...this._panResponder.panHandlers}      
+            {...this._panResponder.panHandlers}
       >
         {leftButtons}
         <View
@@ -379,15 +433,20 @@ var BookCell = React.createClass({
                 borderWidth: 2,
               },{
                 width: SWIPEABLE_MAIN_WIDTH,
-              }]}>          
-            <Text>
+              }]}>
+          <Text onPress = {() => {
+              //TODO:remove until test horizontal
+              this.setState({
+                hidden: true,
+              })}}>
               {'main?'}
             </Text>
             <FAIcon name="rocket" size={30}/>
         </View>
         {rightButtons}
       </View>
-    )      
+      </ToggleView>
+    )
   },
 });
 
