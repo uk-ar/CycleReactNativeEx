@@ -262,7 +262,8 @@ var SwipeableButtons = React.createClass({
 var ToggleView = React.createClass({
   getInitialState: function() {
     return {
-      height:new Animated.Value(null),
+      value: new Animated.ValueXY(),
+      opacity: new Animated.Value(1),
     }
   },
   componentWillMount: function() {
@@ -271,31 +272,45 @@ var ToggleView = React.createClass({
   _onLayout: function({nativeEvent: { layout: {x, y, width, height}}}){
     if(this.animating || this.props.hidden){return};
     console.log("onlay:%O,%O",this.animating,height);
-    this.contentHeight=height;
+    this.contentHeight = height;
+    this.contentWidth = width;
   },
   componentWillReceiveProps: function(nextProps) {
     if (nextProps.hidden !== this.props.hidden) {
-      this.animating=true;
-      this.state.height.setValue(this.contentHeight);
+      this.animating = true;
 
-      Animated.timing(
-        this.state.height,
-        {toValue: 0.01,
-        }//duration: 400,
-      ).start((e)=>{
+      this.state.value.setValue({x:this.contentWidth,
+                                 y:this.contentHeight});
+      this.state.opacity.setValue(1);
+
+      Animated.parallel([
+        Animated.timing(
+          this.state.value,
+          {toValue: {x: this.props.horizontal ? 0.01 : this.contentWidth,
+                     y: this.props.vertical ? 0.01 : this.contentHeight}}
+        ),
+        Animated.timing(
+          this.state.opacity,
+          {toValue: this.props.opacity ? 0 : 1 }
+        )
+      ]).start((e)=>{
+        //this.props.onAnimationEnd
         console.log("ev:",e,this);
         this.animating=false;
       })
     }
   },
   render: function(){
-    var {hidden, ...props} = this.props;
+    var {hidden, opacity, ...props} = this.props;
+
     return(
-      <Animated.View {...this.props}
+      <Animated.View {...props}
                      onLayout={this._onLayout}
                      style={[this.props.style,
-                             //TODO:width
-                             {height:this.state.height}]}>
+                             {width:this.state.value.x,
+                              height:this.state.value.y,
+                              opacity:this.state.opacity}
+                       ]}>
         {this.props.children}
       </Animated.View>
     )
@@ -415,7 +430,11 @@ var BookCell = React.createClass({
       />
     );
     return(
-      <ToggleView hidden={this.state.hidden}>
+      //horizontal={true}
+      //vertical={true}
+      <ToggleView hidden={this.state.hidden}
+                  opacity={true}
+      >
       <View style={{
           flexDirection:"row",
           width:SWIPEABLE_MAIN_WIDTH,
