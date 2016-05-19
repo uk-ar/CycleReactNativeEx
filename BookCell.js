@@ -190,6 +190,7 @@ var SwipeableButtons = React.createClass({
       this.releasing = false;
       if(!close){ this.setState({componentIndex:0})};
       callback && callback(close);
+      //this.props.onRelease && this.props.onRelease(e)
     });
     animatedWidth.addListener(({value:value}) => {
       this.setState({width: value});
@@ -324,6 +325,68 @@ var ToggleView = React.createClass({
       </Animated.View>
     )
   }
+});
+
+var ToggleView2 = React.createClass({
+  getInitialState: function() {
+    return {
+      value: new Animated.ValueXY(),
+      opacity: new Animated.Value(1),
+    }
+  },
+  componentWillMount: function() {
+    this.animating = false;
+    this.hidden = false;
+    //this.props.initialstate?
+  },
+  _onLayout: function({nativeEvent: { layout: {x, y, width, height}}}){
+    if(this.animating || this.hidden){return};
+    //console.log("onlay:%O,%O",this.animating,height);
+    this.contentHeight = height;
+    this.contentWidth = width;
+  },
+  close: function(){
+    this.animating = true;
+
+    this.state.value.setValue({x:this.contentWidth,
+                               y:this.contentHeight});
+    this.state.opacity.setValue(1);
+
+    return new Promise((resolve,reject) =>
+      Animated.parallel([
+        Animated.timing(
+          this.state.value,
+          {toValue: {x: this.props.horizontal ? 0.01 : this.contentWidth,
+                     y: this.props.vertical ? 0.01 : this.contentHeight}}
+        ),
+        Animated.timing(
+          this.state.opacity,
+          {toValue: this.props.opacity ? 0 : 1 }
+        )
+      ]).start((e)=>{
+        //this.props.onAnimationEnd && this.props.onAnimationEnd(e)
+        resolve(e);
+        this.animating = false;
+      })
+    );
+  },
+  render: function(){
+    //drop own props
+    var {hidden, opacity, ...props} = this.props;
+
+    return(
+      <Animated.View
+      {...props}
+      onLayout={this._onLayout}
+      style={[this.props.style,
+              this.props.horizontal ? {width:this.state.value.x} : null,
+              this.props.vertical ? {height:this.state.value.y} : null,
+              this.props.opacity ? {opacity:this.state.opacity} :null,
+        ]}>
+        {this.props.children}
+      </Animated.View>
+    )
+  }
 })
 
 var BookCell = React.createClass({
@@ -350,6 +413,18 @@ var BookCell = React.createClass({
         );
         this.refs.rightButtons.release((close)=>{
           if(close){this.setState({hidden:true})}
+          //panresponder->buttons->button
+          //                     ->cell
+          //                     ->backgroundColor
+          // expand
+          //panresponder->buttons(expand)->button(user callback)
+          //                             ->cell(close):parent
+          // buttons.expand().then(cell.close)
+          //
+          // close
+          //panresponder->buttons(close)->button(user callback)
+          //                            ->backgroundColor(reset):children
+          // buttons.close()
         }
         );
       },
@@ -372,6 +447,9 @@ var BookCell = React.createClass({
   },
   render: function(){
     //genButton([a,b,c,d],left)
+    /* onRelease={(close)=>{
+       if(close){this.setState({hidden:true})}
+       }}*/
     var leftButtons=(
       <SwipeableButtons
           ref="leftButtons"
@@ -439,7 +517,9 @@ var BookCell = React.createClass({
       />
     );
     return(
+      //
       <ToggleView
+          ref="root"
           hidden={this.state.hidden}
           vertical={true}
           style={{
@@ -462,9 +542,10 @@ var BookCell = React.createClass({
               }]}>
           <Text onPress = {() => {
               //TODO:remove until test horizontal
-              this.setState({
-                hidden: true,
-              })}}>
+              this.setState({hidden: true,})
+              //console.log(this);
+              //this.refs.root.close();
+            }}>
               {'main?'}
             </Text>
             <FAIcon name="rocket" size={30}/>
