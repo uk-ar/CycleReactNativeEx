@@ -54,6 +54,7 @@ var Expandable = React.createClass({
   },
   componentWillMount: function(){
     this.thresholds = [];
+    this.setState({width:this.props.width})
   },
   componentWillReceiveProps: function(nextProps) {
     //console.log("next:%O",nextProps);
@@ -79,7 +80,8 @@ var Expandable = React.createClass({
     //render method called according to width
     //console.log("this.props:%O", this.props)
     //this.child exposed to parent
-
+    //console.log("this.state.width:%O",this.state.width);
+    //console.log("this.thresholds.length:%O",this.thresholds.length);
     return(
     this.thresholds.length == 0 ?
     //TODO:...this.props
@@ -149,6 +151,62 @@ var AnimatableBackGroundColor = React.createClass({
         ]}>
         {this.props.children}
       </Animated.View>)
+  }
+});
+
+//Visible toggle hidden display
+var AnimatableView = React.createClass({
+  getInitialState: function() {
+    return {
+      style:this.props.style,
+    }
+  },
+  componentWillMount: function() {
+    //this.animating=false;
+  },
+  _onLayout: function({nativeEvent: { layout: {x, y, width, height}}}){
+    if(this.animating || this.props.hidden){return};
+    //console.log("onlay:%O,%O",this.animating,height);
+    this.contentHeight = height;
+    this.contentWidth = width;
+  },
+  componentWillReceiveProps: function(nextProps) {
+    var current = StyleSheet.flatten(this.props.style);
+    var next = StyleSheet.flatten(nextProps.style);
+    var style={};
+    var values = Object.keys(StyleSheet.flatten(nextProps.style))
+                       .filter((key) => current[key]!==next[key])
+                       .map((key)=>
+                         //if(current[key]!==null)
+                        style[key] = new Animated.Value(current[key])
+                      )//.filter;
+    if(values.length!==0){
+      //console.log("a:%O,%O",values,style);
+    }
+
+  },
+  render: function(){
+    //drop own props
+    var {hidden, opacity, ...props} = this.props;
+    return(
+      <View
+          {...props}
+          onLayout={this._onLayout}
+      >
+        {this.props.children}
+      </View>);
+    /* return(
+       <Animated.View
+       {...props}
+       onLayout={this._onLayout}
+       style={[this.props.style,
+       this.props.horizontal ? {width:this.state.value.x} : null,
+       this.props.vertical ? {height:this.state.value.y} : null,
+       this.props.opacity ? {opacity:this.state.opacity} :null,
+       ]}>
+       {this.props.children}
+       </Animated.View>
+       ) */
   }
 });
 
@@ -233,16 +291,15 @@ var SwipeableButtons = React.createClass({
       <AnimatableBackGroundColor {...props}
                colors={this.colors}
                colorIndex={this.state.componentIndex}>
-        <ToggleView
-            hidden={false}
-            horizontal={true}
-            onAnimationEnd={(e)=>
-              ToastAndroid.show('anim done', ToastAndroid.SHORT)
-                           }
+        <AnimatableView style={{width:this.state.width
+            //props.animate,
+          }}
         >
-        <Expandable
-            width={this.state.width}
-            style={{
+          <Expandable
+              width={100}
+              style={{
+                  //width={this.state.width}
+                //width={50}
               //width cannot shrink under padding
               height:50,//TODO:support height centering
               justifyContent:"center",
@@ -262,7 +319,7 @@ var SwipeableButtons = React.createClass({
                   ]})) //for merge backgroundColor
               })}
         />
-        </ToggleView>
+        </AnimatableView>
       </AnimatableBackGroundColor>)
   },
 });
