@@ -162,51 +162,61 @@ var AnimatableView = React.createClass({
     }
   },
   componentWillMount: function() {
-    //this.animating=false;
+    this.animating=false;
   },
   _onLayout: function({nativeEvent: { layout: {x, y, width, height}}}){
-    if(this.animating || this.props.hidden){return};
-    //console.log("onlay:%O,%O",this.animating,height);
+    if(this.animating){return};
     this.contentHeight = height;
     this.contentWidth = width;
   },
   componentWillReceiveProps: function(nextProps) {
+    if(!nextProps.animatable){
+      this.setState({style:nextProps.style});
+      return;
+    }
     var current = StyleSheet.flatten(this.props.style);
     var next = StyleSheet.flatten(nextProps.style);
-    var style={};
+    var style= Object.assign({},next);
     var values = Object.keys(StyleSheet.flatten(nextProps.style))
                        .filter((key) => current[key]!==next[key])
-                       .map((key)=>
-                         //if(current[key]!==null)
-                        style[key] = new Animated.Value(current[key])
-                      )//.filter;
+                       .filter((key) => (typeof current[key] !== "string"))
+                       .map((key)=>{
+                         if(current[key]){
+                           style[key] = new Animated.Value(current[key]);
+                         }else if(key==="height" || key==="width"){
+                           style[key] = new Animated.Value(this.contentHeight);
+                         }
+                         return key;
+                       }).map((key)=>
+                         Animated.timing(
+                           style[key],
+                           {toValue: next[key],}//TODO:add props duration
+                         ));//null
+    //console.log("style:%O,%O",current,next);
+    //console.log("a:%O,%O",values,style);
+    this.setState({style:style});
+    
     if(values.length!==0){
-      //console.log("a:%O,%O",values,style);
+      this.animating = true;
+      Animated.parallel(values).start((e)=>{
+        this.animating = false;
+        //always animated...
+        this.props.onAnimationEnd &&
+                         this.props.onAnimationEnd();
+      });
     }
-
   },
   render: function(){
     //drop own props
-    var {hidden, opacity, ...props} = this.props;
+    var {style, ...props} = this.props;
     return(
-      <View
+      <Animated.View
           {...props}
+          style={this.state.style}
           onLayout={this._onLayout}
       >
         {this.props.children}
-      </View>);
-    /* return(
-       <Animated.View
-       {...props}
-       onLayout={this._onLayout}
-       style={[this.props.style,
-       this.props.horizontal ? {width:this.state.value.x} : null,
-       this.props.vertical ? {height:this.state.value.y} : null,
-       this.props.opacity ? {opacity:this.state.opacity} :null,
-       ]}>
-       {this.props.children}
-       </Animated.View>
-       ) */
+      </Animated.View>);
   }
 });
 
@@ -236,23 +246,26 @@ var SwipeableButtons = React.createClass({
     //need release listener?
     //Execute button action
     this.onRelease && this.onRelease();
-    //anmation
-    var animatedWidth = new Animated.Value(this.props.width);
-    this.releasing = true;
     var close = this.props.buttons[this.state.componentIndex].props.close;
-    Animated.timing(
-      animatedWidth,
-      {toValue: close ? SWIPEABLE_MAIN_WIDTH : 0.01,
+    this.releasing = true;
+    this.setState({width: close ? SWIPEABLE_MAIN_WIDTH : 0.01,});
+    //anmation
+    /* var animatedWidth = new Animated.Value(this.props.width);
+       this.releasing = true;
+       var close = this.props.buttons[this.state.componentIndex].props.close;
+       Animated.timing(
+       animatedWidth,
+       {toValue: close ? SWIPEABLE_MAIN_WIDTH : 0.01,
        duration: 180,}
-    ).start((e)=> {
-      this.releasing = false;
-      if(!close){ this.setState({componentIndex:0})};
-      callback && callback(close);
-      //this.props.onRelease && this.props.onRelease(e)
-    });
-    animatedWidth.addListener(({value:value}) => {
-      this.setState({width: value});
-    });
+       ).start((e)=> {
+       this.releasing = false;
+       if(!close){ this.setState({componentIndex:0})};
+       callback && callback(close);
+       //this.props.onRelease && this.props.onRelease(e)
+       });
+       animatedWidth.addListener(({value:value}) => {
+       this.setState({width: value});
+       }); */
   },
   render: function(){
     var styles = this.props.direction == "left" ? [{
@@ -292,8 +305,15 @@ var SwipeableButtons = React.createClass({
                colors={this.colors}
                colorIndex={this.state.componentIndex}>
         <AnimatableView style={{width:this.state.width
+            //separete width when release and pan
             //props.animate,
+            //animatable={this.releasing}
           }}
+                        onAnimationEnd={()=>{
+                            //ToastAndroid.show('bar', ToastAndroid.SHORT)
+                            //console.log("anim end");
+                            this.releasing=false;
+                          }}
         >
           <Expandable
               width={100}
@@ -302,9 +322,9 @@ var SwipeableButtons = React.createClass({
                 //width={50}
               //width cannot shrink under padding
               height:50,//TODO:support height centering
-              justifyContent:"center",
+                  justifyContent:"center",
+                  //lock={this.releasing}
             }}
-            lock={this.releasing}
             onResize={(i)=>{
                 //TODO:shuld call from first time?
                 this.onRelease = this.props.buttons[i].props.onRelease;
@@ -465,11 +485,11 @@ var BookCell = React.createClass({
       //onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
         this.refs.leftButtons.release((close)=>{
-          if(close){this.setState({hidden:true})}
+          //if(close){this.setState({hidden:true})}
         }
         );
         this.refs.rightButtons.release((close)=>{
-          if(close){this.setState({hidden:true})}
+          //if(close){this.setState({hidden:true})}
           //panresponder->buttons->button
           //                     ->cell
           //                     ->backgroundColor
@@ -574,13 +594,10 @@ var BookCell = React.createClass({
       />
     );
     return(
-      //
-      <ToggleView
-          ref="root"
-          hidden={this.state.hidden}
-          vertical={true}
+      <AnimatableView
           style={{
               flexDirection:"row",
+              height:this.state.hidden ? 0.01 : null,
               width:SWIPEABLE_MAIN_WIDTH,
               justifyContent: 0 < this.state.left ? "flex-start" : "flex-end",
             }}
@@ -608,7 +625,7 @@ var BookCell = React.createClass({
             <FAIcon name="rocket" size={30}/>
         </View>
         {rightButtons}
-      </ToggleView>
+      </AnimatableView>
     )
   },
 });
