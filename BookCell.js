@@ -159,6 +159,7 @@ var AnimatableView = React.createClass({
   getInitialState: function() {
     return {
       style:this.props.style,
+      value:null,
     }
   },
   componentWillMount: function() {
@@ -170,17 +171,13 @@ var AnimatableView = React.createClass({
     this.contentWidth = width;
   },
   componentWillReceiveProps: function(nextProps) {
-    if(!nextProps.animatable){
-      this.setState({style:nextProps.style});
-      return;
-    }
     var current = StyleSheet.flatten(this.props.style);
     var next = StyleSheet.flatten(nextProps.style);
     var style= Object.assign({},next);
-    var values = Object.keys(StyleSheet.flatten(nextProps.style))
-                       .filter((key) => current[key]!==next[key])
-                       .filter((key) => (typeof current[key] !== "string"))
-                       .map((key)=>{
+    var keys = Object.keys(StyleSheet.flatten(nextProps.style))
+                     .filter((key) => current[key]!==next[key])
+                     .filter((key) => (typeof current[key] !== "string"))
+    var values = keys.map((key)=>{
                          if(current[key]){
                            style[key] = new Animated.Value(current[key]);
                          }else if(key==="height" || key==="width"){
@@ -195,7 +192,7 @@ var AnimatableView = React.createClass({
     //console.log("style:%O,%O",current,next);
     //console.log("a:%O,%O",values,style);
     this.setState({style:style});
-    
+
     if(values.length!==0){
       this.animating = true;
       Animated.parallel(values).start((e)=>{
@@ -204,6 +201,10 @@ var AnimatableView = React.createClass({
         this.props.onAnimationEnd &&
                          this.props.onAnimationEnd();
       });
+      //trac for re-render children
+      /* style[keys[0]].addListener(({value:value}) => {
+         this.setState({value:value});
+         }) */
     }
   },
   render: function(){
@@ -224,7 +225,7 @@ var SwipeableButtons = React.createClass({
   getInitialState: function() {
     return {
       componentIndex:0,
-      width:0.01,
+      width:null,
     }
   },
   componentWillMount: function() {
@@ -238,7 +239,7 @@ var SwipeableButtons = React.createClass({
   componentWillReceiveProps: function(nextProps) {
     //setState(this.props);
     if(nextProps.width != this.props.width){
-      this.setState({width: nextProps.width});
+      //this.setState({width: nextProps.width});
     }
   },
   //shuld handle in parent?
@@ -300,11 +301,13 @@ var SwipeableButtons = React.createClass({
     }];
     var {width, ...props} = this.props;
     //               colors={this.props.colors}
+    //console.log("w:%O", width);
     return(
       <AnimatableBackGroundColor {...props}
                colors={this.colors}
                colorIndex={this.state.componentIndex}>
-        <AnimatableView style={{width:this.state.width
+        <AnimatableView style={{
+            width:this.state.width,
             //separete width when release and pan
             //props.animate,
             //animatable={this.releasing}
@@ -316,7 +319,7 @@ var SwipeableButtons = React.createClass({
                           }}
         >
           <Expandable
-              width={100}
+              width={width}
               style={{
                   //width={this.state.width}
                 //width={50}
