@@ -1261,6 +1261,128 @@ var SwipeableButton = React.createClass({
       )
     }
   })
+
+  //Visible toggle hidden display
+  var ToggleView = React.createClass({
+    getInitialState: function() {
+      return {
+        value: new Animated.ValueXY(),
+        opacity: new Animated.Value(1),
+      }
+    },
+    componentWillMount: function() {
+      this.animating=false;
+    },
+    _onLayout: function({nativeEvent: { layout: {x, y, width, height}}}){
+      if(this.animating || this.props.hidden){return};
+      //console.log("onlay:%O,%O",this.animating,height);
+      this.contentHeight = height;
+      this.contentWidth = width;
+    },
+    componentWillReceiveProps: function(nextProps) {
+      if (nextProps.hidden !== this.props.hidden) {
+        this.animating = true;
+
+        this.state.value.setValue({x:this.contentWidth,
+                                   y:this.contentHeight});
+        this.state.opacity.setValue(1);
+
+        Animated.parallel([
+          Animated.timing(
+            this.state.value,
+            {toValue: {x: this.props.horizontal ? 0.01 : this.contentWidth,
+                       y: this.props.vertical ? 0.01 : this.contentHeight}}
+          ),
+          Animated.timing(
+            this.state.opacity,
+            {toValue: this.props.opacity ? 0 : 1 }
+          )
+        ]).start((e)=>{
+          this.props.onAnimationEnd && this.props.onAnimationEnd(e)
+            this.animating=false;
+        })
+      }
+    },
+    render: function(){
+      //drop own props
+      var {hidden, opacity, ...props} = this.props;
+
+      return(
+        <Animated.View
+      {...props}
+      onLayout={this._onLayout}
+      style={[this.props.style,
+              this.props.horizontal ? {width:this.state.value.x} : null,
+              this.props.vertical ? {height:this.state.value.y} : null,
+              this.props.opacity ? {opacity:this.state.opacity} :null,
+        ]}>
+          {this.props.children}
+        </Animated.View>
+      )
+    }
+  });
+
+var ToggleView2 = React.createClass({
+  getInitialState: function() {
+    return {
+      value: new Animated.ValueXY(),
+      opacity: new Animated.Value(1),
+    }
+  },
+  componentWillMount: function() {
+    this.animating = false;
+    this.hidden = false;
+    //this.props.initialstate?
+  },
+  _onLayout: function({nativeEvent: { layout: {x, y, width, height}}}){
+    if(this.animating || this.hidden){return};
+    //console.log("onlay:%O,%O",this.animating,height);
+    this.contentHeight = height;
+    this.contentWidth = width;
+  },
+  close: function(){
+    this.animating = true;
+
+    this.state.value.setValue({x:this.contentWidth,
+                               y:this.contentHeight});
+    this.state.opacity.setValue(1);
+
+    return new Promise((resolve,reject) =>
+      Animated.parallel([
+        Animated.timing(
+          this.state.value,
+          {toValue: {x: this.props.horizontal ? 0.01 : this.contentWidth,
+                     y: this.props.vertical ? 0.01 : this.contentHeight}}
+        ),
+        Animated.timing(
+          this.state.opacity,
+          {toValue: this.props.opacity ? 0 : 1 }
+        )
+      ]).start((e)=>{
+        //this.props.onAnimationEnd && this.props.onAnimationEnd(e)
+        resolve(e);
+        this.animating = false;
+      })
+    );
+  },
+  render: function(){
+    //drop own props
+    var {hidden, opacity, ...props} = this.props;
+
+    return(
+      <Animated.View
+      {...props}
+      onLayout={this._onLayout}
+      style={[this.props.style,
+              this.props.horizontal ? {width:this.state.value.x} : null,
+              this.props.vertical ? {height:this.state.value.y} : null,
+              this.props.opacity ? {opacity:this.state.opacity} :null,
+        ]}>
+        {this.props.children}
+      </Animated.View>
+    )
+  }
+})
   
 var styles = StyleSheet.create({
   //for new swipe
