@@ -4,7 +4,6 @@ let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/re
 var FAIcon = require('react-native-vector-icons/FontAwesome');
 var MIcon = require('react-native-vector-icons/MaterialIcons');
 var GiftedSpinner = require('react-native-gifted-spinner');
-var Emoji = require('react-native-emoji');
 
 import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
 var _ = require('lodash');
@@ -49,7 +48,7 @@ var Expandable = React.createClass({
   getInitialState: function() {
     return {
       index:null,
-      width:0.01,
+      width:0.001,
     }
   },
   componentWillMount: function(){
@@ -225,7 +224,7 @@ var SwipeableButtons = React.createClass({
   getInitialState: function() {
     return {
       componentIndex:0,
-      width:new Animated.Value(0.01),
+      width:new Animated.Value(0.001),
       releasing:false,
     }
   },
@@ -251,7 +250,7 @@ var SwipeableButtons = React.createClass({
     return new Promise((resolve,reject) =>{
       Animated.timing(
         this.state.width,
-        {toValue: close ? SWIPEABLE_MAIN_WIDTH : 0.01,
+        {toValue: close ? SWIPEABLE_MAIN_WIDTH : 0.001,
          duration: 180,}
       ).start((e)=>{
         resolve(close);
@@ -391,7 +390,7 @@ var SwipeableRow = React.createClass({
       <SwipeableButtons
           ref="rightButtons"
           direction="right"
-          width={this.state.left < 0 ? -this.state.left : 0.01}
+          width={this.state.left < 0 ? -this.state.left : 0.001}
           buttons={this.props.rightButtons}
           style={{justifyContent:"center",}}
       />
@@ -400,7 +399,7 @@ var SwipeableRow = React.createClass({
       <AnimatableView
           style={{
               flexDirection:"row",
-              height:this.state.hidden ? 0.01 : null,
+              height:this.state.hidden ? 0.001 : null,
               width:SWIPEABLE_MAIN_WIDTH,
               justifyContent: 0 < this.state.left ? "flex-start" : "flex-end",
             }}

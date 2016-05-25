@@ -40,6 +40,17 @@ var MOCKED_MOVIES_DATA = [
      reserveUrl: "https://library.city.fuchu.tokyo.jp/licsxp-opac/WOpacTifTilListToTifTilDetailAction.do?tilcod=1009710046217"},
    thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/4655/9784834014655.jpg?_ex=200x200",
    active: true
+  },
+  {title: "IA／UXプラクティス",
+   author: "坂本貴史",
+   isbn: "9784862463241",
+   libraryStatus: {
+     exist: true,
+     rentable: false,
+     reserveUrl: ""
+   },
+   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/3241/9784862463241.jpg?_ex=200x200",
+   active: true
   }
   //size 200x200 largeImageUrl 64x64
 ];

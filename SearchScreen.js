@@ -92,22 +92,19 @@ var BookListView = React.createClass({
     //CycleView has not pass key props? bind this?
     //augmentVTreeWithHandlers seems to have problem
     //          directionalLockEnabled = {true}
-    console.log("ds:%O", this.state.dataSource)
     return(
       <CycleView style = {styles.container} key="listview">
       <ListView
           ref="listview"
           dataSource = {
-            //FIXME:
             dataSource.cloneWithRows(this.state.dataSource)
-            //dataSource.cloneWithRows(['row 1', 'row 2','row 3'])
                        }
           renderRow ={(movie, sectionID, rowID, highlightRowFunc) =>
             <BookCell movie={movie}
                       actions$={this.props.actions$}
                       rowID={rowID}
-                      sectionID={sectionID}
-                                />}
+                      sectionID = {sectionID} />
+                     }
           enableEmptySections={true}
           automaticallyAdjustContentInsets={false}
           keyboardDismissMode="on-drag"
@@ -254,6 +251,7 @@ var SearchScreen = React.createClass({
   //https://github.com/facebook/react-native/blob/master/Examples/Movies/SearchScreen.js
 });
 
+var cellWidth = 60;
 var styles = StyleSheet.create({
   //for toolBar
   toolbar: {
@@ -321,12 +319,6 @@ var styles = StyleSheet.create({
     backgroundColor: 'white',
     flexDirection: 'row',
     padding: 5,
-  },
-  cellImage: {
-    backgroundColor: '#dddddd',
-    height: 93,
-    marginRight: 10,
-    width: 60,
   },
   cellBorder: {
     backgroundColor: 'rgba(0, 0, 0, 0.1)',

@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
 var Icon = require('react-native-vector-icons/FontAwesome');
 var GiftedSpinner = require('react-native-gifted-spinner');
-var Emoji = require('react-native-emoji');
 
 import {
   TouchableOpacity,

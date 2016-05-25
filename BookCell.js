@@ -1,15 +1,15 @@
 
 import React, { Component } from 'react';
+var ReactNative = require('react-native');
 let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
 var FAIcon = require('react-native-vector-icons/FontAwesome');
 var MIcon = require('react-native-vector-icons/MaterialIcons');
 var GiftedSpinner = require('react-native-gifted-spinner');
-var Emoji = require('react-native-emoji');
 
 import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
 var _ = require('lodash');
 
-import {
+var {
   TouchableOpacity,
   ActivityIndicatorIOS,
   ListView,
@@ -33,7 +33,7 @@ import {
   ScrollView,
   PanResponder,
   ToastAndroid,
-} from 'react-native';
+} = ReactNative;
 
 var Dimensions = require('Dimensions');
 var {
@@ -80,12 +80,17 @@ var LibraryStatus = React.createClass({
     if(libraryStatus.rentable){
       text="貸出可"
       //style={backgroundColor: "#03A9F4"} //light blue
+      //style={color: "#009688"} //Teal
+      style={color: "#4CAF50"} //Green
     }else if(libraryStatus.exist){
       text="貸出中"
       //style={backgroundColor: "#FFC107"} //yellow
+      //style={color: "#FFEB3B"} //yellow
+      style={color: "#FFC107"} //amber
     }else if(libraryStatus.exist !== undefined){
       text="なし"
       //style={backgroundColor: "#9E9E9E"} //grey
+      style={color: "#F44336"} //red
     }else{
       //text="取得中"
     }
@@ -94,7 +99,9 @@ var LibraryStatus = React.createClass({
       return (
         <View style={[styles.row]}
         >
-          <Text>
+          <Text style={[
+            //{fontSize: 14,},//default?
+            style]}>
             {text}
           </Text>
         </View>
@@ -152,31 +159,38 @@ var BookCell = React.createClass({
       TouchableElement = TouchableNativeFeedback;
     }
     var book=this.props.movie;
-    console.log("b:%O", book)
     return(
       <SwipeableRow style={[styles.row]}
                     leftButtons={leftButtons}
                     rightButtons={rightButtons}>
-        <TouchableElement selector="cell"
-                          onPress={(e) => console.log("cell action:%O", e)}>
           <View style={[styles.row,{flex:1}]}>
             <Image source={{uri: book.thumbnail}}
+                   resizeMode="contain"
                    style={[styles.cellImage,]} />
-            <View style={[{flex:1,},{padding:10}]}>
-              <Text style={styles.bookTitle} numberOfLines={2}>
-                {book.title}
-              </Text>
-              <Text style={styles.bookYear} numberOfLines={1}>
-                {book.author}
-              </Text>
-              <LibraryStatus libraryStatus={book.libraryStatus}/>
+            <View style={[{flex:1,}]}>
+              <View style={[{flex:1,padding:10,justifyContent:"center",},
+                           ]}>
+                <Text style={styles.bookTitle} numberOfLines={1}>
+                  {book.title}
+                </Text>
+                <Text style={styles.bookAuthor} numberOfLines={1}>
+                  {book.author}
+                </Text>
+                <LibraryStatus libraryStatus={book.libraryStatus}/>
+              </View>
+              <View style={{height:StyleSheet.hairlineWidth,
+                            backgroundColor:'#CCCCCC',
+                            marginRight:10,
+                            //separator
+                }}
+              />
             </View>
           </View>
-        </TouchableElement>
       </SwipeableRow>
     )}
 });
-
+var cellWidth = 64;
+//https://www.google.com/design/spec/style/color.html#color-color-palette
 var styles = StyleSheet.create({
   //application & lib
   rowCenter:{
@@ -211,20 +225,20 @@ var styles = StyleSheet.create({
     //padding: 5,
   },
   bookTitle: {
-    flex: 1,
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 2,
   },
-  movieYear: {
-    color: '#999999',
+  bookAuthor: {
+    //color: '#999999',
+    color: '#9E9E9E',//grey
     fontSize: 12,
   },
   cellImage: {
-    backgroundColor: '#dddddd',
-    height: 93,
-    marginRight: 10,
-    width: 60,
+    //backgroundColor: '#dddddd',
+    height: 64,//PixelRatio 2
+    margin: 10,
+    width: cellWidth,
   },
   cellBorder: {
     //backgroundColor: 'rgba(0, 0, 0, 0.1)',
