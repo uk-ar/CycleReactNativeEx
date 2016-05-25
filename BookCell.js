@@ -71,57 +71,111 @@ var RightButton  = React.createClass({
     )}
 });
 
+var LibraryStatus = React.createClass({
+  render: function() {
+    var libraryStatus = this.props.libraryStatus || {};
+
+    var text, name, backgroundColor;
+
+    if(libraryStatus.rentable){
+      text="貸出可"
+      //style={backgroundColor: "#03A9F4"} //light blue
+    }else if(libraryStatus.exist){
+      text="貸出中"
+      //style={backgroundColor: "#FFC107"} //yellow
+    }else if(libraryStatus.exist !== undefined){
+      text="なし"
+      //style={backgroundColor: "#9E9E9E"} //grey
+    }else{
+      //text="取得中"
+    }
+    //http://www.google.com/design/spec/style/color.html#color-color-palette
+    if(text){
+      return (
+        <View style={[styles.row]}
+        >
+          <Text>
+            {text}
+          </Text>
+        </View>
+      );
+    }else{
+      return (
+        <View style={[styles.row]}>
+          <Text>
+            {"蔵書確認中"}
+          </Text>
+          <GiftedSpinner />
+        </View>
+      )
+    }
+  },
+});
+
 var BookCell = React.createClass({
   render: function(){
     var leftButtons=[
       <LeftButton onRelease={()=> console.log("1")}
                   close={false}
-                  backgroundColor='rgb(158, 158, 158)'
+                  backgroundColor="#E0E0E0"
                   icon="heart-o"
-      />,
+      />,//grey 300
       <LeftButton onRelease={()=> console.log("2")}
                   close={true}
-                  backgroundColor='rgb(33,150,243)'
+                  backgroundColor="#2196F3"
                   icon="heart-o"
                   text="読みたい"
-      />,
+      />,//light blue "#03A9F4"
+      //blue "#2196F3"
       <LeftButton onRelease={()=> console.log("3")}
                   close={true}
                   backgroundColor='rgb(76, 175, 80)'
                   icon="inbox"
                   text="Inbox"
-      />
+      />,//green
     ];
     var rightButtons=[
       <RightButton onRelease={()=> console.log("r1")}
-                   backgroundColor='rgb(158, 158, 158)'
+                   backgroundColor="#E0E0E0"
                    close={false}
                    icon="check-square-o"
-      />,
+      />,//grey 300
       <RightButton onRelease={()=> console.log("r2")}
-                   backgroundColor='#9C27B0'
+                   backgroundColor="#FFC107"
                    close={true}
                    icon="check-square-o"
                    text="読んだ"
-      />,
+      />,//amber
     ];
+    var TouchableElement = TouchableHighlight;
+    if (Platform.OS === 'android') {
+      TouchableElement = TouchableNativeFeedback;
+    }
+    var book=this.props.movie;
+    console.log("b:%O", book)
     return(
-      <SwipeableRow
-          style={[styles.rowCenter,{
-              backgroundColor:"green",
-              borderWidth: 2,
-            }]}
-          leftButtons={leftButtons}
-          rightButtons={rightButtons}
-      >
-        <Text>
-          {'main!'}
-        </Text>
-        <FAIcon name="rocket" size={30}/>
+      <SwipeableRow style={[styles.row]}
+                    leftButtons={leftButtons}
+                    rightButtons={rightButtons}>
+        <TouchableElement selector="cell"
+                          onPress={(e) => console.log("cell action:%O", e)}>
+          <View style={[styles.row,{flex:1}]}>
+            <Image source={{uri: book.thumbnail}}
+                   style={[styles.cellImage,]} />
+            <View style={[{flex:1,},{padding:10}]}>
+              <Text style={styles.bookTitle} numberOfLines={2}>
+                {book.title}
+              </Text>
+              <Text style={styles.bookYear} numberOfLines={1}>
+                {book.author}
+              </Text>
+              <LibraryStatus libraryStatus={book.libraryStatus}/>
+            </View>
+          </View>
+        </TouchableElement>
       </SwipeableRow>
-    )
-  }
-})
+    )}
+});
 
 var styles = StyleSheet.create({
   //application & lib
@@ -129,6 +183,9 @@ var styles = StyleSheet.create({
     flexDirection:"row",
     //justifyContent:"center",
     alignItems:"center",
+  },
+  row:{
+    flexDirection:"row",
   },
   //for new swipe
   /* container: {
@@ -153,10 +210,7 @@ var styles = StyleSheet.create({
     flexDirection: 'row',
     //padding: 5,
   },
-  textContainer: {
-    flex: 1,
-  },
-  movieTitle: {
+  bookTitle: {
     flex: 1,
     fontSize: 16,
     fontWeight: '500',
@@ -167,7 +221,7 @@ var styles = StyleSheet.create({
     fontSize: 12,
   },
   cellImage: {
-    //backgroundColor: '#dddddd',
+    backgroundColor: '#dddddd',
     height: 93,
     marginRight: 10,
     width: 60,
@@ -199,6 +253,10 @@ var styles = StyleSheet.create({
   separator: {
     height: 1,
     //backgroundColor: '#CCCCCC',
+  },
+  test:{
+    borderWidth:2,
+    borderColor:"red",
   },
   Text: {
     color:'#FFFFFF',

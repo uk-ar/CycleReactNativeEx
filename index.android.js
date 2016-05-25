@@ -84,7 +84,7 @@ function main({RN, HTTP, EE}) {
   let sinks = new Rx.ReplaySubject();
   // for android action
 
-  var {AnimatedFlick,BookCell} = require('./BookCell');
+  //var {AnimatedFlick,BookCell} = require('./BookCell');
   let SearchView$ = state$.booksWithStatus$
                           .startWith(MOCKED_MOVIES_DATA)
                           .map(i =>

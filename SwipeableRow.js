@@ -137,7 +137,7 @@ var AnimatableBackGroundColor = React.createClass({
       Animated.timing(
         this.colorIndex,
         {toValue: nextProps.colorIndex,//interpolate?
-         duration: 180,} //TODO:add props
+         duration: 360,} //TODO:add props
       ).start()
     }
   },
@@ -382,6 +382,8 @@ var SwipeableRow = React.createClass({
           direction="left"
           width={this.state.left}
           buttons={this.props.leftButtons}
+          style={{justifyContent:"center",//vertical center
+            }}
       />);
     //button input color, component, release action
     //close flag is parent props
@@ -391,6 +393,7 @@ var SwipeableRow = React.createClass({
           direction="right"
           width={this.state.left < 0 ? -this.state.left : 0.01}
           buttons={this.props.rightButtons}
+          style={{justifyContent:"center",}}
       />
     );
     return(

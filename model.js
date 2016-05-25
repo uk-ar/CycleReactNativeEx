@@ -108,7 +108,7 @@ function model(actions){
        }
        return books;
        }) */
-    .share();
+    //.share();
 
   let navigatorPushRequest$ = actions
               .openBook$

@@ -92,21 +92,23 @@ var BookListView = React.createClass({
     //CycleView has not pass key props? bind this?
     //augmentVTreeWithHandlers seems to have problem
     //          directionalLockEnabled = {true}
+    console.log("ds:%O", this.state.dataSource)
     return(
       <CycleView style = {styles.container} key="listview">
       <ListView
           ref="listview"
           dataSource = {
             //FIXME:
-            /* dataSource.cloneWithRows(this.state.dataSource) */
-            dataSource.cloneWithRows(['row 1', 'row 2','row 3'])}
+            dataSource.cloneWithRows(this.state.dataSource)
+            //dataSource.cloneWithRows(['row 1', 'row 2','row 3'])
+                       }
           renderRow ={(movie, sectionID, rowID, highlightRowFunc) =>
-            <BookCell
-                movie={movie}
-                actions$={this.props.actions$}
-                rowID={rowID}
-                sectionID = {sectionID}
-                            />}
+            <BookCell movie={movie}
+                      actions$={this.props.actions$}
+                      rowID={rowID}
+                      sectionID={sectionID}
+                                />}
+          enableEmptySections={true}
           automaticallyAdjustContentInsets={false}
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps={true}
@@ -170,10 +172,13 @@ var BookListView = React.createClass({
         property: LayoutAnimation.Properties.opacity,
       }
     };
+    this.props.dataSource$.do(i => console.log("booksWithStatus3$:%O", i))
+    //console.log("d$:%O", );
     this.subscription = this.props.dataSource$.subscribe((dataSource) => {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       //LayoutAnimation.configureNext(CustomLayoutSpring);
-      this.setState({dataSource:dataSource})
+      this.setState({dataSource:dataSource});
+      console.log("d:%O",dataSource);
     }
     )
   },
@@ -233,8 +238,12 @@ var SearchScreen = React.createClass({
             isLoading={this.state.isLoading}
         />
         <View style={styles.separator} />
-        <BookListView dataSource$ = {this.props.state$.booksWithStatus$.merge(
-            this.props.state$.searchRequest$.map((_) => []))}
+        <BookListView dataSource$={
+          this.props.state$.booksWithStatus$
+          /* .merge(
+          this.props.state$.searchRequest$.map((_) => [])
+          ) */
+                                  }
                       actions$={this.props.actions$}
                       key = "searchlistview"
                       selectedOption='検索'
