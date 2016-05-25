@@ -8,7 +8,7 @@
   "dependencies": {
     "@cycle/core": "6.0.x",
     "@cycle/http": "7.0.x",
-    "@cycle/react-native": "git+http://github.com/uk-ar/cycle-react-native.git",
+    "@cycle/react-native": "http://github.com/uk-ar/cycle-react-native.git",
     "isbn": "^0.2.0",
     "lodash": "^3.10.1",
     "react": "^0.14.7",
@@ -18,6 +18,7 @@
     "react-native-search-bar": "^2.8.0",
     "react-native-swipeout": "^2.0.12",
     "react-native-vector-icons": "^2.0.2",
+    "realm": "^0.13.1",
     "rx": "^4.0.6"
   }
 }
