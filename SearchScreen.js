@@ -93,18 +93,27 @@ var BookListView = React.createClass({
     //augmentVTreeWithHandlers seems to have problem
     //          directionalLockEnabled = {true}
     return(
-      <CycleView style = {styles.container} key="listview">
+      <CycleView>
       <ListView
           ref="listview"
           dataSource = {
             dataSource.cloneWithRows(this.state.dataSource)
                        }
-          renderRow ={(movie, sectionID, rowID, highlightRowFunc) =>
-            <BookCell movie={movie}
-                      actions$={this.props.actions$}
-                      rowID={rowID}
-                      sectionID = {sectionID} />
-                     }
+          renderRow ={(movie, sectionID, rowID, highlightRowFunc) =>{
+              //actions$={this.props.actions$}
+              //need to intercept renderRow?
+              //error on already defined
+              //selector="bookcell"
+              return (
+                  <BookCell movie={movie}
+                            sectionID={sectionID}
+                            rowID={rowID}
+                            onLike={this.props.onLike}
+                            onDone={this.props.onDone}
+                            onInbox={this.props.onInbox}
+                            selector="foo"
+                                      />)
+            }}
           enableEmptySections={true}
           automaticallyAdjustContentInsets={false}
           keyboardDismissMode="on-drag"
@@ -169,8 +178,7 @@ var BookListView = React.createClass({
         property: LayoutAnimation.Properties.opacity,
       }
     };
-    this.props.dataSource$.do(i => console.log("booksWithStatus3$:%O", i))
-    //console.log("d$:%O", );
+
     this.subscription = this.props.dataSource$.subscribe((dataSource) => {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       //LayoutAnimation.configureNext(CustomLayoutSpring);
@@ -187,15 +195,15 @@ var BookListView = React.createClass({
 var InBoxScreen = React.createClass({
   render: function(){
     return(
-      <CycleView style={styles.container}
+      <View style={styles.container}
                  key = "InBoxScreen">
+        { /* actions$={this.props.actions$}*/}
         <BookListView
             dataSource$={this.props.state$.inbox$}
-            actions$={this.props.actions$}
             key = "inboxlistview"
             selectedOption='読みたい'
         />
-      </CycleView>
+      </View>
     )
   }
 });
@@ -216,6 +224,7 @@ var SearchScreen = React.createClass({
   componentWillMount(){
     this.subscription = this.props.state$.searchRequest$.map((_)=> true)
                             .merge(
+                              //response event
                               this.props.actions$.books$.map((_)=>false))
                             .subscribe((isLoading) =>
                               this.setState({isLoading:isLoading})
@@ -235,15 +244,16 @@ var SearchScreen = React.createClass({
             isLoading={this.state.isLoading}
         />
         <View style={styles.separator} />
+        { /* actions$={this.props.actions$} */}
         <BookListView dataSource$={
           this.props.state$.booksWithStatus$
           /* .merge(
           this.props.state$.searchRequest$.map((_) => [])
           ) */
                                   }
-                      actions$={this.props.actions$}
                       key = "searchlistview"
                       selectedOption='検索'
+                      selector="bookcell"
         />
       </CycleView>
     )

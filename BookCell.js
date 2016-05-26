@@ -119,15 +119,26 @@ var LibraryStatus = React.createClass({
   },
 });
 
+//ToastAndroid.show('foo', ToastAndroid.SHORT)
 var BookCell = React.createClass({
   render: function(){
+    onLike=this.props.onLike
+    onDone =this.props.onDone
+    onInbox=this.props.onInbox
+    var book=this.props.movie;
+    //rowID={rowID}
+    //sectionID={sectionID}
     var leftButtons=[
-      <LeftButton onRelease={()=> console.log("1")}
+      <LeftButton onRelease = {() => onLike(book,
+                                            this.props.sectionID,
+                                            this.props.rowID)}
                   close={false}
                   backgroundColor="#E0E0E0"
                   icon="heart-o"
       />,//grey 300
-      <LeftButton onRelease={()=> console.log("2")}
+      <LeftButton onRelease = {() => onInbox(book,
+                                             this.props.sectionID,
+                                             this.props.rowID)}
                   close={true}
                   backgroundColor="#2196F3"
                   icon="heart-o"
@@ -147,7 +158,9 @@ var BookCell = React.createClass({
                    close={false}
                    icon="check-square-o"
       />,//grey 300
-      <RightButton onRelease={()=> console.log("r2")}
+      <RightButton onRelease = {() => onDone(book,
+                                             this.props.sectionID,
+                                             this.props.rowID)}
                    backgroundColor="#FFC107"
                    close={true}
                    icon="check-square-o"
@@ -158,7 +171,6 @@ var BookCell = React.createClass({
     if (Platform.OS === 'android') {
       TouchableElement = TouchableNativeFeedback;
     }
-    var book=this.props.movie;
     return(
       <SwipeableRow style={[styles.row]}
                     leftButtons={leftButtons}
@@ -235,7 +247,7 @@ var styles = StyleSheet.create({
     fontSize: 12,
   },
   cellImage: {
-    //backgroundColor: '#dddddd',
+    backgroundColor: '#dddddd',
     height: 64,//PixelRatio 2
     margin: 10,
     width: cellWidth,

@@ -74,6 +74,21 @@ function intent({RN, HTTP}){
                     .map(i => i ? JSON.parse(i) : [])
                     .do(i => console.log("inBoxStatus$:%O", i))
       ,
+    like$: RN.select('bookcell')
+             .events('like')
+             .do(i => console.log("like:%O", i))
+             .subscribe()
+      ,
+    done$: RN.select('bookcell')
+             .events('done')
+             .do(i => console.log("done:%O", i))
+             .subscribe()
+      ,
+    inbox$: RN.select('bookcell')
+              .events('inbox')
+              .do(i => console.log("inbox:%O", i))
+              .subscribe()
+      ,
     filterState$: RN.select('filter')
                     .events('press')
                     .startWith(false)
@@ -92,6 +107,8 @@ function intent({RN, HTTP}){
                      .map(event => event.args[0].nativeEvent.text)
                      .do(i => console.log("search text change:%O", i)),
     //intent & model
+    searchResponse$:null
+    ,
     books$: HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
                 .switch()
                 .map(res =>

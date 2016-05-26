@@ -197,7 +197,8 @@ function model(actions){
   let navigatorReplaceRequest$ =
   actions.selectScene$
          .do(i => console.log("nav rep:%O", i) )
-         .map(option =>{
+         .map(options =>{
+           var option = options[0];
            if(option == "検索"){
              return ({
                component:SearchScreen,
