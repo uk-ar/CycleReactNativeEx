@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
-let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
+let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native');
 var FAIcon = require('react-native-vector-icons/FontAwesome');
 var MIcon = require('react-native-vector-icons/MaterialIcons');
 var GiftedSpinner = require('react-native-gifted-spinner');
 
 import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
+import ListView from '@cycle/react-native/src/ListView';
 
 import {
   TouchableOpacity,
   ActivityIndicatorIOS,
-  ListView,
   Platform,
   ProgressBarAndroid,
   StyleSheet,
@@ -36,7 +36,7 @@ var GiftedNavigator = React.createClass({
     //console.log("nav this:%O", this);
     //var navigatorDidMount = this.props.navigatorDidMount.bind(this);
     //navigatorDidMount(this.refs.nav);
-    this.props.onNavigatorMounted.call({},this.refs.nav);
+    //this.props.onNavigatorMounted.call({},this.refs.nav);
   },
   render: function() {
     if (Platform.OS === 'android') {
@@ -63,16 +63,11 @@ var GiftedNavigator = React.createClass({
 
 var {AnimatedFlick,BookCell} = require('./BookCell');
 
-var dataSource = new ListView.DataSource({
+/* var dataSource = new ListView.DataSource({
   rowHasChanged: (row1, row2) => row1 !== row2,
-});
+}); */
 
 var BookListView = React.createClass({
-  getInitialState(){
-    return {
-      dataSource:[],
-    }
-  },
   render() {
     const options = [
       '検索',
@@ -92,13 +87,15 @@ var BookListView = React.createClass({
     //CycleView has not pass key props? bind this?
     //augmentVTreeWithHandlers seems to have problem
     //          directionalLockEnabled = {true}
+    /* dataSource={
+      dataSource.cloneWithRows(this.props.dataSource)
+    } */
+
     return(
-      <CycleView>
+      <View>
       <ListView
           ref="listview"
-          dataSource = {
-            dataSource.cloneWithRows(this.state.dataSource)
-                       }
+          items={this.props.dataSource}
           renderRow ={(movie, sectionID, rowID, highlightRowFunc) =>{
               //actions$={this.props.actions$}
               //need to intercept renderRow?
@@ -145,51 +142,20 @@ var BookListView = React.createClass({
                       style={{marginHorizontal: 8}}
               />
             </View>
-      </CycleView>
-    )
-    {/*
-        <Text allowFontScaling={scaleFont} style={style}>{label}</Text>}
-        renderOption={RadioButtons.getTextOptionRenderer(normalStyle, selectedStyle, (i) => i)}
-        style={styles.toolbarButton}
-        style = {styles.toolbarTitle}
-        onSelection={ setSelectedOption.bind(this) }
-        selectedOption={ this.state.selectedOption }
-        <Icon.Button name = "filter" selector = "filter"
-        style = {styles.icon}/>
-        <Icon.Button name = "sort" selector = "sort"
-        style = {styles.icon}/>
-      */}
-  },
-  componentWillMount(){
-    //https://medium.com/@Jpoliachik/react-native-s-layoutanimation-is-awesome-4a4d317afd3e#.9c2mobfa0
-    //http://browniefed.com/blog/2015/08/01/react-native-animated-listview-row-swipe/
-    var CustomLayoutSpring = {
-      duration: 3000,
-      create: {
-        type: LayoutAnimation.Types.easeInEaseOut,
-        property: LayoutAnimation.Properties.opacity,
-        //property: LayoutAnimation.Properties.scaleXY,
-      },
-      update: {
-        type: LayoutAnimation.Types.easeInEaseOut,
-      },
-      delete:{
-        type: LayoutAnimation.Types.easeInEaseOut,
-        property: LayoutAnimation.Properties.opacity,
-      }
-    };
-
-    this.subscription = this.props.dataSource$.subscribe((dataSource) => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      //LayoutAnimation.configureNext(CustomLayoutSpring);
-      this.setState({dataSource:dataSource});
-      console.log("d:%O",dataSource);
-    }
+      </View>
     )
   },
-  componentWillUnmount(){
-    this.subscription.dispose()
-  }
+  /* componentWillMount(){
+     //https://medium.com/@Jpoliachik/react-native-s-layoutanimation-is-awesome-4a4d317afd3e#.9c2mobfa0
+     //http://browniefed.com/blog/2015/08/01/react-native-animated-listview-row-swipe/
+     this.subscription = this.props.dataSource$.subscribe((dataSource) => {
+     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+     //LayoutAnimation.configureNext(CustomLayoutSpring);
+     this.setState({dataSource:dataSource});
+     console.log("d:%O",dataSource);
+     }
+     )
+     }, */
 });
 
 var InBoxScreen = React.createClass({
@@ -222,10 +188,7 @@ var SearchScreen = React.createClass({
     }
   },
   componentWillMount(){
-    this.subscription = this.props.state$.searchRequest$.map((_)=> true)
-                            .merge(
-                              //response event
-                              this.props.actions$.books$.map((_)=>false))
+    this.subscription = this.props.state$.booksLoadingState$
                             .subscribe((isLoading) =>
                               this.setState({isLoading:isLoading})
                             )
@@ -237,7 +200,7 @@ var SearchScreen = React.createClass({
     //isLoading={this.state.isLoading}
     //onSearchChange={this.onSearchChange}
     return(
-      <CycleView style={styles.container}
+      <View style={styles.container}
                  key = "searchScreen">
         <SearchBar
             key="searchBar"
@@ -255,7 +218,7 @@ var SearchScreen = React.createClass({
                       selectedOption='検索'
                       selector="bookcell"
         />
-      </CycleView>
+      </View>
     )
   }
   //https://github.com/facebook/react-native/blob/master/Examples/Movies/SearchScreen.js
@@ -356,4 +319,4 @@ var styles = StyleSheet.create({
   },
 });
 
-module.exports = {SearchScreen, InBoxScreen, GiftedNavigator};
+module.exports = {SearchScreen, InBoxScreen, GiftedNavigator,BookListView};

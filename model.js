@@ -47,16 +47,6 @@ import {
 } from 'react-native';
 
 function model(actions){
-  const searchRequest$ = actions.changeSearch$.debounce(500)
-                                .filter(query => query.length > 1)
-                                .map(q => RAKUTEN_SEARCH_API + encodeURI(q));
-
-  //model(Actions) -> State$
-  const statusRequest$ = actions.books$
-                                .map(books => books.map(book => book.isbn))
-                                .map(q => CALIL_STATUS_API + encodeURI(q))
-                                .do(i => console.log("status req:%O", i));
-
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
 
   //model
@@ -186,12 +176,53 @@ function model(actions){
                .fromPromise(
                  AsyncStorage.setItem(STORAGE_KEY,JSON.stringify(inbox)))
     });
+  var booksLoadingState$ = actions.searchRequest$.map((_)=> true)
+                                  .merge(
+                                    //response event
+                                    actions.books$.map((_)=>false));
+  /* searchRequest$,statusRequest$
+     searchRequest,statusRequest, */
 
+  const initialNavigationState = {
+    key: 'MainNavigation',
+    index: 0,
+    title: 'Cycle Native',
+    children: [
+      {key: 'Search'}
+    ]
+  };
+
+  const navigationState$ = Rx.Observable.just(initialNavigationState)
+                            //.startWith()
+                            .scan((prevState, action) => {
+                              return action.type === 'back'
+                                   ? NavigationStateUtils.pop(prevState)
+                                : NavigationStateUtils.push(prevState, action)
+                            })
+                            //.merge(goToSecondView,goToThirdView,goToCreditsView,back)
+  /* .distinctUntilChanged(navigationState => navigationState, (a, b) => {
+     if (a.type === `back` && b.type === `back`) {
+     return false
+     }
+
+     return a.key === b.key
+     }) */
+
+  return  Rx.Observable
+            .combineLatest(booksWithStatus$,
+                           inbox$.startWith([]),
+                           booksLoadingState$.startWith(false),
+                           navigationState$,
+              (booksWithStatus,inbox,booksLoadingState,navigationState) =>
+                ({booksWithStatus, inbox, booksLoadingState,navigationState,}));
+
+  /*
   var state$ = {
     searchRequest$: searchRequest$,//request$
     statusRequest$: statusRequest$,
     booksWithStatus$: booksWithStatus$,
-    inbox$:inbox$
+    inbox$:inbox$,
+    booksLoadingState$:
   }
 
   let navigatorReplaceRequest$ =
@@ -226,7 +257,7 @@ function model(actions){
     navigator = nav;
   });
 
-  return state$
+  return state$ */
 }
 
 module.exports = model;

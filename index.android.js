@@ -16,7 +16,8 @@ import React, { Component } from 'react';
 let Rx = require('rx');
 var _ = require('lodash');
 let {run} = require('@cycle/core');
-let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
+import makeReactNativeDriver, {getBackHandler} from '@cycle/react-native/src/driver';
+//let {makeReactNativeDriver, getBackHandler} = require('@cycle/react-native');
 let {makeHTTPDriver} = require('@cycle/http');
 
 var Icon = require('react-native-vector-icons/FontAwesome');
@@ -32,8 +33,13 @@ let {
   makeEventEmitterDriver,
 } = require('./common');
 
-import {
+import Touchable from '@cycle/react-native/src/Touchable';
+const {
   TouchableOpacity,
+  TouchableWithoutFeedback
+} = Touchable;
+
+import {
   ActivityIndicatorIOS,
   ListView,
   Platform,
@@ -56,17 +62,19 @@ import {
   ScrollView,
   PanResponder,
   UIManager,
+  NavigationExperimental,
 } from 'react-native';
+import NavigationStateUtils from 'NavigationStateUtils';
 
 UIManager.setLayoutAnimationEnabledExperimental &&   UIManager.setLayoutAnimationEnabledExperimental(true);
 
-let {SearchScreen, InBoxScreen, GiftedNavigator} = require('./SearchScreen');
+let {SearchScreen, InBoxScreen, GiftedNavigator,BookListView} = require('./SearchScreen');
 
 var intent = require('./intent');
 var model = require('./model');
 
 function main({RN, HTTP, EE}) {
-  const actions = intent({RN:RN, HTTP:HTTP});
+  const actions = intent(RN, HTTP);
   const state$ = model(actions);
 
   EE.events("foo").subscribe(args =>
@@ -85,46 +93,89 @@ function main({RN, HTTP, EE}) {
   // for android action
 
   //var {AnimatedFlick,BookCell} = require('./BookCell');
-  let SearchView$ = state$.booksWithStatus$
-                          .startWith(MOCKED_MOVIES_DATA)
-                          .map(i =>
-                            <GiftedNavigator
-                                selector="nav"
-                                initialRoute = {{
-                                    component:SearchScreen,
-                                    title: 'search',
-                                    passProps:
-                                    {state$: state$, actions$: actions,
-                                     sinks: sinks}
-                                  }}
-                            />
-                          )
-                          //.map(i => <AnimatedFlick/>)
-  /* <AnimatedFlick/> */
   // http://stackoverflow.com/questions/29756217/react-native-nested-scrollview-locking-up
+
+  const onNavigateBack = action => {
+    const backActionHandler = getBackHandler();
+    if (action.type === 'back' || action.type === 'BackAction') {
+      backActionHandler.send();
+    }
+  }
+
+  function renderCard(vdom, navigationProps) {
+    //
+    return (
+      <NavigationExperimental.Card
+      {...navigationProps}
+      key={'View:' + navigationProps.scene.navigationState.key}
+      renderScene={() => vdom}
+      onNavigate={onNavigateBack}
+      />
+    );
+  }
+
+  var SearchBar = require('./SearchBar');
+  function SearchView({booksWithStatus,booksLoadingState}){
+    //console.log('navigationProps', model);
+    return(
+      <View style={styles.container}
+            key = "searchScreen">
+        <Text selector="button">Increment1</Text>
+        <TouchableOpacity selector='button'>
+          <Text>Increment2</Text>
+        </TouchableOpacity>
+        <SearchBar
+            key="searchBar"
+            isLoading={booksLoadingState}
+        />
+        <View style={styles.separator} />
+        <BookListView dataSource={booksWithStatus}
+                      selectedOption='検索'
+                      selector="bookcell"
+        />
+      </View>
+      )
+  };
+
+  function view(model){
+    //console.log('navigationProps', model);
+    return(
+      <NavigationExperimental.AnimatedView
+      style={{flex: 1}}
+      onNavigate={onNavigateBack}
+      navigationState={model.navigationState}
+      renderScene={(navigationProps) => {
+          const key = navigationProps.scene.navigationState.key;
+          console.log('navigationProps', navigationProps);
+          switch (key) {
+            case 'Search':
+              //return renderCard(CreditsView(model), navigationProps);
+              return renderCard(SearchView(model), navigationProps);
+              //return (<Text>foo</Text>)
+            default:
+              console.error('Unexpected view', navigationProps, key);
+              return (<Text>bar</Text>)
+              //renderCard(<Text>Everything is fucked</Text>, navigationProps);
+          }
+        }}
+      />)
+  };
+
+  let SearchView$ = state$.map(view);
+  //let SearchView$ = state$.startWith(0).map(view);
+  let request$ = actions.searchRequest$.merge(actions.statusRequest$)
 
   return {
     RN: SearchView$,//.merge(DetailView$),
-    HTTP: state$.searchRequest$.merge(state$.statusRequest$),
+    //HTTP: state$.searchRequest$.merge(state$.statusRequest$),
+    HTTP: request$,
     EE: sinks,
     //
     //sinks.onNext({event: "foo",args:{bar:"baz"}}),
   };
 }
 
-var styles = StyleSheet.create({
-  listView: {
-    paddingTop: 20,
-    backgroundColor: '#F5FCFF',
-  },
-  toolbar: {
-    backgroundColor: '#a9a9a9',
-    height: 56,
-  },
-  WebViewContainer: {
-    flex: 1,
-  }
-});
+import styles from './styles';
 
 run(main, {
   RN: makeReactNativeDriver('CycleReactNativeEx'),

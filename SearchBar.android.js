@@ -26,7 +26,7 @@ import {
   PanResponder,
 } from 'react-native';
 
-let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
+let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native');
 
 var IS_RIPPLE_EFFECT_SUPPORTED = Platform.Version >= 21;
 
@@ -51,7 +51,7 @@ var SearchBar = React.createClass({
       TouchableNativeFeedback.SelectableBackgroundBorderless() :
       TouchableNativeFeedback.SelectableBackground();
     return (
-      <CycleView style = {styles.searchBar} key = "search">
+      <View style = {styles.searchBar} key = "search">
         <TouchableNativeFeedback
             key = "bar"
             background={background}
@@ -77,7 +77,7 @@ var SearchBar = React.createClass({
             selector = "text-input"
         />
         {loadingView}
-      </CycleView>
+      </View>
     );
   }
 });

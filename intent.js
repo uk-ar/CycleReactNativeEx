@@ -40,9 +40,36 @@ import {
   AsyncStorage,
 } from 'react-native';
 
-function intent({RN, HTTP}){
+function intent(RN, HTTP){
   //Actions
+  const books$ = HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
+                     .switch()
+                     .map(res =>
+                       res.body.Items
+                          .filter(book => book.isbn)
+                         //reject non book
+                          .filter(book => (book.isbn.startsWith("978")
+                              || book.isbn.startsWith("979")))
+                     )
+                     .do(i => console.log("books change:%O", i))
+                     .share();
+  const inc$ = RN.select('button').events('press')
+                 .do(i => console.log("inc:%O", i))
+                 .subscribe();
+  const changeSearch$ = RN.select('text-input')
+                          .events('change')
+                          .map(event => event.args[0].nativeEvent.text)
+                          .do(i => console.log("search text change:%O", i));
+  const searchRequest$ = changeSearch$.debounce(500)
+                                      .filter(query => query.length > 1)
+                                      .map(q => RAKUTEN_SEARCH_API + encodeURI(q));
+  const statusRequest$ = books$.map(books => books.map(book => book.isbn))
+                               .map(q => CALIL_STATUS_API + encodeURI(q))
+                               .do(i => console.log("status req:%O", i));
   return{
+    searchRequest$:searchRequest$,
+    statusRequest$:statusRequest$,
+    changeSearch$:changeSearch$,
     navigatorMounted$: RN.select('nav')
                          .events('navigatorMounted')
                          .map(i=> i.args[0])
@@ -102,24 +129,10 @@ function intent({RN, HTTP}){
                   .scan((current, event) => !current)
                   .do(i => console.log("sort:%O", i))
       ,
-    changeSearch$: RN.select('text-input')
-                     .events('change')
-                     .map(event => event.args[0].nativeEvent.text)
-                     .do(i => console.log("search text change:%O", i)),
     //intent & model
     searchResponse$:null
     ,
-    books$: HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
-                .switch()
-                .map(res =>
-                  res.body.Items
-                     .filter(book => book.isbn)
-                    //reject non book
-                     .filter(book => (book.isbn.startsWith("978")
-                         || book.isbn.startsWith("979")))
-                )
-                .do(i => console.log("books change:%O", i))
-                .share(),
+    books$: books$,
     booksStatus$: HTTP
       .filter(res$ => res$.request.url.indexOf(CALIL_STATUS_API) === 0)
       .switch()
