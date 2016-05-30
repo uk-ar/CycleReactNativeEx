@@ -36,7 +36,8 @@ let {
 import Touchable from '@cycle/react-native/src/Touchable';
 const {
   TouchableOpacity,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Text,
 } = Touchable;
 
 import {
@@ -44,8 +45,8 @@ import {
   ListView,
   Platform,
   ProgressBarAndroid,
+  //Text,
   StyleSheet,
-  Text,
   View,
   Image,
   TouchableHighlight,
