@@ -27,6 +27,7 @@ import {
 } from 'react-native';
 
 let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native');
+import Touchable from '@cycle/react-native/src/Touchable';
 
 var IS_RIPPLE_EFFECT_SUPPORTED = Platform.Version >= 21;
 
@@ -63,7 +64,7 @@ var SearchBar = React.createClass({
             />
           </View>
         </TouchableNativeFeedback>
-        <TextInput
+        <Touchable.TextInput
           key="input"
           ref="input"
           autoCapitalize="none"
@@ -73,8 +74,8 @@ var SearchBar = React.createClass({
           placeholder="Search a movie..."
           placeholderTextColor="rgba(255, 255, 255, 0.5)"
           onFocus={this.props.onFocus}
-            style={styles.searchBarInput}
-            selector = "text-input"
+          style={styles.searchBarInput}
+          selector="text-input"
         />
         {loadingView}
       </View>

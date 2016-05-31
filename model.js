@@ -46,12 +46,14 @@ import {
   AsyncStorage,
 } from 'react-native';
 
+import NavigationStateUtils from 'NavigationStateUtils';
+
 function model(actions){
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
 
   //model
   const booksWithStatus$ = actions
-    .books$
+    .booksResponse$
     .combineLatest(actions.booksStatus$.startWith([]), (books, booksStatus) => {
       return books.map(book => {
         if((booksStatus[book.isbn] !== undefined) && //not yet retrieve
@@ -83,13 +85,13 @@ function model(actions){
     })
     .startWith(MOCKED_MOVIES_DATA)
     .do(i => console.log("booksWithStatus$:%O", i))
-    .combineLatest(actions.filterState$,(books,filter)=>{
-      return books.map(book => {
-        book.active = filter ? (!book.libraryStatus || book.libraryStatus.exist) :
-                      true;
-        return book
-      })
-    })
+    /* .combineLatest(actions.filterState$,(books,filter)=>{
+       return books.map(book => {
+       book.active = filter ? (!book.libraryStatus || book.libraryStatus.exist) :
+       true;
+       return book
+       })
+       }) */
     .do(i => console.log("booksWithStatus2$:%O", i))
     /* .combineLatest(actions.openSwipe$.startWith(1), (books,rowID) => {
        for (var i = 0; i < books.length; i++) {
@@ -99,7 +101,7 @@ function model(actions){
        return books;
        }) */
     //.share();
-
+    /*
   let navigatorPushRequest$ = actions
               .openBook$
               .map(i => {
@@ -115,10 +117,11 @@ function model(actions){
                 title: 'detail',
                 component: BookScreen,
                 passProps: {url: url}
-              }));
+       })); */
 
+  let inbox$ = Rx.Observable.just([]);
   // for android action
-  function canPop(navigator){
+  /* function canPop(navigator){
     return (navigator && navigator.getCurrentRoutes().length > 1)
   }
   let navigatorPopRequest$;
@@ -145,11 +148,6 @@ function model(actions){
   let inbox=[]
   //load inbox
   actions.inBoxStatus$.subscribe((i) => inbox = i);
-  /* var result = inbox.filter(inBoxBook => inBoxBook.isbn !== book.isbn);
-     console.log("result1:%O", result);
-     result.unshift(book);
-     console.log("result2:%O", result);
-     return result; */
   //.do(i => console.log("addInbox$:%O", i))
   actions.addInbox$.map(book =>
     [book].concat(
@@ -175,11 +173,11 @@ function model(actions){
       return Rx.Observable
                .fromPromise(
                  AsyncStorage.setItem(STORAGE_KEY,JSON.stringify(inbox)))
-    });
-  var booksLoadingState$ = actions.searchRequest$.map((_)=> true)
+    });*/
+  var booksLoadingState$ = actions.requestBooks$.map((_)=> true)
                                   .merge(
                                     //response event
-                                    actions.books$.map((_)=>false));
+                                    actions.booksResponse$.map((_)=>false));
   /* searchRequest$,statusRequest$
      searchRequest,statusRequest, */
 
@@ -191,15 +189,27 @@ function model(actions){
       {key: 'Search'}
     ]
   };
-
-  const navigationState$ = Rx.Observable.just(initialNavigationState)
-                            //.startWith()
-                            .scan((prevState, action) => {
-                              return action.type === 'back'
-                                   ? NavigationStateUtils.pop(prevState)
-                                : NavigationStateUtils.push(prevState, action)
-                            })
-                            //.merge(goToSecondView,goToThirdView,goToCreditsView,back)
+  //const navigationState$ = Rx.Observable.just(initialNavigationState)
+  const navigationState$ =
+  Rx.Observable
+    .merge(
+      actions.goToInboxView$,
+      actions.goToSearchView$,
+    )
+    .distinctUntilChanged(navigationState =>
+      navigationState, (a, b) => {
+        if (a.type === `back` && b.type === `back`) {
+          return false
+        }
+        return a.key === b.key
+      })
+    .startWith(initialNavigationState)
+    .scan((prevState, action) => {
+      return action.type === 'back'
+           ? NavigationStateUtils.pop(prevState)
+           : NavigationStateUtils.push(prevState, action)
+    })
+  //.merge(goToSecondView,goToThirdView,goToCreditsView,back)
   /* .distinctUntilChanged(navigationState => navigationState, (a, b) => {
      if (a.type === `back` && b.type === `back`) {
      return false

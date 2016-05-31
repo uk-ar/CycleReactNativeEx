@@ -31,6 +31,15 @@ import {
   PanResponder,
 } from 'react-native';
 
+import Touchable from '@cycle/react-native/src/Touchable';
+Touchable["FAIcon"] = Touchable.createCycleComponent(
+  FAIcon,Touchable.PRESS_ACTION_TYPES);
+
+Touchable["SegmentedControls"] = Touchable.createCycleComponent(
+  SegmentedControls,{
+    onSelection: 'selection',
+  });
+
 var GiftedNavigator = React.createClass({
   componentDidMount: function(){
     //console.log("nav this:%O", this);
@@ -84,13 +93,6 @@ var BookListView = React.createClass({
       //fontWeight: 'bold'
       marginHorizontal: 5
     };
-    //CycleView has not pass key props? bind this?
-    //augmentVTreeWithHandlers seems to have problem
-    //          directionalLockEnabled = {true}
-    /* dataSource={
-      dataSource.cloneWithRows(this.props.dataSource)
-    } */
-
     return(
       <View>
       <ListView
@@ -101,6 +103,8 @@ var BookListView = React.createClass({
               //need to intercept renderRow?
               //error on already defined
               //selector="bookcell"
+              //<Touchable.TouchableOpacity selector="list"> //ng
+              //<TouchableOpacity selector="list"> //ok
               return (
                   <BookCell movie={movie}
                             sectionID={sectionID}
@@ -108,8 +112,8 @@ var BookListView = React.createClass({
                             onLike={this.props.onLike}
                             onDone={this.props.onDone}
                             onInbox={this.props.onInbox}
-                            selector="foo"
-                                      />)
+                                    />
+              )
             }}
           enableEmptySections={true}
           automaticallyAdjustContentInsets={false}
@@ -120,13 +124,13 @@ var BookListView = React.createClass({
             <View style = {[styles.row,
                             { justifyContent: "space-between",
                               alignItems: "center"}]}>
-              <FAIcon name = "filter"
+              <Touchable.FAIcon name = "filter"
                     selector = "filter"
                     size = {25}
                     color = "#007AFF"
                     style={{marginHorizontal: 8}}
               />
-              <SegmentedControls
+              <Touchable.SegmentedControls
                   options={ options }
                   selector = "segmented"
                   style={styles.toolbarButton}
@@ -135,7 +139,7 @@ var BookListView = React.createClass({
                     }}
                   selectedOption={this.props.selectedOption}
               />
-              <FAIcon name = "sort"
+              <Touchable.FAIcon name = "sort"
                       selector = "sort"
                       size = {25}
                       color = "#007AFF"
@@ -177,7 +181,7 @@ var InBoxScreen = React.createClass({
 //var SearchBar = require('SearchBar');
 var SearchBar = require('./SearchBar');
 
-var SearchScreen = React.createClass({
+/* var SearchScreen = React.createClass({
   getInitialState(){
     return {
       isLoading:false,
@@ -207,12 +211,8 @@ var SearchScreen = React.createClass({
             isLoading={this.state.isLoading}
         />
         <View style={styles.separator} />
-        { /* actions$={this.props.actions$} */}
         <BookListView dataSource$={
           this.props.state$.booksWithStatus$
-          /* .merge(
-          this.props.state$.searchRequest$.map((_) => [])
-          ) */
                                   }
                       key = "searchlistview"
                       selectedOption='検索'
@@ -222,7 +222,7 @@ var SearchScreen = React.createClass({
     )
   }
   //https://github.com/facebook/react-native/blob/master/Examples/Movies/SearchScreen.js
-});
+});*/
 
 var cellWidth = 60;
 var styles = StyleSheet.create({
@@ -319,4 +319,4 @@ var styles = StyleSheet.create({
   },
 });
 
-module.exports = {SearchScreen, InBoxScreen, GiftedNavigator,BookListView};
+module.exports = {InBoxScreen, GiftedNavigator,BookListView};

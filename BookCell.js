@@ -6,7 +6,6 @@ var FAIcon = require('react-native-vector-icons/FontAwesome');
 var MIcon = require('react-native-vector-icons/MaterialIcons');
 var GiftedSpinner = require('react-native-gifted-spinner');
 
-import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
 var _ = require('lodash');
 
 var {
@@ -34,6 +33,7 @@ var {
   PanResponder,
   ToastAndroid,
 } = ReactNative;
+import Touchable from '@cycle/react-native/src/Touchable';
 
 var Dimensions = require('Dimensions');
 var {
@@ -166,15 +166,19 @@ var BookCell = React.createClass({
                    icon="check-square-o"
                    text="読んだ"
       />,//amber
-    ];
-    var TouchableElement = TouchableHighlight;
+    ];//Touchable
+    //onPress={()=>console.log("cell press")}
+    var TouchableElement = Touchable.TouchableHighlight;
     if (Platform.OS === 'android') {
-      TouchableElement = TouchableNativeFeedback;
+      TouchableElement = Touchable.TouchableNativeFeedback;
     }
     return(
       <SwipeableRow style={[styles.row]}
                     leftButtons={leftButtons}
                     rightButtons={rightButtons}>
+      <TouchableElement
+           selector="cell"
+           payload={book}>
           <View style={[styles.row,{flex:1}]}>
             <Image source={{uri: book.thumbnail}}
                    resizeMode="contain"
@@ -198,6 +202,7 @@ var BookCell = React.createClass({
               />
             </View>
           </View>
+          </TouchableElement>
       </SwipeableRow>
     )}
 });

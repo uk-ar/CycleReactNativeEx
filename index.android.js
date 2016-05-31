@@ -37,10 +37,10 @@ import Touchable from '@cycle/react-native/src/Touchable';
 const {
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Text,
 } = Touchable;
 
 import {
+  Text,
   ActivityIndicatorIOS,
   ListView,
   Platform,
@@ -121,10 +121,6 @@ function main({RN, HTTP, EE}) {
     return(
       <View style={styles.container}
             key = "searchScreen">
-        <Text selector="button">Increment1</Text>
-        <TouchableOpacity selector='button'>
-          <Text>Increment2</Text>
-        </TouchableOpacity>
         <SearchBar
             key="searchBar"
             isLoading={booksLoadingState}
@@ -136,6 +132,19 @@ function main({RN, HTTP, EE}) {
         />
       </View>
       )
+  };
+  function InboxView({booksWithStatus,booksLoadingState}){
+    //console.log('navigationProps', model);
+    return(
+      <View style={styles.container}
+            key = "searchScreen">
+        <View style={styles.separator} />
+        <BookListView dataSource={booksWithStatus}
+                      selectedOption='読みたい'
+                      selector="bookcell"
+        />
+      </View>
+    )
   };
 
   function view(model){
@@ -150,9 +159,9 @@ function main({RN, HTTP, EE}) {
           console.log('navigationProps', navigationProps);
           switch (key) {
             case 'Search':
-              //return renderCard(CreditsView(model), navigationProps);
               return renderCard(SearchView(model), navigationProps);
-              //return (<Text>foo</Text>)
+            case 'Inbox':
+              return renderCard(InboxView(model), navigationProps);
             default:
               console.error('Unexpected view', navigationProps, key);
               return (<Text>bar</Text>)
@@ -162,16 +171,10 @@ function main({RN, HTTP, EE}) {
       />)
   };
 
-  let SearchView$ = state$.map(view);
-  //let SearchView$ = state$.startWith(0).map(view);
-  let request$ = actions.searchRequest$.merge(actions.statusRequest$)
-
   return {
-    RN: SearchView$,//.merge(DetailView$),
-    //HTTP: state$.searchRequest$.merge(state$.statusRequest$),
-    HTTP: request$,
+    RN: state$.map(view),
+    HTTP: actions.request$,//state$.map(request),
     EE: sinks,
-    //
     //sinks.onNext({event: "foo",args:{bar:"baz"}}),
   };
 }
