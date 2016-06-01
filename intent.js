@@ -62,8 +62,8 @@ function intent(RN, HTTP){
   const requestStatus$ = booksResponse$.map(books => books.map(book => book.isbn))
                                        .map(q => CALIL_STATUS_API + encodeURI(q))
                                        .do(i => console.log("status req:%O", i));
-
   const request$ = Rx.Observable.merge(requestBooks$, requestStatus$);
+  console.log("RN:%O",RN.navigateBack())
   return{
     requestBooks$:requestBooks$,
     request$:request$,
@@ -87,6 +87,9 @@ function intent(RN, HTTP){
                          key: 'Search',
                        }))
                        .do(i => console.log("select press2:%O", i))
+      ,
+    back$: RN.navigateBack()
+       .map({type: 'back'})
       ,
     openBook$: RN.select('cell').events('press')
                  //.map(i => i.currentTarget.props.item)

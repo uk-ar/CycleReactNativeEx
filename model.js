@@ -195,6 +195,7 @@ function model(actions){
     .merge(
       actions.goToInboxView$,
       actions.goToSearchView$,
+      actions.back$,
     )
     .distinctUntilChanged(navigationState =>
       navigationState, (a, b) => {
