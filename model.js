@@ -186,7 +186,7 @@ function model(actions){
     index: 0,
     title: 'Cycle Native',
     children: [
-      {key: 'Search'}
+      {key: 'Main'},
     ]
   };
   //const navigationState$ = Rx.Observable.just(initialNavigationState)
@@ -195,6 +195,7 @@ function model(actions){
     .merge(
       actions.goToInboxView$,
       actions.goToSearchView$,
+      actions.goToSectionView$,
       actions.back$,
     )
     .distinctUntilChanged(navigationState =>
@@ -206,18 +207,17 @@ function model(actions){
       })
     .startWith(initialNavigationState)
     .scan((prevState, action) => {
-      return action.type === 'back'
-           ? NavigationStateUtils.pop(prevState)
-           : NavigationStateUtils.push(prevState, action)
+      switch (action.type) {
+        case 'back':
+          return NavigationStateUtils.pop(prevState);
+        case 'push':
+          return NavigationStateUtils.push(prevState, action);
+        case 'replace':
+          return NavigationStateUtils.replace(prevState, action);
+        default:
+          console.error('Unexpected action', navigationProps, key);
+      }
     })
-  //.merge(goToSecondView,goToThirdView,goToCreditsView,back)
-  /* .distinctUntilChanged(navigationState => navigationState, (a, b) => {
-     if (a.type === `back` && b.type === `back`) {
-     return false
-     }
-
-     return a.key === b.key
-     }) */
 
   return  Rx.Observable
             .combineLatest(booksWithStatus$,

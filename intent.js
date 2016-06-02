@@ -88,19 +88,25 @@ function intent(RN, HTTP){
                        }))
                        .do(i => console.log("select press2:%O", i))
       ,
-    back$: RN.navigateBack()
-       .map({type: 'back'})
+    goToSectionView$: RN.select('section')
+                        .events('press')
+                        .map(profile=>({
+                          type: 'push',
+                          //type: 'replace',
+                          key: 'Section',
+                        }))
+                        .do(i => console.log("section:%O", i))
+      ,
+    back$: Rx.Observable
+             .merge(RN.navigateBack(),
+                    RN.select('close').events('press'))
+             .map({type: 'back'})
       ,
     openBook$: RN.select('cell').events('press')
                  //.map(i => i.currentTarget.props.item)
                  .do(i => console.log("cell press:%O", i))
                  //.subscribe()
       ,
-    /* openSwipe$: RN.select('swipeout').events('open')
-                  .map(i => i.args[1])
-                  .map(i => parseInt(i, 10))
-                  .do(i => console.log("swipe open:%O", i))
-                  //.subscribe(), */
     inBoxStatus$: Rx.Observable
                     .fromPromise(AsyncStorage.getItem(STORAGE_KEY))
                     .map(i => i ? JSON.parse(i) : [])
