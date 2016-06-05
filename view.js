@@ -49,7 +49,7 @@ function onNavigateBack(action){
 import NavigationCardStackStyleInterpolator from 'NavigationCardStackStyleInterpolator';
 
 function emptyFunction(){};
-function renderCard(vdom, navigationProps) {
+function renderVCard(vdom, navigationProps) {
   return (
     //      onNavigate={onNavigateBack}
     //NavigationExperimental.Card is not deplicated.
@@ -58,6 +58,19 @@ function renderCard(vdom, navigationProps) {
       {...navigationProps}
       key={'View:' + navigationProps.scene.navigationState.key}
       style={NavigationCardStackStyleInterpolator.forVertical(navigationProps)}
+      renderScene={() => vdom}
+      onNavigate={onNavigateBack}
+    />
+  );
+}
+function renderCard(vdom, navigationProps) {
+  return (
+    //      onNavigate={onNavigateBack}
+    //NavigationExperimental.Card is not deplicated.
+    //navigationState={navigationProps.navigationParentState}
+    <NavigationExperimental.Card
+      {...navigationProps}
+      key={'View:' + navigationProps.scene.navigationState.key}
       renderScene={() => vdom}
       onNavigate={onNavigateBack}
     />
@@ -100,79 +113,90 @@ var dataSource = new ListView.DataSource({
   sectionHeaderHasChanged: (s1, s2) => s1 !== s2
 })
 
-/* var terminator = (
-   <View style={{
-   backgroundColor:"#E0E0E0",//grey 300
-   borderTopLeftRadius:0,
-   borderTopRightRadius:0,
-   borderRadius:5,
-   padding:10,
-   marginBottom:3,
-   selector:"section",
-   //height:30,
-   }}>
-   <Text>
-   もっと読む
-   </Text>
-   </View>); */
+function MySectionFooter({text}) {
+  return(
+    <View style={{
+        backgroundColor:"#E0E0E0",//grey 300
+        borderTopLeftRadius:0,
+        borderTopRightRadius:0,
+        borderRadius:5,
+        padding:10,
+        marginBottom:3,
+        //height:30,
+      }}>
+      <Text>
+        {text}
+      </Text>
+    </View>)
+};
 
-function MySectionHeader(big) {
-  return ((sectionData,sectionID)=>{
-    //terminator is one of row
-    //android not support sticky
-    // return null;
-    console.log("b:%O",big)
-    var content=null;
-    if(big == true){
-      content=(
-        <Touchable.FAIcon
+function MySectionHeader({big,sectionID}) {
+  var content = big ? (
+      <Touchable.FAIcon
           name="close"
           selector="close"
           size={20}
           style={{marginRight:5}}/>
-      )//margin:10
-    }
-    return(
-      <TouchableElement
-         selector="section"
-         payload={sectionID}>
-        <View style={{
-            backgroundColor:"#E0E0E0",//grey 300
-            borderTopLeftRadius:5,
-            borderTopRightRadius:5,
-            marginTop:3,
-            padding:10,
-            flexDirection:"row",
-            //selector:"section",
-            //height:30,
-          }}>
-          {content}
-          <Text>
-            {"section:"+sectionID}
-          </Text>
-        </View>
-      </TouchableElement>
-    )
-  })
-}
+  ) : null;
+    //margin:10
+  return(
+    <TouchableElement
+        selector="section"
+        payload={sectionID}>
+      <View style={{
+          backgroundColor:"#E0E0E0",//grey 300
+          borderTopLeftRadius:5,
+          borderTopRightRadius:5,
+          marginTop:3,
+          padding:10,
+          flexDirection:"row",
+          //selector:"section",
+          //height:30,
+        }}>
+        {content}
+        <Text>
+          {"section:"+sectionID}
+        </Text>
+      </View>
+    </TouchableElement>
+  )
+};
 
-
-function MyListView({items, sectionHeader }) {
-  var data = dataSource.cloneWithRowsAndSections(items)
+function Cell({item}) {
   return (
+    <Touchable.TouchableNativeFeedback
+                          selector="cell"
+                          payload={item}>
+      <View style={{
+          backgroundColor:"#FAFAFA",//grey 300
+          padding:10,
+        }}>
+        <Text style={{height:30}}>
+          {item}
+        </Text>
+      </View>
+    </Touchable.TouchableNativeFeedback>
+  )
+};
+
+
+function MyListView({items, sectionHeader,selectedSection }) {
+  var data = dataSource.cloneWithRowsAndSections(items)
+    //cell
+    return (
     <ListView
         dataSource={data}
-        renderRow={(item)=> {
-            return(
-              <View style={{
-                  backgroundColor:"#FAFAFA",//grey 300
-                  padding:10,
-                }}>
-                <Text style={{height:30}}>
-                            {item}
-                </Text>
-              </View>
-            )
+        renderRow={(item,sectionID)=> {
+            if(!selectedSection || sectionID == selectedSection){
+              if(item !== null){return <Cell item={item}/>}
+              return (selectedSection ?
+                      <MySectionFooter text={""}/> :
+                      <MySectionFooter text={"もっと読む"}/>
+              )
+            }else{
+              //non active section
+              return null;
+            }
           }}
         renderSectionHeader={sectionHeader}
         style={{
@@ -183,46 +207,70 @@ function MyListView({items, sectionHeader }) {
   )
 }
 
-function MainView({booksWithStatus,booksLoadingState}){
+function MainView({booksWithStatus,booksLoadingState,selectedSection}){
   //console.log('navigationProps', model);
-  return(
-    <View style={{
-      flex:1,
-      backgroundColor:"#1A237E",//indigo 900
-      //backgroundColor:"#263238",//blue grey 800
-    }}>
+  var header =
+  selectedSection ?
+  null : (
     <View style={{padding:10,}}>
       <Text style={{color:"white"}}>
         header
       </Text>
-    </View>
+    </View>);
+
+  // ref: https://facebook.github.io/react-native/docs/listviewdatasource.html#constructor
+  var all_items = {
+    a:["foo","bar","baz","qux","1","2","3","4","5",],
+    b:["a","b","c","d"],
+    c:["f","g","h","i","j"],
+  }
+  var items ={}// = all_items;
+  Object.keys(all_items)
+        .map((key)=>{
+          items[key] = selectedSection ?
+                       all_items[key] :
+                       all_items[key].slice(0,3)
+          return key;
+        }).map((key)=>
+          //add terminator
+          items[key].push(null)
+        )
+  LayoutAnimation.easeInEaseOut();
+
+  return(
+    <View style={{
+        flex:1,
+        backgroundColor:"#1A237E",//indigo 900
+        //backgroundColor:"#263238",//blue grey 800
+      }}>
+      {header}
     <MyListView
-        items={{a:["foo","bar","baz","qux"],
-                b:["a","b","c","d"],
-                c:["f","g","h","i","j"],
-          }}
-        sectionHeader={MySectionHeader(false)}
-    />
+        items={items}
+        selectedSection={selectedSection}
+        sectionHeader={(sectionData, sectionID) => {
+            return (!selectedSection || sectionID == selectedSection) ?
+                   <MySectionHeader
+                 big={selectedSection ? true : false}
+                 sectionID={sectionID}/>: <View />
+          }}/>
+    </View>
+  )//big={selectedSection ? false : true}
+};
+
+function BookView({booksWithStatus,booksLoadingState,selectedBook}){
+  //console.log('navigationProps', model);
+  return(
+    <View style={{
+        flex:1,
+        backgroundColor:"#1A237E",//indigo 900
+        //backgroundColor:"#263238",//blue grey 800
+      }}>
+      <Text>
+        {selectedBook}
+      </Text>
     </View>
   )
 };
-
- function SectionView({booksWithStatus,booksLoadingState}){
-   //console.log('navigationProps', model);
-   return(
-     <View style={{
-         flex:1,
-         backgroundColor:"#1A237E",//indigo 900
-         //backgroundColor:"#263238",//blue grey 800
-       }}>
-       <MyListView
-           items={{a:["foo","bar","baz","qux"],
-             }}
-           sectionHeader={MySectionHeader(true)}
-       />
-     </View>
-   )
- };
 
 function view(model){
   //console.log('navigationProps', model);
@@ -244,8 +292,8 @@ function view(model){
               return renderCard(InboxView(model), navigationProps);
             case 'Main':
               return renderCard(MainView(model), navigationProps);
-            case 'Section':
-              return renderCard(SectionView(model), navigationProps);
+            case 'Book':
+              return renderCard(BookView(model), navigationProps);
             default:
               console.error('Unexpected view', navigationProps, key);
               return (<Text>bar</Text>)

@@ -119,7 +119,9 @@ function model(actions){
                 passProps: {url: url}
        })); */
 
-  let inbox$ = Rx.Observable.just([]);
+    let inbox$ = Rx.Observable.just([]);
+  let selectedBook$ = actions.goToBookView$
+                             .map(({data})=>data)
   // for android action
   /* function canPop(navigator){
     return (navigator && navigator.getCurrentRoutes().length > 1)
@@ -195,7 +197,8 @@ function model(actions){
     .merge(
       actions.goToInboxView$,
       actions.goToSearchView$,
-      actions.goToSectionView$,
+      //actions.goToSectionView$,
+      actions.goToBookView$,
       actions.back$,
     )
     .distinctUntilChanged(navigationState =>
@@ -218,14 +221,16 @@ function model(actions){
           console.error('Unexpected action', navigationProps, key);
       }
     })
-
+  
   return  Rx.Observable
             .combineLatest(booksWithStatus$,
                            inbox$.startWith([]),
                            booksLoadingState$.startWith(false),
                            navigationState$,
-              (booksWithStatus,inbox,booksLoadingState,navigationState) =>
-                ({booksWithStatus, inbox, booksLoadingState,navigationState,}));
+                           selectedBook$.startWith(null),
+                           actions.selectedSection$.startWith(null),
+                           (booksWithStatus,inbox,booksLoadingState,navigationState,selectedBook,selectedSection) =>
+                             ({booksWithStatus, inbox, booksLoadingState,navigationState,selectedBook,selectedSection,}));
 
   /*
   var state$ = {
