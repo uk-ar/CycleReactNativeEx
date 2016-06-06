@@ -133,9 +133,6 @@ function MySectionFooter({text}) {
 
 function MySectionHeader({children}) {
   return(
-    <TouchableElement
-        selector="section"
-        payload={sectionID}>
       <View style={{
           backgroundColor:"#E0E0E0",//grey 300
           borderTopLeftRadius:5,
@@ -147,11 +144,7 @@ function MySectionHeader({children}) {
           //height:30,
         }}>
         {content}
-        <Text>
-          {"section:"+sectionID}
-        </Text>
       </View>
-    </TouchableElement>
   )
 };
 
@@ -208,17 +201,32 @@ function MyListView({items, sectionHeader, selectedSection }) {
       [items[selectedSection],items[parseInt(selectedSection)+1]])
     counts = [items[selectedSection].length]
     content = (
-      <Touchable.FAIcon
+      <View>
+        <Touchable.FAIcon
           name="close"
           selector="close"
           size={20}
-          style={{marginRight:5}}/>)
+          style={{marginRight:5}}/>
+        <Text>
+          {"section:"}
+        </Text>
+      </View>
+    )
   }else{
     footerText = "すべて表示"
     data = dataSource.cloneWithRowsAndSections(
       items.map((books)=> books.slice(0,limit)))
     counts = items.map((books)=>books.length)
-    content = null
+    content =(
+      <TouchableElement
+          selector="section"
+          payload={sectionID}>
+        <Text>
+          {"section:"}
+        </Text>
+      </TouchableElement>
+    )
+
     //margin:10
   };
   //cell
