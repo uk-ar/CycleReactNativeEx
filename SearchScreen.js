@@ -87,7 +87,6 @@ var BookListView = React.createClass({
       color: 'white',
       marginHorizontal: 5
     };
-
     const selectedStyle = {
       color: '#007AFF',//'rgba(0,0,0,1)',//baseColor,
       //fontWeight: 'bold'
@@ -106,7 +105,7 @@ var BookListView = React.createClass({
               //<Touchable.TouchableOpacity selector="list"> //ng
               //<TouchableOpacity selector="list"> //ok
               return (
-                  <BookCell movie={movie}
+                  <BookCell book={movie}
                             sectionID={sectionID}
                             rowID={rowID}
                             onLike={this.props.onLike}

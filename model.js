@@ -52,9 +52,13 @@ function model(actions){
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
 
   //model
-  const booksWithStatus$ = actions
-    .booksResponse$
-    .combineLatest(actions.booksStatus$.startWith([]), (books, booksStatus) => {
+  //result items inbox favoritebox searchedbox
+  //searchedBooks $
+  const searchedBooks$ = Rx.Observable
+                             .combineLatest(
+                               actions.booksResponse$,
+                               actions.booksStatus$.startWith([]),
+                               (books, booksStatus) => {
       return books.map(book => {
         if((booksStatus[book.isbn] !== undefined) && //not yet retrieve
            //sub library exist?
@@ -83,8 +87,7 @@ function model(actions){
       }
       )
     })
-    .startWith(MOCKED_MOVIES_DATA)
-    .do(i => console.log("booksWithStatus$:%O", i))
+    .do(i => console.log("searchedBooks$:%O", i))
     /* .combineLatest(actions.filterState$,(books,filter)=>{
        return books.map(book => {
        book.active = filter ? (!book.libraryStatus || book.libraryStatus.exist) :
@@ -92,7 +95,7 @@ function model(actions){
        return book
        })
        }) */
-    .do(i => console.log("booksWithStatus2$:%O", i))
+    .do(i => console.log("searchedBooks2$:%O", i));
     /* .combineLatest(actions.openSwipe$.startWith(1), (books,rowID) => {
        for (var i = 0; i < books.length; i++) {
        if (i != rowID) books[i].active = false
@@ -119,7 +122,19 @@ function model(actions){
                 passProps: {url: url}
        })); */
 
-    let inbox$ = Rx.Observable.just([]);
+  let likedBooks$ = Rx.Observable.just([
+    {title: "like:SOFT SKILLS",isbn:"9784822251550",},
+    {title: "like:foo",isbn:"9784480064851",},
+  ])
+  let doneBooks$ = Rx.Observable.just([
+    {title:"done:bar",isbn:"9784105393069"},
+    {title:"done:baz",isbn:"9784822285159"},
+    {title:"done:toz",isbn:"9784757142794"},
+  ]);
+  let borrowedBooks$ = Rx.Observable.just([
+    {title:"borrow:qux",isbn:"9784492314630",},
+    {title:"borrow:quxx",isbn:"9784798134208",},
+  ]);
   let selectedBook$ = actions.goToBookView$
                              .map(({data})=>data)
   // for android action
@@ -220,17 +235,19 @@ function model(actions){
         default:
           console.error('Unexpected action', navigationProps, key);
       }
-    })
-  
+    });
+
   return  Rx.Observable
-            .combineLatest(booksWithStatus$,
-                           inbox$.startWith([]),
+            .combineLatest(searchedBooks$.startWith(MOCKED_MOVIES_DATA),
+                           likedBooks$,
+                           doneBooks$,
+                           borrowedBooks$,
                            booksLoadingState$.startWith(false),
                            navigationState$,
                            selectedBook$.startWith(null),
                            actions.selectedSection$.startWith(null),
-                           (booksWithStatus,inbox,booksLoadingState,navigationState,selectedBook,selectedSection) =>
-                             ({booksWithStatus, inbox, booksLoadingState,navigationState,selectedBook,selectedSection,}));
+                           (searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,navigationState,selectedBook,selectedSection) =>
+                             ({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,navigationState,selectedBook,selectedSection,}));
 
   /*
   var state$ = {

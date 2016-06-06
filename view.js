@@ -109,6 +109,7 @@ function InboxView({booksWithStatus,booksLoadingState}){
 };
 
 var dataSource = new ListView.DataSource({
+  //rowHasChanged: (r1, r2) => r1.isbn !== r2.isbn,
   rowHasChanged: (r1, r2) => r1 !== r2,
   sectionHeaderHasChanged: (s1, s2) => s1 !== s2
 })
@@ -130,15 +131,7 @@ function MySectionFooter({text}) {
     </View>)
 };
 
-function MySectionHeader({big,sectionID}) {
-  var content = big ? (
-      <Touchable.FAIcon
-          name="close"
-          selector="close"
-          size={20}
-          style={{marginRight:5}}/>
-  ) : null;
-    //margin:10
+function MySectionHeader({children}) {
   return(
     <TouchableElement
         selector="section"
@@ -162,43 +155,93 @@ function MySectionHeader({big,sectionID}) {
   )
 };
 
-function Cell({item}) {
+//key?
+function Cell({book}) {
   return (
     <Touchable.TouchableNativeFeedback
                           selector="cell"
-                          payload={item}>
+                          payload={book}>
       <View style={{
           backgroundColor:"#FAFAFA",//grey 300
           padding:10,
         }}>
-        <Text style={{height:30}}>
-          {item}
-        </Text>
+        <TouchableElement
+            selector="cell"
+            payload={book}>
+          <View style={[styles.row,{flex:1}]}>
+            <Image source={{uri: book.thumbnail}}
+                   resizeMode="contain"
+                   style={[styles.cellImage,]} />
+            <View style={[{flex:1,}]}>
+              <View style={[{flex:1,padding:10,justifyContent:"center",},
+                ]}>
+                <Text style={styles.bookTitle} numberOfLines={1}>
+                  {book.title}
+                </Text>
+                <Text style={styles.bookAuthor} numberOfLines={1}>
+                  {book.author}
+                </Text>
+              </View>
+              <View style={{height:StyleSheet.hairlineWidth,
+                            backgroundColor:'#CCCCCC',
+                            marginRight:10,
+                            //separator
+                }}
+              />
+            </View>
+          </View>
+        </TouchableElement>
       </View>
     </Touchable.TouchableNativeFeedback>
   )
 };
 
+var BookCell = require('./BookCell');
 
-function MyListView({items, sectionHeader,selectedSection }) {
-  var data = dataSource.cloneWithRowsAndSections(items)
-    //cell
-    return (
+function MyListView({items, sectionHeader, selectedSection }) {
+  const limit=1;
+
+  var footerText,data,count;
+  if(selectedSection){
+    footerText = ""
+    data = dataSource.cloneWithRowsAndSections(
+      [items[selectedSection],items[parseInt(selectedSection)+1]])
+    counts = [items[selectedSection].length]
+    content = (
+      <Touchable.FAIcon
+          name="close"
+          selector="close"
+          size={20}
+          style={{marginRight:5}}/>)
+  }else{
+    footerText = "すべて表示"
+    data = dataSource.cloneWithRowsAndSections(
+      items.map((books)=> books.slice(0,limit)))
+    counts = items.map((books)=>books.length)
+    content = null
+    //margin:10
+  };
+  //cell
+  return (
     <ListView
         dataSource={data}
-        renderRow={(item,sectionID)=> {
-            if(!selectedSection || sectionID == selectedSection){
-              if(item !== null){return <Cell item={item}/>}
-              return (selectedSection ?
-                      <MySectionFooter text={""}/> :
-                      <MySectionFooter text={"もっと読む"}/>
+        enableEmptySections={true}
+        renderRow={(item, sectionID, rowID)=> {
+            return <Cell book={item} />
+          }}
+        renderSectionHeader={(sectionData, sectionID) => {
+            if(sectionID % 2 == 0){
+              return (
+                <MySectionHeader>
+                            {content}
+                </MySectionHeader>
               )
             }else{
-              //non active section
-              return null;
+              return (
+                <MySectionFooter
+                  text={footerText + counts[sectionID-1]}/>)
             }
           }}
-        renderSectionHeader={sectionHeader}
         style={{
             padding:3,
             //height:100,
@@ -207,7 +250,7 @@ function MyListView({items, sectionHeader,selectedSection }) {
   )
 }
 
-function MainView({booksWithStatus,booksLoadingState,selectedSection}){
+function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,selectedSection}){
   //console.log('navigationProps', model);
   var header =
   selectedSection ?
@@ -218,23 +261,33 @@ function MainView({booksWithStatus,booksLoadingState,selectedSection}){
       </Text>
     </View>);
 
-  // ref: https://facebook.github.io/react-native/docs/listviewdatasource.html#constructor
-  var all_items = {
-    a:["foo","bar","baz","qux","1","2","3","4","5",],
-    b:["a","b","c","d"],
-    c:["f","g","h","i","j"],
-  }
-  var items ={}// = all_items;
-  Object.keys(all_items)
-        .map((key)=>{
-          items[key] = selectedSection ?
-                       all_items[key] :
-                       all_items[key].slice(0,3)
-          return key;
-        }).map((key)=>
-          //add terminator
-          items[key].push(null)
-        )
+  var items = [
+    searchedBooks,
+    [],//terminator
+    likedBooks,
+    [],//terminator
+    doneBooks,
+    [],//terminator
+    borrowedBooks,
+    [],//terminator
+  ]
+  //console.log("all:%O",all_items)
+  /* Object.keys(all_items)
+     .map((key)=>{
+     items[key] = selectedSection ?
+     all_items[key] :
+     all_items[key].slice(0,limit)
+     return key;
+     })
+     .map((key)=>{
+     var term = {type:"terminator",
+     section:key,
+     more:all_items[key].length - limit,}
+     if(items[key][items[key].length-1] !== term){
+     items[key].push(term);
+     }
+     }) */
+
   LayoutAnimation.easeInEaseOut();
 
   return(
@@ -247,12 +300,7 @@ function MainView({booksWithStatus,booksLoadingState,selectedSection}){
     <MyListView
         items={items}
         selectedSection={selectedSection}
-        sectionHeader={(sectionData, sectionID) => {
-            return (!selectedSection || sectionID == selectedSection) ?
-                   <MySectionHeader
-                 big={selectedSection ? true : false}
-                 sectionID={sectionID}/>: <View />
-          }}/>
+        />
     </View>
   )//big={selectedSection ? false : true}
 };
