@@ -5,6 +5,15 @@ import {
 
 var cellWidth = 60;
 var styles = StyleSheet.create({
+  //view.js
+  sectionHeader:{
+    backgroundColor:"#E0E0E0",//grey 300
+    borderTopLeftRadius:5,
+    borderTopRightRadius:5,
+    marginTop:3,
+    padding:10,
+    flexDirection:"row",
+  },
   //for toolBar
   toolbar: {
     backgroundColor: '#e9eaed',

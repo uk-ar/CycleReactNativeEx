@@ -131,23 +131,6 @@ function MySectionFooter({text}) {
     </View>)
 };
 
-function MySectionHeader({children}) {
-  return(
-      <View style={{
-          backgroundColor:"#E0E0E0",//grey 300
-          borderTopLeftRadius:5,
-          borderTopRightRadius:5,
-          marginTop:3,
-          padding:10,
-          flexDirection:"row",
-          //selector:"section",
-          //height:30,
-        }}>
-        {content}
-      </View>
-  )
-};
-
 //key?
 function Cell({book}) {
   return (
@@ -193,69 +176,78 @@ var BookCell = require('./BookCell');
 
 function MyListView({items, sectionHeader, selectedSection }) {
   const limit=1;
-
-  var footerText,data,count;
   if(selectedSection){
-    footerText = ""
-    data = dataSource.cloneWithRowsAndSections(
-      [items[selectedSection],items[parseInt(selectedSection)+1]])
-    counts = [items[selectedSection].length]
-    content = (
-      <View>
-        <Touchable.FAIcon
-          name="close"
-          selector="close"
-          size={20}
-          style={{marginRight:5}}/>
-        <Text>
-          {"section:"}
-        </Text>
-      </View>
+    //cell
+    return (
+      <ListView
+          dataSource={dataSource.cloneWithRowsAndSections(
+              [items[selectedSection],items[parseInt(selectedSection)+1]])}
+          enableEmptySections={true}
+          renderRow={(item, sectionID, rowID)=> {
+              return <Cell book={item} />
+            }}
+          renderSectionHeader={(sectionData, sectionID) => {
+              if(sectionID % 2 == 0){
+                return (
+                  <View style={styles.sectionHeader}>
+                    <Touchable.FAIcon
+                       name="close"
+                       selector="close"
+                       size={20}
+                       style={{marginRight:5}}/>
+                    <Text>
+                       {"section:"}
+                    </Text>
+                  </View>
+                )
+              }else{
+                return (
+                  <MySectionFooter
+                  text={items[selectedSection].length}/>)
+              }
+            }}
+          style={{
+              padding:3,
+              //height:100,
+            }}
+      />
     )
   }else{
-    footerText = "すべて表示"
-    data = dataSource.cloneWithRowsAndSections(
-      items.map((books)=> books.slice(0,limit)))
-    counts = items.map((books)=>books.length)
-    content =(
-      <TouchableElement
-          selector="section"
-          payload={sectionID}>
-        <Text>
-          {"section:"}
-        </Text>
-      </TouchableElement>
+    //cell
+    return (
+      <ListView
+          dataSource={dataSource.cloneWithRowsAndSections(
+              items.map((books)=> books.slice(0,limit)))}
+          enableEmptySections={true}
+          renderRow={(item, sectionID, rowID)=> {
+              return <Cell book={item} />
+            }}
+          renderSectionHeader={(sectionData, sectionID) => {
+              if(sectionID % 2 == 0){
+                return (
+                  <TouchableElement
+                    selector="section"
+                    payload={sectionID} >
+                    <View style={styles.sectionHeader}>
+                      <Text>
+                                {"section:"}
+                      </Text>
+                    </View>
+                  </TouchableElement>
+                )
+              }else{
+                return (
+                  <MySectionFooter
+                  text={`すべて表示(${items[sectionID-1].length})`}/>)
+              }
+            }}
+          style={{
+              padding:3,
+              //height:100,
+            }}
+      />
     )
-
-    //margin:10
   };
-  //cell
-  return (
-    <ListView
-        dataSource={data}
-        enableEmptySections={true}
-        renderRow={(item, sectionID, rowID)=> {
-            return <Cell book={item} />
-          }}
-        renderSectionHeader={(sectionData, sectionID) => {
-            if(sectionID % 2 == 0){
-              return (
-                <MySectionHeader>
-                            {content}
-                </MySectionHeader>
-              )
-            }else{
-              return (
-                <MySectionFooter
-                  text={footerText + counts[sectionID-1]}/>)
-            }
-          }}
-        style={{
-            padding:3,
-            //height:100,
-          }}
-    />
-  )
 }
 
 function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,selectedSection}){
@@ -367,6 +359,6 @@ function view(model){
    )
    }}
  */
-import styles from './styles';
+import {styles} from './styles';
 
 module.exports = view;
