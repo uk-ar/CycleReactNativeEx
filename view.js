@@ -175,10 +175,35 @@ function Cell({book}) {
 var BookCell = require('./BookCell');
 
 function MyListView({items, sectionHeader, selectedSection }) {
+
+}
+
+function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,selectedSection}){
+  var items = [
+    searchedBooks,
+    [],//terminator
+    likedBooks,
+    [],//terminator
+    borrowedBooks,
+    [],//terminator
+    doneBooks,
+    [],//terminator
+  ]
+  var titles=["検索","お気に入り","借りてる","読んだ"]
+
+  LayoutAnimation.easeInEaseOut();
+
   const limit=1;
-  if(selectedSection){
+  console.log("se:%O",selectedSection);
+  if(selectedSection !== null){
     //cell
     return (
+      <View style={{
+          flex:1,
+          backgroundColor:"#1A237E",//indigo 900
+          //backgroundColor:"#263238",//blue grey 800
+        }}>
+        {null /* for LayoutAnimation */}
       <ListView
           dataSource={dataSource.cloneWithRowsAndSections(
               [items[selectedSection],items[parseInt(selectedSection)+1]])}
@@ -196,7 +221,7 @@ function MyListView({items, sectionHeader, selectedSection }) {
                        size={20}
                        style={{marginRight:5}}/>
                     <Text>
-                       {"section:"}
+                             {titles[selectedSection/2]}
                     </Text>
                   </View>
                 )
@@ -211,10 +236,21 @@ function MyListView({items, sectionHeader, selectedSection }) {
               //height:100,
             }}
       />
+      </View>
     )
   }else{
     //cell
     return (
+      <View style={{
+        flex:1,
+        backgroundColor:"#1A237E",//indigo 900
+        //backgroundColor:"#263238",//blue grey 800
+        }}>
+        <View style={{padding:10,}}>
+          <Text style={{color:"white"}}>
+            header
+          </Text>
+        </View>
       <ListView
           dataSource={dataSource.cloneWithRowsAndSections(
               items.map((books)=> books.slice(0,limit)))}
@@ -230,7 +266,7 @@ function MyListView({items, sectionHeader, selectedSection }) {
                     payload={sectionID} >
                     <View style={styles.sectionHeader}>
                       <Text>
-                                {"section:"}
+                                {titles[sectionID/2]}
                       </Text>
                     </View>
                   </TouchableElement>
@@ -246,63 +282,9 @@ function MyListView({items, sectionHeader, selectedSection }) {
               //height:100,
             }}
       />
+      </View>
     )
   };
-}
-
-function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,selectedSection}){
-  //console.log('navigationProps', model);
-  var header =
-  selectedSection ?
-  null : (
-    <View style={{padding:10,}}>
-      <Text style={{color:"white"}}>
-        header
-      </Text>
-    </View>);
-
-  var items = [
-    searchedBooks,
-    [],//terminator
-    likedBooks,
-    [],//terminator
-    doneBooks,
-    [],//terminator
-    borrowedBooks,
-    [],//terminator
-  ]
-  //console.log("all:%O",all_items)
-  /* Object.keys(all_items)
-     .map((key)=>{
-     items[key] = selectedSection ?
-     all_items[key] :
-     all_items[key].slice(0,limit)
-     return key;
-     })
-     .map((key)=>{
-     var term = {type:"terminator",
-     section:key,
-     more:all_items[key].length - limit,}
-     if(items[key][items[key].length-1] !== term){
-     items[key].push(term);
-     }
-     }) */
-
-  LayoutAnimation.easeInEaseOut();
-
-  return(
-    <View style={{
-        flex:1,
-        backgroundColor:"#1A237E",//indigo 900
-        //backgroundColor:"#263238",//blue grey 800
-      }}>
-      {header}
-    <MyListView
-        items={items}
-        selectedSection={selectedSection}
-        />
-    </View>
-  )//big={selectedSection ? false : true}
 };
 
 function BookView({booksWithStatus,booksLoadingState,selectedBook}){
