@@ -78,7 +78,7 @@ var LibraryStatus = React.createClass({
     var text, name, backgroundColor;
 
     if(libraryStatus.rentable){
-      text="貸出可"
+      text="貸出可"//利用可
       //style={backgroundColor: "#03A9F4"} //light blue
       //style={color: "#009688"} //Teal
       style={color: "#4CAF50"} //Green
@@ -179,7 +179,7 @@ var BookCell = React.createClass({
       <TouchableElement
            selector="cell"
            payload={book}>
-          <View style={[styles.row,{flex:1}]}>
+          <View style={[styles.row,{flex:1},this.props.style]}>
             <Image source={{uri: book.thumbnail}}
                    resizeMode="contain"
                    style={[styles.cellImage,]} />
@@ -301,4 +301,4 @@ var styles = StyleSheet.create({
   }
 });
 
-module.exports = {BookCell};
+module.exports = {BookCell,SwipeableRow};

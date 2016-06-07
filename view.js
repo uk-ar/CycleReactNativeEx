@@ -131,12 +131,10 @@ function MySectionFooter({text}) {
     </View>)
 };
 
+import {BookCell,SwipeableRow} from './BookCell';
 //key?
 function Cell({book}) {
   return (
-    <Touchable.TouchableNativeFeedback
-                          selector="cell"
-                          payload={book}>
       <View style={{
           backgroundColor:"#FAFAFA",//grey 300
           padding:10,
@@ -168,15 +166,8 @@ function Cell({book}) {
           </View>
         </TouchableElement>
       </View>
-    </Touchable.TouchableNativeFeedback>
   )
 };
-
-var BookCell = require('./BookCell');
-
-function MyListView({items, sectionHeader, selectedSection }) {
-
-}
 
 function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,selectedSection}){
   var items = [
@@ -196,7 +187,7 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
   const limit=1;
   console.log("se:%O",selectedSection);
   if(selectedSection !== null){
-    //cell
+    //detail view
     return (
       <View style={{
           flex:1,
@@ -209,7 +200,11 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
               [items[selectedSection],items[parseInt(selectedSection)+1]])}
           enableEmptySections={true}
           renderRow={(item, sectionID, rowID)=> {
-              return <Cell book={item} />
+              return (
+                <BookCell
+                    book={item}
+                    style={{backgroundColor:"#FAFAFA",//grey 300
+                    }}/>)
             }}
           renderSectionHeader={(sectionData, sectionID) => {
               if(sectionID % 2 == 0){
@@ -232,7 +227,7 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
               }
             }}
           style={{
-              padding:3,
+            padding:3,
               //height:100,
             }}
       />
@@ -256,7 +251,11 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
               items.map((books)=> books.slice(0,limit)))}
           enableEmptySections={true}
           renderRow={(item, sectionID, rowID)=> {
-              return <Cell book={item} />
+              return (
+                <BookCell
+                  book={item}
+                  style={{backgroundColor:"#FAFAFA",//grey 300
+                  }}/>)
             }}
           renderSectionHeader={(sectionData, sectionID) => {
               if(sectionID % 2 == 0){
@@ -278,7 +277,7 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
               }
             }}
           style={{
-              padding:3,
+            padding:3,
               //height:100,
             }}
       />
