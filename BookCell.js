@@ -122,30 +122,27 @@ var LibraryStatus = React.createClass({
 //ToastAndroid.show('foo', ToastAndroid.SHORT)
 var BookCell = React.createClass({
   render: function(){
-    onLike=this.props.onLike
-    onDone =this.props.onDone
-    onInbox=this.props.onInbox
-    var book=this.props.book;
-    //rowID={rowID}
-    //sectionID={sectionID}
+    var {book,onRelease,style,...props}=this.props;
+    //There is 3 type of close behavior
+    //animated left only
+    //animated right and vertical close permanently
+    //animated right and vertical close temporary
+    //onSwipeEnd onSwipeStart
+    //expand or close
     var leftButtons=[
-      <LeftButton onRelease = {() => onLike(book,
-                                            this.props.sectionID,
-                                            this.props.rowID)}
+      <LeftButton onRelease = {() => console.log(1)}
                   close={false}
                   backgroundColor="#E0E0E0"
                   icon="heart-o"
       />,//grey 300
-      <LeftButton onRelease = {() => onInbox(book,
-                                             this.props.sectionID,
-                                             this.props.rowID)}
-                  close={true}
+      <LeftButton onRelease = {() => this.props.onRelease(book,"liked")}
+                  close={false}
                   backgroundColor="#2196F3"
                   icon="heart-o"
                   text="読みたい"
       />,//light blue "#03A9F4"
       //blue "#2196F3"
-      <LeftButton onRelease={()=> console.log("3")}
+      <LeftButton onRelease={()=> this.props.onRelease(book,"borrowed")}
                   close={true}
                   backgroundColor='rgb(76, 175, 80)'
                   icon="inbox"
@@ -158,9 +155,7 @@ var BookCell = React.createClass({
                    close={false}
                    icon="check-square-o"
       />,//grey 300
-      <RightButton onRelease = {() => onDone(book,
-                                             this.props.sectionID,
-                                             this.props.rowID)}
+      <RightButton onRelease = {() => this.props.onRelease(book,"done")}
                    backgroundColor="#FFC107"
                    close={true}
                    icon="check-square-o"
@@ -173,9 +168,11 @@ var BookCell = React.createClass({
       TouchableElement = Touchable.TouchableNativeFeedback;
     }
     return(
-      <SwipeableRow style={[styles.row]}
-                    leftButtons={leftButtons}
-                    rightButtons={rightButtons}>
+      <SwipeableRow
+          style={[styles.row]}
+          leftButtons={leftButtons}
+          rightButtons={rightButtons}
+          {...props}>
       <TouchableElement
            selector="cell"
            payload={book}>

@@ -96,11 +96,12 @@ function intent(RN, HTTP){
       ,
     goToBookView$: RN.select('cell').events('press')
                      .do(i => console.log("cell press:%O", i))
-                     .map(book=>({
-                       type: 'push',
-                       key: 'Book',
-                       data: book,
-                     }))
+                     //.subscribe()
+      /* .map(book=>({
+         type: 'push',
+         key: 'Book',
+         data: book,
+         })) */
       ,
     back$: Rx.Observable
              .merge(RN.navigateBack(),
@@ -112,20 +113,14 @@ function intent(RN, HTTP){
                     .map(i => i ? JSON.parse(i) : [])
                     .do(i => console.log("inBoxStatus$:%O", i))
       ,
+    changeBucket$: RN.select('bookcell')
+                     .events('release')
+                     .do(i => console.log("rel:%O", i))
+      ,
     like$: RN.select('bookcell')
              .events('like')
              .do(i => console.log("like:%O", i))
              .subscribe()
-      ,
-    done$: RN.select('bookcell')
-             .events('done')
-             .do(i => console.log("done:%O", i))
-             .subscribe()
-      ,
-    inbox$: RN.select('bookcell')
-              .events('inbox')
-              .do(i => console.log("inbox:%O", i))
-              .subscribe()
       ,
     filterState$: RN.select('filter')
                     .events('press')

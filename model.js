@@ -122,21 +122,35 @@ function model(actions){
                 passProps: {url: url}
        })); */
 
-  let likedBooks$ = Rx.Observable.just([
-    {title: "like:SOFT SKILLS",isbn:"9784822251550",},
-    {title: "like:foo",isbn:"9784480064851",},
-  ])
-  let doneBooks$ = Rx.Observable.just([
-    {title:"done:bar",isbn:"9784105393069"},
-    {title:"done:baz",isbn:"9784822285159"},
-    {title:"done:toz",isbn:"9784757142794"},
-  ]);
-  let borrowedBooks$ = Rx.Observable.just([
-    {title:"borrow:qux",isbn:"9784492314630",},
-    {title:"borrow:quxx",isbn:"9784798134208",},
-  ]);
+  let allBooks$ = actions.changeBucket$.startWith(
+    [
+      {title:"like:SOFT SKILLS",isbn:"9784822251550",bucket:"liked",},
+      {title:"like:foo",isbn:"9784480064851",bucket:"liked",},
+      {title:"borrow:qux",isbn:"9784492314630",bucket:"borrowed",},
+      {title:"borrow:quxx",isbn:"9784798134208",bucket:"borrowed",},
+      {title:"done:bar",isbn:"9784105393069",bucket:"done",},
+      {title:"done:baz",isbn:"9784822285159",bucket:"done",},
+      {title:"done:toz",isbn:"9784757142794",bucket:"done",},
+    ]
+  ).scan((books, [book,bucket]) => {
+    book.bucket=bucket;
+    return ([book].concat(books.filter((elem)=>elem.isbn.toString() !== book.isbn.toString())))
+    //books.find((b)=>b.isbn.toString === book.isbn.toString)
+      /* console.log("b:%O",book.isbn)
+         return books */
+  }).do((books)=>console.log(books)
+  ).do((books)=>LayoutAnimation.spring())
+  //.do((books)=>LayoutAnimation.easeInEaseOut());
+  //
+
+  let likedBooks$ = allBooks$.map((books)=>
+    books.filter((book)=>book.bucket=="liked"));
+  let borrowedBooks$ = allBooks$.map((books)=>
+    books.filter((book)=>book.bucket=="borrowed"));
+  let doneBooks$ = allBooks$.map((books)=>
+    books.filter((book)=>book.bucket=="done"))
   let selectedBook$ = actions.goToBookView$
-                             .map(({data})=>data)
+                             //.map(({data})=>data)
   // for android action
   /* function canPop(navigator){
     return (navigator && navigator.getCurrentRoutes().length > 1)
@@ -213,7 +227,7 @@ function model(actions){
       actions.goToInboxView$,
       actions.goToSearchView$,
       //actions.goToSectionView$,
-      actions.goToBookView$,
+      //actions.goToBookView$,
       actions.back$,
     )
     .distinctUntilChanged(navigationState =>

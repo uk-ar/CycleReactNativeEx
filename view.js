@@ -28,6 +28,7 @@ import {
   AsyncStorage,
   NavigationExperimental,
   RecyclerViewBackedScrollView,
+  ToastAndroid,
 } from 'react-native';
 
 import Touchable from '@cycle/react-native/src/Touchable';
@@ -132,6 +133,11 @@ function MySectionFooter({text}) {
 };
 
 import {BookCell,SwipeableRow} from './BookCell';
+Touchable["BookCell"] = Touchable.createCycleComponent(
+  BookCell,{
+    onRelease:'release',
+  });
+
 //key?
 function Cell({book}) {
   return (
@@ -169,6 +175,41 @@ function Cell({book}) {
   )
 };
 
+var MyListView = React.createClass({
+  /* propTypes: {
+     items: PropTypes.array.isRequired
+     }, */
+  getInitialState(){
+    const dataSource = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+    });
+    return {dataSource:dataSource.cloneWithRowsAndSections(this.props.items)};
+  },
+
+  componentWillReceiveProps({items}) {
+    if (items !== this.props.items) {
+      this.setState(
+        {dataSource: this.state.dataSource.cloneWithRowsAndSections(items)});
+    }
+  },
+
+  getScrollResponder() {
+    return this._listView.getScrollResponder();
+  },
+
+  render() {
+    const {items, ...listViewProps} = this.props;
+    return (
+      <ListView
+        ref={listView => this._listView = listView}
+        dataSource={this.state.dataSource}
+        {...listViewProps}
+      />
+    );
+  }
+})
+
 function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,selectedSection}){
   var items = [
     searchedBooks,
@@ -184,24 +225,25 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
 
   LayoutAnimation.easeInEaseOut();
 
-  const limit=1;
+  const limit=2;
   console.log("se:%O",selectedSection);
   if(selectedSection !== null){
     //detail view
     return (
+      //dataSource={dataSource.cloneWithRowsAndSections([items[selectedSection],items[parseInt(selectedSection)+1]])}
       <View style={{
-          flex:1,
+          flex:1,//for scroll
           backgroundColor:"#1A237E",//indigo 900
           //backgroundColor:"#263238",//blue grey 800
         }}>
         {null /* for LayoutAnimation */}
-      <ListView
-          dataSource={dataSource.cloneWithRowsAndSections(
-              [items[selectedSection],items[parseInt(selectedSection)+1]])}
+      <MyListView
+          items={[items[selectedSection],items[parseInt(selectedSection)+1]]}
           enableEmptySections={true}
           renderRow={(item, sectionID, rowID)=> {
               return (
-                <BookCell
+                <Touchable.BookCell
+                    selector="bookcell"
                     book={item}
                     style={{backgroundColor:"#FAFAFA",//grey 300
                     }}/>)
@@ -234,8 +276,9 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
       </View>
     )
   }else{
-    //cell
+    //main
     return (
+      //dataSource={dataSource.cloneWithRowsAndSections(items.map((books)=> books.slice(0,limit)))}
       <View style={{
         flex:1,
         backgroundColor:"#1A237E",//indigo 900
@@ -246,17 +289,17 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
             header
           </Text>
         </View>
-      <ListView
-          dataSource={dataSource.cloneWithRowsAndSections(
-              items.map((books)=> books.slice(0,limit)))}
+        <MyListView
           enableEmptySections={true}
           renderRow={(item, sectionID, rowID)=> {
-              return (
-                <BookCell
-                  book={item}
-                  style={{backgroundColor:"#FAFAFA",//grey 300
-                  }}/>)
-            }}
+              return(
+                <Touchable.BookCell
+                    selector="bookcell"
+                    book={item}
+                    style={{backgroundColor:"#FAFAFA",//grey 300
+                      }}/>)
+              }}
+          items={items.map((books)=> books.slice(0,limit))}
           renderSectionHeader={(sectionData, sectionID) => {
               if(sectionID % 2 == 0){
                 return (
@@ -272,8 +315,16 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
                 )
               }else{
                 return (
-                  <MySectionFooter
-                  text={`すべて表示(${items[sectionID-1].length})`}/>)
+                   <TouchableElement
+                       selector="section"
+                       payload={(parseInt(sectionID)-1).toString()} >
+                   <View style={styles.sectionFooter}>
+                     <Text>
+                                {`すべて表示(${items[sectionID-1].length})`}
+                     </Text>
+                   </View>
+                   </TouchableElement>
+                )
               }
             }}
           style={{

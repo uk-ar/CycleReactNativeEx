@@ -14,6 +14,15 @@ var styles = StyleSheet.create({
     padding:10,
     flexDirection:"row",
   },
+  sectionFooter:{
+    backgroundColor:"#E0E0E0",//grey 300
+    borderTopLeftRadius:0,
+    borderTopRightRadius:0,
+    borderRadius:5,
+    marginBottom:3,
+    padding:10,
+    //height:30,
+  },
   //for toolBar
   toolbar: {
     backgroundColor: '#e9eaed',
