@@ -10,7 +10,7 @@ var styles = StyleSheet.create({
     backgroundColor:"#E0E0E0",//grey 300
     borderTopLeftRadius:5,
     borderTopRightRadius:5,
-    marginTop:3,
+    //marginTop:3,
     padding:10,
     flexDirection:"row",
   },
@@ -19,7 +19,7 @@ var styles = StyleSheet.create({
     borderTopLeftRadius:0,
     borderTopRightRadius:0,
     borderRadius:5,
-    marginBottom:3,
+    marginBottom:3,//separator is better?
     padding:10,
     //height:30,
   },

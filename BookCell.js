@@ -168,21 +168,23 @@ var BookCell = React.createClass({
       TouchableElement = Touchable.TouchableNativeFeedback;
     }
     return(
+      //probrem with hard coded width
       <SwipeableRow
           style={[styles.row]}
           leftButtons={leftButtons}
           rightButtons={rightButtons}
           {...props}>
-      <TouchableElement
-           selector="cell"
-           payload={book}>
-          <View style={[styles.row,{flex:1},this.props.style]}>
+        <TouchableElement
+            selector="cell"
+            style={{flex:1}}
+        payload={book}>
+          <View style={[{flex:1},styles.row,this.props.style]}>
             <Image source={{uri: book.thumbnail}}
                    resizeMode="contain"
                    style={[styles.cellImage,]} />
-            <View style={[{flex:1,}]}>
-              <View style={[{flex:1,padding:10,justifyContent:"center",},
-                           ]}>
+            <View style={[{flexDirection:"column",}]}>
+              <View style={[{padding:10,justifyContent:"center",},
+                ]}>
                 <Text style={styles.bookTitle} numberOfLines={1}>
                   {book.title}
                 </Text>
@@ -199,7 +201,7 @@ var BookCell = React.createClass({
               />
             </View>
           </View>
-          </TouchableElement>
+        </TouchableElement>
       </SwipeableRow>
     )}
 });

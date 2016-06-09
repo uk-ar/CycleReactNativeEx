@@ -347,7 +347,7 @@ var SwipeableRow = React.createClass({
         null,
         {dx: this._panX}
       ]),
-      onPanResponderTerminationRequest: (evt, gestureState) => true,
+      onPanResponderTerminationRequest: (evt, gestureState) => false,
       onPanResponderRelease: (evt, gestureState) => {
         if(0 < this.state.left){
           this.refs.leftButtons.release().then((close)=>{

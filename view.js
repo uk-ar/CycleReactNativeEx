@@ -313,10 +313,12 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
                   <TouchableElement
                     selector="section"
                     payload={sectionID} >
+                    <View style={{backgroundColor:"#1A237E"}} >
                     <View style={styles.sectionHeader}>
                       <Text>
                                 {titles[sectionID/2]}
                       </Text>
+                    </View>
                     </View>
                   </TouchableElement>
                 )
@@ -335,7 +337,7 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
               }
             }}
           style={{
-            padding:3,
+            paddingHorizontal:20,
               //height:100,
             }}
       />
