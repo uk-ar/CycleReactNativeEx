@@ -1,6 +1,14 @@
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
+TODO:
+   - fix swipeout
+     - enable swipe out
+     - fix performance
+   - automate webview
+   - support books pagination
+   - add done state
+   - add sort feature
  */
 'use strict';
 
@@ -8,27 +16,25 @@ import React, { Component } from 'react';
 let Rx = require('rx');
 var _ = require('lodash');
 let {run} = require('@cycle/core');
-let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
+import makeReactNativeDriver, {getBackHandler} from '@cycle/react-native/src/driver';
 let {makeHTTPDriver} = require('@cycle/http');
 
 var Icon = require('react-native-vector-icons/FontAwesome');
 
-let {
-  STORAGE_KEY,
-  RAKUTEN_SEARCH_API,
-  LIBRARY_ID,
-  CALIL_STATUS_API,
-  MOCKED_MOVIES_DATA,
-} = require('./common');
+import Touchable from '@cycle/react-native/src/Touchable';
+const {
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} = Touchable;
 
 import {
-  TouchableOpacity,
+  Text,
   ActivityIndicatorIOS,
   ListView,
   Platform,
   ProgressBarAndroid,
+  //Text,
   StyleSheet,
-  Text,
   View,
   Image,
   TouchableHighlight,
@@ -44,65 +50,34 @@ import {
   Animated,
   ScrollView,
   PanResponder,
+  UIManager,
+  NavigationExperimental,
 } from 'react-native';
+import NavigationStateUtils from 'NavigationStateUtils';
 
-let {SearchScreen, InBoxScreen, GiftedNavigator} = require('./SearchScreen');
+UIManager.setLayoutAnimationEnabledExperimental &&   UIManager.setLayoutAnimationEnabledExperimental(true);
+
+let {SearchScreen, InBoxScreen, GiftedNavigator,BookListView} = require('./SearchScreen');
 
 var intent = require('./intent');
 var model = require('./model');
+var view = require('./view');
 
-function main({RN, HTTP}) {
-  const actions = intent({RN:RN, HTTP:HTTP});
+function main({RN, HTTP, EE}) {
+  const actions = intent(RN, HTTP);
   const state$ = model(actions);
 
-  var {AnimatedFlick,BookCell} = require('./BookCell');
-  /* let SearchView$ = state$.booksWithStatus$
-     .startWith(MOCKED_MOVIES_DATA)
-     .map(i =>
-     <AnimatedFlick/>
-     ); */
-
-  let SearchView$ = state$.booksWithStatus$
-                          .startWith(MOCKED_MOVIES_DATA)
-                          //.map(i => <AnimatedFlick/>)
-                          .map(i =>
-                            <GiftedNavigator
-                                selector="nav"
-                                initialRoute = {{
-                                    component:SearchScreen,
-                                    title: 'search',
-                                    passProps:
-                                    {state$: state$, actions$: actions}
-                                  }}
-                            />
-                          );
-  /* onNavigatorMounted = {(nav) => {
-     //console.log("nav this:%O", this);
-     RouteMapper(nav);
-     }}
-   */
-
+  //0192521722
+  //qwerty
   return {
-    RN: SearchView$,//.merge(DetailView$),
-    HTTP: state$.searchRequest$.merge(state$.statusRequest$),
+    RN: state$.map(view),
+    HTTP: actions.request$,//state$.map(request),
   };
 }
 
-var styles = StyleSheet.create({
-  listView: {
-    paddingTop: 20,
-    backgroundColor: '#F5FCFF',
-  },
-  toolbar: {
-    backgroundColor: '#a9a9a9',
-    height: 56,
-  },
-  WebViewContainer: {
-    flex: 1,
-  }
-});
+import styles from './styles';
 
 run(main, {
   RN: makeReactNativeDriver('CycleReactNativeEx'),
-  HTTP: makeHTTPDriver()
+  HTTP: makeHTTPDriver(),
 });

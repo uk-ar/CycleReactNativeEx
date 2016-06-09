@@ -243,8 +243,6 @@ var SwipeableButtons = React.createClass({
     //Execute button action
     var currentButton = this.props.buttons[this.state.componentIndex];
     var close = currentButton.props.close;
-    currentButton.props.onRelease && currentButton.props.onRelease();
-
     this.setState({releasing:true});
 
     return new Promise((resolve,reject) =>{
@@ -254,6 +252,7 @@ var SwipeableButtons = React.createClass({
          duration: 180,}
       ).start((e)=>{
         resolve(close);
+        currentButton.props.onRelease && currentButton.props.onRelease();
         if(!close){this.setState(
           {releasing:false,
            componentIndex:0})}

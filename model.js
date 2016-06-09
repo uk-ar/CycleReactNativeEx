@@ -132,14 +132,39 @@ function model(actions){
       {title:"done:baz",isbn:"9784822285159",bucket:"done",},
       {title:"done:toz",isbn:"9784757142794",bucket:"done",},
     ]
-  ).scan((books, [book,bucket]) => {
-    book.bucket=bucket;
-    return ([book].concat(books.filter((elem)=>elem.isbn.toString() !== book.isbn.toString())))
+  ).scan((books, {type,book}) => {
+    console.log("t:",type);
+    switch (type) {
+      case 'remove':
+        return books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString());
+        //It may need rowID as object key
+      case 'add':
+        //return [book].concat(books);
+        books.unshift(book);
+        return books
+      default:
+        return books;
+    }
+    /* book.bucket=bucket;
+       return ([book].concat(books.filter((elem)=>elem.isbn.toString() !== book.isbn.toString()))) */
     //books.find((b)=>b.isbn.toString === book.isbn.toString)
       /* console.log("b:%O",book.isbn)
          return books */
-  }).do((books)=>console.log(books)
-  ).do((books)=>LayoutAnimation.spring())
+  }).do((books)=>
+    //https://github.com/facebook/react-native/blob/d4e7c8a0550891208284bd1d900bd9721d899f8f/Libraries/LayoutAnimation/LayoutAnimation.js#L97
+    //https://github.com/facebook/react-native/blob/ac5636dd59f97a7381acd548e701e83fadcba408/Examples/UIExplorer/ListViewPagingExample.js#L261
+    LayoutAnimation.configureNext({
+      duration: 1000,
+      create: {
+        type: LayoutAnimation.Types.easeInEaseOut,
+        property: LayoutAnimation.Properties.scaleXY,
+      },
+      update: {
+        delay: 1000,
+        type: LayoutAnimation.Types.easeInEaseOut,
+      },
+    },)
+  )
   //.do((books)=>LayoutAnimation.easeInEaseOut());
   //
 

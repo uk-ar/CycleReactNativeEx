@@ -1383,7 +1383,144 @@ var ToggleView2 = React.createClass({
     )
   }
 })
-  
+
+function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,selectedSection}){
+  var items = [
+    searchedBooks,
+    [],//terminator
+    likedBooks,
+    [],//terminator
+    borrowedBooks,
+    [],//terminator
+    doneBooks,
+    [],//terminator
+  ]
+  var titles=["検索","お気に入り","借りてる","読んだ"]
+  var buckets=[
+    {title:"検索"     ,books:searchedBooks},
+    {title:"お気に入り",books:likedBooks},
+    {title:"借りてる"  ,books:borrowedBooks},
+    {title:"読んだ"    ,books:doneBooks},
+  ]
+  LayoutAnimation.easeInEaseOut();
+
+  const limit=2;
+  console.log("se:%O",selectedSection);
+  if(selectedSection !== null){
+    //detail view
+    return (
+      //dataSource={dataSource.cloneWithRowsAndSections([items[selectedSection],items[parseInt(selectedSection)+1]])}
+      //   key={item.isbn}
+      <View style={{
+        flex:1,//for scroll
+        backgroundColor:"#1A237E",//indigo 900
+        //backgroundColor:"#263238",//blue grey 800
+      }}>
+        {null /* for LayoutAnimation */}
+        <MyListView
+            items={[buckets[selectedSection].books,[]]}
+            enableEmptySections={true}
+            renderRow={(item, sectionID, rowID)=> {
+                return (
+                  <Touchable.BookCell
+                    selector="bookcell"
+                    book={item}
+                    style={{backgroundColor:"#FAFAFA",//grey 300
+                    }}/>)
+              }}
+            renderSectionHeader={(sectionData, sectionID) => {
+                if(sectionID % 2 == 0){
+                  return (
+                    <View style={styles.sectionHeader}>
+                      <Touchable.FAIcon
+                       name="close"
+                       selector="close"
+                       size={20}
+                       style={{marginRight:5}}/>
+                      <Text>
+                             {buckets[selectedSection].title}
+                      </Text>
+                    </View>
+                  )
+                }else{
+                  return (
+                    <MySectionFooter
+                  text={items[selectedSection].length}/>)
+                }
+              }}
+            style={{
+              padding:3,
+              //height:100,
+            }}
+        />
+      </View>
+    )
+  }else{
+    //main
+    return (
+      //dataSource={dataSource.cloneWithRowsAndSections(items.map((books)=> books.slice(0,limit)))}
+      <View style={{
+        flex:1,
+        backgroundColor:"#1A237E",//indigo 900
+        //backgroundColor:"#263238",//blue grey 800
+      }}>
+        <View style={{padding:10,}}>
+          <Text style={{color:"white"}}>
+            header
+          </Text>
+        </View>
+        <ScrollView style={{flex:1}}>
+          {buckets.map(({title,books},index)=>
+            <MyListView
+                enableEmptySections={true}
+                renderRow={(item, sectionID, rowID)=> {
+                    return(
+                      <Touchable.BookCell
+                     selector="bookcell"
+                     book={item}
+                     style={{backgroundColor:"#FAFAFA",//grey 300
+                     }}/>)
+                  }}
+                items={[books.slice(0,limit),[]]}
+                renderSectionHeader={(sectionData, sectionID) => {
+                    if(sectionID == 0){
+                      return (
+                        <TouchableElement
+                             selector="section"
+                             payload={index} >
+                          <View style={styles.sectionHeader}>
+                            <Text>
+                                      {title}
+                            </Text>
+                          </View>
+                        </TouchableElement>
+                      )
+                    }else{
+                      return (
+                        <TouchableElement
+                             selector="section"
+                             payload={index} >
+                          <View style={styles.sectionFooter}>
+                            <Text>
+                                      {`すべて表示(${items[sectionID-1].length})`}
+                            </Text>
+                          </View>
+                        </TouchableElement>
+                      )
+                    }
+                  }}
+                style={{
+                  padding:3,
+                  //height:100,
+                }}
+            />
+           )}
+        </ScrollView>
+      </View>
+    )
+  };
+};
+
 var styles = StyleSheet.create({
   //for new swipe
   /* container: {

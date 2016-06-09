@@ -181,6 +181,7 @@ var MyListView = React.createClass({
      }, */
   getInitialState(){
     const dataSource = new ListView.DataSource({
+      //rowHasChanged: (r1, r2) => r1 !== r2,
       rowHasChanged: (r1, r2) => r1 !== r2,
       sectionHeaderHasChanged: (s1, s2) => s1 !== s2
     });
@@ -222,7 +223,12 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
     [],//terminator
   ]
   var titles=["検索","お気に入り","借りてる","読んだ"]
-
+  var buckets=[
+    {title:"検索"     ,books:searchedBooks},
+    {title:"お気に入り",books:likedBooks},
+    {title:"借りてる"  ,books:borrowedBooks},
+    {title:"読んだ"    ,books:doneBooks},
+  ]
   LayoutAnimation.easeInEaseOut();
 
   const limit=2;
@@ -231,6 +237,7 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
     //detail view
     return (
       //dataSource={dataSource.cloneWithRowsAndSections([items[selectedSection],items[parseInt(selectedSection)+1]])}
+      //   key={item.isbn}
       <View style={{
           flex:1,//for scroll
           backgroundColor:"#1A237E",//indigo 900
@@ -238,7 +245,7 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
         }}>
         {null /* for LayoutAnimation */}
       <MyListView
-          items={[items[selectedSection],items[parseInt(selectedSection)+1]]}
+          items={[buckets[selectedSection].books,[]]}
           enableEmptySections={true}
           renderRow={(item, sectionID, rowID)=> {
               return (
@@ -258,7 +265,7 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
                        size={20}
                        style={{marginRight:5}}/>
                     <Text>
-                             {titles[selectedSection/2]}
+                             {buckets[selectedSection].title}
                     </Text>
                   </View>
                 )
