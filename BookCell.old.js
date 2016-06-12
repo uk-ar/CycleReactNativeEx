@@ -1521,6 +1521,59 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
   };
 };
 
+var config=LayoutAnimation.Presets.spring;//easeInEaseOut;//spring;//linear;//
+
+var MyView = React.createClass({
+  getInitialState(){
+    return(
+      {items:{s1:{r1:"1",r2:"2",r3:"3"},s2:{r1:"4",r2:"5"}}}//ok
+    )
+  },
+  render(){
+    return (
+      <View style={{backgroundColor:"green"}}>
+        <Text
+            onPress={()=>{
+                this.setState(
+                  {items:{s1:{r1:"1",r2:"2",r3:"3"},s2:{r1:"4",r2:"5"}}}
+                );
+                LayoutAnimation.configureNext(config)
+              }}>reset</Text>
+        <Text
+            onPress={()=>{
+                this.setState(
+                  {items:{s1:{r2:"2",r3:"3"},s2:{r1:"4",r2:"5"}}}
+                );
+                LayoutAnimation.configureNext(config)
+              }}>a</Text>
+        <Text
+            onPress={()=>{
+                this.setState(
+                  {items:{s1:{r2:"2",r3:"3",r1:"1"},s2:{r1:"4",r2:"5"}}}
+                );
+                LayoutAnimation.configureNext(config)
+              }}>a</Text>
+        <MyListView
+            items={this.state.items}
+            renderRow={(item)=>{
+                return (
+                  <Text
+                      key={item}
+                      style={{backgroundColor:"blue"}}>
+                            {item}
+                  </Text>)
+              }}
+            renderSectionHeader={(sectionData, sectionID) =>
+              <Text>
+                                sec:
+              </Text>
+                                }
+        />
+      </View>
+    )
+  },
+});
+
 var styles = StyleSheet.create({
   //for new swipe
   /* container: {

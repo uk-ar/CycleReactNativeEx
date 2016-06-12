@@ -168,9 +168,25 @@ var BookCell = React.createClass({
       TouchableElement = Touchable.TouchableNativeFeedback;
     }
     return(
+      //    style={{flex:1}}
+      <SwipeableRow
+          leftButtons={leftButtons}
+          rightButtons={rightButtons}
+      >
+        <View style={{backgroundColor:"red"}}>
+          <Text>
+            "foo"
+          </Text>
+          <Text>
+            "bar"
+          </Text>
+        </View>
+      </SwipeableRow>
+    )
+    //TODO:flex-start & flex-end
+    return(
       //probrem with hard coded width
       <SwipeableRow
-          style={[styles.row]}
           leftButtons={leftButtons}
           rightButtons={rightButtons}
           {...props}>

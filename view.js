@@ -209,34 +209,39 @@ var MyListView = React.createClass({
       />
     );
   }
-})
+});
+
+ function booksToObject(books){
+   var obj={};
+   books.forEach((book)=>obj["isbn-"+book.isbn]=book)
+   return obj
+ }
 
 function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,selectedSection}){
-  var items = [
-    searchedBooks,
-    [],//terminator
-    likedBooks,
-    [],//terminator
-    borrowedBooks,
-    [],//terminator
-    doneBooks,
-    [],//terminator
-  ]
-  var titles=["検索","お気に入り","借りてる","読んだ"]
+
+  const limit=2;
+  var items = {
+    0: booksToObject(searchedBooks.slice(0,limit)),
+    1: {},//terminator
+    2: booksToObject(likedBooks.slice(0,limit)),
+    3: {},//terminator
+    4: booksToObject(borrowedBooks.slice(0,limit)),
+    5: {},//terminator
+    6: booksToObject(doneBooks.slice(0,limit)),
+    7: {},//terminator
+  }
+
   var buckets=[
     {title:"検索"     ,books:searchedBooks},
     {title:"お気に入り",books:likedBooks},
     {title:"借りてる"  ,books:borrowedBooks},
     {title:"読んだ"    ,books:doneBooks},
   ]
-  LayoutAnimation.easeInEaseOut();
-
-  const limit=2;
+  //LayoutAnimation.easeInEaseOut();
   console.log("se:%O",selectedSection);
   if(selectedSection !== null){
     //detail view
     return (
-      //dataSource={dataSource.cloneWithRowsAndSections([items[selectedSection],items[parseInt(selectedSection)+1]])}
       //   key={item.isbn}
       <View style={{
           flex:1,//for scroll
@@ -245,7 +250,10 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
         }}>
         {null /* for LayoutAnimation */}
       <MyListView
-          items={[buckets[selectedSection].books,[]]}
+          items={{
+              0:booksToObject(buckets[selectedSection].books),
+              1:[],
+            }}
           enableEmptySections={true}
           renderRow={(item, sectionID, rowID)=> {
               return (
@@ -272,7 +280,7 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
               }else{
                 return (
                   <MySectionFooter
-                  text={items[selectedSection].length}/>)
+                      text={buckets[selectedSection].books.length}/>)
               }
             }}
           style={{
@@ -306,17 +314,17 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
                     style={{backgroundColor:"#FAFAFA",//grey 300
                       }}/>)
               }}
-          items={items.map((books)=> books.slice(0,limit))}
+          items={items}
           renderSectionHeader={(sectionData, sectionID) => {
               if(sectionID % 2 == 0){
                 return (
                   <TouchableElement
                     selector="section"
-                    payload={sectionID} >
+                    payload={sectionID/2} >
                     <View style={{backgroundColor:"#1A237E"}} >
                     <View style={styles.sectionHeader}>
                       <Text>
-                                {titles[sectionID/2]}
+                                {buckets[sectionID/2].title}
                       </Text>
                     </View>
                     </View>
@@ -326,10 +334,10 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
                 return (
                    <TouchableElement
                        selector="section"
-                       payload={(parseInt(sectionID)-1).toString()} >
+                       payload={(sectionID-1)/2} >
                    <View style={styles.sectionFooter}>
                      <Text>
-                                {`すべて表示(${items[sectionID-1].length})`}
+                                {`すべて表示(${buckets[(sectionID-1)/2].books.length})`}
                      </Text>
                    </View>
                    </TouchableElement>

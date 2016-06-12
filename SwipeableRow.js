@@ -251,11 +251,26 @@ var SwipeableButtons = React.createClass({
         {toValue: close ? SWIPEABLE_MAIN_WIDTH : 0.001,
          duration: 180,}
       ).start((e)=>{
+        //called when animation finished
         resolve(close);
-        currentButton.props.onRelease && currentButton.props.onRelease();
-        if(!close){this.setState(
-          {releasing:false,
-           componentIndex:0})}
+        if(!close){
+          this.setState({
+            releasing:false,
+            componentIndex:0,
+          },()=>{
+            //delete data
+            currentButton.props.onRelease && currentButton.props.onRelease()
+          }
+          )
+        }else{
+          this.setState({
+            releasing:false,
+          },()=>{
+            //delete data
+            currentButton.props.onRelease && currentButton.props.onRelease()
+          }
+          )
+        }
       })
     });
   },
@@ -304,7 +319,10 @@ var SwipeableButtons = React.createClass({
                colors={this.colors}
                colorIndex={this.state.componentIndex}>
         <AnimatedExpandable
-            width={this.state.width}
+            width={this.state.width.interpolate({
+                inputRange: [0,   0.01,1],
+                outputRange:[0.01,0.01,1]
+              })}
             lock={this.state.releasing}
             style={{
                 //width={this.state.width}
@@ -351,11 +369,11 @@ var SwipeableRow = React.createClass({
       onPanResponderRelease: (evt, gestureState) => {
         if(0 < this.state.left){
           this.refs.leftButtons.release().then((close)=>{
-            if(close){this.setState({hidden:true})}
+            //if(close){this.setState({hidden:true})}
           });
         }else{
           this.refs.rightButtons.release().then((close)=>{
-            if(close){this.setState({hidden:true})}
+            //if(close){this.setState({hidden:true})}
           });
         }
       },
@@ -368,13 +386,15 @@ var SwipeableRow = React.createClass({
   },
   getInitialState: function() {
     return {
-      left:0,//changed when move & release
-      componentIndex:0,
-      hidden:false,
+      left:0.01,//changed when move & release
+      componentIndex:0,//TODO:remove?
+      hidden:false,//TODO:remove?
+      offsetPositive:true,
     }
   },
   render: function(){
     var leftButtons=(
+      //cannot convert animatedvalue because of release function
       <SwipeableButtons
           ref="leftButtons"
           direction="left"
@@ -389,25 +409,31 @@ var SwipeableRow = React.createClass({
       <SwipeableButtons
           ref="rightButtons"
           direction="right"
-          width={this.state.left < 0 ? -this.state.left : 0.001}
+          width={-this.state.left}
           buttons={this.props.rightButtons}
-          style={{justifyContent:"center",}}
+          style={{justifyContent:"center",
+                  overflow:"hidden"}}
       />
     );
+
     return(
       <AnimatableView
           style={{
-              flexDirection:"row",
-              height:this.state.hidden ? 0.001 : null,
-              width:SWIPEABLE_MAIN_WIDTH,
-              justifyContent: 0 < this.state.left ? "flex-start" : "flex-end",
+            flexDirection:"row",
+            //TODO:vertical stretch will fixed in RN 0.28?
+            //https://github.com/facebook/react-native/commit/d95757037aef3fbd8bb9064e667ea4fea9e5abc1
+            alignItems:"stretch",
+            justifyContent: 0 < this.state.left ? "flex-start" : "flex-end",
+            overflow:"hidden",
             }}
           {...this._panResponder.panHandlers}
       >
         {leftButtons}
-        <View style={[this.props.style,{
-            width:SWIPEABLE_MAIN_WIDTH,
-          }]}>
+        <View style={[//0 < this.state.left ? {flex:1} : {} ,
+            //{alignSelf:"stretch"},
+            //{flex:1},
+            {width:SWIPEABLE_MAIN_WIDTH},
+                      this.props.style,]}>
           {this.props.children}
         </View>
         {rightButtons}

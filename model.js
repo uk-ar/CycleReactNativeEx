@@ -137,11 +137,8 @@ function model(actions){
     switch (type) {
       case 'remove':
         return books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString());
-        //It may need rowID as object key
       case 'add':
-        //return [book].concat(books);
-        books.unshift(book);
-        return books
+        return [book].concat(books);
       default:
         return books;
     }
@@ -150,23 +147,7 @@ function model(actions){
     //books.find((b)=>b.isbn.toString === book.isbn.toString)
       /* console.log("b:%O",book.isbn)
          return books */
-  }).do((books)=>
-    //https://github.com/facebook/react-native/blob/d4e7c8a0550891208284bd1d900bd9721d899f8f/Libraries/LayoutAnimation/LayoutAnimation.js#L97
-    //https://github.com/facebook/react-native/blob/ac5636dd59f97a7381acd548e701e83fadcba408/Examples/UIExplorer/ListViewPagingExample.js#L261
-    LayoutAnimation.configureNext({
-      duration: 1000,
-      create: {
-        type: LayoutAnimation.Types.easeInEaseOut,
-        property: LayoutAnimation.Properties.scaleXY,
-      },
-      update: {
-        delay: 1000,
-        type: LayoutAnimation.Types.easeInEaseOut,
-      },
-    },)
-  )
-  //.do((books)=>LayoutAnimation.easeInEaseOut());
-  //
+  }).do((books)=>LayoutAnimation.easeInEaseOut());
 
   let likedBooks$ = allBooks$.map((books)=>
     books.filter((book)=>book.bucket=="liked"));

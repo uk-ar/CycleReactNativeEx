@@ -117,11 +117,10 @@ function intent(RN, HTTP){
       RN.select('bookcell')
         .events('release')
         .map(([book,bucket])=>({type:"remove",book:book})),
-      /* RN.select('bookcell')
-         .events('release')
-         .map(([book,bucket])=>
-         ({type:"add",book:Object.assign({bucket:bucket},book)}))
-         .delay(1000), */
+      RN.select('bookcell')
+        .events('release')
+        .map(([book,bucket])=>
+          ({type:"add",book:Object.assign(book,{bucket:bucket})}))
     ).do(i => console.log("rel:%O", i))
       ,
     like$: RN.select('bookcell')
