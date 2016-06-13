@@ -47,7 +47,7 @@ var SWIPEABLE_MAIN_WIDTH = width;
 var Expandable = React.createClass({
   getInitialState: function() {
     return {
-      index:null,
+      index:0,
       width:0.001,
     }
   },
@@ -80,14 +80,16 @@ var Expandable = React.createClass({
     //console.log("this.props:%O", this.props)
     //this.child exposed to parent
     //console.log("this.state.width:%O",this.state.width);
-    //console.log("this.thresholds.length:%O",this.thresholds.length);
+    //if (this.thresholds.length !== this.props.components.length){
+    if (Object.keys(this.thresholds).length !== this.props.components.length)
+    {
     return(
-      this.thresholds.length == 0 ?
       //TODO:...this.props
       //use onFirstLayout
       // row->buttons({width})->selectableView({viewIndex})
       //TODO:optimize
-      <View onLayout={()=> this.setState({index:0})}>
+      //this.setState({index:0})
+      <View>
         {this.props.components.map((elem,i)=>{
            return (
              <View
@@ -105,13 +107,16 @@ var Expandable = React.createClass({
                {elem}
              </View>
            )})}
-      </View>
-:
-      <View
-          style={[this.props.style,{width: this.state.width}]}
-      >
-        {this.props.components[this.state.index]}
       </View>)
+    }else{
+      //console.log("this.thresholds1:%O",this.thresholds);
+      return (
+        <View
+            style={[this.props.style,{width: this.state.width}]}
+        >
+          {this.props.components[this.state.index]}
+        </View>)
+    }
     //return(this.child)
   }
 });
@@ -334,7 +339,7 @@ var SwipeableButtons = React.createClass({
                 //width={this.state.width}
                 //width={50}
                 //width cannot shrink under padding
-                height:50,//TODO:support height centering
+              //height:50,//TODO:support height centering
                 justifyContent:"center",
                 //lock={this.releasing}
               }}
