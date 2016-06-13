@@ -84,6 +84,9 @@ var Expandable = React.createClass({
     return(
       this.thresholds.length == 0 ?
       //TODO:...this.props
+      //use onFirstLayout
+      // row->buttons({width})->selectableView({viewIndex})
+      //TODO:optimize
       <View onLayout={()=> this.setState({index:0})}>
         {this.props.components.map((elem,i)=>{
            return (
@@ -166,6 +169,8 @@ var AnimatableView = React.createClass({
     this.animating=false;
   },
   _onLayout: function({nativeEvent: { layout: {x, y, width, height}}}){
+    this.props.onLayout && this.props.onLayout(
+      {nativeEvent: { layout: {x, y, width, height}}});
     if(this.animating){return};
     this.contentHeight = height;
     this.contentWidth = width;
@@ -193,6 +198,7 @@ var AnimatableView = React.createClass({
                          ));//null
     //console.log("style:%O,%O",current,next);
     //console.log("a:%O,%O",values,style);
+    //TODO:may heavy?
     this.setState({style:style});
 
     if(values.length!==0){
@@ -231,6 +237,41 @@ var SwipeableButtons = React.createClass({
   componentWillMount: function() {
     this.colors = this.props.buttons.map(
       (elem,i)=> elem.props.backgroundColor);
+    this.styles = this.props.direction == "left" ? [{
+      flexDirection:"row",
+      alignItems:"center",
+      backgroundColor:null,
+      justifyContent:"flex-end",
+      //padding:10,//RN bug:clipped padding
+    },{
+      flexDirection:"row",
+      alignItems:"center",
+      backgroundColor:null,
+      width:SWIPEABLE_MAIN_WIDTH/2,
+    },{
+      flexDirection:"row",
+      alignItems:"center",
+      backgroundColor:null,
+      width:SWIPEABLE_MAIN_WIDTH,
+    }] : [{
+      flexDirection:"row",
+      alignItems:"center",
+      backgroundColor:null,
+    },{
+      flexDirection:"row",
+      alignItems:"center",
+      backgroundColor:null,
+      alignSelf:"flex-end",
+      justifyContent:"flex-end",
+      width:SWIPEABLE_MAIN_WIDTH/2,
+    },{
+      flexDirection:"row",
+      alignItems:"center",
+      backgroundColor:null,
+      alignSelf:"flex-end",
+      justifyContent:"flex-end",
+      width:SWIPEABLE_MAIN_WIDTH,
+    }];
   },
   componentWillReceiveProps: function(nextProps) {
     if(nextProps.width != this.props.width){
@@ -275,42 +316,7 @@ var SwipeableButtons = React.createClass({
     });
   },
   render: function(){
-    var styles = this.props.direction == "left" ? [{
-      flexDirection:"row",
-      alignItems:"center",
-      justifyContent:"flex-end",
-      backgroundColor:null,
-      //padding:10,//RN bug:clipped padding
-    },{
-      flexDirection:"row",
-      alignItems:"center",
-      width:SWIPEABLE_MAIN_WIDTH/2,
-      backgroundColor:null,
-    },{
-      flexDirection:"row",
-      alignItems:"center",
-      width:SWIPEABLE_MAIN_WIDTH,
-      backgroundColor:null,
-    }] : [{
-      flexDirection:"row",
-      alignItems:"center",
-      backgroundColor:null,
-      //padding:10,//RN bug:clipped padding
-    },{
-      width:SWIPEABLE_MAIN_WIDTH/2,
-      flexDirection:"row",
-      alignItems:"center",
-      justifyContent:"flex-end",
-      alignSelf:"flex-end",
-      backgroundColor:null,
-    },{
-      width:SWIPEABLE_MAIN_WIDTH,
-      flexDirection:"row",
-      alignItems:"center",
-      justifyContent:"flex-end",
-      alignSelf:"flex-end",
-      backgroundColor:null,
-    }];
+    var styles=this.styles;
     var {width, ...props} = this.props;
     //               colors={this.props.colors}
     //console.log("w:%O", width);
@@ -349,6 +355,58 @@ var SwipeableButtons = React.createClass({
   },
 });
 
+var MeasureableView = React.createClass({
+  //TODO:remove this.done
+  render: function(){
+    return (
+      <View
+          {...this.props}
+          onLayout={({nativeEvent: { layout: {x, y, width, height}}})=>{
+              if(this.done){
+                this.props.onLayout &&
+                this.props.onLayout(
+                  {nativeEvent: { layout: {x, y, width, height}}});
+              }else{
+                this.props.onFirstLayout &&
+                this.props.onFirstLayout(
+                  {nativeEvent: { layout: {x, y, width, height}}});
+                this.done = true;
+              }
+            }}>
+        {this.props.children}
+      </View>)
+  }
+});
+
+/* var SelectableView = React.createClass({
+   getInitialState:function(){
+   return({
+   containerStyle:{position:"absolute"}
+   })
+   },
+   render: function(){
+   return (
+   <View
+   {...this.props}
+   style={[this.props.style,this.state.containerStyle]}
+   onFirstLayout={()=> this.setState({containerStyle:null})}
+   >
+   {this.props.components.map((elem,i)=>{
+   return (
+   <View
+   key={i}
+   onFirstLayout={({nativeEvent:{layout:{width, height}}})=>{
+   //this.props.onChildrenMount()
+   }}>
+   {elem}
+   </View>
+   )
+   })}
+   </View>
+   )
+   }
+   });
+ */
 var SwipeableRow = React.createClass({
   componentWillMount: function() {
     this._panX = new Animated.Value(0);
@@ -368,6 +426,8 @@ var SwipeableRow = React.createClass({
       onPanResponderTerminationRequest: (evt, gestureState) => false,
       onPanResponderRelease: (evt, gestureState) => {
         if(0 < this.state.left){
+          console.log("this.refs.leftButtons.refs.node:%O",
+                      this.refs.leftButtons.refs.node);
           this.refs.leftButtons.release().then((close)=>{
             //if(close){this.setState({hidden:true})}
           });
@@ -381,20 +441,23 @@ var SwipeableRow = React.createClass({
       onShouldBlockNativeResponder: (evt, gestureState) => true,
     });
     this._panX.addListener(({value:value}) => {
+      //if(0 < value){
+      //}
+      //TODO:heavy
       this.setState({left: value,})
     });
   },
   getInitialState: function() {
     return {
       left:0.01,//changed when move & release
-      componentIndex:0,//TODO:remove?
-      hidden:false,//TODO:remove?
-      offsetPositive:true,
+      positiveSwipe:true,
+      width:null,
     }
   },
   render: function(){
     var leftButtons=(
       //cannot convert animatedvalue because of release function
+      //<SwipeableButtons
       <SwipeableButtons
           ref="leftButtons"
           direction="left"
@@ -417,7 +480,11 @@ var SwipeableRow = React.createClass({
     );
 
     return(
-      <AnimatableView
+      //onFirstLayout
+      <MeasureableView
+          onFirstLayout={({nativeEvent: { layout: {x, y, width, height}}})=>{
+              this.setState({width:width})
+            }}
           style={{
             flexDirection:"row",
             //TODO:vertical stretch will fixed in RN 0.28?
@@ -429,15 +496,12 @@ var SwipeableRow = React.createClass({
           {...this._panResponder.panHandlers}
       >
         {leftButtons}
-        <View style={[//0 < this.state.left ? {flex:1} : {} ,
-            //{alignSelf:"stretch"},
-            //{flex:1},
-            {width:SWIPEABLE_MAIN_WIDTH},
+        <View style={[{width:this.state.width},//fixed width
                       this.props.style,]}>
           {this.props.children}
         </View>
         {rightButtons}
-      </AnimatableView>
+      </MeasureableView>
     )
   },
 });

@@ -45,26 +45,24 @@ let {SwipeableRow,} = require('./SwipeableRow');
 
 var LeftButton  = React.createClass({
   render: function(){
-    var text = this.props.text ?
-               <Text style={{margin:10,marginLeft:0}}>
-                 {this.props.text}</Text> : null;
     return(
       <View {...this.props}>
         <FAIcon name={this.props.icon} size={20}
                 style={{margin:10,marginRight:5}} />
-        {text}
+      <Text>
+        {this.props.text}
+      </Text>
       </View>
     )}
 });
 
 var RightButton  = React.createClass({
   render: function(){
-    var text = this.props.text ?
-               <Text style = {{margin:10, marginRight:0}}>
-                 {this.props.text}</Text> : null;
     return(
       <View {...this.props}>
-        {text}
+        <Text>
+          {this.props.text}
+        </Text>
         <FAIcon name={this.props.icon} size={20}
                 style = {{margin:10, marginLeft:5}} />
       </View>
