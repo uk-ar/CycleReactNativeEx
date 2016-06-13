@@ -356,25 +356,24 @@ var SwipeableButtons = React.createClass({
 });
 
 var MeasureableView = React.createClass({
-  //TODO:remove this.done
+  //TODO:remove this.mounted
   render: function(){
-    return (
+    return this.mounted ? (
       <View
-          {...this.props}
-          onLayout={({nativeEvent: { layout: {x, y, width, height}}})=>{
-              if(this.done){
-                this.props.onLayout &&
-                this.props.onLayout(
-                  {nativeEvent: { layout: {x, y, width, height}}});
-              }else{
+          {...this.props}>
+        {this.props.children}
+      </View>) : (
+        <View
+            {...this.props}
+            onLayout={({nativeEvent: { layout: {x, y, width, height}}})=>{
                 this.props.onFirstLayout &&
                 this.props.onFirstLayout(
                   {nativeEvent: { layout: {x, y, width, height}}});
-                this.done = true;
-              }
-            }}>
-        {this.props.children}
-      </View>)
+                this.mounted = true;
+              }}>
+          {this.props.children}
+        </View>
+      )
   }
 });
 
