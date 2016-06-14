@@ -43,31 +43,31 @@ var {
 
 let {SwipeableRow,} = require('./SwipeableRow');
 
-var LeftButton  = React.createClass({
-  render: function(){
-    return(
-      <View {...this.props}>
-        <FAIcon name={this.props.icon} size={20}
-                style={{margin:10,marginRight:5}} />
+function LeftButton({icon,text,...props}){
+  return(
+    <View {...props}>
+      <FAIcon name={icon} size={20}
+              style={{margin:10,marginRight:5}} />
       <Text>
-        {this.props.text}
+        {text}
       </Text>
-      </View>
-    )}
-});
+    </View>
+  )
+}
 
-var RightButton  = React.createClass({
-  render: function(){
-    return(
-      <View {...this.props}>
-        <Text>
-          {this.props.text}
-        </Text>
-        <FAIcon name={this.props.icon} size={20}
-                style = {{margin:10, marginLeft:5}} />
-      </View>
-    )}
-});
+//http://mae.chab.in/archives/2854
+//stateless component validation
+function RightButton({icon,text,...props}){
+  return(
+    <View {...props}>
+      <Text>
+        {text}
+      </Text>
+      <FAIcon name={icon} size={20}
+              style = {{margin:10, marginLeft:5}} />
+    </View>
+  )
+}
 
 var LibraryStatus = React.createClass({
   render: function() {
@@ -117,49 +117,79 @@ var LibraryStatus = React.createClass({
   },
 });
 
+function getButtons(type,func,book){
+  var leftButtons,rightButtons,likedButton,
+      borrowedButton,doneButton;
+  var selfProps={text:"先頭に移動",icon:"level-up",close:false}
+  //MIcon publish,vertical align top,low priority
+   switch(type){
+     case "読みたい":
+       likedButton=selfProps;
+       break;
+     case "借りてる":
+       borrowedButton=selfProps;
+       break;
+     case "読んだ":
+       doneButton=selfProps;
+       break;
+  }
+  var leftButtons=[
+    <LeftButton
+        icon="heart-o"
+        close={false}
+        backgroundColor="#E0E0E0"
+        text={null}
+        {...likedButton}
+    />,//grey 300
+    <LeftButton
+        icon="heart-o"
+        close={true}
+        onRelease = {() => func(book,"liked")}
+        backgroundColor="#2196F3"
+        text="読みたい"
+        {...likedButton}
+    />,//light blue "#03A9F4"
+    //blue "#2196F3"
+    <LeftButton
+        onRelease={()=> func(book,"borrowed")}
+        close={true}
+        backgroundColor='rgb(76, 175, 80)'
+        icon="bookmark-o"
+        text="借りてる"
+        {...borrowedButton}
+    />,//green
+  ];
+  var rightButtons=[
+    <RightButton
+        backgroundColor="#E0E0E0"
+        close={false}
+        icon="check-square-o"
+         text={null}
+         {...doneButton}
+     />,//grey 300
+     <RightButton
+         onRelease = {() => func(book,"done")}
+         backgroundColor="#FFC107"
+         close={true}
+         icon="check-square-o"
+         text="読んだ"
+         {...doneButton}
+     />,//amber
+   ];//Touchable
+   return {leftButtons,rightButtons}
+ }
+
 //ToastAndroid.show('foo', ToastAndroid.SHORT)
 var BookCell = React.createClass({
   render: function(){
-    var {book,onRelease,style,...props}=this.props;
+    var {book,onRelease,style,title,...props}=this.props;
     //There is 3 type of close behavior
     //animated left only
     //animated right and vertical close permanently
     //animated right and vertical close temporary
     //onSwipeEnd onSwipeStart
     //expand or close
-    var leftButtons=[
-      <LeftButton onRelease = {() => console.log(1)}
-                  close={false}
-                  backgroundColor="#E0E0E0"
-                  icon="heart-o"
-      />,//grey 300
-      <LeftButton onRelease = {() => this.props.onRelease(book,"liked")}
-                  close={false}
-                  backgroundColor="#2196F3"
-                  icon="heart-o"
-                  text="読みたい"
-      />,//light blue "#03A9F4"
-      //blue "#2196F3"
-      <LeftButton onRelease={()=> this.props.onRelease(book,"borrowed")}
-                  close={true}
-                  backgroundColor='rgb(76, 175, 80)'
-                  icon="inbox"
-                  text="Inbox"
-      />,//green
-    ];
-    var rightButtons=[
-      <RightButton onRelease={()=> console.log("r1")}
-                   backgroundColor="#E0E0E0"
-                   close={false}
-                   icon="check-square-o"
-      />,//grey 300
-      <RightButton onRelease = {() => this.props.onRelease(book,"done")}
-                   backgroundColor="#FFC107"
-                   close={true}
-                   icon="check-square-o"
-                   text="読んだ"
-      />,//amber
-    ];//Touchable
+    var {leftButtons,rightButtons}=getButtons(title,onRelease,book);
     //onPress={()=>console.log("cell press")}
     var TouchableElement = Touchable.TouchableHighlight;
     if (Platform.OS === 'android') {

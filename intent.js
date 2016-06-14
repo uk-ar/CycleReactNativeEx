@@ -93,6 +93,7 @@ function intent(RN, HTTP){
                         .merge(RN.select('close')
                                  .events('press').map(()=>null))
                         .do(i => console.log("section selected:%O", i))
+                        .do((books)=>LayoutAnimation.easeInEaseOut())
       ,
     goToBookView$: RN.select('cell').events('press')
                      .do(i => console.log("cell press:%O", i))

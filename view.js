@@ -233,11 +233,12 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
 
   var buckets=[
     {title:"検索"     ,books:searchedBooks},
-    {title:"お気に入り",books:likedBooks},
+    {title:"読みたい"  ,books:likedBooks},
     {title:"借りてる"  ,books:borrowedBooks},
     {title:"読んだ"    ,books:doneBooks},
   ]
   //LayoutAnimation.easeInEaseOut();
+
   console.log("se:%O",selectedSection);
   if(selectedSection !== null){
     //detail view
@@ -260,6 +261,7 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
                 <Touchable.BookCell
                     selector="bookcell"
                     book={item}
+                    title={buckets[selectedSection].title}
                     style={{backgroundColor:"#FAFAFA",//grey 300
                     }}/>)
             }}
@@ -311,6 +313,7 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
                 <Touchable.BookCell
                     selector="bookcell"
                     book={item}
+                    title={buckets[sectionID/2].title}
                     style={{backgroundColor:"#FAFAFA",//grey 300
                       }}/>)
               }}
@@ -321,7 +324,8 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
                   <TouchableElement
                     selector="section"
                     payload={sectionID/2} >
-                    <View style={{backgroundColor:"#1A237E"}} >
+                    <View style={{backgroundColor:"#1A237E",//indigo 900
+                    }} >
                     <View style={styles.sectionHeader}>
                       <Text>
                                 {buckets[sectionID/2].title}
@@ -345,7 +349,7 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
               }
             }}
           style={{
-            paddingHorizontal:20,
+            paddingHorizontal:3,
               //height:100,
             }}
       />

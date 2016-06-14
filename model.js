@@ -48,6 +48,33 @@ import {
 
 import NavigationStateUtils from 'NavigationStateUtils';
 
+const Realm = require('realm');
+class Book {}
+Book.schema = {
+  name: "Book",
+  primaryKey: "isbn",
+  properties:{
+    isbn:"string",
+    title: "string",
+    author: "string",
+    thumbnail:"string",
+    modifyDate:"date",
+  }
+}
+let realm = new Realm({schema:[Book],schemaVersion:1});
+
+realm.write(()=>{
+  let myBook = realm.create("Book",{
+    title: "縺舌ｊ縺ｨ縺舌ｉ縺ｮ邨ｵ譛ｬ7蜀翫そ繝・ヨ",
+    author: "",
+    thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/2147/9784834032147.jpg?_ex=200x200",
+    isbn: "9784834032147",
+    bucket:"liked",
+    modifyDate: new Date(Date.now()),
+  },true);
+  myBook.title = "縺舌ｊ縺ｨ縺舌ｉ縺ｮ邨ｵ譛ｬ7蜀翫そ繝・ヨ?"
+})
+
 function model(actions){
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
 
