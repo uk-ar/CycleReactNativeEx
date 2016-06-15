@@ -69,6 +69,7 @@ function renderCard(vdom, navigationProps) {
     //      onNavigate={onNavigateBack}
     //NavigationExperimental.Card is not deplicated.
     //navigationState={navigationProps.navigationParentState}
+    //NavigationExperimental.Card is static view?
     <NavigationExperimental.Card
       {...navigationProps}
       key={'View:' + navigationProps.scene.navigationState.key}
@@ -302,7 +303,7 @@ function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoading
         //backgroundColor:"#263238",//blue grey 800
         }}>
         <View style={{padding:10,}}>
-          <Text style={{color:"white"}}>
+          <Text style={{color:"white"}} onPress={()=>console.log("pressed t")}>
             header
           </Text>
         </View>
@@ -373,17 +374,19 @@ function BookView({booksWithStatus,booksLoadingState,selectedBook}){
   )
 };
 
-function view(model){
-  //console.log('navigationProps', model);
-  return(
-    //      onNavigate={onNavigateBack}
-    // NavigationExperimental.AnimatedView is deplicated.
-    // https://github.com/facebook/react-native/blob/69627bf91476274e92396370acff08fb20b8f3fc/Examples/UIExplorer/NavigationExperimental/NavigationCardStack-example.js#L140
-    <NavigationExperimental.AnimatedView
+var MyNav = React.createClass({
+  render: function(){
+    var model=this.props.model
+    console.log("mynav");
+    //this.setState({foo:null})
+    return(
+      //<NavigationExperimental.CardStack
+      <NavigationExperimental.AnimatedView
       style={{flex: 1}}
       navigationState={model.navigationState}
       onNavigate={onNavigateBack}
       renderScene={(navigationProps) => {
+          console.log("rs");
           const key = navigationProps.scene.navigationState.key;
           console.log('navigationProps', navigationProps);
           switch (key) {
@@ -392,7 +395,10 @@ function view(model){
             case 'Inbox':
               return renderCard(InboxView(model), navigationProps);
             case 'Main':
-              return renderCard(MainView(model), navigationProps);
+              return (
+                <MainView
+                     key="root"
+                     {...model} />)
             case 'Book':
               return renderCard(BookView(model), navigationProps);
             default:
@@ -401,8 +407,18 @@ function view(model){
               //renderCard(<Text>Everything is fucked</Text>, navigationProps);
           }
         }}
-    />)
+      />)
+  }
+});
+
+function view(model){
+  console.log('view:', model);
+  return (<MyNav model={model}/>)
+  //      onNavigate={onNavigateBack}
+  // NavigationExperimental.AnimatedView is deplicated.
+  // https://github.com/facebook/react-native/blob/69627bf91476274e92396370acff
 };
+
 /* renderOverlay={(props)=>{
    return (
    //NavigationExperimental.Header is not deplicated, but no examples.

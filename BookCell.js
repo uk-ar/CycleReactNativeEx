@@ -135,6 +135,7 @@ function getButtons(type,func,book){
   }
   var leftButtons=[
     <LeftButton
+        onRelease = {() => func(book,"1")}
         icon="heart-o"
         close={false}
         backgroundColor="#E0E0E0"
@@ -144,7 +145,7 @@ function getButtons(type,func,book){
     <LeftButton
         icon="heart-o"
         close={true}
-        onRelease = {() => func(book,"liked")}
+        onRelease = {() => {console.log("like");func(book,"liked")}}
         backgroundColor="#2196F3"
         text="読みたい"
         {...likedButton}
@@ -161,6 +162,7 @@ function getButtons(type,func,book){
   ];
   var rightButtons=[
     <RightButton
+        onRelease = {() => func(book,"-1")}
         backgroundColor="#E0E0E0"
         close={false}
         icon="check-square-o"
@@ -195,22 +197,22 @@ var BookCell = React.createClass({
     if (Platform.OS === 'android') {
       TouchableElement = Touchable.TouchableNativeFeedback;
     }
-    /* return(
-     *   //    style={{flex:1}}
-     *   <SwipeableRow
-     *       leftButtons={leftButtons}
-     *       rightButtons={rightButtons}
-     *   >
-     *     <View style={{backgroundColor:"red"}}>
-     *       <Text>
-     *         "foo"
-     *       </Text>
-     *       <Text>
-     *         "bar"
-     *       </Text>
-     *     </View>
-     *   </SwipeableRow>
-     * )*/
+    return(
+      //    style={{flex:1}}
+      <SwipeableRow
+          leftButtons={leftButtons}
+          rightButtons={rightButtons}
+      >
+        <View style={{backgroundColor:"red"}}>
+          <Text>
+            "foo"
+          </Text>
+          <Text>
+            "bar"
+          </Text>
+        </View>
+      </SwipeableRow>
+    )
     //TODO:flex-start & flex-end
     return(
       //probrem with hard coded width
@@ -220,9 +222,8 @@ var BookCell = React.createClass({
           {...props}>
         <TouchableElement
             selector="cell"
-            style={{flex:1}}
         payload={book}>
-          <View style={[{flex:1},styles.row,this.props.style]}>
+          <View style={[styles.row,this.props.style]}>
             <Image source={{uri: book.thumbnail}}
                    resizeMode="contain"
                    style={[styles.cellImage,]} />

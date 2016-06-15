@@ -64,6 +64,11 @@ function intent(RN, HTTP){
                                        .do(i => console.log("status req:%O", i));
   const request$ = Rx.Observable.merge(requestBooks$, requestStatus$);
   console.log("RN:%O",RN.navigateBack())
+  const release$ = RN.select('bookcell')
+                     .events('release')
+                     //.publish()
+                     //.share()
+  //release$.do((i)=>console.log("rel$")).subscribe()
   return{
     requestBooks$:requestBooks$,
     request$:request$,
@@ -113,22 +118,28 @@ function intent(RN, HTTP){
                     .fromPromise(AsyncStorage.getItem(STORAGE_KEY))
                     .map(i => i ? JSON.parse(i) : [])
                     .do(i => console.log("inBoxStatus$:%O", i))
-      ,
-    changeBucket$: Rx.Observable.merge(
-      RN.select('bookcell')
-        .events('release')
-        .map(([book,bucket])=>({type:"remove",book:book})),
-      RN.select('bookcell')
-        .events('release')
-        .map(([book,bucket])=>
-          ({type:"add",book:Object.assign(book,{bucket:bucket})}))
-    ).do(i => console.log("rel:%O", i))
-      ,
-    like$: RN.select('bookcell')
-             .events('like')
-             .do(i => console.log("like:%O", i))
-             .subscribe()
-      ,
+    ,
+    /* changeBucket$: Rx.Observable.merge(
+       release$
+       .distinctUntilChanged()
+       .do(i=>console.log("release:",i))
+       .map(([book,bucket])=>({type:"remove",book:book}))
+       ,
+       release$
+       .map(([book,bucket])=>{
+       return ({type:"add",
+       book:Object.assign(
+       {},book,{bucket:bucket,modifyDate: new Date(Date.now())})})
+       })
+      ).do(i => console.log("rel:%O", i))*/
+    changeBucket$: release$
+      .do(i=>console.log("release:",i))
+      .map(([book,bucket])=>(
+        {type:"replace",
+         book:Object.assign(
+           {},book,{bucket:bucket,modifyDate: new Date(Date.now())})}))
+      .do(i => console.log("rel:%O", i))
+    ,
     filterState$: RN.select('filter')
                     .events('press')
                     .startWith(false)

@@ -299,12 +299,14 @@ var SwipeableButtons = React.createClass({
       ).start((e)=>{
         //called when animation finished
         resolve(close);
+        console.log("callReleasefunc")
         if(!close){
           this.setState({
             releasing:false,
             componentIndex:0,
           },()=>{
             //delete data
+            console.log("callReleasefunc0")
             currentButton.props.onRelease && currentButton.props.onRelease()
           }
           )
@@ -313,6 +315,7 @@ var SwipeableButtons = React.createClass({
             releasing:false,
           },()=>{
             //delete data
+            console.log("callReleasefunc1")
             currentButton.props.onRelease && currentButton.props.onRelease()
           }
           )

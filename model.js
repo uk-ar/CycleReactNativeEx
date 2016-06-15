@@ -55,25 +55,34 @@ Book.schema = {
   primaryKey: "isbn",
   properties:{
     isbn:"string",
-    title: "string",
-    author: "string",
-    thumbnail:"string",
+    bucket: {type:"string", optional:true},
+    title: {type:"string", optional:true},
+    author: {type:"string", optional:true},
+    thumbnail:{type:"string", optional:true},
     modifyDate:"date",
   }
 }
-let realm = new Realm({schema:[Book],schemaVersion:1});
+let realm = new Realm({schema:[Book],schemaVersion:3});
+
+let mockBooks=[
+  {title:"like:SOFT SKILLS",isbn:"9784822251550",bucket:"liked",},
+  {title:"like:foo",isbn:"9784480064851",bucket:"liked",},
+  {title:"borrow:qux",isbn:"9784492314630",bucket:"borrowed",},
+  {title:"borrow:quxx",isbn:"9784798134208",bucket:"borrowed",},
+  {title:"done:bar",isbn:"9784105393069",bucket:"done",},
+  {title:"done:baz",isbn:"9784822285159",bucket:"done",},
+  {title:"done:toz",isbn:"9784757142794",bucket:"done",},
+]
 
 realm.write(()=>{
-  let myBook = realm.create("Book",{
-    title: "縺舌ｊ縺ｨ縺舌ｉ縺ｮ邨ｵ譛ｬ7蜀翫そ繝・ヨ",
-    author: "",
-    thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/2147/9784834032147.jpg?_ex=200x200",
-    isbn: "9784834032147",
-    bucket:"liked",
-    modifyDate: new Date(Date.now()),
-  },true);
-  myBook.title = "縺舌ｊ縺ｨ縺舌ｉ縺ｮ邨ｵ譛ｬ7蜀翫そ繝・ヨ?"
+  mockBooks.reverse().map((book)=>{
+    realm.create('Book',{...book,modifyDate: new Date(Date.now())},true)
+  })
 })
+
+var allBooks=realm.objects("Book")
+                  .sorted("modifyDate",true)//reverse sort
+                  .map((elem)=>elem);
 
 function model(actions){
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
@@ -112,17 +121,8 @@ function model(actions){
           active: true
         })
       }
-      )
-    })
-    .do(i => console.log("searchedBooks$:%O", i))
-    /* .combineLatest(actions.filterState$,(books,filter)=>{
-       return books.map(book => {
-       book.active = filter ? (!book.libraryStatus || book.libraryStatus.exist) :
-       true;
-       return book
-       })
-       }) */
-    .do(i => console.log("searchedBooks2$:%O", i));
+      )}).do(i => console.log("searchedBooks$:%O", i)
+      ).distinctUntilChanged();
     /* .combineLatest(actions.openSwipe$.startWith(1), (books,rowID) => {
        for (var i = 0; i < books.length; i++) {
        if (i != rowID) books[i].active = false
@@ -149,39 +149,40 @@ function model(actions){
                 passProps: {url: url}
        })); */
 
-  let allBooks$ = actions.changeBucket$.startWith(
-    [
-      {title:"like:SOFT SKILLS",isbn:"9784822251550",bucket:"liked",},
-      {title:"like:foo",isbn:"9784480064851",bucket:"liked",},
-      {title:"borrow:qux",isbn:"9784492314630",bucket:"borrowed",},
-      {title:"borrow:quxx",isbn:"9784798134208",bucket:"borrowed",},
-      {title:"done:bar",isbn:"9784105393069",bucket:"done",},
-      {title:"done:baz",isbn:"9784822285159",bucket:"done",},
-      {title:"done:toz",isbn:"9784757142794",bucket:"done",},
-    ]
-  ).scan((books, {type,book}) => {
-    console.log("t:",type);
-    switch (type) {
-      case 'remove':
-        return books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString());
-      case 'add':
-        return [book].concat(books);
-      default:
-        return books;
-    }
-    /* book.bucket=bucket;
-       return ([book].concat(books.filter((elem)=>elem.isbn.toString() !== book.isbn.toString()))) */
-    //books.find((b)=>b.isbn.toString === book.isbn.toString)
-      /* console.log("b:%O",book.isbn)
-         return books */
-  }).do((books)=>LayoutAnimation.easeInEaseOut());
+  let allBooks$ = Rx.Observable.just(
+    //actions.changeBucket$.
+    allBooks
+  ).do((i)=> console.log("b&o:",i))//.share()//.publish()
+  /* .scan((books, {type,book}) => {
+    *  console.log("t:",type);
+    *  switch (type) {
+    *    case 'remove':
+    *      return books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString());
+    *    case 'add':
+    *      return [book].concat(books);
+    *    case 'replace':
+    *      return [book].concat(books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString()));
+    *    default:
+    *      return books;
+    *  }
+      }).do((books)=>LayoutAnimation.easeInEaseOut()
+      ).do((books)=>{
+    *  realm.write(()=>{
+    *    books.map((book)=>{
+    *      realm.create('Book',book,true)
+    *    })
+    *  });
+      });*/
 
-  let likedBooks$ = allBooks$.map((books)=>
-    books.filter((book)=>book.bucket=="liked"));
   let borrowedBooks$ = allBooks$.map((books)=>
-    books.filter((book)=>book.bucket=="borrowed"));
+    books.filter((book)=>book.bucket=="borrowed")
+  ).do((i)=>console.log("b:",i))
+  let likedBooks$ = allBooks$.map((books)=>
+    books.filter((book)=>book.bucket=="liked")
+  ).do((i)=>console.log("l:",i))
   let doneBooks$ = allBooks$.map((books)=>
-    books.filter((book)=>book.bucket=="done"))
+    books.filter((book)=>book.bucket=="done")
+  ).do((i)=>console.log("d:",i))
   let selectedBook$ = actions.goToBookView$
                              //.map(({data})=>data)
   // for android action
@@ -285,13 +286,13 @@ function model(actions){
     });
 
   return  Rx.Observable
-            .combineLatest(searchedBooks$.startWith(MOCKED_MOVIES_DATA),
+            .combineLatest(searchedBooks$.startWith(MOCKED_MOVIES_DATA).distinctUntilChanged(),
                            likedBooks$,
                            doneBooks$,
                            borrowedBooks$,
-                           booksLoadingState$.startWith(false),
-                           navigationState$,
-                           selectedBook$.startWith(null),
+                           booksLoadingState$.startWith(false).distinctUntilChanged(),
+                           navigationState$.distinctUntilChanged(),
+                           selectedBook$.startWith(null).distinctUntilChanged(),
                            actions.selectedSection$.startWith(null),
                            (searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,navigationState,selectedBook,selectedSection) =>
                              ({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,navigationState,selectedBook,selectedSection,}));
