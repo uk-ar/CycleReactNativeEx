@@ -41,7 +41,7 @@ var {
   height
 } = Dimensions.get('window');
 
-let {SwipeableRow,} = require('./SwipeableRow');
+let {SwipeableRow,SwipeableRow2} = require('./SwipeableRow');
 
 function LeftButton({icon,text,...props}){
   return(
@@ -199,7 +199,7 @@ var BookCell = React.createClass({
     }
     return(
       //    style={{flex:1}}
-      <SwipeableRow
+      <SwipeableRow2
           leftButtons={leftButtons}
           rightButtons={rightButtons}
       >
@@ -208,10 +208,10 @@ var BookCell = React.createClass({
             "foo"
           </Text>
           <Text>
-            "bar"
+            "bar?"
           </Text>
         </View>
-      </SwipeableRow>
+      </SwipeableRow2>
     )
     //TODO:flex-start & flex-end
     return(

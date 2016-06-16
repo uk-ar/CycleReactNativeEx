@@ -412,8 +412,157 @@ var MeasureableView = React.createClass({
    </View>
    )
    }
-   });
- */
+}); */
+
+/* var MeasureableViews = React.createClass({
+ *   //TODO:remove this.widths
+ *   render: function(){
+ *     return (React.Children.toArray(this.props.children))
+ *     return (
+ *       React.Children.map(
+ *         this.props.children,
+ *         ((button, i, array)=>
+ *           <MeasureableView
+ *               onFirstLayout={({nativeEvent:{layout:{x, y, width, height}}})=>{
+ *                   this.widths[i] = width;
+ *                   if(Object.keys(this.widths).length == array.length){
+ *                     this.props.onFirstLayoutAll &&
+ *                     this.props.onFirstLayoutAll(widths)
+ *                   }
+ *                 }}>
+ *             {button}
+ *           </MeasureableView>)))
+ *   }
+ * })*/
+
+var Buttons = React.createClass({
+  getInitialState: function() {
+    return {
+       index:0,
+     }
+   },
+  componentWillMount: function(){
+    this.thresholds = [50, 100]
+    this.props.width.addListener(({value:value}) => {
+      var index = calcIndex(value, [50, 100]);
+      if(index != -1 && this.state.index != index){
+        this.setState({index:index})
+      }
+    });
+  },
+  render: function(){
+    //console.log("buttons")
+    var {width, props} = this.props
+    //TODO:remove ref
+    return (
+      <Animated.View
+      {...props}
+      style={[
+        {flexDirection:"row",
+         width:width.interpolate({
+          inputRange: [0,   0.01,1],
+          outputRange:[0.01,0.01,1]
+        })},
+        this.props.style]}
+      >
+        {React.Children.toArray(
+           this.props.buttons.map((button,i)=>
+             <MeasureableView
+                 ref={i}
+                 style={{
+                   width:i == this.state.index ? null: 0.01,
+                   backgroundColor:"white"
+                 }}
+                 onFirstLayout={
+                   ({nativeEvent:{layout:{x, y, width, height}}})=>{
+                     this.thresholds[i] = width;
+                     }}>
+                   {button}
+             </MeasureableView>
+           )
+         )}
+       </Animated.View>)
+   }
+});
+
+function calcIndex(value, thresholds){
+  return thresholds.findIndex((elem, index) => {
+    return value < elem
+  })
+};
+
+ //scroll view base
+ //ref: http://browniefed.com/blog/react-native-animated-listview-row-swipe/
+ var SwipeableRow2 = React.createClass({
+   getInitialState: function() {
+     return {
+       positiveSwipe:true,
+     }
+   },
+   componentWillMount: function() {
+     this._panX = new Animated.Value(0.01);
+
+     this._panResponder = PanResponder.create({
+       // Ask to be the responder:
+       onStartShouldSetPanResponder: (evt, gestureState) => false,
+       onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
+       onMoveShouldSetPanResponder: (evt, gestureState) => true,
+       onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+
+       onPanResponderGrant: (evt, gestureState) => {},
+       onPanResponderMove: Animated.event([null,{dx: this._panX}]),
+       onPanResponderTerminationRequest: (evt, gestureState) => false,
+       onPanResponderRelease: (evt, gestureState) => {
+         Animated.timing(this._panX,
+                         {toValue: 0.001,duration: 180,}).start()
+       },
+       onShouldBlockNativeResponder: (evt, gestureState) => true,
+     });
+     this._panX.addListener(({value:value}) => {
+       if(0 < value && this.state.positiveSwipe != true){
+         this.setState({positiveSwipe: true})
+       }else if(value <= 0 && this.state.positiveSwipe != false){
+         this.setState({positiveSwipe: false})
+       }
+     });
+   },
+   render: function(){
+     //console.log("re:")
+     leftButtons=[
+       <View style={{width:50}}><Text>1</Text></View>,
+       <View style={{width:100}}><Text>2</Text></View>,
+     ]
+     return (
+       <View
+           {...this._panResponder.panHandlers}
+           style={{flexDirection:"row",
+                   justifyContent: this.state.positiveSwipe ?
+                                   "flex-start" : "flex-end",
+           }}>
+         <Buttons
+             width={this._panX}
+             style={{
+               backgroundColor:"green",
+             }}
+             buttons={leftButtons}
+             />
+         <View style={{width:width}}>
+           {this.props.children}
+         </View>
+         <Animated.View
+       style={{width:Animated
+         .multiply(this._panX,-1)
+         .interpolate({
+           inputRange: [0,   0.01,1],
+           outputRange:[0.01,0.01,1]
+         })}}>
+       <Text numberOfLines={1}>rightButtons</Text>
+      </Animated.View>
+      </View>
+     )
+   }
+ });
+
 var SwipeableRow = React.createClass({
   componentWillMount: function() {
     this._panX = new Animated.Value(0);
@@ -513,4 +662,18 @@ var SwipeableRow = React.createClass({
   },
 });
 
-module.exports = {SwipeableRow};
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column'
+  },
+  outerScroll: {
+    flex: 1,
+    flexDirection: 'column'
+  },
+  row: {
+    flex: 1
+  }
+});
+
+module.exports = {SwipeableRow,SwipeableRow2};

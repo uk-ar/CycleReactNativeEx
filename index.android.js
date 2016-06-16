@@ -52,6 +52,7 @@ import {
   PanResponder,
   UIManager,
   NavigationExperimental,
+  AppRegistry,
 } from 'react-native';
 import NavigationStateUtils from 'NavigationStateUtils';
 
@@ -66,7 +67,6 @@ var view = require('./view');
 function main({RN, HTTP, EE}) {
   const actions = intent(RN, HTTP);
   const state$ = model(actions);
-  console.log("s",state$)
   //0192521722
   //qwerty
   return {

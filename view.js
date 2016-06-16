@@ -70,6 +70,7 @@ function renderCard(vdom, navigationProps) {
     //NavigationExperimental.Card is not deplicated.
     //navigationState={navigationProps.navigationParentState}
     //NavigationExperimental.Card is static view?
+    //ref: https://github.com/facebook/react-native/issues/7720
     <NavigationExperimental.Card
       {...navigationProps}
       key={'View:' + navigationProps.scene.navigationState.key}
@@ -218,9 +219,12 @@ var MyListView = React.createClass({
    return obj
  }
 
-function MainView({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,selectedSection}){
-
+function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
   const limit=2;
+  let borrowedBooks = allBooks.filter((book)=>book.bucket=="borrowed");
+  let likedBooks = allBooks.filter((book)=>book.bucket=="liked");
+  let doneBooks = allBooks.filter((book)=>book.bucket=="done");
+  //todo transition to detail view
   var items = {
     0: booksToObject(searchedBooks.slice(0,limit)),
     1: {},//terminator
@@ -380,15 +384,14 @@ var MyNav = React.createClass({
     console.log("mynav");
     //this.setState({foo:null})
     return(
-      //<NavigationExperimental.CardStack
-      <NavigationExperimental.AnimatedView
+      //<NavigationExperimental.Transitioner
+      <NavigationExperimental.CardStack
       style={{flex: 1}}
       navigationState={model.navigationState}
       onNavigate={onNavigateBack}
       renderScene={(navigationProps) => {
           console.log("rs");
           const key = navigationProps.scene.navigationState.key;
-          console.log('navigationProps', navigationProps);
           switch (key) {
             case 'Search':
               return renderCard(SearchView(model), navigationProps);
@@ -412,7 +415,6 @@ var MyNav = React.createClass({
 });
 
 function view(model){
-  console.log('view:', model);
   return (<MyNav model={model}/>)
   //      onNavigate={onNavigateBack}
   // NavigationExperimental.AnimatedView is deplicated.

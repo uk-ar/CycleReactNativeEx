@@ -149,40 +149,39 @@ function model(actions){
                 passProps: {url: url}
        })); */
 
-  let allBooks$ = Rx.Observable.just(
-    //actions.changeBucket$.
+  let allBooks$ = actions.changeBucket$.startWith(
     allBooks
-  ).do((i)=> console.log("b&o:",i))//.share()//.publish()
-  /* .scan((books, {type,book}) => {
-    *  console.log("t:",type);
-    *  switch (type) {
-    *    case 'remove':
-    *      return books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString());
-    *    case 'add':
-    *      return [book].concat(books);
-    *    case 'replace':
-    *      return [book].concat(books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString()));
-    *    default:
-    *      return books;
-    *  }
-      }).do((books)=>LayoutAnimation.easeInEaseOut()
-      ).do((books)=>{
-    *  realm.write(()=>{
-    *    books.map((book)=>{
-    *      realm.create('Book',book,true)
-    *    })
-    *  });
-      });*/
+  ).scan((books, {type,book}) => {
+    console.log("type:",type);
+    switch (type) {
+      case 'remove':
+        return books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString())
+      case 'add':
+        return [book].concat(books);
+      case 'replace':
+        return [book].concat(books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString()))
+     default:
+          return books;
+    }
+  }).do((books)=>LayoutAnimation.easeInEaseOut()
+  ).do((books)=>{
+    realm.write(()=>{
+      books.map((book)=>{
+        realm.create('Book',book,true)
+      })
+    });
+  }).do((i)=> console.log("b&o:",i)
+  ).shareReplay();
 
-  let borrowedBooks$ = allBooks$.map((books)=>
-    books.filter((book)=>book.bucket=="borrowed")
-  ).do((i)=>console.log("b:",i))
-  let likedBooks$ = allBooks$.map((books)=>
-    books.filter((book)=>book.bucket=="liked")
-  ).do((i)=>console.log("l:",i))
-  let doneBooks$ = allBooks$.map((books)=>
-    books.filter((book)=>book.bucket=="done")
-  ).do((i)=>console.log("d:",i))
+            /* let borrowedBooks$ = allBooks$.map((books)=>
+               books.filter((book)=>book.bucket=="borrowed")
+               ).do((i)=>console.log("b:",i))
+               let likedBooks$ = allBooks$.map((books)=>
+               books.filter((book)=>book.bucket=="liked")
+               ).do((i)=>console.log("l:",i))
+               let doneBooks$ = allBooks$.map((books)=>
+               books.filter((book)=>book.bucket=="done")
+               ).do((i)=>console.log("d:",i))*/
   let selectedBook$ = actions.goToBookView$
                              //.map(({data})=>data)
   // for android action
@@ -287,15 +286,13 @@ function model(actions){
 
   return  Rx.Observable
             .combineLatest(searchedBooks$.startWith(MOCKED_MOVIES_DATA).distinctUntilChanged(),
-                           likedBooks$,
-                           doneBooks$,
-                           borrowedBooks$,
+                           allBooks$,
                            booksLoadingState$.startWith(false).distinctUntilChanged(),
                            navigationState$.distinctUntilChanged(),
                            selectedBook$.startWith(null).distinctUntilChanged(),
                            actions.selectedSection$.startWith(null),
-                           (searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,navigationState,selectedBook,selectedSection) =>
-                             ({searchedBooks,likedBooks,doneBooks,borrowedBooks,booksLoadingState,navigationState,selectedBook,selectedSection,}));
+                           (searchedBooks,allBooks,booksLoadingState,navigationState,selectedBook,selectedSection) =>
+                             ({searchedBooks,allBooks,booksLoadingState,navigationState,selectedBook,selectedSection,}));
 
   /*
   var state$ = {
