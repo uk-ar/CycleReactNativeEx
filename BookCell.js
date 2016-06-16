@@ -199,11 +199,12 @@ var BookCell = React.createClass({
     }
     return(
       //    style={{flex:1}}
+      //style={{backgroundColor:"red"}}
       <SwipeableRow2
           leftButtons={leftButtons}
           rightButtons={rightButtons}
       >
-        <View style={{backgroundColor:"red"}}>
+        <View style={{opacity:0.5}}>
           <Text>
             "foo"
           </Text>

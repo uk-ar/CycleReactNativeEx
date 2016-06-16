@@ -438,17 +438,21 @@ var MeasureableView = React.createClass({
 var Buttons = React.createClass({
   getInitialState: function() {
     return {
-       index:0,
+       index:null,
      }
    },
   componentWillMount: function(){
-    this.thresholds = [50, 100]
-    this.props.width.addListener(({value:value}) => {
-      var index = calcIndex(value, [50, 100]);
-      if(index != -1 && this.state.index != index){
-        this.setState({index:index})
-      }
-    });
+    this.thresholds = [];
+    this.releasing = false;
+  },
+  release: function(){
+    //this.props.width.removeListener(this.listener)
+    this.releasing = true;
+    Animated.timing(this.props.width,
+                    {toValue: width,duration: 180,}
+    ).start(()=>{
+      this.releasing = false;
+    })
   },
   render: function(){
     //console.log("buttons")
@@ -459,23 +463,38 @@ var Buttons = React.createClass({
       {...props}
       style={[
         {flexDirection:"row",
-         width:width.interpolate({
+         width:this.props.width.interpolate({
           inputRange: [0,   0.01,1],
           outputRange:[0.01,0.01,1]
         })},
         this.props.style]}
       >
         {React.Children.toArray(
-           this.props.buttons.map((button,i)=>
+           this.props.buttons.map((button, i, array)=>
              <MeasureableView
                  ref={i}
                  style={{
-                   width:i == this.state.index ? null: 0.01,
-                   backgroundColor:"white"
+                   width:(this.state.index == null) ? null :
+                   (this.state.index == i) ? null : 0.01,
+                   backgroundColor:"white",
                  }}
+                 onLayout={()=>
+                   console.log("w:",i,(this.state.index == i) ? null : 0.01)}
                  onFirstLayout={
                    ({nativeEvent:{layout:{x, y, width, height}}})=>{
                      this.thresholds[i] = width;
+                     if(Object.keys(this.thresholds).length == array.length){
+                       this.listener =
+                         this.props.width.addListener(({value:value}) => {
+                           if(this.releasing){return}
+                           var index = calcIndex(value, this.thresholds);
+                           if(index != -1 && this.state.index != index){
+                             console.log("i:",index)
+                             this.setState({index:index});
+                           }
+                         });
+                       this.setState({index:0})
+                     }
                      }}>
                    {button}
              </MeasureableView>
@@ -513,8 +532,7 @@ function calcIndex(value, thresholds){
        onPanResponderMove: Animated.event([null,{dx: this._panX}]),
        onPanResponderTerminationRequest: (evt, gestureState) => false,
        onPanResponderRelease: (evt, gestureState) => {
-         Animated.timing(this._panX,
-                         {toValue: 0.001,duration: 180,}).start()
+         this.refs.leftButtons.release()
        },
        onShouldBlockNativeResponder: (evt, gestureState) => true,
      });
@@ -529,8 +547,8 @@ function calcIndex(value, thresholds){
    render: function(){
      //console.log("re:")
      leftButtons=[
-       <View style={{width:50}}><Text>1</Text></View>,
-       <View style={{width:100}}><Text>2</Text></View>,
+       <View style={{width:50}}><Text>0</Text></View>,
+       <View style={{width:100}}><Text>1</Text></View>,
      ]
      return (
        <View
@@ -540,6 +558,7 @@ function calcIndex(value, thresholds){
                                    "flex-start" : "flex-end",
            }}>
          <Buttons
+             ref="leftButtons"
              width={this._panX}
              style={{
                backgroundColor:"green",
