@@ -4,6 +4,7 @@ let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/re
 var FAIcon = require('react-native-vector-icons/FontAwesome');
 var MIcon = require('react-native-vector-icons/MaterialIcons');
 var GiftedSpinner = require('react-native-gifted-spinner');
+import materialColor from 'material-colors'
 
 import { RadioButtons,SegmentedControls } from 'react-native-radio-buttons'
 var _ = require('lodash');
@@ -365,6 +366,7 @@ var SwipeableButtons = React.createClass({
 
 var MeasureableView = React.createClass({
   //TODO:remove this.mounted
+  //TODO:position absolute
   render: function(){
     return this.mounted ? (
       <View
@@ -435,6 +437,53 @@ var MeasureableView = React.createClass({
  *   }
  * })*/
 
+var AnimatableBackGroundColor2 = React.createClass({
+  //Use LayoutAnimation if you want to use height or width null
+  getInitialState: function() {
+    return {
+      style:this.props.style,
+    }
+  },
+  componentWillReceiveProps: function(nextProps) {
+    if(nextProps.style != this.props.style){
+      this.counter = new Animated.Value(0);
+      //this.positive = true;
+      var current = StyleSheet.flatten(this.props.style);
+      this.next = StyleSheet.flatten(nextProps.style);
+
+      Object.keys(this.next).map((key)=>{
+        //remove if with filter & merge
+        if((typeof this.next[key] === "number" ||
+            key == "backgroundColor" || key == "color")
+            && current[key] !== this.next[key]
+        ){
+          this.next[key] = this.counter.interpolate({
+            inputRange:[0,1],
+            outputRange:[current[key],this.next[key]]
+          })
+        }
+      });
+      //console.log(this.next)
+      this.setState({style:this.next})
+        Animated.timing(
+          this.counter,
+          {toValue: 1,
+           duration: 180,}
+        ).start()
+    }
+  },
+  render: function(){
+    //console.log("rend;")
+    return(
+      //style={[this.props.style,]}
+      <Animated.View
+          {...this.props}
+          style={[this.state.style,]}>
+        {this.props.children}
+      </Animated.View>)
+  }
+});
+
 var Buttons = React.createClass({
   getInitialState: function() {
     return {
@@ -446,7 +495,6 @@ var Buttons = React.createClass({
     this.releasing = false;
   },
   release: function(){
-    //this.props.width.removeListener(this.listener)
     this.releasing = true;
     Animated.timing(this.props.width,
                     {toValue: width,duration: 180,}
@@ -456,17 +504,28 @@ var Buttons = React.createClass({
   },
   render: function(){
     //console.log("buttons")
+    //react-native cannot set width for clipped subview in ios
     var {width, props} = this.props
-    //TODO:remove ref
+    console.log("w",width)
+    var colors=[
+      materialColor.grey[300],
+      materialColor.lightBlue[500],
+      materialColor.green[500],
+    ]
     return (
-      <Animated.View
-      {...props}
+      //          removeClippedSubview="false"
+      <AnimatableBackGroundColor2
+          {...props}
       style={[
         {flexDirection:"row",
+         //overflow:"hidden",
+         //height: this.state.index == 0 ? 30 : 50 ,
+         backgroundColor:(this.state.index === null) ?
+                       colors[0] : colors[this.state.index],
          width:this.props.width.interpolate({
-          inputRange: [0,   0.01,1],
-          outputRange:[0.01,0.01,1]
-        })},
+           inputRange: [0,   0.01,1],
+           outputRange:[0.01,0.01,1]
+         })},
         this.props.style]}
       >
         {React.Children.toArray(
@@ -476,32 +535,36 @@ var Buttons = React.createClass({
                  style={{
                    width:(this.state.index == null) ? null :
                    (this.state.index == i) ? null : 0.01,
-                   backgroundColor:"white",
                  }}
-                 onLayout={()=>
-                   console.log("w:",i,(this.state.index == i) ? null : 0.01)}
+                 onLayout={()=>{
+                     console.log("lay:", i)
+                     /* console.log("w:",i,(this.state.index == null) ? null :
+                     (this.state.index == i) ? null : 0.01)
+                     console.log("w2:", i, (this.state.index === i) ? null :0.01,) */
+                   }}
                  onFirstLayout={
                    ({nativeEvent:{layout:{x, y, width, height}}})=>{
+                     console.log("b:", i)
                      this.thresholds[i] = width;
                      if(Object.keys(this.thresholds).length == array.length){
-                       this.listener =
-                         this.props.width.addListener(({value:value}) => {
-                           if(this.releasing){return}
-                           var index = calcIndex(value, this.thresholds);
-                           if(index != -1 && this.state.index != index){
-                             console.log("i:",index)
-                             this.setState({index:index});
-                           }
-                         });
-                       this.setState({index:0})
+                       console.log("all:", i)
+                       this.props.width.addListener(({value:value}) => {
+                         if(this.releasing){return}
+                         var index = calcIndex(value, this.thresholds);
+                         if(index != -1 && this.state.index != index){
+                           console.log("i:",index)
+                           this.setState({index:index});
+                         }
+                       });
                      }
+                     this.setState({index:0}) // to avoid backgroundColor:null
                      }}>
                    {button}
              </MeasureableView>
            )
          )}
-       </Animated.View>)
-   }
+       </AnimatableBackGroundColor2>
+   )}
 });
 
 function calcIndex(value, thresholds){
@@ -549,6 +612,7 @@ function calcIndex(value, thresholds){
      leftButtons=[
        <View style={{width:50}}><Text>0</Text></View>,
        <View style={{width:100}}><Text>1</Text></View>,
+       <View style={{width:150}}><Text>2</Text></View>,
      ]
      return (
        <View
@@ -561,7 +625,7 @@ function calcIndex(value, thresholds){
              ref="leftButtons"
              width={this._panX}
              style={{
-               backgroundColor:"green",
+               //backgroundColor:"green",
              }}
              buttons={leftButtons}
              />
