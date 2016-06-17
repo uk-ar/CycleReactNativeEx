@@ -541,6 +541,7 @@ var Buttons = React.createClass({
                        this.setState({index:index});
                      }
                    });
+                   this.setState({index:0});//for re-render
                  }
                }}>
            {button}
@@ -577,7 +578,18 @@ function calcIndex(value, thresholds){
        onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
 
        onPanResponderGrant: (evt, gestureState) => {},
-       onPanResponderMove: Animated.event([null,{dx: this._panX}]),
+       onPanResponderMove: (evt, gestureState) => {
+         this._panX.setValue(gestureState.dx);
+         //https://github.com/facebook/react-native/issues/1705
+         if (Math.abs(gestureState.dx) > 10){
+           this.props.onPanResponderMove &&
+           this.props.onPanResponderMove(evt, gestureState)
+         }
+       },
+       onPanResponderEnd: (evt, gestureState) => {
+         this.props.onPanResponderEnd &&
+         this.props.onPanResponderEnd(evt, gestureState)
+       },
        onPanResponderTerminationRequest: (evt, gestureState) => false,
        onPanResponderRelease: (evt, gestureState) => {
          this.refs.leftButtons.release()
