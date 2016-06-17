@@ -487,7 +487,7 @@ var AnimatableBackGroundColor2 = React.createClass({
 var Buttons = React.createClass({
   getInitialState: function() {
     return {
-       index:null,
+       index:0,
      }
    },
   componentWillMount: function(){
@@ -503,66 +503,51 @@ var Buttons = React.createClass({
     })
   },
   render: function(){
-    //console.log("buttons")
+    console.log("buttons")
     //react-native cannot set width for clipped subview in ios
     var {width, props} = this.props
-    console.log("w",width)
     var colors=[
       materialColor.grey[300],
       materialColor.lightBlue[500],
       materialColor.green[500],
     ]
     return (
-      //          removeClippedSubview="false"
       <AnimatableBackGroundColor2
           {...props}
       style={[
         {flexDirection:"row",
-         //overflow:"hidden",
+         overflow:"hidden",
          //height: this.state.index == 0 ? 30 : 50 ,
-         backgroundColor:(this.state.index === null) ?
-                       colors[0] : colors[this.state.index],
+         backgroundColor:colors[this.state.index],
          width:this.props.width.interpolate({
            inputRange: [0,   0.01,1],
            outputRange:[0.01,0.01,1]
          })},
         this.props.style]}
       >
-        {React.Children.toArray(
-           this.props.buttons.map((button, i, array)=>
-             <MeasureableView
-                 ref={i}
-                 style={{
-                   width:(this.state.index == null) ? null :
-                   (this.state.index == i) ? null : 0.01,
-                 }}
-                 onLayout={()=>{
-                     console.log("lay:", i)
-                     /* console.log("w:",i,(this.state.index == null) ? null :
-                     (this.state.index == i) ? null : 0.01)
-                     console.log("w2:", i, (this.state.index === i) ? null :0.01,) */
-                   }}
-                 onFirstLayout={
-                   ({nativeEvent:{layout:{x, y, width, height}}})=>{
-                     console.log("b:", i)
-                     this.thresholds[i] = width;
-                     if(Object.keys(this.thresholds).length == array.length){
-                       console.log("all:", i)
-                       this.props.width.addListener(({value:value}) => {
-                         if(this.releasing){return}
-                         var index = calcIndex(value, this.thresholds);
-                         if(index != -1 && this.state.index != index){
-                           console.log("i:",index)
-                           this.setState({index:index});
-                         }
-                       });
+      {(Object.keys(this.thresholds).length !== this.props.buttons.length) ?
+       this.props.buttons.map((button, i, array)=>
+         <MeasureableView
+             ref={i}
+             key={i}
+             onFirstLayout={
+               ({nativeEvent:{layout:{x, y, width, height}}})=>{
+                 this.thresholds[i] = width;
+                 if(Object.keys(this.thresholds).length == array.length){
+                   this.props.width.addListener(({value:value}) => {
+                     if(this.releasing){return}
+                     var index = calcIndex(value, this.thresholds);
+                     if(index != -1 && this.state.index != index){
+                       this.setState({index:index});
                      }
-                     this.setState({index:0}) // to avoid backgroundColor:null
-                     }}>
-                   {button}
-             </MeasureableView>
-           )
-         )}
+                   });
+                 }
+               }}>
+           {button}
+         </MeasureableView>)
+     :
+       this.props.buttons[this.state.index]
+      }
        </AnimatableBackGroundColor2>
    )}
 });
@@ -608,7 +593,7 @@ function calcIndex(value, thresholds){
      });
    },
    render: function(){
-     //console.log("re:")
+     console.log("sr2:")
      leftButtons=[
        <View style={{width:50}}><Text>0</Text></View>,
        <View style={{width:100}}><Text>1</Text></View>,
