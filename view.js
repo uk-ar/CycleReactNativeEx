@@ -204,10 +204,27 @@ var MyListView = React.createClass({
   render() {
     const {items, ...listViewProps} = this.props;
     return (
+      //onResponderMove is too premitive
       <ListView
-        ref={listView => this._listView = listView}
-        dataSource={this.state.dataSource}
-        {...listViewProps}
+          ref={listView => this._listView = listView}
+          dataSource={this.state.dataSource}
+          enableEmptySections={true}
+          renderRow={(item, sectionID, rowID)=> {
+                return(
+                  <Touchable.BookCell
+                    selector="bookcell"
+                    onPanResponderMove={()=>{
+                        this._listView.setNativeProps({scrollEnabled:false})
+                      }}
+                    onPanResponderEnd={()=>{
+                        this._listView.setNativeProps({scrollEnabled:true})
+                      }}
+                    book={item}
+                    title={this.props.items[sectionID/2].title}
+                    style={{backgroundColor:"#FAFAFA",//grey 300
+                    }}/>)
+              }}
+          {...listViewProps}
       />
     );
   }
@@ -245,119 +262,101 @@ function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
   //LayoutAnimation.easeInEaseOut();
 
   console.log("se:%O",selectedSection);
-  if(selectedSection !== null){
-    //detail view
-    return (
-      //   key={item.isbn}
-      <View style={{
-          flex:1,//for scroll
-          backgroundColor:"#1A237E",//indigo 900
-          //backgroundColor:"#263238",//blue grey 800
-        }}>
-        {null /* for LayoutAnimation */}
-      <MyListView
-          items={{
-              0:booksToObject(buckets[selectedSection].books),
-              1:[],
-            }}
-          enableEmptySections={true}
-          renderRow={(item, sectionID, rowID)=> {
-              return (
-                <Touchable.BookCell
-                    selector="bookcell"
-                    book={item}
-                    title={buckets[selectedSection].title}
-                    style={{backgroundColor:"#FAFAFA",//grey 300
-                    }}/>)
-            }}
-          renderSectionHeader={(sectionData, sectionID) => {
-              if(sectionID % 2 == 0){
-                return (
-                  <View style={styles.sectionHeader}>
-                    <Touchable.FAIcon
-                       name="close"
-                       selector="close"
-                       size={20}
-                       style={{marginRight:5}}/>
-                    <Text>
-                             {buckets[selectedSection].title}
-                    </Text>
-                  </View>
-                )
-              }else{
-                return (
-                  <MySectionFooter
-                      text={buckets[selectedSection].books.length}/>)
-              }
-            }}
-          style={{
-            padding:3,
-              //height:100,
-            }}
-      />
-      </View>
-    )
-  }else{
+  if(selectedSection == null){
+
     //main
     return (
       //dataSource={dataSource.cloneWithRowsAndSections(items.map((books)=> books.slice(0,limit)))}
+      //            ref="listView"
       <View style={{
         flex:1,
         backgroundColor:"#1A237E",//indigo 900
         //backgroundColor:"#263238",//blue grey 800
-        }}>
+      }}>
         <View style={{padding:10,}}>
           <Text style={{color:"white"}} onPress={()=>console.log("pressed t")}>
             header
           </Text>
         </View>
         <MyListView
-          enableEmptySections={true}
-          renderRow={(item, sectionID, rowID)=> {
-              return(
-                <Touchable.BookCell
-                    selector="bookcell"
-                    book={item}
-                    title={buckets[sectionID/2].title}
-                    style={{backgroundColor:"#FAFAFA",//grey 300
-                      }}/>)
-              }}
-          items={items}
-          renderSectionHeader={(sectionData, sectionID) => {
-              if(sectionID % 2 == 0){
-                return (
-                  <TouchableElement
+            items={items}
+            renderSectionHeader={(sectionData, sectionID) => {
+                if(sectionID % 2 == 0){
+                  return (
+                    <TouchableElement
                     selector="section"
                     payload={sectionID/2} >
-                    <View style={{backgroundColor:"#1A237E",//indigo 900
-                    }} >
-                    <View style={styles.sectionHeader}>
-                      <Text>
-                                {buckets[sectionID/2].title}
-                      </Text>
-                    </View>
-                    </View>
-                  </TouchableElement>
-                )
-              }else{
-                return (
-                   <TouchableElement
+                      <View style={{backgroundColor:"#1A237E",//indigo 900
+                      }} >
+                        <View style={styles.sectionHeader}>
+                          <Text>
+                                    {buckets[sectionID/2].title}
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableElement>
+                  )
+                }else{
+                  return (
+                    <TouchableElement
                        selector="section"
                        payload={(sectionID-1)/2} >
-                   <View style={styles.sectionFooter}>
-                     <Text>
-                                {`すべて表示(${buckets[(sectionID-1)/2].books.length})`}
-                     </Text>
-                   </View>
-                   </TouchableElement>
-                )
-              }
-            }}
-          style={{
-            paddingHorizontal:3,
+                      <View style={styles.sectionFooter}>
+                        <Text>
+                                  {`すべて表示(${buckets[(sectionID-1)/2].books.length})`}
+                        </Text>
+                      </View>
+                    </TouchableElement>
+                  )
+                }
+              }}
+            style={{
+              paddingHorizontal:3,
               //height:100,
             }}
-      />
+        />
+      </View>
+    )
+  }else{
+    //detail view
+    return (
+      //   key={item.isbn}
+      <View style={{
+        flex:1,//for scroll
+        backgroundColor:"#1A237E",//indigo 900
+        //backgroundColor:"#263238",//blue grey 800
+      }}>
+        {null /* for LayoutAnimation */}
+        <MyListView
+            items={{
+              0:booksToObject(buckets[selectedSection].books),
+              1:[],
+            }}
+            renderSectionHeader={(sectionData, sectionID) => {
+                if(sectionID % 2 == 0){
+                  return (
+                    <View style={styles.sectionHeader}>
+                      <Touchable.FAIcon
+                       name="close"
+                       selector="close"
+                       size={20}
+                       style={{marginRight:5}}/>
+                      <Text>
+                             {buckets[selectedSection].title}
+                      </Text>
+                    </View>
+                  )
+                }else{
+                  return (
+                    <MySectionFooter
+                      text={buckets[selectedSection].books.length}/>)
+                }
+              }}
+            style={{
+              padding:3,
+              //height:100,
+            }}
+        />
       </View>
     )
   };

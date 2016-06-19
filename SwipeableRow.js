@@ -574,14 +574,19 @@ function calcIndex(value, thresholds){
        // Ask to be the responder:
        onStartShouldSetPanResponder: (evt, gestureState) => false,
        onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
-       onMoveShouldSetPanResponder: (evt, gestureState) => true,
-       onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+       onMoveShouldSetPanResponder: (evt, gestureState) => {
+         //allow vertical scroll
+         return Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
+             && Math.abs(gestureState.dx) > 10
+       },
+       onMoveShouldSetPanResponderCapture: (evt, gestureState) => false,
 
        onPanResponderGrant: (evt, gestureState) => {},
        onPanResponderMove: (evt, gestureState) => {
          this._panX.setValue(gestureState.dx);
          //https://github.com/facebook/react-native/issues/1705
-         if (Math.abs(gestureState.dx) > 10){
+         if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
+             && Math.abs(gestureState.dx) > 10){
            this.props.onPanResponderMove &&
            this.props.onPanResponderMove(evt, gestureState)
          }
@@ -624,7 +629,7 @@ function calcIndex(value, thresholds){
              style={{
                //backgroundColor:"green",
              }}
-             buttons={leftButtons}
+             buttons={this.props.leftButtons}
              />
          <View style={{width:width}}>
            {this.props.children}

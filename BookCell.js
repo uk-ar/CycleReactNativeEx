@@ -43,9 +43,14 @@ var {
 
 let {SwipeableRow,SwipeableRow2} = require('./SwipeableRow');
 
-function LeftButton({icon,text,...props}){
+function LeftButton({icon,text,style,...props}){
   return(
-    <View {...props}>
+    <View
+        {...props}
+        style={[style,{
+            flexDirection:"row",
+            alignItems:"center",
+          }]}>
       <FAIcon name={icon} size={20}
               style={{margin:10,marginRight:5}} />
       <Text>
@@ -57,9 +62,14 @@ function LeftButton({icon,text,...props}){
 
 //http://mae.chab.in/archives/2854
 //stateless component validation
-function RightButton({icon,text,...props}){
+function RightButton({icon,text,style,...props}){
   return(
-    <View {...props}>
+    <View
+        {...props}
+        style={[style,{
+            flexDirection:"row",
+            alignItems:"center",
+          }]}>
       <Text>
         {text}
       </Text>
@@ -148,6 +158,7 @@ function getButtons(type,func,book){
         onRelease = {() => {console.log("like");func(book,"liked")}}
         backgroundColor="#2196F3"
         text="読みたい"
+        style={{width:width/2}}
         {...likedButton}
     />,//light blue "#03A9F4"
     //blue "#2196F3"
@@ -157,6 +168,7 @@ function getButtons(type,func,book){
         backgroundColor='rgb(76, 175, 80)'
         icon="bookmark-o"
         text="借りてる"
+        style={{width:width}}
         {...borrowedButton}
     />,//green
   ];
@@ -203,6 +215,15 @@ var BookCell = React.createClass({
       <SwipeableRow2
           leftButtons={leftButtons}
           rightButtons={rightButtons}
+          onPanResponderMove={()=>{
+              //prevent vertical scroll
+              this.props.onPanResponderMove &&
+              this.props.onPanResponderMove()
+            }}
+          onPanResponderEnd={()=>{
+              this.props.onPanResponderEnd &&
+              this.props.onPanResponderEnd()
+            }}
       >
         <View style={{opacity:0.5}}>
           <Text>
