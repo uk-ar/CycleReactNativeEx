@@ -5,6 +5,7 @@ let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/re
 var FAIcon = require('react-native-vector-icons/FontAwesome');
 var MIcon = require('react-native-vector-icons/MaterialIcons');
 var GiftedSpinner = require('react-native-gifted-spinner');
+import materialColor from 'material-colors'
 
 var _ = require('lodash');
 
@@ -142,13 +143,13 @@ function getButtons(type,func,book){
      case "読んだ":
        doneButton=selfProps;
        break;
-  }
+   }
   var leftButtons=[
     <LeftButton
         onRelease = {() => func(book,"1")}
         icon="heart-o"
         close={false}
-        backgroundColor="#E0E0E0"
+        backgroundColor={materialColor.grey[300]}
         text={null}
         {...likedButton}
     />,//grey 300
@@ -156,7 +157,7 @@ function getButtons(type,func,book){
         icon="heart-o"
         close={true}
         onRelease = {() => {console.log("like");func(book,"liked")}}
-        backgroundColor="#2196F3"
+        backgroundColor={materialColor.lightBlue[500]}
         text="読みたい"
         style={{width:width/2}}
         {...likedButton}
@@ -165,7 +166,7 @@ function getButtons(type,func,book){
     <LeftButton
         onRelease={()=> func(book,"borrowed")}
         close={true}
-        backgroundColor='rgb(76, 175, 80)'
+        backgroundColor={materialColor.green[500]}
         icon="bookmark-o"
         text="借りてる"
         style={{width:width}}
@@ -175,7 +176,7 @@ function getButtons(type,func,book){
   var rightButtons=[
     <RightButton
         onRelease = {() => func(book,"-1")}
-        backgroundColor="#E0E0E0"
+        backgroundColor={materialColor.grey[300]}
         close={false}
         icon="check-square-o"
          text={null}
@@ -183,7 +184,7 @@ function getButtons(type,func,book){
      />,//grey 300
      <RightButton
          onRelease = {() => func(book,"done")}
-         backgroundColor="#FFC107"
+         backgroundColor={materialColor.amber[500]}
          close={true}
          icon="check-square-o"
          text="読んだ"
@@ -212,6 +213,7 @@ var BookCell = React.createClass({
     return(
       //    style={{flex:1}}
       //style={{backgroundColor:"red"}}
+      //style={{opacity:0.5}}
       <SwipeableRow2
           leftButtons={leftButtons}
           rightButtons={rightButtons}
@@ -225,7 +227,7 @@ var BookCell = React.createClass({
               this.props.onPanResponderEnd()
             }}
       >
-        <View style={{opacity:0.5}}>
+        <View style={{backgroundColor:"white"}}>
           <Text>
             "foo"
           </Text>

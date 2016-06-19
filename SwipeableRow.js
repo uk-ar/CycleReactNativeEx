@@ -484,7 +484,7 @@ var AnimatableBackGroundColor2 = React.createClass({
   }
 });
 
-var Buttons = React.createClass({
+var SwipeableButtons2 = React.createClass({
   getInitialState: function() {
     return {
        index:0,
@@ -503,27 +503,28 @@ var Buttons = React.createClass({
     })
   },
   render: function(){
-    console.log("buttons")
+    /* width={Animated.multiply(this._panX,-1)}*/
+    //console.log("mul",Animated.multiply(this._panX,-1))
+    //console.log("buttons")
     //react-native cannot set width for clipped subview in ios
     var {width, props} = this.props
-    var colors=[
-      materialColor.grey[300],
-      materialColor.lightBlue[500],
-      materialColor.green[500],
-    ]
+    currentButton = this.props.buttons[this.state.index];
+    if(this.props.direction=="right"){
+      width = Animated.multiply(this.props.width,-1);
+    }
     return (
       <AnimatableBackGroundColor2
           {...props}
-      style={[
-        {flexDirection:"row",
-         overflow:"hidden",
-         //height: this.state.index == 0 ? 30 : 50 ,
-         backgroundColor:colors[this.state.index],
-         width:this.props.width.interpolate({
-           inputRange: [0,   0.01,1],
-           outputRange:[0.01,0.01,1]
-         })},
-        this.props.style]}
+          style={[
+            {flexDirection:"row",
+             overflow:"hidden",
+             //height: this.state.index == 0 ? 30 : 50 ,
+             backgroundColor:currentButton.props.backgroundColor,
+             width:width.interpolate({
+               inputRange: [0,   0.01,1],
+               outputRange:[0.01,0.01,1]
+             })},
+            this.props.style]}
       >
       {(Object.keys(this.thresholds).length !== this.props.buttons.length) ?
        this.props.buttons.map((button, i, array)=>
@@ -534,9 +535,13 @@ var Buttons = React.createClass({
                ({nativeEvent:{layout:{x, y, width, height}}})=>{
                  this.thresholds[i] = width;
                  if(Object.keys(this.thresholds).length == array.length){
+                   //console.log(this.thresholds)
                    this.props.width.addListener(({value:value}) => {
                      if(this.releasing){return}
                      var index = calcIndex(value, this.thresholds);
+                     if(this.props.direction=="right"){
+                       index = calcIndex(-value, this.thresholds);
+                     }
                      if(index != -1 && this.state.index != index){
                        this.setState({index:index});
                      }
@@ -546,10 +551,10 @@ var Buttons = React.createClass({
                }}>
            {button}
          </MeasureableView>)
-     :
+       :
        this.props.buttons[this.state.index]
       }
-       </AnimatableBackGroundColor2>
+      </AnimatableBackGroundColor2>
    )}
 });
 
@@ -611,39 +616,30 @@ function calcIndex(value, thresholds){
    },
    render: function(){
      console.log("sr2:")
-     leftButtons=[
-       <View style={{width:50}}><Text>0</Text></View>,
-       <View style={{width:100}}><Text>1</Text></View>,
-       <View style={{width:150}}><Text>2</Text></View>,
-     ]
      return (
        <View
            {...this._panResponder.panHandlers}
            style={{flexDirection:"row",
                    justifyContent: this.state.positiveSwipe ?
                                    "flex-start" : "flex-end",
+                   overflow:"hidden",
            }}>
-         <Buttons
+         <SwipeableButtons2
              ref="leftButtons"
+             direction="left"
              width={this._panX}
-             style={{
-               //backgroundColor:"green",
-             }}
              buttons={this.props.leftButtons}
-             />
+         />
          <View style={{width:width}}>
            {this.props.children}
          </View>
-         <Animated.View
-       style={{width:Animated
-         .multiply(this._panX,-1)
-         .interpolate({
-           inputRange: [0,   0.01,1],
-           outputRange:[0.01,0.01,1]
-         })}}>
-       <Text numberOfLines={1}>rightButtons</Text>
-      </Animated.View>
-      </View>
+         <SwipeableButtons2
+             ref="rightButtons"
+             direction="right"
+             width={this._panX}
+             buttons={this.props.rightButtons}
+         />
+       </View>
      )
    }
  });
