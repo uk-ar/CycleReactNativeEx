@@ -32,10 +32,14 @@ import {
 } from 'react-native';
 
 import Touchable from '@cycle/react-native/src/Touchable';
-var TouchableElement = Touchable.TouchableHighlight;
+Touchable["TouchableElement"] = Touchable.TouchableHighlight;
+var TouchableElement=TouchableHighlight;
 if (Platform.OS === 'android') {
-  TouchableElement = Touchable.TouchableNativeFeedback;
+  Touchable["TouchableElement"] = Touchable.TouchableNativeFeedback;
+  TouchableElement=TouchableNativeFeedback;
 }
+
+
 Touchable["FAIcon"] = Touchable.createCycleComponent(
   FAIcon,Touchable.PRESS_ACTION_TYPES);
 
@@ -147,7 +151,7 @@ function Cell({book}) {
           backgroundColor:"#FAFAFA",//grey 300
           padding:10,
         }}>
-        <TouchableElement
+        <Touchable.TouchableElement
             selector="cell"
             payload={book}>
           <View style={[styles.row,{flex:1}]}>
@@ -172,7 +176,7 @@ function Cell({book}) {
               />
             </View>
           </View>
-        </TouchableElement>
+        </Touchable.TouchableElement>
       </View>
   )
 };
@@ -190,7 +194,7 @@ var MyListView = React.createClass({
     return {dataSource:dataSource.cloneWithRowsAndSections(this.props.items)};
   },
 
-  componentWillReceiveProps({items}) {
+  componentWillReceiveProps({items,offset}) {
     if (items !== this.props.items) {
       this.setState(
         {dataSource: this.state.dataSource.cloneWithRowsAndSections(items)});
@@ -203,71 +207,95 @@ var MyListView = React.createClass({
 
   render() {
     const {items, ...listViewProps} = this.props;
+    if(this._listView && this.props.offset){
+      this._listView.scrollTo({y:this.props.offset,animated:false})
+    }
     return (
       //onResponderMove is too premitive
+      //          directionalLockEnabled={true}
       <ListView
           ref={listView => this._listView = listView}
           dataSource={this.state.dataSource}
           enableEmptySections={true}
           renderRow={(item, sectionID, rowID)=> {
+              if(item.isbn == undefined){
+                return (
+                  <Touchable.TouchableElement
+                  selector="section"
+                  payload={sectionID} >
+                    <View style={styles.sectionFooter}>
+                      <Text>
+                                {`すべて表示(${item.count})`}
+                      </Text>
+                    </View>
+                  </Touchable.TouchableElement>
+                )
+              }else{
                 return(
                   <Touchable.BookCell
-                    selector="bookcell"
-                    onPanResponderMove={()=>{
-                        this._listView.setNativeProps({scrollEnabled:false})
-                      }}
-                    onPanResponderEnd={()=>{
-                        this._listView.setNativeProps({scrollEnabled:true})
-                      }}
-                    book={item}
-                    title={this.props.items[sectionID/2].title}
-                    style={{backgroundColor:"#FAFAFA",//grey 300
-                    }}/>)
-              }}
+                                key={rowID}
+                  selector="bookcell"
+                  onPanResponderMove={()=>{
+                      this._listView.setNativeProps({scrollEnabled:false})
+                    }}
+                  onPanResponderEnd={()=>{
+                      this._listView.setNativeProps({scrollEnabled:true})
+                    }}
+                  book={item}
+                  title={sectionID}
+                  style={{backgroundColor:"#FAFAFA",//grey 300
+                  }}/>
+                )
+              }
+            }}
           {...listViewProps}
       />
     );
   }
 });
 
- function booksToObject(books){
-   var obj={};
-   books.forEach((book)=>obj["isbn-"+book.isbn]=book)
-   return obj
- }
+function booksToObject(books){
+  var obj={};
+  /* if(limit){
+   *   books.slice(0,limit).forEach((book)=>obj["isbn-"+book.isbn]=book);
+   * }else{*/
+    books.forEach((book)=>obj["isbn-"+book.isbn]=book);
+  //}
+  //obj["terminator"]=books.length
+  return obj;
+  //.slice(0,limit)
+}
 
 function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
-  const limit=2;
   let borrowedBooks = allBooks.filter((book)=>book.bucket=="borrowed");
   let likedBooks = allBooks.filter((book)=>book.bucket=="liked");
   let doneBooks = allBooks.filter((book)=>book.bucket=="done");
   //todo transition to detail view
   var items = {
-    0: booksToObject(searchedBooks.slice(0,limit)),
-    1: {},//terminator
-    2: booksToObject(likedBooks.slice(0,limit)),
-    3: {},//terminator
-    4: booksToObject(borrowedBooks.slice(0,limit)),
-    5: {},//terminator
-    6: booksToObject(doneBooks.slice(0,limit)),
-    7: {},//terminator
+    "検索"   :searchedBooks,
+    "読みたい":likedBooks,
+    "借りてる":borrowedBooks,
+    "読んだ"  :doneBooks,
   }
-
-  var buckets=[
-    {title:"検索"     ,books:searchedBooks},
-    {title:"読みたい"  ,books:likedBooks},
-    {title:"借りてる"  ,books:borrowedBooks},
-    {title:"読んだ"    ,books:doneBooks},
-  ]
   //LayoutAnimation.easeInEaseOut();
 
-  console.log("se:%O",selectedSection);
+  //console.log("se:%O",selectedSection);
   if(selectedSection == null){
-
-    //main
+    const limit=2;
+    var visibleItems={}
+    Object.keys(items).map((key)=>{
+      visibleItems[key]=booksToObject(items[key].slice(0,limit));
+      visibleItems[key][key]={type:"term",count:items[key].length};
+    })
+    /* var visibleItems={
+        "検索":booksToObject(searchedBooks,limit),
+        "読みたい":booksToObject(likedBooks,limit),
+        "借りてる":booksToObject(borrowedBooks,limit),
+        "読んだ":booksToObject(doneBooks,limit),
+      }*/
+    //console.log("main",visibleItems)
     return (
-      //dataSource={dataSource.cloneWithRowsAndSections(items.map((books)=> books.slice(0,limit)))}
-      //            ref="listView"
+      //main
       <View style={{
         flex:1,
         backgroundColor:"#1A237E",//indigo 900
@@ -279,36 +307,22 @@ function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
           </Text>
         </View>
         <MyListView
-            items={items}
+            items={visibleItems}
             renderSectionHeader={(sectionData, sectionID) => {
-                if(sectionID % 2 == 0){
-                  return (
-                    <TouchableElement
-                    selector="section"
-                    payload={sectionID/2} >
-                      <View style={{backgroundColor:"#1A237E",//indigo 900
-                      }} >
-                        <View style={styles.sectionHeader}>
-                          <Text>
-                                    {buckets[sectionID/2].title}
-                          </Text>
-                        </View>
-                      </View>
-                    </TouchableElement>
-                  )
-                }else{
-                  return (
-                    <TouchableElement
-                       selector="section"
-                       payload={(sectionID-1)/2} >
-                      <View style={styles.sectionFooter}>
-                        <Text>
-                                  {`すべて表示(${buckets[(sectionID-1)/2].books.length})`}
-                        </Text>
-                      </View>
-                    </TouchableElement>
-                  )
-                }
+                return (
+                  <Touchable.TouchableElement
+                  selector="section"
+                            key={sectionID}
+                  payload={sectionID}>
+                    <View
+                  style={styles.sectionHeader}>
+                        {null}
+                      <Text>
+                        {sectionID+"?"}
+                      </Text>
+                    </View>
+                  </Touchable.TouchableElement>
+                )
               }}
             style={{
               paddingHorizontal:3,
@@ -319,39 +333,40 @@ function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
     )
   }else{
     //detail view
+    var selectedItems={}
+    selectedItems[selectedSection]=booksToObject(items[selectedSection]);
+    selectedItems[selectedSection][selectedSection]=
+      {type:"term",count:items[selectedSection].length};
+    //console.log("detail",selectedItems)
     return (
-      //   key={item.isbn}
       <View style={{
         flex:1,//for scroll
         backgroundColor:"#1A237E",//indigo 900
-        //backgroundColor:"#263238",//blue grey 800
       }}>
         {null /* for LayoutAnimation */}
         <MyListView
-            items={{
-              0:booksToObject(buckets[selectedSection].books),
-              1:[],
-            }}
+            items={selectedItems}
+            onScroll={()=>{}}
             renderSectionHeader={(sectionData, sectionID) => {
-                if(sectionID % 2 == 0){
-                  return (
-                    <View style={styles.sectionHeader}>
+                return (
+                  <Touchable.TouchableElement
+                  selector="section"
+                            key={sectionID}
+                  payload={sectionID}>
+                    <View
+                  style={styles.sectionHeader}>
                       <Touchable.FAIcon
-                       name="close"
-                       selector="close"
-                       size={20}
-                       style={{marginRight:5}}/>
+                  name="close"
+                  selector="close"
+                            payload="contentOffset.y"
+                  size={20}
+                  style={{marginRight:5}}/>
                       <Text>
-                             {buckets[selectedSection].title}
+                        {sectionID}
                       </Text>
                     </View>
-                  )
-                }else{
-                  return (
-                    <MySectionFooter
-                      text={buckets[selectedSection].books.length}/>)
-                }
-              }}
+                  </Touchable.TouchableElement>
+                )}}
             style={{
               padding:3,
               //height:100,
@@ -383,13 +398,13 @@ var MyNav = React.createClass({
     console.log("mynav");
     //this.setState({foo:null})
     return(
-      //<NavigationExperimental.Transitioner
-      <NavigationExperimental.CardStack
+      //<NavigationExperimental.CardStack
+      <NavigationExperimental.Transitioner
       style={{flex: 1}}
       navigationState={model.navigationState}
       onNavigate={onNavigateBack}
       renderScene={(navigationProps) => {
-          console.log("rs");
+          //console.log("rs");
           const key = navigationProps.scene.navigationState.key;
           switch (key) {
             case 'Search':

@@ -151,6 +151,9 @@ function getButtons(type,func,book){
         close={false}
         backgroundColor={materialColor.grey[300]}
         text={null}
+        style={{
+            justifyContent:"flex-end",
+          }}
         {...likedButton}
     />,//grey 300
     <LeftButton
@@ -188,6 +191,9 @@ function getButtons(type,func,book){
          close={true}
          icon="check-square-o"
          text="読んだ"
+         style={{
+           justifyContent:"flex-end",
+         }}
          {...doneButton}
      />,//amber
    ];//Touchable
@@ -227,14 +233,33 @@ var BookCell = React.createClass({
               this.props.onPanResponderEnd()
             }}
       >
-        <View style={{backgroundColor:"white"}}>
-          <Text>
-            "foo"
-          </Text>
-          <Text>
-            "bar?"
-          </Text>
-        </View>
+        <TouchableElement
+            selector="cell"
+            payload={book}>
+          <View style={[styles.row,this.props.style]}>
+            <Image source={{uri: book.thumbnail}}
+                   resizeMode="contain"
+                   style={[styles.cellImage,]} />
+            <View style={[{flexDirection:"column",}]}>
+              <View style={[{padding:10,justifyContent:"center",},
+                ]}>
+                <Text style={styles.bookTitle} numberOfLines={1}>
+                  {book.title}
+                </Text>
+                <Text style={styles.bookAuthor} numberOfLines={1}>
+                  {book.author}
+                </Text>
+                <LibraryStatus libraryStatus={book.libraryStatus}/>
+              </View>
+              <View style={{height:StyleSheet.hairlineWidth,
+                            backgroundColor:'#CCCCCC',
+                            marginRight:10,
+                            //separator
+              }}
+              />
+            </View>
+          </View>
+        </TouchableElement>
       </SwipeableRow2>
     )
     //TODO:flex-start & flex-end

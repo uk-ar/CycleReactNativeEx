@@ -495,9 +495,14 @@ var SwipeableButtons2 = React.createClass({
     this.releasing = false;
   },
   release: function(){
+    var close = this.currentButton.props.close;
     this.releasing = true;
+
     Animated.timing(this.props.width,
-                    {toValue: width,duration: 180,}
+                    {toValue:  !close ? 0.001 :
+                     this.props.direction=="left" ? SWIPEABLE_MAIN_WIDTH
+                   : - SWIPEABLE_MAIN_WIDTH,
+                     duration: 180,}
     ).start(()=>{
       this.releasing = false;
     })
@@ -508,27 +513,22 @@ var SwipeableButtons2 = React.createClass({
     //console.log("buttons")
     //react-native cannot set width for clipped subview in ios
     var {width, props} = this.props
-    currentButton = this.props.buttons[this.state.index];
+    this.currentButton = this.props.buttons[this.state.index];
     if(this.props.direction=="right"){
-      width = Animated.multiply(this.props.width,-1);
+      this.width = Animated.multiply(this.props.width,-1);
+    }else{
+      this.width = this.props.width;
     }
-    return (
-      <AnimatableBackGroundColor2
-          {...props}
-          style={[
-            {flexDirection:"row",
-             overflow:"hidden",
-             //height: this.state.index == 0 ? 30 : 50 ,
-             backgroundColor:currentButton.props.backgroundColor,
-             width:width.interpolate({
-               inputRange: [0,   0.01,1],
-               outputRange:[0.01,0.01,1]
-             })},
-            this.props.style]}
-      >
-      {(Object.keys(this.thresholds).length !== this.props.buttons.length) ?
-       this.props.buttons.map((button, i, array)=>
-         <MeasureableView
+    if (Object.keys(this.thresholds).length !== this.props.buttons.length){
+      //not measured
+      return(
+        <View
+            {...props}
+            style={{flexDirection:"row",
+                    width:0.01,
+                    overflow:"hidden",}}>
+          {this.props.buttons.map((button, i, array)=>
+          <MeasureableView
              ref={i}
              key={i}
              onFirstLayout={
@@ -550,12 +550,23 @@ var SwipeableButtons2 = React.createClass({
                  }
                }}>
            {button}
-         </MeasureableView>)
-       :
-       this.props.buttons[this.state.index]
-      }
-      </AnimatableBackGroundColor2>
-   )}
+             </MeasureableView>
+            )}
+         </View>)
+     }else{
+       return (<AnimatableBackGroundColor2
+           {...props}
+           style={[{overflow:"hidden",
+                    backgroundColor:this.currentButton.props.backgroundColor,
+                    width:this.width.interpolate({
+                      inputRange: [0,   0.01,1],
+                      outputRange:[0.01,0.01,1]
+                    })},
+                   this.props.style]}>
+         {this.props.buttons[this.state.index]}
+       </AnimatableBackGroundColor2>)
+     }
+   }
 });
 
 function calcIndex(value, thresholds){
@@ -602,7 +613,11 @@ function calcIndex(value, thresholds){
        },
        onPanResponderTerminationRequest: (evt, gestureState) => false,
        onPanResponderRelease: (evt, gestureState) => {
-         this.refs.leftButtons.release()
+         if(this.state.positiveSwipe){
+           this.refs.leftButtons.release()
+         }else{
+           this.refs.rightButtons.release()
+         }
        },
        onShouldBlockNativeResponder: (evt, gestureState) => true,
      });
@@ -623,6 +638,9 @@ function calcIndex(value, thresholds){
                    justifyContent: this.state.positiveSwipe ?
                                    "flex-start" : "flex-end",
                    overflow:"hidden",
+                   //TODO:vertical stretch will fixed in RN 0.28?
+                   //https://github.com/facebook/react-native/commit/d95757037aef3fbd8bb9064e667ea4fea9e5abc1
+                   //alignItems:"stretch"
            }}>
          <SwipeableButtons2
              ref="leftButtons"
@@ -630,7 +648,9 @@ function calcIndex(value, thresholds){
              width={this._panX}
              buttons={this.props.leftButtons}
          />
-         <View style={{width:width}}>
+         <View
+             style={[{width:width,//expand to cell width
+               },this.props.style]}>
            {this.props.children}
          </View>
          <SwipeableButtons2

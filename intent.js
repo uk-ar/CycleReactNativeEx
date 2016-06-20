@@ -98,7 +98,9 @@ function intent(RN, HTTP){
                         .merge(RN.select('close')
                                  .events('press').map(()=>null))
                         .do(i => console.log("section selected:%O", i))
-                        .do((books)=>LayoutAnimation.easeInEaseOut())
+    //.do((books)=>LayoutAnimation.easeInEaseOut())//there is bug in iOS
+    //Will be fixed in RN 0.28?
+    //ref: https://github.com/facebook/react-native/pull/7942
       ,
     goToBookView$: RN.select('cell').events('press')
                      .do(i => console.log("cell press:%O", i))
