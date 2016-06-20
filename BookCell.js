@@ -51,6 +51,7 @@ function LeftButton({icon,text,style,...props}){
         style={[style,{
             flexDirection:"row",
             alignItems:"center",
+            flex:1,//vertical center
           }]}>
       <FAIcon name={icon} size={20}
               style={{margin:10,marginRight:5}} />
@@ -70,6 +71,7 @@ function RightButton({icon,text,style,...props}){
         style={[style,{
             flexDirection:"row",
             alignItems:"center",
+            flex:1,//vertical center
           }]}>
       <Text>
         {text}
@@ -146,15 +148,14 @@ function getButtons(type,func,book){
    }
   var leftButtons=[
     <LeftButton
-        onRelease = {() => func(book,"1")}
         icon="heart-o"
         close={false}
         backgroundColor={materialColor.grey[300]}
-        text={null}
         style={{
-            justifyContent:"flex-end",
-          }}
+          justifyContent:"flex-end",
+        }}
         {...likedButton}
+        text={null}
     />,//grey 300
     <LeftButton
         icon="heart-o"
@@ -178,12 +179,11 @@ function getButtons(type,func,book){
   ];
   var rightButtons=[
     <RightButton
-        onRelease = {() => func(book,"-1")}
         backgroundColor={materialColor.grey[300]}
         close={false}
         icon="check-square-o"
-         text={null}
-         {...doneButton}
+        {...doneButton}
+        text={null}
      />,//grey 300
      <RightButton
          onRelease = {() => func(book,"done")}

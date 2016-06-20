@@ -504,6 +504,8 @@ var SwipeableButtons2 = React.createClass({
                    : - SWIPEABLE_MAIN_WIDTH,
                      duration: 180,}
     ).start(()=>{
+      this.currentButton.props.onRelease &&
+      this.currentButton.props.onRelease()
       this.releasing = false;
     })
   },
@@ -525,6 +527,7 @@ var SwipeableButtons2 = React.createClass({
         <View
             {...props}
             style={{flexDirection:"row",
+                    opacity:0,
                     width:0.01,
                     overflow:"hidden",}}>
           {this.props.buttons.map((button, i, array)=>
