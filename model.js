@@ -75,9 +75,9 @@ let mockBooks=[
 ]
 
 realm.write(()=>{
-  mockBooks.reverse().map((book)=>{
-    realm.create('Book',{...book,modifyDate: new Date(Date.now())},true)
-  })
+  /* mockBooks.reverse().map((book)=>{
+      realm.create('Book',{...book,modifyDate: new Date(Date.now())},true)
+     })*/
 })
 
 var allBooks=realm.objects("Book")
@@ -163,7 +163,7 @@ function model(actions){
      default:
           return books;
     }
-  }).do((books)=>LayoutAnimation.easeInEaseOut()
+  } //).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
   ).do((books)=>{
     realm.write(()=>{
       books.map((book)=>{
