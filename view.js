@@ -256,14 +256,14 @@ var MyListView = React.createClass({
 
 function booksToObject(books){
   var obj={};
-  /* if(limit){
-   *   books.slice(0,limit).forEach((book)=>obj["isbn-"+book.isbn]=book);
-   * }else{*/
-    books.forEach((book)=>obj["isbn-"+book.isbn]=book);
-  //}
-  //obj["terminator"]=books.length
+  books.forEach((book)=>{
+    if(book.isbn){
+      obj["isbn-"+book.isbn]=book;
+    }else{
+      obj[book.key]=book;
+    }
+  });
   return obj;
-  //.slice(0,limit)
 }
 
 function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
@@ -271,110 +271,85 @@ function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
   let likedBooks = allBooks.filter((book)=>book.bucket=="liked");
   let doneBooks = allBooks.filter((book)=>book.bucket=="done");
   //todo transition to detail view
-  var items = {
+  var allItems = {
     "検索"   :searchedBooks,
     "読みたい":likedBooks,
     "借りてる":borrowedBooks,
     "読んだ"  :doneBooks,
   }
   //LayoutAnimation.easeInEaseOut();
-
+  var items={};
+  var header=null;
+  var closeButton=null;
   //console.log("se:%O",selectedSection);
   if(selectedSection == null){
     const limit=2;
-    var visibleItems={}
-    Object.keys(items).map((key)=>{
-      visibleItems[key]=booksToObject(items[key].slice(0,limit));
-      visibleItems[key][key]={type:"term",count:items[key].length};
-    })
-    /* var visibleItems={
-        "検索":booksToObject(searchedBooks,limit),
-        "読みたい":booksToObject(likedBooks,limit),
-        "借りてる":booksToObject(borrowedBooks,limit),
-        "読んだ":booksToObject(doneBooks,limit),
-      }*/
-    //console.log("main",visibleItems)
-    return (
-      //main
-      <View style={{
-        flex:1,
-        backgroundColor:"#1A237E",//indigo 900
-        //backgroundColor:"#263238",//blue grey 800
-      }}>
-        <View style={{padding:10,}}>
-          <Text style={{color:"white"}} onPress={()=>console.log("pressed t")}>
-            header
-          </Text>
-        </View>
-        <MyListView
-            items={visibleItems}
-            renderSectionHeader={(sectionData, sectionID) => {
-                return (
-                  <Touchable.TouchableElement
-                  selector="section"
-                            key={sectionID}
-                  payload={sectionID}>
-                    <View
-                  style={styles.sectionHeader}>
-                        {null}
-                      <Text>
-                        {sectionID+"?"}
-                      </Text>
-                    </View>
-                  </Touchable.TouchableElement>
-                )
-              }}
-            style={{
-              paddingHorizontal:3,
-              //height:100,
-            }}
-        />
+    Object.keys(allItems).map((key)=>{
+      items[key]=booksToObject(allItems[key].slice(0,limit));
+      items[key][key]={type:"term",count:allItems[key].length};
+    });
+    /* var items={
+      "検索":booksToObject(searchedBooks,limit),
+      "読みたい":booksToObject(likedBooks,limit),
+      "借りてる":booksToObject(borrowedBooks,limit),
+      "読んだ":booksToObject(doneBooks,limit),
+    }*/
+    header=(
+      <View style={{padding:10,}}>
+        <Text style={{color:"white"}} onPress={()=>console.log("pressed t")}>
+          header
+        </Text>
       </View>
     )
   }else{
+    closeButton=(
+      <Touchable.FAIcon
+      name="close"
+      selector="close"
+      payload="contentOffset.y"
+      size={20}
+      style={{marginRight:5}}/>
+    )
     //detail view
-    var selectedItems={}
-    selectedItems[selectedSection]=booksToObject(items[selectedSection]);
-    selectedItems[selectedSection][selectedSection]=
-      {type:"term",count:items[selectedSection].length};
-    //console.log("detail",selectedItems)
-    return (
-      <View style={{
-        flex:1,//for scroll
-        backgroundColor:"#1A237E",//indigo 900
-      }}>
-        {null /* for LayoutAnimation */}
-        <MyListView
-            items={selectedItems}
-            onScroll={()=>{}}
-            renderSectionHeader={(sectionData, sectionID) => {
+    items[selectedSection]=booksToObject(allItems[selectedSection]);
+    items[selectedSection][selectedSection]=
+      {type:"term",count:allItems[selectedSection].length};
+    //console.log("detail",items)
+  };
+  return (
+    //main
+    <View style={{
+      flex:1,
+      backgroundColor:"#1A237E",//indigo 900
+      //backgroundColor:"#263238",//blue grey 800
+    }}>
+      {header}
+      <MyListView
+          selectedSection={selectedSection}
+          items={items}
+          renderSectionHeader={(sectionData, sectionID) => {
                 return (
                   <Touchable.TouchableElement
-                  selector="section"
-                            key={sectionID}
-                  payload={sectionID}>
+                      selector="section"
+                      key={sectionID}
+                      payload={sectionID}>
                     <View
-                  style={styles.sectionHeader}>
-                      <Touchable.FAIcon
-                  name="close"
-                  selector="close"
-                            payload="contentOffset.y"
-                  size={20}
-                  style={{marginRight:5}}/>
+                      style={styles.sectionHeader}>
+                            {closeButton}
                       <Text>
-                        {sectionID}
-                      </Text>
+                            {sectionID}
+                     </Text>
                     </View>
-                  </Touchable.TouchableElement>
-                )}}
-            style={{
-              padding:3,
-              //height:100,
-            }}
+                 </Touchable.TouchableElement>
+               )
+             }}
+           style={{
+               paddingHorizontal:3,
+               //height:100,
+             }}
         />
       </View>
     )
-  };
 };
 
 function BookView({booksWithStatus,booksLoadingState,selectedBook}){
