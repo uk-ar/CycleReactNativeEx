@@ -437,43 +437,54 @@ var MeasureableView = React.createClass({
  *   }
  * })*/
 
-var AnimatableBackGroundColor2 = React.createClass({
+var AnimView = React.createClass({
   //Use LayoutAnimation if you want to use height or width null
   getInitialState: function() {
     return {
       style:this.props.style,
     }
   },
+  componentWillMount:function(){
+    this.prevStyle = this.props.style;
+  },
   componentWillReceiveProps: function(nextProps) {
     if(nextProps.style != this.props.style){
       this.counter = new Animated.Value(0);
       //this.positive = true;
-      var current = StyleSheet.flatten(this.props.style);
-      this.next = StyleSheet.flatten(nextProps.style);
+      var current = StyleSheet.flatten(this.prevStyle);
+      var next = StyleSheet.flatten(nextProps.style);
+      this.prevStyle = StyleSheet.flatten(nextProps.style);
+      //Object.assign(,next)
 
-      Object.keys(this.next).map((key)=>{
+      console.log("rec",current,next,this.prevStyle)
+
+      Object.keys(next).map((key)=>{
         //remove if with filter & merge
-        if((typeof this.next[key] === "number" ||
-            key == "backgroundColor" || key == "color")
-            && current[key] !== this.next[key]
+        //console.log("k:",key,typeof next[key] === "number",key == "backgroundColor" || key == "color",current[key] != next[key],current[key],next[key])
+        if((typeof next[key] === "number" ||
+            key.endsWith("Color") || key == "color")
+           && current[key] !== next[key]
         ){
-          this.next[key] = this.counter.interpolate({
+          console.log("an",current[key],next[key])
+          next[key] = this.counter.interpolate({
             inputRange:[0,1],
-            outputRange:[current[key],this.next[key]]
+            outputRange:[current[key],next[key]]
           })
         }
       });
-      //console.log(this.next)
-      this.setState({style:this.next})
+      //console.log("next",next)
+      this.setState({style:next},()=>
         Animated.timing(
           this.counter,
           {toValue: 1,
-           duration: 180,}
+           //duration: 180,}
+           duration: 1000,}
         ).start()
+      );
     }
   },
   render: function(){
-    //console.log("rend;")
+    console.log("rend",this.state.style)
     return(
       //style={[this.props.style,]}
       <Animated.View
@@ -557,17 +568,21 @@ var SwipeableButtons2 = React.createClass({
             )}
          </View>)
      }else{
-       return (<AnimatableBackGroundColor2
-           {...props}
-           style={[{overflow:"hidden",
-                    backgroundColor:this.currentButton.props.backgroundColor,
-                    width:this.width.interpolate({
-                      inputRange: [0,   0.01,1],
-                      outputRange:[0.01,0.01,1]
-                    })},
-                   this.props.style]}>
-         {this.props.buttons[this.state.index]}
-       </AnimatableBackGroundColor2>)
+       return (
+         <AnimView
+             {...props}
+             style={[{overflow:"hidden",
+                      height:30 * (this.state.index+1),
+                      //borderWidth:3 * (this.state.index+1),
+                      //borderColor:"black",
+                      backgroundColor:this.currentButton.props.backgroundColor,
+                      width:this.width.interpolate({
+                        inputRange: [0,   0.01,1],
+                        outputRange:[0.01,0.01,1]
+                      })},
+                     this.props.style]}>
+           {this.props.buttons[this.state.index]}
+         </AnimView>)
      }
    }
 });
@@ -780,4 +795,4 @@ var styles = StyleSheet.create({
   }
 });
 
-module.exports = {SwipeableRow,SwipeableRow2};
+module.exports = {SwipeableRow,SwipeableRow2,AnimView};

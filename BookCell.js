@@ -146,11 +146,13 @@ function getButtons(type,func,book){
        doneButton=selfProps;
        break;
    }
+  //#e0e0e0 #03a9f4 #4caf50
   var leftButtons=[
     <LeftButton
         icon="heart-o"
         close={false}
-        backgroundColor={materialColor.grey[300]}
+        backgroundColor={"rgb(224,224,224)"}
+        //backgroundColor={materialColor.grey[300]}
         style={{
           justifyContent:"flex-end",
         }}
@@ -161,7 +163,8 @@ function getButtons(type,func,book){
         icon="heart-o"
         close={true}
         onRelease = {() => {console.log("like");func(book,"liked")}}
-        backgroundColor={materialColor.lightBlue[500]}
+        backgroundColor={"rgb(3,169,244)"}
+        //backgroundColor={materialColor.lightBlue[500]}
         text="読みたい"
         style={{width:width/2}}
         {...likedButton}

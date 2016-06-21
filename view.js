@@ -207,6 +207,28 @@ function booksToObject(books){
   return obj;
 }
 
+import {AnimView} from './SwipeableRow';
+
+var Header = React.createClass({
+  getInitialState: function(){
+    return({toggle:true})
+  },
+  render: function(){
+    console.log("pad?",this.state.toggle ? 10 : 20,)
+    return(
+      <AnimView style={{padding:20,
+                        //height:this.state.toggle ? 50 : 100,
+      }}>
+        <Text
+            style={{color:"white"}}
+            onPress={()=>this.setState((prev,current)=>
+              ({toggle:!prev.toggle}))}>
+          {"header"+this.state.toggle}
+        </Text>
+      </AnimView>)
+  },
+});
+
 function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
   let borrowedBooks = allBooks.filter((book)=>book.bucket=="borrowed");
   let likedBooks = allBooks.filter((book)=>book.bucket=="liked");
@@ -236,11 +258,7 @@ function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
       "読んだ":booksToObject(doneBooks,limit),
     }*/
     header=(
-      <View style={{padding:10,}}>
-        <Text style={{color:"white"}} onPress={()=>console.log("pressed t")}>
-          header
-        </Text>
-      </View>
+      <Header />
     )
   }else{
     closeButton=(
