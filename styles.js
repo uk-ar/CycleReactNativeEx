@@ -2,12 +2,13 @@ import {
   StyleSheet,
   PixelRatio,
 } from 'react-native';
+import materialColor from 'material-colors'
 
 var cellWidth = 60;
 var styles = StyleSheet.create({
   //view.js
   sectionHeader:{
-    backgroundColor:"#E0E0E0",//grey 300
+    backgroundColor:materialColor.grey["200"],
     borderTopLeftRadius:5,
     borderTopRightRadius:5,
     //marginTop:3,
@@ -15,7 +16,7 @@ var styles = StyleSheet.create({
     flexDirection:"row",
   },
   sectionFooter:{
-    backgroundColor:"#E0E0E0",//grey 300
+    backgroundColor:materialColor.grey["200"],
     borderTopLeftRadius:0,
     borderTopRightRadius:0,
     borderRadius:5,

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 var FAIcon = require('react-native-vector-icons/FontAwesome');
+import materialColor from 'material-colors'
 
 import {
   TouchableOpacity,
@@ -115,71 +116,11 @@ function InboxView({booksWithStatus,booksLoadingState}){
   )
 };
 
-var dataSource = new ListView.DataSource({
-  //rowHasChanged: (r1, r2) => r1.isbn !== r2.isbn,
-  rowHasChanged: (r1, r2) => r1 !== r2,
-  sectionHeaderHasChanged: (s1, s2) => s1 !== s2
-})
-
-function MySectionFooter({text}) {
-  return(
-    <View style={{
-        backgroundColor:"#E0E0E0",//grey 300
-        borderTopLeftRadius:0,
-        borderTopRightRadius:0,
-        borderRadius:5,
-        padding:10,
-        marginBottom:3,
-        //height:30,
-      }}>
-      <Text>
-        {text}
-      </Text>
-    </View>)
-};
-
 import {BookCell,SwipeableRow} from './BookCell';
 Touchable["BookCell"] = Touchable.createCycleComponent(
   BookCell,{
     onRelease:'release',
   });
-
-//key?
-function Cell({book}) {
-  return (
-      <View style={{
-          backgroundColor:"#FAFAFA",//grey 300
-          padding:10,
-        }}>
-        <Touchable.TouchableElement
-            selector="cell"
-            payload={book}>
-          <View style={[styles.row,{flex:1}]}>
-            <Image source={{uri: book.thumbnail}}
-                   resizeMode="contain"
-                   style={[styles.cellImage,]} />
-            <View style={[{flex:1,}]}>
-              <View style={[{flex:1,padding:10,justifyContent:"center",},
-                ]}>
-                <Text style={styles.bookTitle} numberOfLines={1}>
-                  {book.title}
-                </Text>
-                <Text style={styles.bookAuthor} numberOfLines={1}>
-                  {book.author}
-                </Text>
-              </View>
-              <View style={{height:StyleSheet.hairlineWidth,
-                            backgroundColor:'#CCCCCC',
-                            marginRight:10,
-                            //separator
-                }}
-              />
-            </View>
-          </View>
-        </Touchable.TouchableElement>
-      </View>
-  )
-};
 
 var MyListView = React.createClass({
   /* propTypes: {
@@ -243,7 +184,7 @@ var MyListView = React.createClass({
                     }}
                   book={item}
                   title={sectionID}
-                  style={{backgroundColor:"#FAFAFA",//grey 300
+                  style ={{backgroundColor:materialColor.grey["50"]
                   }}/>
                 )
               }
