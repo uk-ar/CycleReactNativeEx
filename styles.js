@@ -16,7 +16,8 @@ var styles = StyleSheet.create({
     flexDirection:"row",
   },
   sectionFooter:{
-    backgroundColor:materialColor.grey["200"],
+    //backgroundColor:materialColor.grey["200"],
+    backgroundColor:materialColor.grey["50"],
     borderTopLeftRadius:0,
     borderTopRightRadius:0,
     borderRadius:5,

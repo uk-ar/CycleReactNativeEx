@@ -44,7 +44,7 @@ var {
 
 let {SwipeableRow,SwipeableRow2} = require('./SwipeableRow');
 
-function LeftButton({icon,text,style,...props}){
+function LeftButton({icon,text,style,backgroundColor,...props}){
   return(
     <View
         {...props}
@@ -64,7 +64,7 @@ function LeftButton({icon,text,style,...props}){
 
 //http://mae.chab.in/archives/2854
 //stateless component validation
-function RightButton({icon,text,style,...props}){
+function RightButton({icon,text,style,backgroundColor,...props}){
   return(
     <View
         {...props}
@@ -151,8 +151,7 @@ function getButtons(type,func,book){
     <LeftButton
         icon="heart-o"
         close={false}
-        backgroundColor={"rgb(224,224,224)"}
-        //backgroundColor={materialColor.grey[300]}
+        backgroundColor={materialColor.grey[300]}
         style={{
           justifyContent:"flex-end",
         }}
@@ -163,8 +162,7 @@ function getButtons(type,func,book){
         icon="heart-o"
         close={true}
         onRelease = {() => {console.log("like");func(book,"liked")}}
-        backgroundColor={"rgb(3,169,244)"}
-        //backgroundColor={materialColor.lightBlue[500]}
+        backgroundColor={materialColor.lightBlue[500]}
         text="読みたい"
         style={{width:width/2}}
         {...likedButton}
@@ -243,7 +241,10 @@ var BookCell = React.createClass({
             <Image source={{uri: book.thumbnail}}
                    resizeMode="contain"
                    style={[styles.cellImage,]} />
-            <View style={[{flexDirection:"column",}]}>
+            <View style={[{flexDirection:"column",
+                           flex:1,
+                           //backgroundColor:"red",
+              }]}>
               <View style={[{padding:10,justifyContent:"center",},
                 ]}>
                 <Text style={styles.bookTitle} numberOfLines={1}>
@@ -254,6 +255,7 @@ var BookCell = React.createClass({
                 </Text>
                 <LibraryStatus libraryStatus={book.libraryStatus}/>
               </View>
+              <View style={{flex:1}}/>
               <View style={{height:StyleSheet.hairlineWidth,
                             backgroundColor:'#CCCCCC',
                             marginRight:10,

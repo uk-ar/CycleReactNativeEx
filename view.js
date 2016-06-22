@@ -123,6 +123,7 @@ Touchable["BookCell"] = Touchable.createCycleComponent(
   });
 
 var MyListView = React.createClass({
+  //remove this.state.dataSource && this._listView
   /* propTypes: {
      items: PropTypes.array.isRequired
      }, */
@@ -154,6 +155,7 @@ var MyListView = React.createClass({
     return (
       //onResponderMove is too premitive
       //          directionalLockEnabled={true}
+      //https://github.com/facebook/react-native/issues/6764
       <ListView
           ref={listView => this._listView = listView}
           dataSource={this.state.dataSource}
@@ -214,18 +216,31 @@ var Header = React.createClass({
     return({toggle:true})
   },
   render: function(){
-    console.log("pad?",this.state.toggle ? 10 : 20,)
+    console.log("render header pad?",this.state.toggle)
     return(
-      <AnimView style={{padding:20,
-                        //height:this.state.toggle ? 50 : 100,
-      }}>
+      <View style={{padding:10,}}
+          >
+        <AnimView
+            ref="view1"
+            style={{height:this.state.toggle ? 50 : 100,
+                    //backgroundColor:this.state.toggle ? "black" : "white",
+              }}
+        />
+        <AnimView
+            ref="view2"
+            style={{
+                height:10,
+                backgroundColor:"green",}}
+        />
         <Text
             style={{color:"white"}}
-            onPress={()=>this.setState((prev,current)=>
-              ({toggle:!prev.toggle}))}>
+            onPress={()=>{
+                this.refs.view2.animate({height:50});
+                //this.setState((prev,current)=>({toggle:!prev.toggle}))
+              }}>
           {"header"+this.state.toggle}
         </Text>
-      </AnimView>)
+      </View>)
   },
 });
 
@@ -240,6 +255,7 @@ function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
     "借りてる":borrowedBooks,
     "読んだ"  :doneBooks,
   }
+  console.log("render main")
   //LayoutAnimation.easeInEaseOut();
   var items={};
   var header=null;
@@ -332,13 +348,12 @@ var MyNav = React.createClass({
     console.log("mynav");
     //this.setState({foo:null})
     return(
-      //<NavigationExperimental.CardStack
       <NavigationExperimental.Transitioner
       style={{flex: 1}}
       navigationState={model.navigationState}
       onNavigate={onNavigateBack}
       renderScene={(navigationProps) => {
-          //console.log("rs");
+          console.log("MyNav:renderScene");
           const key = navigationProps.scene.navigationState.key;
           switch (key) {
             case 'Search':
@@ -346,10 +361,8 @@ var MyNav = React.createClass({
             case 'Inbox':
               return renderCard(InboxView(model), navigationProps);
             case 'Main':
-              return (
-                <MainView
-                     key="root"
-                     {...model} />)
+              return (MainView(model))
+              //return renderCard(MainView(model), navigationProps);
             case 'Book':
               return renderCard(BookView(model), navigationProps);
             default:

@@ -441,22 +441,63 @@ var AnimView = React.createClass({
   //Use LayoutAnimation if you want to use height or width null
   getInitialState: function() {
     return {
-      style:this.props.style,
+      currentStyle:this.props.style,
     }
   },
   componentWillMount:function(){
     this.prevStyle = this.props.style;
+    this.animating = false;
+  },
+  animate:function(nextStyle) {
+    //duration,easing jquery
+    console.log("animate");
+    this.animating = true;
+    this.counter = new Animated.Value(0);
+    const current = StyleSheet.flatten(this.prevStyle);
+    const next = StyleSheet.flatten(nextStyle);
+    var animatedStyle = Object.assign({},next);
+
+    //console.log("rec",current,this.prevStyle,next,animatedStyle);
+
+    Object.keys(next).map((key)=>{
+      //remove if with filter & merge
+      //console.log("k:",key,typeof next[key] === "number",key == "backgroundColor" || key == "color",current[key] != next[key],current[key],next[key])
+      if((typeof next[key] === "number" ||
+          key.endsWith("Color") || key == "color")
+          && current[key] !== next[key]
+      ){
+        console.log("an",current[key],next[key]);
+        animatedStyle[key] = this.counter.interpolate({
+          inputRange:[0,1],
+          outputRange:[current[key],next[key]]
+        });
+      }
+    });
+    this.prevStyle = next;
+    //console.log("animatedStyle?",animatedStyle);
+    //this.counter.setValue(1);
+    //this.setState({animatedStyle:next});
+    this.setState({currentStyle:animatedStyle},()=>{
+      Animated.timing(
+        this.counter,
+        {toValue: 1,
+         duration: 180,}
+      ).start(()=>{
+        //this.animating = false;
+      })
+    });
   },
   componentWillReceiveProps: function(nextProps) {
-    if(nextProps.style != this.props.style){
+    console.log("willReceiveProps",this.animating);
+    if((nextProps.style != this.props.style) && (this.animating == false)
+    ){
       this.counter = new Animated.Value(0);
       //this.positive = true;
-      var current = StyleSheet.flatten(this.prevStyle);
-      var next = StyleSheet.flatten(nextProps.style);
-      this.prevStyle = StyleSheet.flatten(nextProps.style);
-      //Object.assign(,next)
+      const current = StyleSheet.flatten(this.prevStyle);
+      const next = StyleSheet.flatten(nextProps.style);
+      var animatedStyle = Object.assign({},next);
 
-      console.log("rec",current,next,this.prevStyle)
+      console.log("rec2",current,this.prevStyle,next,animatedStyle);
 
       Object.keys(next).map((key)=>{
         //remove if with filter & merge
@@ -465,31 +506,34 @@ var AnimView = React.createClass({
             key.endsWith("Color") || key == "color")
            && current[key] !== next[key]
         ){
-          console.log("an",current[key],next[key])
-          next[key] = this.counter.interpolate({
+          console.log("an",current[key],next[key]);
+          animatedStyle[key] = this.counter.interpolate({
             inputRange:[0,1],
             outputRange:[current[key],next[key]]
-          })
+          });
         }
       });
-      //console.log("next",next)
-      this.setState({style:next},()=>
+      this.prevStyle = next;
+      //console.log("animatedStyle?",animatedStyle);
+      //this.counter.setValue(1);
+      //this.setState({animatedStyle:next});
+      this.setState({currentStyle:animatedStyle},()=>{
         Animated.timing(
           this.counter,
           {toValue: 1,
-           //duration: 180,}
-           duration: 1000,}
+           duration: 180,}
         ).start()
-      );
+      });
     }
   },
   render: function(){
-    console.log("rend",this.state.style)
+    //console.log("rend1:%O,%O",this.state.currentStyle,this.props.style);
     return(
-      //style={[this.props.style,]}
+      //style={[this.state.style,]}
       <Animated.View
-          {...this.props}
-          style={[this.state.style,]}>
+             {...this.props}
+             style={[this.state.currentStyle]}
+      >
         {this.props.children}
       </Animated.View>)
   }
@@ -568,21 +612,20 @@ var SwipeableButtons2 = React.createClass({
             )}
          </View>)
      }else{
-       return (
-         <AnimView
-             {...props}
-             style={[{overflow:"hidden",
-                      height:30 * (this.state.index+1),
-                      //borderWidth:3 * (this.state.index+1),
-                      //borderColor:"black",
-                      backgroundColor:this.currentButton.props.backgroundColor,
-                      width:this.width.interpolate({
-                        inputRange: [0,   0.01,1],
-                        outputRange:[0.01,0.01,1]
-                      })},
-                     this.props.style]}>
-           {this.props.buttons[this.state.index]}
-         </AnimView>)
+       console.log("rend buttons")
+        return (
+          <AnimView
+              {...props}
+              style={[{
+                  overflow:"hidden",
+                  //height:30 * (this.state.index+1),
+                  backgroundColor:this.currentButton.props.backgroundColor,
+                  width:this.width.interpolate({
+                    inputRange: [0,   0.01,1],
+                    outputRange:[0.01,0.01,1]
+                  })},this.props.style]}>
+            {this.props.buttons[this.state.index]}
+          </AnimView>)
      }
    }
 });
