@@ -4,14 +4,14 @@ var ReactNative = require('react-native');
 let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
 var FAIcon = require('react-native-vector-icons/FontAwesome');
 var MIcon = require('react-native-vector-icons/MaterialIcons');
-var GiftedSpinner = require('react-native-gifted-spinner');
+
 import materialColor from 'material-colors'
 
 var _ = require('lodash');
 
 var {
   TouchableOpacity,
-  ActivityIndicatorIOS,
+  ActivityIndicator,
   ListView,
   Platform,
   ProgressBarAndroid,
@@ -123,7 +123,7 @@ var LibraryStatus = React.createClass({
           <Text>
             {"蔵書確認中"}
           </Text>
-          <GiftedSpinner />
+          <ActivityIndicator />
         </View>
       )
     }

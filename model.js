@@ -249,7 +249,7 @@ function model(actions){
     key: 'MainNavigation',
     index: 0,
     title: 'Cycle Native',
-    children: [
+    routes: [
       {key: 'Main'},
     ]
   };

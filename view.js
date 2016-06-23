@@ -76,9 +76,9 @@ function renderCard(vdom, navigationProps) {
     //navigationState={navigationProps.navigationParentState}
     //NavigationExperimental.Card is static view?
     //ref: https://github.com/facebook/react-native/issues/7720
+    //key={'View:' + navigationProps.scene.navigationState.key}
     <NavigationExperimental.Card
       {...navigationProps}
-      key={'View:' + navigationProps.scene.navigationState.key}
       renderScene={() => vdom}
       onNavigate={onNavigateBack}
     />
@@ -354,7 +354,7 @@ function BookView({booksWithStatus,booksLoadingState,selectedBook}){
 var MyNav = React.createClass({
   render: function(){
     var model=this.props.model
-    console.log("mynav");
+    console.log("mynav",model.navigationState);
     //this.setState({foo:null})
     //NavigationExperimental.Transitioner calls twice when layout changed in android
     return(
@@ -364,8 +364,9 @@ var MyNav = React.createClass({
       navigationState={model.navigationState}
       onNavigate={onNavigateBack}
       renderScene={(navigationProps) => {
-          console.log("MyNav:renderScene");
-          const key = navigationProps.scene.navigationState.key;
+          console.log("MyNav:renderScene",navigationProps);
+          //const key = navigationProps.scene.navigationState.key;
+          const key = navigationProps.scene.route.key;
           switch (key) {
             case 'Search':
               return renderCard(SearchView(model), navigationProps);
@@ -377,7 +378,8 @@ var MyNav = React.createClass({
             case 'Book':
               return renderCard(BookView(model), navigationProps);
             default:
-              console.error('Unexpected view', navigationProps, key);
+              console.error('Unexpected view', navigationProps,
+                            navigationProps.scene.navigationState);
               return (<Text>bar</Text>)
               //renderCard(<Text>Everything is fucked</Text>, navigationProps);
           }
