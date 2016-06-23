@@ -222,8 +222,8 @@ var Header = React.createClass({
           >
         <AnimView
             ref="view1"
-            style={{height:this.state.toggle ? 50 : 100,
-                    //backgroundColor:this.state.toggle ? "black" : "white",
+            style={{height:this.state.toggle ? 10 : 20,
+                    backgroundColor:this.state.toggle ? "black" : "white",
               }}
         />
         <AnimView
@@ -235,10 +235,19 @@ var Header = React.createClass({
         <Text
             style={{color:"white"}}
             onPress={()=>{
-                this.refs.view2.animate({height:50});
-                //this.setState((prev,current)=>({toggle:!prev.toggle}))
+                this.refs.view2.animate({
+                  height:20,
+                  backgroundColor:"yellow",
+                });
               }}>
-          {"header"+this.state.toggle}
+          {"animate"}
+        </Text>
+        <Text
+            style={{color:"white"}}
+            onPress={()=>{
+                this.setState((prev,current)=>({toggle:!prev.toggle}))
+              }}>
+          {"toggle"}
         </Text>
       </View>)
   },
@@ -347,7 +356,9 @@ var MyNav = React.createClass({
     var model=this.props.model
     console.log("mynav");
     //this.setState({foo:null})
+    //NavigationExperimental.Transitioner calls twice when layout changed in android
     return(
+      //<NavigationExperimental.CardStack
       <NavigationExperimental.Transitioner
       style={{flex: 1}}
       navigationState={model.navigationState}

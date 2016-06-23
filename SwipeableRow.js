@@ -441,17 +441,17 @@ var AnimView = React.createClass({
   //Use LayoutAnimation if you want to use height or width null
   getInitialState: function() {
     return {
-      currentStyle:this.props.style,
+      animatedStyle:StyleSheet.flatten(this.props.style),
     }
   },
   componentWillMount:function(){
-    this.prevStyle = this.props.style;
-    this.animating = false;
+    this.prevStyle = StyleSheet.flatten(this.props.style);
+    //this.animating = false;
   },
   animate:function(nextStyle) {
     //duration,easing jquery
     console.log("animate");
-    this.animating = true;
+    //this.animating = true;
     this.counter = new Animated.Value(0);
     const current = StyleSheet.flatten(this.prevStyle);
     const next = StyleSheet.flatten(nextStyle);
@@ -466,78 +466,43 @@ var AnimView = React.createClass({
           key.endsWith("Color") || key == "color")
           && current[key] !== next[key]
       ){
-        console.log("an",current[key],next[key]);
-        animatedStyle[key] = this.counter.interpolate({
-          inputRange:[0,1],
-          outputRange:[current[key],next[key]]
-        });
-      }
-    });
-    this.prevStyle = next;
-    //console.log("animatedStyle?",animatedStyle);
-    //this.counter.setValue(1);
-    //this.setState({animatedStyle:next});
-    this.setState({currentStyle:animatedStyle},()=>{
-      Animated.timing(
-        this.counter,
-        {toValue: 1,
-         duration: 180,}
-      ).start(()=>{
-        //this.animating = false;
-      })
-    });
-  },
-  componentWillReceiveProps: function(nextProps) {
-    console.log("willReceiveProps",this.animating);
-    if((nextProps.style != this.props.style) && (this.animating == false)
-    ){
-      this.counter = new Animated.Value(0);
-      //this.positive = true;
-      const current = StyleSheet.flatten(this.prevStyle);
-      const next = StyleSheet.flatten(nextProps.style);
-      var animatedStyle = Object.assign({},next);
-
-      console.log("rec2",current,this.prevStyle,next,animatedStyle);
-
-      Object.keys(next).map((key)=>{
-        //remove if with filter & merge
-        //console.log("k:",key,typeof next[key] === "number",key == "backgroundColor" || key == "color",current[key] != next[key],current[key],next[key])
-        if((typeof next[key] === "number" ||
-            key.endsWith("Color") || key == "color")
-           && current[key] !== next[key]
-        ){
-          console.log("an",current[key],next[key]);
+          //console.log("an",current[key],next[key]);
           animatedStyle[key] = this.counter.interpolate({
             inputRange:[0,1],
             outputRange:[current[key],next[key]]
           });
         }
       });
+
       this.prevStyle = next;
-      //console.log("animatedStyle?",animatedStyle);
-      //this.counter.setValue(1);
-      //this.setState({animatedStyle:next});
-      this.setState({currentStyle:animatedStyle},()=>{
-        Animated.timing(
-          this.counter,
-          {toValue: 1,
-           duration: 180,}
-        ).start()
-      });
-    }
-  },
-  render: function(){
-    //console.log("rend1:%O,%O",this.state.currentStyle,this.props.style);
-    return(
-      //style={[this.state.style,]}
-      <Animated.View
-             {...this.props}
-             style={[this.state.currentStyle]}
-      >
+      return new Promise((resolve,reject) =>{
+        this.setState({animatedStyle:animatedStyle},()=>{
+          Animated.timing(
+            this.counter,
+            {toValue: 1,
+             duration: 180,}
+          ).start(()=>{
+            resolve()
+          })
+        });
+      })
+    },
+    componentWillReceiveProps: function(nextProps) {
+      console.log("willReceiveProps");
+      this.animate(nextProps.style);
+    },
+    render: function(){
+      //console.log("rend anim,view1,view2",this.state.animatedStyle,this.props.style)
+      return(
+        //style={[this.state.style,]}
+        <Animated.View
+        {...this.props}
+        style={[this.state.animatedStyle]}
+        >
         {this.props.children}
       </Animated.View>)
-  }
-});
+    }
+  });
 
 var SwipeableButtons2 = React.createClass({
   getInitialState: function() {
