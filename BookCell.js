@@ -123,7 +123,8 @@ var LibraryStatus = React.createClass({
           <Text>
             {"蔵書確認中"}
           </Text>
-          <ActivityIndicator />
+          <ActivityIndicator
+              size="small"/>
         </View>
       )
     }

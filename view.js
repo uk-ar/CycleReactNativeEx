@@ -222,9 +222,11 @@ var Header = React.createClass({
           >
         <AnimView
             ref="view1"
-            style={{height:this.state.toggle ? 10 : 20,
-                    backgroundColor:this.state.toggle ? "black" : "white",
-              }}
+            style={{
+              //height:this.state.toggle ? 10 : 20,
+              height:10,
+              backgroundColor:this.state.toggle ? "black" : "white",
+            }}
         />
         <AnimView
             ref="view2"
@@ -236,7 +238,7 @@ var Header = React.createClass({
             style={{color:"white"}}
             onPress={()=>{
                 this.refs.view2.animate({
-                  height:20,
+                  height:10,
                   backgroundColor:"yellow",
                 });
               }}>
@@ -264,7 +266,7 @@ function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
     "借りてる":borrowedBooks,
     "読んだ"  :doneBooks,
   }
-  console.log("render main")
+  console.log("render main");
   //LayoutAnimation.easeInEaseOut();
   var items={};
   var header=null;
@@ -302,11 +304,13 @@ function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
   };
   return (
     //main
-    <View style={{
-      flex:1,
-      backgroundColor:"#1A237E",//indigo 900
-      //backgroundColor:"#263238",//blue grey 800
-    }}>
+    <View
+        key="main"
+        style={{
+          flex:1,
+          backgroundColor:"#1A237E",//indigo 900
+          //backgroundColor:"#263238",//blue grey 800
+        }}>
       {header}
       <MyListView
           selectedSection={selectedSection}
@@ -354,14 +358,20 @@ function BookView({booksWithStatus,booksLoadingState,selectedBook}){
 var MyNav = React.createClass({
   render: function(){
     var model=this.props.model
-    console.log("mynav",model.navigationState);
-    //this.setState({foo:null})
-    //NavigationExperimental.Transitioner calls twice when layout changed in android
+    var navigationState=Object.assign({},model.navigationState,
+                                      {routes:[
+                                        {key:"Main",
+                                         id:Math.random()}]})
+    console.log("mynav",navigationState);
+    /* NavigationExperimental.Transitioner calls twice when layout changed in
+       android. But NavigationExperimental.CardStack cannot re-render by model
+       change.So we should add random key or force update*/
+    //http://stackoverflow.com/a/35004739
     return(
-      //<NavigationExperimental.CardStack
-      <NavigationExperimental.Transitioner
+      //<NavigationExperimental.Transitioner
+      <NavigationExperimental.CardStack
       style={{flex: 1}}
-      navigationState={model.navigationState}
+      navigationState={navigationState}
       onNavigate={onNavigateBack}
       renderScene={(navigationProps) => {
           console.log("MyNav:renderScene",navigationProps);
@@ -373,8 +383,8 @@ var MyNav = React.createClass({
             case 'Inbox':
               return renderCard(InboxView(model), navigationProps);
             case 'Main':
-              return (MainView(model))
-              //return renderCard(MainView(model), navigationProps);
+              //return (MainView(model))
+              return renderCard(MainView(model), navigationProps);
             case 'Book':
               return renderCard(BookView(model), navigationProps);
             default:
