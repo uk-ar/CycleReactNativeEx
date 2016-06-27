@@ -32,6 +32,8 @@ import {
   ToastAndroid,
 } from 'react-native';
 
+import NavigationStateUtils from 'NavigationStateUtils';
+
 import Touchable from '@cycle/react-native/src/Touchable';
 Touchable["TouchableElement"] = Touchable.TouchableHighlight;
 var TouchableElement=TouchableHighlight;
@@ -124,9 +126,10 @@ Touchable["BookCell"] = Touchable.createCycleComponent(
 
 var MyListView = React.createClass({
   //remove this.state.dataSource && this._listView
-  /* propTypes: {
-     items: PropTypes.array.isRequired
-     }, */
+  propTypes: {
+    items: React.PropTypes.array.isRequired,
+    //selectedSection:selectedSection
+  },
   getInitialState(){
     const dataSource = new ListView.DataSource({
       //rowHasChanged: (r1, r2) => r1 !== r2,
@@ -137,21 +140,23 @@ var MyListView = React.createClass({
   },
 
   componentWillReceiveProps({items,offset}) {
+    /* if(this._listView && this.props.){
+       this._listView.scrollTo({y:this.props.offset,animated:false})
+       } */
+
     if (items !== this.props.items) {
       this.setState(
         {dataSource: this.state.dataSource.cloneWithRowsAndSections(items)});
     }
   },
 
-  getScrollResponder() {
+  /* getScrollResponder() {
     return this._listView.getScrollResponder();
-  },
+  },*/
 
   render() {
     const {items, ...listViewProps} = this.props;
-    if(this._listView && this.props.offset){
-      this._listView.scrollTo({y:this.props.offset,animated:false})
-    }
+    console.log(this._listView);
     return (
       //onResponderMove is too premitive
       //          directionalLockEnabled={true}
@@ -355,18 +360,20 @@ function BookView({booksWithStatus,booksLoadingState,selectedBook}){
   )
 };
 
-var MyNav = React.createClass({
-  render: function(){
-    var model=this.props.model
-    var navigationState=Object.assign({},model.navigationState,
-                                      {routes:[
-                                        {key:"Main",
-                                         id:Math.random()}]})
-    console.log("mynav",navigationState);
-    /* NavigationExperimental.Transitioner calls twice when layout changed in
-       android. But NavigationExperimental.CardStack cannot re-render by model
-       change.So we should add random key or force update*/
-    //http://stackoverflow.com/a/35004739
+function view(model){
+  /* NavigationExperimental.Transitioner calls twice when layout changed in
+     android. But NavigationExperimental.CardStack cannot re-render by model
+     change.So we should add random key or force update*/
+  //http://stackoverflow.com/a/35004739
+  var navigationState=
+    NavigationStateUtils.replaceAtIndex(
+      model.navigationState,//navigationState
+      model.navigationState.index,//index
+      {key:model.navigationState.routes[model.navigationState.index].key,
+       id:Math.random(),
+      }//route
+    )//
+  console.log("mynav",navigationState);
     return(
       //<NavigationExperimental.Transitioner
       <NavigationExperimental.CardStack
@@ -395,16 +402,7 @@ var MyNav = React.createClass({
           }
         }}
       />)
-  }
-});
-
-function view(model){
-  return (<MyNav model={model}/>)
-  //      onNavigate={onNavigateBack}
-  // NavigationExperimental.AnimatedView is deplicated.
-  // https://github.com/facebook/react-native/blob/69627bf91476274e92396370acff
 };
-
 /* renderOverlay={(props)=>{
    return (
    //NavigationExperimental.Header is not deplicated, but no examples.
