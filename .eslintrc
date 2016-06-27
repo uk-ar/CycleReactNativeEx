@@ -1,0 +1,19 @@
+{
+  "extends": ["eslint:recommended"],
+  "parser": "babel-eslint",
+  "env": { "node" :true,
+           "es6":true
+         },
+  "ecmaFeatures": {
+    "jsx": true,
+    "experimentalObjectRestSpread": true
+  },
+  "plugins": [
+    "react"
+  ],
+  "rules": {
+    "comma-dangle" : ["error","only-multiline"],
+    "no-console" : "warn",
+    "react/jsx-uses-vars": 1,
+  },
+}
