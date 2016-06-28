@@ -33,7 +33,7 @@ import {
   ListView,
   Platform,
   ProgressBarAndroid,
-  //Text,
+  // Text,
   StyleSheet,
   View,
   Image,
@@ -55,7 +55,7 @@ import {
 } from 'react-native';
 import NavigationStateUtils from 'NavigationStateUtils';
 
-UIManager.setLayoutAnimationEnabledExperimental &&   UIManager.setLayoutAnimationEnabledExperimental(true);
+UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
 
 let { SearchScreen, InBoxScreen, GiftedNavigator, BookListView } = require('./SearchScreen');
 
@@ -67,11 +67,11 @@ function main({ RN, HTTP, EE }) {
   const actions = intent(RN, HTTP);
   const state$ = model(actions);
 
-  //0192521722
-  //qwerty
+  // 0192521722
+  // qwerty
   return {
     RN: state$.map(view),
-    HTTP: actions.request$,//state$.map(request),
+    HTTP: actions.request$, //state$.map(request),
   };
 }
 

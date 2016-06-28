@@ -6,26 +6,26 @@ import materialColor from 'material-colors';
 
 var cellWidth = 60;
 var styles = StyleSheet.create({
-  //view.js
+  // view.js
   sectionHeader: {
     backgroundColor: materialColor.grey['200'],
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
-    //marginTop:3,
+    // marginTop:3,
     padding: 10,
     flexDirection: 'row',
   },
   sectionFooter: {
-    //backgroundColor:materialColor.grey["200"],
+    // backgroundColor:materialColor.grey["200"],
     backgroundColor: materialColor.grey['50'],
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
     borderRadius: 5,
-    marginBottom: 3,//separator is better?
+    marginBottom: 3, // separator is better?
     padding: 10,
     //height:30,
   },
-  //for toolBar
+  // for toolBar
   toolbar: {
     backgroundColor: '#e9eaed',
     height: 56,
@@ -45,7 +45,7 @@ var styles = StyleSheet.create({
     width: 30,
     color: 'white',
   },
-  //for listview
+  // for listview
   container: {
     flex: 1,
     backgroundColor: 'white',
@@ -72,7 +72,7 @@ var styles = StyleSheet.create({
   rowSeparatorHide: {
     opacity: 0.0,
   },
-  //for cell
+  // for cell
   textContainer: {
     flex: 1,
   },
@@ -87,7 +87,7 @@ var styles = StyleSheet.create({
     fontSize: 12,
   },
   row: {
-    //alignItems: 'center',
+    // alignItems: 'center',
     backgroundColor: 'white',
     flexDirection: 'row',
     padding: 5,
@@ -103,15 +103,15 @@ var styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   icon: {
-    //width: 50
+    // width: 50
   },
   toolbarButton: {
-    //width: 50,            //Step 2
-    //textAlign:'center',
+    // width: 50,            //Step 2
+    // textAlign:'center',
     flex: 1,                //Step 3
   },
   toolbarTitle: {
-    //alignItems: 'center',
+    // alignItems: 'center',
     textAlign: 'center',
     fontWeight: 'bold',
     flex: 1,                //Step 3

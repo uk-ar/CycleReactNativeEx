@@ -40,31 +40,31 @@ Touchable['SegmentedControls'] = Touchable.createCycleComponent(
   });
 
 var GiftedNavigator = React.createClass({
-  componentDidMount: function () {
-    //console.log("nav this:%O", this);
-    //var navigatorDidMount = this.props.navigatorDidMount.bind(this);
-    //navigatorDidMount(this.refs.nav);
-    //this.props.onNavigatorMounted.call({},this.refs.nav);
+  componentDidMount() {
+    // console.log("nav this:%O", this);
+    // var navigatorDidMount = this.props.navigatorDidMount.bind(this);
+    // navigatorDidMount(this.refs.nav);
+    // this.props.onNavigatorMounted.call({},this.refs.nav);
   },
 
-  render: function () {
+  render() {
     if (Platform.OS === 'android') {
       return (
         <Navigator {...this.props}
           ref="nav"
           configureScene={() => Navigator.SceneConfigs.FadeAndroid}
-          renderScene = {(route, navigator, component) => {
-              //console.log("nav this:%O", this)
-              return React.createElement(route.component, route.passProps);
-            }}
+          renderScene={(route, navigator, component) => {
+              // console.log("nav this:%O", this)
+            return React.createElement(route.component, route.passProps);
+          }}
 
         />);
     } else {
       return (
         <NavigatorIOS
-            {...this.props}
-            ref="nav"
-            style={styles.container}
+          {...this.props}
+          ref="nav"
+          style={styles.container}
         />);
     }
   },
@@ -88,63 +88,63 @@ var BookListView = React.createClass({
       marginHorizontal: 5,
     };
     const selectedStyle = {
-      color: '#007AFF',//'rgba(0,0,0,1)',//baseColor,
-      //fontWeight: 'bold'
+      color: '#007AFF', // 'rgba(0,0,0,1)',//baseColor,
+      // fontWeight: 'bold'
       marginHorizontal: 5,
     };
     return (
       <View>
       <ListView
-          ref="listview"
-          items={this.props.dataSource}
-          renderRow ={(movie, sectionID, rowID, highlightRowFunc) => {
-              //actions$={this.props.actions$}
-              //need to intercept renderRow?
-              //error on already defined
-              //selector="bookcell"
-              //<Touchable.TouchableOpacity selector="list"> //ng
-              //<TouchableOpacity selector="list"> //ok
-              return (
+        ref="listview"
+        items={this.props.dataSource}
+        renderRow={(movie, sectionID, rowID, highlightRowFunc) => {
+              // actions$={this.props.actions$}
+              // need to intercept renderRow?
+              // error on already defined
+              // selector="bookcell"
+              // <Touchable.TouchableOpacity selector="list"> //ng
+              // <TouchableOpacity selector="list"> //ok
+          return (
                   <BookCell book={movie}
-                            sectionID={sectionID}
-                            rowID={rowID}
-                            onLike={this.props.onLike}
-                            onDone={this.props.onDone}
-                            onInbox={this.props.onInbox}
-                                    />
+                    sectionID={sectionID}
+                    rowID={rowID}
+                    onLike={this.props.onLike}
+                    onDone={this.props.onDone}
+                    onInbox={this.props.onInbox}
+                  />
               );
-            }}
+        }}
 
-          enableEmptySections={true}
-          automaticallyAdjustContentInsets={false}
-          keyboardDismissMode="on-drag"
-          keyboardShouldPersistTaps={true}
-          showsVerticalScrollIndicator={false}
+        enableEmptySections
+        automaticallyAdjustContentInsets={false}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps
+        showsVerticalScrollIndicator={false}
       />
-            <View style = {[styles.row,
+            <View style={[styles.row,
                             { justifyContent: 'space-between',
                               alignItems: 'center' }]}>
-              <Touchable.FAIcon name = "filter"
-                    selector = "filter"
-                    size = {25}
-                    color = "#007AFF"
-                    style={{ marginHorizontal: 8 }}
+              <Touchable.FAIcon name="filter"
+                selector="filter"
+                size={25}
+                color="#007AFF"
+                style={{ marginHorizontal: 8 }}
               />
               <Touchable.SegmentedControls
-                  options={ options }
-                  selector = "segmented"
-                  style={styles.toolbarButton}
-                  renderOption={(option, selected)=> {
-                      return <Text allowFontScaling={true} style={selected ? normalStyle : selectedStyle}>{option}</Text>;
-                    }}
+                options={options}
+                selector="segmented"
+                style={styles.toolbarButton}
+                renderOption={(option, selected) => {
+                  return <Text allowFontScaling style={selected ? normalStyle : selectedStyle}>{option}</Text>;
+                }}
 
-                  selectedOption={this.props.selectedOption}
+                selectedOption={this.props.selectedOption}
               />
-              <Touchable.FAIcon name = "sort"
-                      selector = "sort"
-                      size = {25}
-                      color = "#007AFF"
-                      style={{ marginHorizontal: 8 }}
+              <Touchable.FAIcon name="sort"
+                selector="sort"
+                size={25}
+                color="#007AFF"
+                style={{ marginHorizontal: 8 }}
               />
             </View>
       </View>
@@ -164,22 +164,23 @@ var BookListView = React.createClass({
 });
 
 var InBoxScreen = React.createClass({
-  render: function () {
+  render() {
     return (
       <View style={styles.container}
-                 key = "InBoxScreen">
-        { /* actions$={this.props.actions$}*/}
+        key="InBoxScreen"
+      >
+        {}
         <BookListView
-            dataSource$={this.props.state$.inbox$}
-            key = "inboxlistview"
-            selectedOption='読みたい'
+          dataSource$={this.props.state$.inbox$}
+          key="inboxlistview"
+          selectedOption="読みたい"
         />
       </View>
     );
   },
 });
 
-//var SearchBar = require('SearchBar');
+// var SearchBar = require('SearchBar');
 var SearchBar = require('./SearchBar');
 
 /* var SearchScreen = React.createClass({
@@ -227,7 +228,7 @@ var SearchBar = require('./SearchBar');
 
 var cellWidth = 60;
 var styles = StyleSheet.create({
-  //for toolBar
+  // for toolBar
   toolbar: {
     backgroundColor: '#e9eaed',
     height: 56,
@@ -247,7 +248,7 @@ var styles = StyleSheet.create({
     width: 30,
     color: 'white',
   },
-  //for listview
+  // for listview
   container: {
     flex: 1,
     backgroundColor: 'white',
@@ -274,7 +275,7 @@ var styles = StyleSheet.create({
   rowSeparatorHide: {
     opacity: 0.0,
   },
-  //for cell
+  // for cell
   textContainer: {
     flex: 1,
   },
@@ -289,7 +290,7 @@ var styles = StyleSheet.create({
     fontSize: 12,
   },
   row: {
-    //alignItems: 'center',
+    // alignItems: 'center',
     backgroundColor: 'white',
     flexDirection: 'row',
     padding: 5,
@@ -305,15 +306,15 @@ var styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   icon: {
-    //width: 50
+    // width: 50
   },
   toolbarButton: {
-    //width: 50,            //Step 2
-    //textAlign:'center',
+    // width: 50,            //Step 2
+    // textAlign:'center',
     flex: 1,                //Step 3
   },
   toolbarTitle: {
-    //alignItems: 'center',
+    // alignItems: 'center',
     textAlign: 'center',
     fontWeight: 'bold',
     flex: 1,                //Step 3

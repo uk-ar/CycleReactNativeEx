@@ -47,14 +47,16 @@ let { SwipeableRow, SwipeableRow2 } = require('./SwipeableRow');
 function LeftButton({ icon, text, style, backgroundColor, ...props }) {
   return (
     <View
-        {...props}
-        style={[style, {
-            flexDirection: 'row',
-            alignItems: 'center',
-            flex: 1,//vertical center
-          }]}>
+      {...props}
+      style={[style, {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1, //vertical center
+      }]}
+    >
       <FAIcon name={icon} size={20}
-              style={{ margin: 10, marginRight: 5 }} />
+        style={{ margin: 10, marginRight: 5 }}
+      />
       <Text>
         {text}
       </Text>
@@ -62,69 +64,71 @@ function LeftButton({ icon, text, style, backgroundColor, ...props }) {
   );
 }
 
-//http://mae.chab.in/archives/2854
-//stateless component validation
+// http://mae.chab.in/archives/2854
+// stateless component validation
 function RightButton({ icon, text, style, backgroundColor, ...props }) {
   return (
     <View
-        {...props}
-        style={[style, {
-            flexDirection: 'row',
-            alignItems: 'center',
-            flex: 1,//vertical center
-          }]}>
+      {...props}
+      style={[style, {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1, //vertical center
+      }]}
+    >
       <Text>
         {text}
       </Text>
       <FAIcon name={icon} size={20}
-              style = {{ margin: 10, marginLeft: 5 }} />
+        style={{ margin: 10, marginLeft: 5 }}
+      />
     </View>
   );
 }
 
 var LibraryStatus = React.createClass({
-  render: function () {
+  render() {
     var libraryStatus = this.props.libraryStatus || {};
 
     var text, name, backgroundColor;
 
     if (libraryStatus.rentable) {
-      text = '貸出可';//利用可
-      //style={backgroundColor: "#03A9F4"} //light blue
-      //style={color: "#009688"} //Teal
-      style = { color: '#4CAF50' }; //Green
-    }else if (libraryStatus.exist) {
+      text = '貸出可';// 利用可
+      // style={backgroundColor: "#03A9F4"} //light blue
+      // style={color: "#009688"} //Teal
+      style = { color: '#4CAF50' }; // Green
+    } else if (libraryStatus.exist) {
       text = '貸出中';
-      //style={backgroundColor: "#FFC107"} //yellow
-      //style={color: "#FFEB3B"} //yellow
-      style = { color: '#FFC107' }; //amber
-    }else if (libraryStatus.exist !== undefined) {
+      // style={backgroundColor: "#FFC107"} //yellow
+      // style={color: "#FFEB3B"} //yellow
+      style = { color: '#FFC107' }; // amber
+    } else if (libraryStatus.exist !== undefined) {
       text = 'なし';
-      //style={backgroundColor: "#9E9E9E"} //grey
-      style = { color: '#F44336' }; //red
-    }else {
-      //text="取得中"
+      // style={backgroundColor: "#9E9E9E"} //grey
+      style = { color: '#F44336' }; // red
+    } else {
+      // text="取得中"
     }
-    //http://www.google.com/design/spec/style/color.html#color-color-palette
+    // http://www.google.com/design/spec/style/color.html#color-color-palette
     if (text) {
       return (
-        <View style={[styles.row]}
-        >
+        <View style={[styles.row]}>
           <Text style={[
-            //{fontSize: 14,},//default?
+            // {fontSize: 14,},//default?
             style]}>
             {text}
           </Text>
         </View>
       );
-    }else {
+    } else {
       return (
         <View style={[styles.row]}>
           <Text>
             {'蔵書確認中'}
           </Text>
           <ActivityIndicator
-              size="small"/>
+            size="small"
+          />
         </View>
       );
     }
@@ -133,90 +137,90 @@ var LibraryStatus = React.createClass({
 
 function getButtons(type, func, book) {
   var leftButtons, rightButtons, likedButton,
-      borrowedButton, doneButton;
+    borrowedButton, doneButton;
   var selfProps = { text: '先頭に移動', icon: 'level-up', close: false };
-  //MIcon publish,vertical align top,low priority
-  switch (type){
+  // MIcon publish,vertical align top,low priority
+  switch (type) {
     case '読みたい':
       likedButton = selfProps;
-    break;
+      break;
     case '借りてる':
       borrowedButton = selfProps;
-    break;
+      break;
     case '読んだ':
       doneButton = selfProps;
-    break;
+      break;
   }
-  //#e0e0e0 #03a9f4 #4caf50
+  // #e0e0e0 #03a9f4 #4caf50
   var leftButtons = [
     <LeftButton
-        icon="heart-o"
-        close={false}
-        backgroundColor={materialColor.grey[300]}
-        style={{
-          justifyContent: 'flex-end',
-        }}
-        {...likedButton}
-        text={null}
-    />,//grey 300
+      icon="heart-o"
+      close={false}
+      backgroundColor={materialColor.grey[300]}
+      style={{
+        justifyContent: 'flex-end',
+      }}
+      {...likedButton}
+      text={null}
+    />, // grey 300
     <LeftButton
-        icon="heart-o"
-        close={true}
-        onRelease = {() => {
-    console.log('like');func(book, 'liked');
-  }}
+      icon="heart-o"
+      close
+      onRelease={() => {
+        console.log('like'); func(book, 'liked');
+      }}
 
-        backgroundColor={materialColor.lightBlue[500]}
-        text="読みたい"
-        style={{ width: width / 2 }}
-        {...likedButton}
-    />,//light blue "#03A9F4"
-    //blue "#2196F3"
+      backgroundColor={materialColor.lightBlue[500]}
+      text="読みたい"
+      style={{ width: width / 2 }}
+      {...likedButton}
+    />, // light blue "#03A9F4"
+    // blue "#2196F3"
     <LeftButton
-        onRelease={()=> func(book, 'borrowed')}
-        close={true}
-        backgroundColor={materialColor.green[500]}
-        icon="bookmark-o"
-        text="借りてる"
-        style={{ width: width }}
-        {...borrowedButton}
-    />,//green
+      onRelease={() => func(book, 'borrowed')}
+      close
+      backgroundColor={materialColor.green[500]}
+      icon="bookmark-o"
+      text="借りてる"
+      style={{ width }}
+      {...borrowedButton}
+    />, //green
   ];
   var rightButtons = [
     <RightButton
-        backgroundColor={materialColor.grey[300]}
-        close={false}
-        icon="check-square-o"
-        {...doneButton}
-        text={null}
-     />,//grey 300
-     <RightButton
-         onRelease = {() => func(book, 'done')}
-         backgroundColor={materialColor.amber[500]}
-         close={true}
-         icon="check-square-o"
-         text="読んだ"
-         style={{
-          justifyContent: 'flex-end',
-        }}
-         {...doneButton}
-     />,//amber
-   ];//Touchable
+      backgroundColor={materialColor.grey[300]}
+      close={false}
+      icon="check-square-o"
+      {...doneButton}
+      text={null}
+    />, // grey 300
+    <RightButton
+      onRelease={() => func(book, 'done')}
+      backgroundColor={materialColor.amber[500]}
+      close
+      icon="check-square-o"
+      text="読んだ"
+      style={{
+        justifyContent: 'flex-end',
+      }}
+      {...doneButton}
+    />, //amber
+  ];// Touchable
   return { leftButtons, rightButtons };
 }
 
-//ToastAndroid.show('foo', ToastAndroid.SHORT)
+// ToastAndroid.show('foo', ToastAndroid.SHORT)
 var BookCell = React.createClass({
-  render: function () {
+  render() {
     var { book, onRelease, style, title, ...props } = this.props;
-    //There is 3 type of close behavior
-    //animated left only
-    //animated right and vertical close permanently
-    //animated right and vertical close temporary
-    //onSwipeEnd onSwipeStart
-    //expand or close
+    // There is 3 type of close behavior
+    // animated left only
+    // animated right and vertical close permanently
+    // animated right and vertical close temporary
+    // onSwipeEnd onSwipeStart
+    // expand or close
     var { leftButtons, rightButtons } = getButtons(title, onRelease, book);
-    //onPress={()=>console.log("cell press")}
+    // onPress={()=>console.log("cell press")}
     var TouchableElement = Touchable.TouchableHighlight;
     if (Platform.OS === 'android') {
       TouchableElement = Touchable.TouchableNativeFeedback;
@@ -224,29 +228,31 @@ var BookCell = React.createClass({
 
     return (
       //    style={{flex:1}}
-      //style={{backgroundColor:"red"}}
-      //style={{opacity:0.5}}
+      // style={{backgroundColor:"red"}}
+      // style={{opacity:0.5}}
       <SwipeableRow2
-          leftButtons={leftButtons}
-          rightButtons={rightButtons}
-          onPanResponderMove={()=> {
-              //prevent vertical scroll
-              this.props.onPanResponderMove &&
+        leftButtons={leftButtons}
+        rightButtons={rightButtons}
+        onPanResponderMove={() => {
+              // prevent vertical scroll
+          this.props.onPanResponderMove &&
               this.props.onPanResponderMove();
-            }}
+        }}
 
-          onPanResponderEnd={()=> {
-              this.props.onPanResponderEnd &&
+        onPanResponderEnd={() => {
+          this.props.onPanResponderEnd &&
               this.props.onPanResponderEnd();
-            }}
+        }}
       >
         <TouchableElement
-            selector="cell"
-            payload={book}>
+          selector="cell"
+          payload={book}
+        >
           <View style={[styles.row, this.props.style]}>
             <Image source={{ uri: book.thumbnail }}
-                   resizeMode="contain"
-                   style={[styles.cellImage]} />
+              resizeMode="contain"
+              style={[styles.cellImage]}
+            />
             <View style={[{ flexDirection: 'column',
                           flex: 1,
                           //backgroundColor:"red",
@@ -259,34 +265,36 @@ var BookCell = React.createClass({
                 <Text style={styles.bookAuthor} numberOfLines={1}>
                   {book.author}
                 </Text>
-                <LibraryStatus libraryStatus={book.libraryStatus}/>
+                <LibraryStatus libraryStatus={book.libraryStatus} />
               </View>
-              <View style={{ flex: 1 }}/>
+              <View style={{ flex: 1 }} />
               <View style={{ height: StyleSheet.hairlineWidth,
                             backgroundColor: '#CCCCCC',
                             marginRight: 10,
                             //separator
-                          }}
-              />
+                          }} />
             </View>
           </View>
         </TouchableElement>
       </SwipeableRow2>
     );
-    //TODO:flex-start & flex-end
+    // TODO:flex-start & flex-end
     return (
-      //probrem with hard coded width
+      // probrem with hard coded width
       <SwipeableRow
-          leftButtons={leftButtons}
-          rightButtons={rightButtons}
-          {...props}>
+        leftButtons={leftButtons}
+        rightButtons={rightButtons}
+        {...props}
+      >
         <TouchableElement
-            selector="cell"
-        payload={book}>
+          selector="cell"
+          payload={book}
+        >
           <View style={[styles.row, this.props.style]}>
             <Image source={{ uri: book.thumbnail }}
-                   resizeMode="contain"
-                   style={[styles.cellImage]} />
+              resizeMode="contain"
+              style={[styles.cellImage]}
+            />
             <View style={[{ flexDirection: 'column' }]}>
               <View style={[{ padding: 10, justifyContent: 'center' },
                 ]}>
@@ -296,14 +304,13 @@ var BookCell = React.createClass({
                 <Text style={styles.bookAuthor} numberOfLines={1}>
                   {book.author}
                 </Text>
-                <LibraryStatus libraryStatus={book.libraryStatus}/>
+                <LibraryStatus libraryStatus={book.libraryStatus} />
               </View>
               <View style={{ height: StyleSheet.hairlineWidth,
                             backgroundColor: '#CCCCCC',
                             marginRight: 10,
                             //separator
-                          }}
-              />
+                          }} />
             </View>
           </View>
         </TouchableElement>
@@ -312,18 +319,18 @@ var BookCell = React.createClass({
   },
 });
 var cellWidth = 64;
-//https://www.google.com/design/spec/style/color.html#color-color-palette
+// https://www.google.com/design/spec/style/color.html#color-color-palette
 var styles = StyleSheet.create({
-  //application & lib
+  // application & lib
   rowCenter: {
     flexDirection: 'row',
-    //justifyContent:"center",
+    // justifyContent:"center",
     alignItems: 'center',
   },
   row: {
     flexDirection: 'row',
   },
-  //for new swipe
+  // for new swipe
   /* container: {
      flex: 1,
      flexDirection: 'column'
@@ -339,10 +346,10 @@ var styles = StyleSheet.create({
     flex: 1,
     //backgroundColor: 'white',
   },
-  //for cell
+  // for cell
   row: {
-    //alignItems: 'center',
-    //backgroundColor: 'white',
+    // alignItems: 'center',
+    // backgroundColor: 'white',
     flexDirection: 'row',
     //padding: 5,
   },
@@ -352,18 +359,18 @@ var styles = StyleSheet.create({
     marginBottom: 2,
   },
   bookAuthor: {
-    //color: '#999999',
-    color: '#9E9E9E',//grey
+    // color: '#999999',
+    color: '#9E9E9E', // grey
     fontSize: 12,
   },
   cellImage: {
     backgroundColor: '#dddddd',
-    height: 64,//PixelRatio 2
+    height: 64, // PixelRatio 2
     margin: 10,
     width: cellWidth,
   },
   cellBorder: {
-    //backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    // backgroundColor: 'rgba(0, 0, 0, 0.1)',
     // Trick to get the thinest line the device can display
     height: 1 / PixelRatio.get(),
     marginLeft: 4,
@@ -373,15 +380,15 @@ var styles = StyleSheet.create({
     //backgroundColor: 'black',
   },
   icon: {
-    //width: 50
+    // width: 50
   },
   toolbarButton: {
-    //width: 50,            //Step 2
-    //textAlign:'center',
+    // width: 50,            //Step 2
+    // textAlign:'center',
     flex: 1,                //Step 3
   },
   toolbarTitle: {
-    //alignItems: 'center',
+    // alignItems: 'center',
     textAlign: 'center',
     fontWeight: 'bold',
     flex: 1,                //Step 3

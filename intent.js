@@ -41,7 +41,7 @@ import {
 } from 'react-native';
 
 function intent(RN, HTTP) {
-  //Actions
+  // Actions
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')
                          .do(i => console.log('search text change:%O', i));
@@ -53,7 +53,7 @@ function intent(RN, HTTP) {
                              .map(res =>
                                res.body.Items
                                   .filter(book => book.isbn)
-                                 //reject non book
+                                 // reject non book
                                   .filter(book => (book.isbn.startsWith('978')
                                       || book.isbn.startsWith('979')))
                              )
@@ -66,43 +66,43 @@ function intent(RN, HTTP) {
   console.log('RN:%O', RN.navigateBack());
   const release$ = RN.select('bookcell')
                      .events('release');
-  //.publish()
-  //.share()
-  //release$.do((i)=>console.log("rel$")).subscribe()
+  // .publish()
+  // .share()
+  // release$.do((i)=>console.log("rel$")).subscribe()
   return {
-    requestBooks$: requestBooks$,
-    request$: request$,
+    requestBooks$,
+    request$,
     /* changeScene$: RN.select('toolbar').events('actionSelected')
                     .map(i=> i.args),
        navigatorBackPress$: RN.select('back').events('iconClicked'),*/
     goToInboxView$: RN.select('segmented').events('selection')
                       .distinctUntilChanged()
-                      .filter(([title, _])=>title == '読みたい')
-                      .map(_=>({
+                      .filter(([title, _]) => title == '読みたい')
+                      .map(_ => ({
                         type: 'push',
                         key: 'Inbox',
                       }))
                       .do(i => console.log('select press1:%O', i)),
     goToSearchView$: RN.select('segmented').events('selection')
                        .distinctUntilChanged()
-                       .filter(([title, _])=>title == '検索')
-                       .map(_=>({
-                        type: 'push',
-                        key: 'Search',
-                      }))
+                       .filter(([title, _]) => title == '検索')
+                       .map(_ => ({
+                         type: 'push',
+                         key: 'Search',
+                       }))
                        .do(i => console.log('select press2:%O', i)),
     selectedSection$: RN.select('section')
                         .events('press')
                         .merge(RN.select('close')
-                                 .events('press').map(()=>null))
+                                 .events('press').map(() => null))
                         .do(i => console.log('section selected:%O', i))
-    //.do((books)=>LayoutAnimation.easeInEaseOut())//there is bug in iOS
-    //Will be fixed in RN 0.28?
-    //ref: https://github.com/facebook/react-native/pull/7942
+    // .do((books)=>LayoutAnimation.easeInEaseOut())//there is bug in iOS
+    // Will be fixed in RN 0.28?
+    // ref: https://github.com/facebook/react-native/pull/7942
     ,
     goToBookView$: RN.select('cell').events('press')
                      .do(i => console.log('cell press:%O', i))
-    //.subscribe()
+    // .subscribe()
     /* .map(book=>({
        type: 'push',
        key: 'Book',
@@ -131,11 +131,11 @@ function intent(RN, HTTP) {
        })
       ).do(i => console.log("rel:%O", i))*/
     changeBucket$: release$
-      .do(i=>console.log('release:', i))
-      .map(([book, bucket])=>(
+      .do(i => console.log('release:', i))
+      .map(([book, bucket]) => (
         { type: 'replace',
         book: Object.assign(
-          {}, book, { bucket: bucket, modifyDate: new Date(Date.now()) }) }))
+          {}, book, { bucket, modifyDate: new Date(Date.now()) }) }))
       .do(i => console.log('rel:%O', i)),
     filterState$: RN.select('filter')
                     .events('press')
@@ -146,29 +146,29 @@ function intent(RN, HTTP) {
     sortState$: RN.select('sort')
                   .events('press')
                   .do(i => console.log('sort change:%O', i))
-      //actions.sortState$
+      // actions.sortState$
                   .startWith(false)
                   .scan((current, event) => !current)
                   .do(i => console.log('sort:%O', i))
                   .subscribe(),
-    booksResponse$: booksResponse$,
+    booksResponse$,
     booksStatus$: HTTP
       .filter(res$ => res$.request.url.indexOf(CALIL_STATUS_API) === 0)
       .switch()
       .map(res$ => JSON.parse(res$.text.match(/callback\((.*)\)/)[1]))
       .do(i => console.log('books status retry:%O', i))
-      //FIXME:
+      // FIXME:
       .flatMap(result => [Object.assign({}, result, { continue: 0 }), result])
       .map(result => {
         if (result.continue == 1) {
           throw result;
         }
 
-        return result; //don't use?
+        return result; // don't use?
       })
-      //cannot capture retry stream
+      // cannot capture retry stream
       .retryWhen(function (errors) {
-        return errors.delay(2000); //.map(log)
+        return errors.delay(2000); // .map(log)
       })
       .map(result => result.books)
       .distinctUntilChanged()

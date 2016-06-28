@@ -32,9 +32,9 @@ import Touchable from '@cycle/react-native/src/Touchable';
 var IS_RIPPLE_EFFECT_SUPPORTED = Platform.Version >= 21;
 
 var SearchBar = React.createClass({
-  render: function () {
+  render() {
     var loadingView;
-    //FIXME:dynamic view and cycle view?
+    // FIXME:dynamic view and cycle view?
     if (this.props.isLoading) {
       loadingView = (
         <ProgressBarAndroid
@@ -44,20 +44,22 @@ var SearchBar = React.createClass({
         />
       );
     } else {
-      loadingView = <View
-                        key = "loadingView"
-                        style={styles.spinner} />;
+      loadingView = (<View
+        key="loadingView"
+        style={styles.spinner}
+      />);
     }
 
     var background = IS_RIPPLE_EFFECT_SUPPORTED ?
       TouchableNativeFeedback.SelectableBackgroundBorderless() :
       TouchableNativeFeedback.SelectableBackground();
     return (
-      <View style = {styles.searchBar} key = "search">
+      <View style={styles.searchBar} key="search">
         <TouchableNativeFeedback
-            key = "bar"
-            background={background}
-            onPress={() => this.refs.input && this.refs.input.focus()}>
+          key="bar"
+          background={background}
+          onPress={() => this.refs.input && this.refs.input.focus()}
+        >
           <View>
             <Image
               source={require('image!android_search_white')}
@@ -70,7 +72,7 @@ var SearchBar = React.createClass({
           ref="input"
           autoCapitalize="none"
           autoCorrect={false}
-          autoFocus={true}
+          autoFocus
           onChange={this.props.onSearchChange}
           placeholder="Search a movie..."
           placeholderTextColor="rgba(255, 255, 255, 0.5)"

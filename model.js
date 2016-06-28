@@ -73,58 +73,58 @@ let mockBooks = [
   { title: 'done:baz', isbn: '9784822285159', bucket: 'done' },
   { title: 'done:toz', isbn: '9784757142794', bucket: 'done' },
 ];
-mockBooks; //for lint
+mockBooks; // for lint
 
-realm.write(()=> {
+realm.write(() => {
   /* mockBooks.reverse().map((book)=>{
       realm.create('Book',{...book,modifyDate: new Date(Date.now())},true)
      })*/
 });
 
 var allBooks = realm.objects('Book')
-                  .sorted('modifyDate', true)//reverse sort
-                  .map((elem)=>elem);
+                  .sorted('modifyDate', true)// reverse sort
+                  .map((elem) => elem);
 
 function model(actions) {
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
 
-  //model
-  //result items inbox favoritebox searchedbox
-  //searchedBooks $
+  // model
+  // result items inbox favoritebox searchedbox
+  // searchedBooks $
   const searchedBooks$ = Rx.Observable
                              .combineLatest(
                                actions.booksResponse$,
                                actions.booksStatus$.startWith([]),
                                (books, booksStatus) => {
-      return books.map(book => {
-        if ((booksStatus[book.isbn] !== undefined) && //not yet retrieve
-           //sub library exist?
+                                 return books.map(book => {
+                                   if ((booksStatus[book.isbn] !== undefined) && // not yet retrieve
+           // sub library exist?
            (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)) {
-          const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
-          //TODO:support error case
-          //if bookStatus.status == "Error"
-          var exist = Object.keys(bookStatus.libkey)
+                                     const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
+          // TODO:support error case
+          // if bookStatus.status == "Error"
+                                     var exist = Object.keys(bookStatus.libkey)
                             .length !== 0;
-          var rentable = _.values(bookStatus.libkey)//Object.values
+                                     var rentable = _.values(bookStatus.libkey)// Object.values
                           .some(i => i === '貸出可');
-          book.libraryStatus = {
-            status: bookStatus.libkey,
-            reserveUrl: bookStatus.reserveurl,
-            rentable: rentable,
-            exist: exist,
-          };
-        }
+                                     book.libraryStatus = {
+                                       status: bookStatus.libkey,
+                                       reserveUrl: bookStatus.reserveurl,
+                                       rentable,
+                                       exist,
+                                     };
+                                   }
 
-        return ({
-          title: book.title.replace(/^【バーゲン本】/, ''),
-          author: book.author,
-          isbn: book.isbn,
-          thumbnail: book.largeImageUrl,
-          libraryStatus: book.libraryStatus,
-          active: true,
-        });
-      }
-      );}).do(i => console.log('searchedBooks$:%O', i)
+                                   return ({
+                                     title: book.title.replace(/^【バーゲン本】/, ''),
+                                     author: book.author,
+                                     isbn: book.isbn,
+                                     thumbnail: book.largeImageUrl,
+                                     libraryStatus: book.libraryStatus,
+                                     active: true,
+                                   });
+                                 }
+      ); }).do(i => console.log('searchedBooks$:%O', i)
       ).distinctUntilChanged();
   /* .combineLatest(actions.openSwipe$.startWith(1), (books,rowID) => {
      for (var i = 0; i < books.length; i++) {
@@ -133,7 +133,7 @@ function model(actions) {
      }
      return books;
      }) */
-  //.share();
+  // .share();
   /*
 let navigatorPushRequest$ = actions
             .openBook$
@@ -158,22 +158,22 @@ let navigatorPushRequest$ = actions
     console.log('type:', type);
     switch (type) {
       case 'remove':
-        return books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString());
+        return books.filter((elem) => elem.isbn.toString() !== book.isbn.toString());
       case 'add':
         return [book].concat(books);
       case 'replace':
-        return [book].concat(books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString()));
+        return [book].concat(books.filter((elem) => elem.isbn.toString() !== book.isbn.toString()));
       default:
         return books;
     }
-  } //).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
-  ).do((books)=> {
-    realm.write(()=> {
-      books.map((book)=> {
+  } // ).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
+  ).do((books) => {
+    realm.write(() => {
+      books.map((book) => {
         realm.create('Book', book, true);
       });
     });
-  }).do((i)=> console.log('b&o:', i)
+  }).do((i) => console.log('b&o:', i)
   ).shareReplay();
 
   /* let borrowedBooks$ = allBooks$.map((books)=>
@@ -186,7 +186,7 @@ let navigatorPushRequest$ = actions
              books.filter((book)=>book.bucket=="done")
              ).do((i)=>console.log("d:",i))*/
   let selectedBook$ = actions.goToBookView$;
-  //.map(({data})=>data)
+  // .map(({data})=>data)
   // for android action
   /* function canPop(navigator){
     return (navigator && navigator.getCurrentRoutes().length > 1)
@@ -241,10 +241,10 @@ let navigatorPushRequest$ = actions
                .fromPromise(
                  AsyncStorage.setItem(STORAGE_KEY,JSON.stringify(inbox)))
     });*/
-  var booksLoadingState$ = actions.requestBooks$.map((_)=> true)
+  var booksLoadingState$ = actions.requestBooks$.map((_) => true)
                                   .merge(
-                                    //response event
-                                    actions.booksResponse$.map((_)=>false));
+                                    // response event
+                                    actions.booksResponse$.map((_) => false));
   /* searchRequest$,statusRequest$
      searchRequest,statusRequest, */
 
@@ -256,19 +256,19 @@ let navigatorPushRequest$ = actions
       { key: 'Main' },
     ],
   };
-  //const navigationState$ = Rx.Observable.just(initialNavigationState)
+  // const navigationState$ = Rx.Observable.just(initialNavigationState)
   const navigationState$ =
   Rx.Observable
     .merge(
       actions.goToInboxView$,
       actions.goToSearchView$,
-      //actions.goToSectionView$,
-      //actions.goToBookView$,
+      // actions.goToSectionView$,
+      // actions.goToBookView$,
       actions.back$,
     )
     .distinctUntilChanged(navigationState =>
       navigationState, (a, b) => {
-        if (a.type === `back` && b.type === `back`) {
+        if (a.type === 'back' && b.type === 'back') {
           return false;
         }
 

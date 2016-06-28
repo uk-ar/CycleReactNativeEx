@@ -1,5 +1,5 @@
 const STORAGE_KEY = '@CycleReactNativeEx:inBox';
-//books search api cannot use query keyword
+// books search api cannot use query keyword
 const RAKUTEN_SEARCH_API =
 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&booksGenreId=001&applicationId=1088506385229803383&formatVersion=2&keyword=';
 
@@ -63,8 +63,8 @@ function makeEventEmitterDriver() {
   return function eventEmitterDriver(outgoing$) {
     outgoing$.subscribe(outgoing =>
       eventEmitter.emit(outgoing.event, outgoing.args));
-    //event is string
-    //args is array
+    // event is string
+    // args is array
     return {
       events: function events(event) {
         return Rx.Observable.fromEvent(eventEmitter, event);
@@ -84,11 +84,11 @@ function makeEventEmitterDriver() {
      setState{
      vtree:
      }) */
-//func() can use this.props & this.props$
-//func() returns DOM & value
-//then subscribe DOM & setstate
-//and subscribe value & onNext
-//call func
+// func() can use this.props & this.props$
+// func() returns DOM & value
+// then subscribe DOM & setstate
+// and subscribe value & onNext
+// call func
 /* const sinks = {
              compo:compo
              DOM: vtree,

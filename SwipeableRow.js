@@ -41,90 +41,90 @@ var {
   height,
 } = Dimensions.get('window');
 
-//variable for debug layout
-//var SWIPEABLE_MAIN_WIDTH = 300;
+// variable for debug layout
+// var SWIPEABLE_MAIN_WIDTH = 300;
 var SWIPEABLE_MAIN_WIDTH = width;
 
 var Expandable = React.createClass({
-  getInitialState: function () {
+  getInitialState() {
     return {
       index: 0,
       width: 0.001,
     };
   },
 
-  componentWillMount: function () {
+  componentWillMount() {
     this.thresholds = [];
     this.setState({ width: this.props.width });
   },
 
-  componentWillReceiveProps: function (nextProps) {
-    //console.log("next:%O",nextProps);
+  componentWillReceiveProps(nextProps) {
+    // console.log("next:%O",nextProps);
     var width = nextProps.width;
-    this.setState({ width: width });
-    if (this.props.lock) {return; }
-    //this.width = width;
+    this.setState({ width });
+    if (this.props.lock) { return; }
+    // this.width = width;
     if ((this.state.index < this.props.components.length - 1) &&
        (this.thresholds[this.state.index] < width)) {
       this.setState({ index: this.state.index + 1 });
-      //console.log("set+1");
+      // console.log("set+1");
       this.props.onResize &&
       this.props.onResize(this.state.index + 1);
-    }else if ((0 < this.state.index) &&
+    } else if ((0 < this.state.index) &&
              (width < this.thresholds[this.state.index - 1])) {
       this.setState({ index: this.state.index - 1 });
-      //console.log("set-1");
+      // console.log("set-1");
       this.props.onResize &&
       this.props.onResize(this.state.index - 1);
     }
   },
 
-  render: function () {
-    //render method called according to width
-    //console.log("this.props:%O", this.props)
-    //this.child exposed to parent
-    //console.log("this.state.width:%O",this.state.width);
-    //if (this.thresholds.length !== this.props.components.length){
+  render() {
+    // render method called according to width
+    // console.log("this.props:%O", this.props)
+    // this.child exposed to parent
+    // console.log("this.state.width:%O",this.state.width);
+    // if (this.thresholds.length !== this.props.components.length){
     if (Object.keys(this.thresholds).length !== this.props.components.length)
     {
       return (
-        //TODO:...this.props
-        //use onFirstLayout
+        // TODO:...this.props
+        // use onFirstLayout
         // row->buttons({width})->selectableView({viewIndex})
-        //TODO:optimize
-        //this.setState({index:0})
+        // TODO:optimize
+        // this.setState({index:0})
         <View>
-        {this.props.components.map((elem, i)=> {
-            return (
-              
+        {this.props.components.map((elem, i) => {
+          return (
 
 
 <View
-                  key={i}
-                  style={{ position: 'absolute' }}
-                  onLayout={({ nativeEvent:{ layout:{ width, height } } })=> {
-                      //console.log("i:%O,w:%O",i,width);
-                      //style={[this.props.style,{position:"absolute"}]}
-                      //style={[this.props.style]}
-                      //{padding:10,margin:7,position:"absolute"}47,120,220
-                      //{padding:10,position:"absolute"}47,120,220
-                      //{position:"absolute"}27,100,200
-                      this.thresholds[i] = width;
-                    }}>
+  key={i}
+  style={{ position: 'absolute' }}
+  onLayout={({ nativeEvent: { layout: { width, height } } }) => {
+                      // console.log("i:%O,w:%O",i,width);
+                      // style={[this.props.style,{position:"absolute"}]}
+                      // style={[this.props.style]}
+                      // {padding:10,margin:7,position:"absolute"}47,120,220
+                      // {padding:10,position:"absolute"}47,120,220
+                      // {position:"absolute"}27,100,200
+    this.thresholds[i] = width;
+  }}
+>
                {elem}
              </View>
-            );})}
+            ); })}
       </View>);
-    }else {
-      //console.log("this.thresholds1:%O",this.thresholds);
+    } else {
+      // console.log("this.thresholds1:%O",this.thresholds);
       return (
         <View
-            style={[this.props.style, { width: this.state.width }]}
+          style={[this.props.style, { width: this.state.width }]}
         >
           {this.props.components[this.state.index]}
         </View>);
     }
-    //return(this.child)
+    // return(this.child)
   },
 });
 
@@ -140,60 +140,60 @@ var AnimatedExpandable = Animated.createAnimatedComponent(Expandable);
    })
    }}>foo</Text>
    </AnimatableBackGroundColor> */
-//TODO:migrate to AnimatableView
+// TODO:migrate to AnimatableView
 var AnimatableBackGroundColor = React.createClass({
-  componentWillMount: function () {
+  componentWillMount() {
     this.colorIndex = new Animated.Value(this.props.colorIndex);
   },
 
-  componentWillReceiveProps: function (nextProps) {
-    //animated
+  componentWillReceiveProps(nextProps) {
+    // animated
     if (nextProps.colorIndex != this.props.colorIndex) {
       Animated.timing(
         this.colorIndex,
-        { toValue: nextProps.colorIndex,//interpolate?
-        duration: 360 } //TODO:add props
+        { toValue: nextProps.colorIndex, // interpolate?
+        duration: 360 } // TODO:add props
       ).start();
     }
   },
 
-  render: function () {
+  render() {
     return (
-      //AnimatableBackGroundColor and children can expose method?
-      <Animated.View {...this.props} style = {[this.props.style, {
-          backgroundColor: this.colorIndex.interpolate({
-            inputRange: _.range(this.props.colors.length),
-            outputRange: this.props.colors,
-          }),
-        },
+      // AnimatableBackGroundColor and children can expose method?
+      <Animated.View {...this.props} style={[this.props.style, {
+        backgroundColor: this.colorIndex.interpolate({
+          inputRange: _.range(this.props.colors.length),
+          outputRange: this.props.colors,
+        }),
+      },
         ]}>
         {this.props.children}
       </Animated.View>);
   },
 });
 
-//Visible toggle hidden display
+// Visible toggle hidden display
 var AnimatableView = React.createClass({
-  getInitialState: function () {
+  getInitialState() {
     return {
       style: this.props.style,
     };
   },
 
-  componentWillMount: function () {
+  componentWillMount() {
     this.animating = false;
   },
 
-  _onLayout: function ({ nativeEvent: { layout: { x, y, width, height } } }) {
+  _onLayout({ nativeEvent: { layout: { x, y, width, height } } }) {
     this.props.onLayout && this.props.onLayout(
       { nativeEvent: { layout: { x, y, width, height } } });
-    if (this.animating) {return; }
+    if (this.animating) { return; }
 
     this.contentHeight = height;
     this.contentWidth = width;
   },
 
-  componentWillReceiveProps: function (nextProps) {
+  componentWillReceiveProps(nextProps) {
     var current = StyleSheet.flatten(this.props.style);
     var next = StyleSheet.flatten(nextProps.style);
     var style = Object.assign({}, next);
@@ -202,44 +202,44 @@ var AnimatableView = React.createClass({
                        .filter((key) =>
                          ((typeof current[key] !== 'string') ||
                           (key === 'backgroundColor')))
-                       .map((key)=> {
-                        if (current[key]) {
-                          style[key] = new Animated.Value(current[key]);
-                        }else if (key === 'height' || key === 'width') {
-                          style[key] = new Animated.Value(this.contentHeight);
-                        }
+                       .map((key) => {
+                         if (current[key]) {
+                           style[key] = new Animated.Value(current[key]);
+                         } else if (key === 'height' || key === 'width') {
+                           style[key] = new Animated.Value(this.contentHeight);
+                         }
 
-                        return key;
-                      }).map((key)=>
+                         return key;
+                       }).map((key) =>
                          Animated.timing(
                            style[key],
-                           { toValue: next[key] }//TODO:add props duration
-                         ));//null
-    //console.log("style:%O,%O",current,next);
-    //console.log("a:%O,%O",values,style);
-    //TODO:may heavy?
-    this.setState({ style: style });
+                           { toValue: next[key] }// TODO:add props duration
+                         ));// null
+    // console.log("style:%O,%O",current,next);
+    // console.log("a:%O,%O",values,style);
+    // TODO:may heavy?
+    this.setState({ style });
 
     if (values.length !== 0) {
       this.animating = true;
-      Animated.parallel(values).start((e)=> {
+      Animated.parallel(values).start((e) => {
         this.animating = false;
-        //always animated...
+        // always animated...
         this.props.onAnimationEnd &&
                          this.props.onAnimationEnd();
       });
-      //trac for re-render children
+      // trac for re-render children
     }
   },
 
-  render: function () {
-    //drop own props
+  render() {
+    // drop own props
     var { style, ...props } = this.props;
     return (
       <Animated.View
-          {...props}
-          style={this.state.style}
-          onLayout={this._onLayout}
+        {...props}
+        style={this.state.style}
+        onLayout={this._onLayout}
       >
         {this.props.children}
       </Animated.View>);
@@ -247,7 +247,7 @@ var AnimatableView = React.createClass({
 });
 
 var SwipeableButtons = React.createClass({
-  getInitialState: function () {
+  getInitialState() {
     return {
       componentIndex: 0,
       width: new Animated.Value(0.001),
@@ -255,9 +255,9 @@ var SwipeableButtons = React.createClass({
     };
   },
 
-  componentWillMount: function () {
+  componentWillMount() {
     this.colors = this.props.buttons.map(
-      (elem, i)=> elem.props.backgroundColor);
+      (elem, i) => elem.props.backgroundColor);
     this.styles = this.props.direction == 'left' ? [{
       flexDirection: 'row',
       alignItems: 'center',
@@ -295,15 +295,15 @@ var SwipeableButtons = React.createClass({
     }];
   },
 
-  componentWillReceiveProps: function (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.width != this.props.width) {
       this.setState({ width: new Animated.Value(nextProps.width) });
     }
   },
-  //shuld handle in parent?
-  release: function (callback) {
-    //need release listener?
-    //Execute button action
+  // shuld handle in parent?
+  release(callback) {
+    // need release listener?
+    // Execute button action
     var currentButton = this.props.buttons[this.state.componentIndex];
     var close = currentButton.props.close;
     this.setState({ releasing: true });
@@ -313,25 +313,25 @@ var SwipeableButtons = React.createClass({
         this.state.width,
         { toValue: close ? SWIPEABLE_MAIN_WIDTH : 0.001,
         duration: 180 }
-      ).start((e)=> {
-        //called when animation finished
+      ).start((e) => {
+        // called when animation finished
         resolve(close);
         console.log('callReleasefunc');
         if (!close) {
           this.setState({
             releasing: false,
             componentIndex: 0,
-          }, ()=> {
-            //delete data
+          }, () => {
+            // delete data
             console.log('callReleasefunc0');
             currentButton.props.onRelease && currentButton.props.onRelease();
           }
           );
-        }else {
+        } else {
           this.setState({
             releasing: false,
-          }, ()=> {
-            //delete data
+          }, () => {
+            // delete data
             console.log('callReleasefunc1');
             currentButton.props.onRelease && currentButton.props.onRelease();
           }
@@ -341,67 +341,69 @@ var SwipeableButtons = React.createClass({
     });
   },
 
-  render: function () {
+  render() {
     var styles = this.styles;
     var { width, ...props } = this.props;
     //               colors={this.props.colors}
-    //console.log("w:%O", width);
+    // console.log("w:%O", width);
     return (
       <AnimatableBackGroundColor {...props}
-               colors={this.colors}
-               colorIndex={this.state.componentIndex}>
+        colors={this.colors}
+        colorIndex={this.state.componentIndex}
+      >
         <AnimatedExpandable
-            width={this.state.width.interpolate({
-                inputRange: [0,   0.01, 1],
-                outputRange: [0.01, 0.01, 1],
-              })}
-            lock={this.state.releasing}
-            style={{
-                //width={this.state.width}
-                //width={50}
-                //width cannot shrink under padding
-                //height:50,//TODO:support height centering
-                justifyContent: 'center',
+          width={this.state.width.interpolate({
+            inputRange: [0, 0.01, 1],
+            outputRange: [0.01, 0.01, 1],
+          })}
+          lock={this.state.releasing}
+          style={{
+                // width={this.state.width}
+                // width={50}
+                // width cannot shrink under padding
+                // height:50,//TODO:support height centering
+            justifyContent: 'center',
                 //lock={this.releasing}
-              }}
-            onResize={(i)=> {
-                //TODO:shuld call from first time?
-                this.setState({ componentIndex: i });
-              }}
+          }}
+          onResize={(i) => {
+                // TODO:shuld call from first time?
+            this.setState({ componentIndex: i });
+          }}
 
-            components={this.props.buttons.map((elem, i)=> {
-                return (React.cloneElement(
+          components={this.props.buttons.map((elem, i) => {
+            return (React.cloneElement(
                   elem,
                   { style: [
                     elem.props.style,
                     styles[i],
-                  ] })); //for merge backgroundColor
-              })}
+                  ] })); // for merge backgroundColor
+          })}
         />
       </AnimatableBackGroundColor>);
   },
 });
 
 var MeasureableView = React.createClass({
-  //TODO:remove this.mounted
-  //TODO:position absolute
-  render: function () {
+  // TODO:remove this.mounted
+  // TODO:position absolute
+  render() {
     return this.mounted ? (
       <View
-          {...this.props}>
+        {...this.props}
+      >
         {this.props.children}
       </View>) : (
-        
 
 
 <View
-            {...this.props}
-            onLayout={({ nativeEvent: { layout: { x, y, width, height } } })=> {
-                this.props.onFirstLayout &&
+  {...this.props}
+  onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
+    this.props.onFirstLayout &&
                 this.props.onFirstLayout(
                   { nativeEvent: { layout: { x, y, width, height } } });
-                this.mounted = true;
-              }}>
+    this.mounted = true;
+  }}
+>
           {this.props.children}
         </View>
       );
@@ -459,70 +461,70 @@ var MeasureableView = React.createClass({
  * })*/
 
 var AnimView = React.createClass({
-  //Use LayoutAnimation if you want to use height or width null
-  getInitialState: function () {
+  // Use LayoutAnimation if you want to use height or width null
+  getInitialState() {
     return {
       animatedStyle: StyleSheet.flatten(this.props.style),
     };
   },
 
-  componentWillMount: function () {
+  componentWillMount() {
     this.prevStyle = StyleSheet.flatten(this.props.style);
-    //this.animating = false;
+    // this.animating = false;
   },
 
-  animate: function (nextStyle) {
-      //duration,easing jquery
-      console.log('animate');
-      //this.animating = true;
-      this.counter = new Animated.Value(0);
-      const current = StyleSheet.flatten(this.prevStyle);
-      const next = StyleSheet.flatten(nextStyle);
-      var animatedStyle = Object.assign({}, next);
+  animate(nextStyle) {
+      // duration,easing jquery
+    console.log('animate');
+      // this.animating = true;
+    this.counter = new Animated.Value(0);
+    const current = StyleSheet.flatten(this.prevStyle);
+    const next = StyleSheet.flatten(nextStyle);
+    var animatedStyle = Object.assign({}, next);
 
-      //console.log("rec",current,this.prevStyle,next,animatedStyle);
+      // console.log("rec",current,this.prevStyle,next,animatedStyle);
 
-      Object.keys(next).map((key)=> {
-          //remove if with filter & merge
-          //console.log("k:",key,typeof next[key] === "number",key == "backgroundColor" || key == "color",current[key] != next[key],current[key],next[key])
-          if ((typeof next[key] === 'number' ||
+    Object.keys(next).map((key) => {
+          // remove if with filter & merge
+          // console.log("k:",key,typeof next[key] === "number",key == "backgroundColor" || key == "color",current[key] != next[key],current[key],next[key])
+      if ((typeof next[key] === 'number' ||
               key.endsWith('Color') || key == 'color')
               && current[key] !== next[key]
           ) {
-            //console.log("an",current[key],next[key]);
-            animatedStyle[key] = this.counter.interpolate({
-              inputRange: [0, 1],
-              outputRange: [current[key], next[key]],
-            });
-          }
+            // console.log("an",current[key],next[key]);
+        animatedStyle[key] = this.counter.interpolate({
+          inputRange: [0, 1],
+          outputRange: [current[key], next[key]],
         });
+      }
+    });
 
-      this.prevStyle = next;
-      return new Promise((resolve, reject) => {
-        this.setState({ animatedStyle: animatedStyle }, ()=> {
-          Animated.timing(
+    this.prevStyle = next;
+    return new Promise((resolve, reject) => {
+      this.setState({ animatedStyle }, () => {
+        Animated.timing(
             this.counter,
             { toValue: 1,
             duration: 180 }
-          ).start(()=> {
+          ).start(() => {
             resolve();
           });
-        });
       });
-    },
+    });
+  },
 
-  componentWillReceiveProps: function (nextProps) {
+  componentWillReceiveProps(nextProps) {
     console.log('willReceiveProps');
     this.animate(nextProps.style);
   },
 
-  render: function () {
-    //console.log("rend anim,view1,view2",this.state.animatedStyle,this.props.style)
+  render() {
+    // console.log("rend anim,view1,view2",this.state.animatedStyle,this.props.style)
     return (
-      //style={[this.state.style,]}
+      // style={[this.state.style,]}
       <Animated.View
-      {...this.props}
-      style={[this.state.animatedStyle]}
+        {...this.props}
+        style={[this.state.animatedStyle]}
       >
         {this.props.children}
       </Animated.View>);
@@ -530,99 +532,101 @@ var AnimView = React.createClass({
 });
 
 var SwipeableButtons2 = React.createClass({
-  getInitialState: function () {
+  getInitialState() {
     return {
       index: 0,
     };
   },
 
-  componentWillMount: function () {
+  componentWillMount() {
     this.thresholds = [];
     this.releasing = false;
   },
 
-  release: function () {
+  release() {
     var close = this.currentButton.props.close;
     this.releasing = true;
 
     Animated.timing(this.props.width,
-                    { toValue:  !close ? 0.001 :
+                    { toValue: !close ? 0.001 :
                      this.props.direction == 'left' ? SWIPEABLE_MAIN_WIDTH
                    : -SWIPEABLE_MAIN_WIDTH,
                     duration: 180 }
-    ).start(()=> {
+    ).start(() => {
       this.currentButton.props.onRelease &&
       this.currentButton.props.onRelease();
       this.releasing = false;
     });
   },
 
-  render: function () {
+  render() {
     /* width={Animated.multiply(this._panX,-1)}*/
-    //console.log("mul",Animated.multiply(this._panX,-1))
-    //console.log("buttons")
-    //react-native cannot set width for clipped subview in ios
+    // console.log("mul",Animated.multiply(this._panX,-1))
+    // console.log("buttons")
+    // react-native cannot set width for clipped subview in ios
     var { width, props } = this.props;
     this.currentButton = this.props.buttons[this.state.index];
     if (this.props.direction == 'right') {
       this.width = Animated.multiply(this.props.width, -1);
-    }else {
+    } else {
       this.width = this.props.width;
     }
 
     if (Object.keys(this.thresholds).length !== this.props.buttons.length) {
-      //not measured
+      // not measured
       return (
         <View
-            {...props}
-            style={{ flexDirection: 'row',
+          {...props}
+          style={{ flexDirection: 'row',
                     opacity: 0,
                     width: 0.01,
-                    overflow: 'hidden' }}>
-          {this.props.buttons.map((button, i, array)=>
-          
+                    overflow: 'hidden' }}
+        >
+          {this.props.buttons.map((button, i, array) =>
 
 
 <MeasureableView
-             ref={i}
-             key={i}
-             onFirstLayout={
-               ({ nativeEvent:{ layout:{ x, y, width, height } } })=> {
-                this.thresholds[i] = width;
-                if (Object.keys(this.thresholds).length == array.length) {
-                  //console.log(this.thresholds)
-                  this.props.width.addListener(({ value:value }) => {
-                    if (this.releasing) {return; }
+  ref={i}
+  key={i}
+  onFirstLayout={
+               ({ nativeEvent: { layout: { x, y, width, height } } }) => {
+                 this.thresholds[i] = width;
+                 if (Object.keys(this.thresholds).length == array.length) {
+                  // console.log(this.thresholds)
+                   this.props.width.addListener(({ value: value }) => {
+                     if (this.releasing) { return; }
 
-                    var index = calcIndex(value, this.thresholds);
-                    if (this.props.direction == 'right') {
-                      index = calcIndex(-value, this.thresholds);
-                    }
+                     var index = calcIndex(value, this.thresholds);
+                     if (this.props.direction == 'right') {
+                       index = calcIndex(-value, this.thresholds);
+                     }
 
-                    if (index != -1 && this.state.index != index) {
-                      this.setState({ index: index });
-                    }
-                  });
-                  this.setState({ index: 0 });//for re-render
-                }
-              }}>
+                     if (index != -1 && this.state.index != index) {
+                       this.setState({ index });
+                     }
+                   });
+                   this.setState({ index: 0 });// for re-render
+                 }
+               }}
+>
            {button}
              </MeasureableView>
             )}
          </View>);
-    }else {
+    } else {
       console.log('rend buttons');
       return (
         <AnimView
-            {...props}
-            style={[{
-                overflow: 'hidden',
-                //height:30 * (this.state.index+1),
-                backgroundColor: this.currentButton.props.backgroundColor,
-                width: this.width.interpolate({
-                  inputRange: [0,   0.01, 1],
-                  outputRange: [0.01, 0.01, 1],
-                }) }, this.props.style]}>
+          {...props}
+          style={[{
+            overflow: 'hidden',
+                // height:30 * (this.state.index+1),
+            backgroundColor: this.currentButton.props.backgroundColor,
+            width: this.width.interpolate({
+              inputRange: [0, 0.01, 1],
+              outputRange: [0.01, 0.01, 1],
+            }) }, this.props.style]}
+        >
             {this.props.buttons[this.state.index]}
           </AnimView>);
     }
@@ -635,16 +639,16 @@ function calcIndex(value, thresholds) {
   });
 }
 
-//scroll view base
-//ref: http://browniefed.com/blog/react-native-animated-listview-row-swipe/
+// scroll view base
+// ref: http://browniefed.com/blog/react-native-animated-listview-row-swipe/
 var SwipeableRow2 = React.createClass({
-  getInitialState: function () {
+  getInitialState() {
     return {
       positiveSwipe: true,
     };
   },
 
-  componentWillMount: function () {
+  componentWillMount() {
     this._panX = new Animated.Value(0.01);
 
     this._panResponder = PanResponder.create({
@@ -652,7 +656,7 @@ var SwipeableRow2 = React.createClass({
       onStartShouldSetPanResponder: (evt, gestureState) => false,
       onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
-        //allow vertical scroll
+        // allow vertical scroll
         return Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
             && Math.abs(gestureState.dx) > 10;
       },
@@ -663,7 +667,7 @@ var SwipeableRow2 = React.createClass({
 
       onPanResponderMove: (evt, gestureState) => {
         this._panX.setValue(gestureState.dx);
-        //https://github.com/facebook/react-native/issues/1705
+        // https://github.com/facebook/react-native/issues/1705
         if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
             && Math.abs(gestureState.dx) > 10) {
           this.props.onPanResponderMove &&
@@ -680,59 +684,61 @@ var SwipeableRow2 = React.createClass({
       onPanResponderRelease: (evt, gestureState) => {
         if (this.state.positiveSwipe) {
           this.refs.leftButtons.release();
-        }else {
+        } else {
           this.refs.rightButtons.release();
         }
       },
 
       onShouldBlockNativeResponder: (evt, gestureState) => true,
     });
-    this._panX.addListener(({ value:value }) => {
+    this._panX.addListener(({ value: value }) => {
       if (0 < value && this.state.positiveSwipe != true) {
         this.setState({ positiveSwipe: true });
-      }else if (value <= 0 && this.state.positiveSwipe != false) {
+      } else if (value <= 0 && this.state.positiveSwipe != false) {
         this.setState({ positiveSwipe: false });
       }
     });
   },
 
-  render: function () {
+  render() {
     console.log('sr2:');
     return (
       <View
-          {...this._panResponder.panHandlers}
-          style={{ flexDirection: 'row',
+        {...this._panResponder.panHandlers}
+        style={{ flexDirection: 'row',
                   justifyContent: this.state.positiveSwipe ?
                                   'flex-start' : 'flex-end',
                   overflow: 'hidden',
                   //TODO:vertical stretch will fixed in RN 0.28?
                   //https://github.com/facebook/react-native/commit/d95757037aef3fbd8bb9064e667ea4fea9e5abc1
                   //alignItems:"stretch"
-                }}>
+                }}
+      >
          <SwipeableButtons2
-            ref="leftButtons"
-            direction="left"
-            width={this._panX}
-            buttons={this.props.leftButtons}
-        />
+           ref="leftButtons"
+           direction="left"
+           width={this._panX}
+           buttons={this.props.leftButtons}
+         />
          <View
-            style={[{ width: width,//expand to cell width
-    }, this.props.style]}>
+           style={[{ width, //expand to cell width
+    }, this.props.style]}
+         >
            {this.props.children}
          </View>
          <SwipeableButtons2
-            ref="rightButtons"
-            direction="right"
-            width={this._panX}
-            buttons={this.props.rightButtons}
-        />
+           ref="rightButtons"
+           direction="right"
+           width={this._panX}
+           buttons={this.props.rightButtons}
+         />
        </View>
     );
   },
 });
 
 var SwipeableRow = React.createClass({
-  componentWillMount: function () {
+  componentWillMount() {
     this._panX = new Animated.Value(0);
 
     this._panResponder = PanResponder.create({
@@ -753,78 +759,78 @@ var SwipeableRow = React.createClass({
         if (0 < this.state.left) {
           console.log('this.refs.leftButtons.refs.node:%O',
                       this.refs.leftButtons.refs.node);
-          this.refs.leftButtons.release().then((close)=> {
-            //if(close){this.setState({hidden:true})}
+          this.refs.leftButtons.release().then((close) => {
+            // if(close){this.setState({hidden:true})}
           });
-        }else {
-          this.refs.rightButtons.release().then((close)=> {
-            //if(close){this.setState({hidden:true})}
+        } else {
+          this.refs.rightButtons.release().then((close) => {
+            // if(close){this.setState({hidden:true})}
           });
         }
       },
 
       onShouldBlockNativeResponder: (evt, gestureState) => true,
     });
-    this._panX.addListener(({ value:value }) => {
-      //if(0 < value){
-      //}
-      //TODO:heavy
+    this._panX.addListener(({ value: value }) => {
+      // if(0 < value){
+      // }
+      // TODO:heavy
       this.setState({ left: value });
     });
   },
 
-  getInitialState: function () {
+  getInitialState() {
     return {
-      left: 0.01,//changed when move & release
+      left: 0.01, // changed when move & release
       positiveSwipe: true,
       width: null,
     };
   },
 
-  render: function () {
+  render() {
     var leftButtons = (
-      //cannot convert animatedvalue because of release function
-      //<SwipeableButtons
+      // cannot convert animatedvalue because of release function
+      // <SwipeableButtons
       <SwipeableButtons
-          ref="leftButtons"
-          direction="left"
-          width={this.state.left}
-          buttons={this.props.leftButtons}
-          style={{ justifyContent: 'center',//vertical center
+        ref="leftButtons"
+        direction="left"
+        width={this.state.left}
+        buttons={this.props.leftButtons}
+        style={{ justifyContent: 'center', //vertical center
     }}
       />);
-    //button input color, component, release action
-    //close flag is parent props
+    // button input color, component, release action
+    // close flag is parent props
     var rightButtons = (
       <SwipeableButtons
-          ref="rightButtons"
-          direction="right"
-          width={-this.state.left}
-          buttons={this.props.rightButtons}
-          style={{ justifyContent: 'center',
+        ref="rightButtons"
+        direction="right"
+        width={-this.state.left}
+        buttons={this.props.rightButtons}
+        style={{ justifyContent: 'center',
                   overflow: 'hidden' }}
       />
     );
 
     return (
-      //onFirstLayout
+      // onFirstLayout
       <MeasureableView
-          onFirstLayout={({ nativeEvent: { layout: { x, y, width, height } } })=> {
-              this.setState({ width: width });
-            }}
+        onFirstLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
+          this.setState({ width });
+        }}
 
-          style={{
-            flexDirection: 'row',
-            //TODO:vertical stretch will fixed in RN 0.28?
-            //https://github.com/facebook/react-native/commit/d95757037aef3fbd8bb9064e667ea4fea9e5abc1
-            alignItems: 'stretch',
-            justifyContent: 0 < this.state.left ? 'flex-start' : 'flex-end',
-            overflow: 'hidden',
-          }}
-          {...this._panResponder.panHandlers}
+        style={{
+          flexDirection: 'row',
+            // TODO:vertical stretch will fixed in RN 0.28?
+            // https://github.com/facebook/react-native/commit/d95757037aef3fbd8bb9064e667ea4fea9e5abc1
+          alignItems: 'stretch',
+          justifyContent: 0 < this.state.left ? 'flex-start' : 'flex-end',
+          overflow: 'hidden',
+        }}
+        {...this._panResponder.panHandlers}
       >
         {leftButtons}
-        <View style={[{ width: this.state.width },//fixed width
+        <View style={[{ width: this.state.width }, // fixed width
                       this.props.style]}>
           {this.props.children}
         </View>

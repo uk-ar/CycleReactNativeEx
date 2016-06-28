@@ -28,34 +28,34 @@ import {
   PanResponder,
 } from 'react-native';
 
-//rx js output confusing message when component not imported
+// rx js output confusing message when component not imported
 
 var BookScreen = React.createClass({
   /* render: function(){
      generateCycleRender(this.myRender)
      }, */
-  render: function () {
+  render() {
     return (
       <CycleView style={{ flex: 1 }}>
         <ToolbarAndroid
-            actions={[]}
-            navIcon={require('image!ic_arrow_back_white_24dp')}
-            style={styles.toolbar}
-            titleColor="white"
-            selector = "back"
-            //title={route.movie.title}
-            //title = "book"
+          actions={[]}
+          navIcon={require('image!ic_arrow_back_white_24dp')}
+          style={styles.toolbar}
+          titleColor="white"
+          selector="back"
+            // title={route.movie.title}
+            // title = "book"
         />
-        <WebView url = {this.props.url}
-                 domStorageEnabled={true}
-                 startInLoadingState={true}
-                 javaScriptEnabled={true}
-                 style={styles.WebViewContainer}
+        <WebView url={this.props.url}
+          domStorageEnabled
+          startInLoadingState
+          javaScriptEnabled
+          style={styles.WebViewContainer}
         />
       </CycleView>
     );
-    //TODO:navigationBar
-    //https://github.com/facebook/react-native/blob/cd89016ee7168bb6971f800779e0878e9a70206f/Examples/UIExplorer/Navigator/NavigationBarSample.js
+    // TODO:navigationBar
+    // https://github.com/facebook/react-native/blob/cd89016ee7168bb6971f800779e0878e9a70206f/Examples/UIExplorer/Navigator/NavigationBarSample.js
     /* 'document.querySelector("[value$=\'カートに入れる\']").click()'
        injectedJavaScript='document.querySelector(".button").click()'
        onError = {i => console.log("on err:%O", i)}

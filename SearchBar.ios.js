@@ -29,28 +29,28 @@ import {
 let { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
 
 var SearchBar = React.createClass({
-  render: function () {
-    //there is a search for ios
-    //https://github.com/umhan35/react-native-search-bar
-    //TODO:Add Icon
+  render() {
+    // there is a search for ios
+    // https://github.com/umhan35/react-native-search-bar
+    // TODO:Add Icon
     return (
-      <CycleView style = {styles.searchBar} key = "search">
+      <CycleView style={styles.searchBar} key="search">
         <Image
-            source={require('image!android_search_white')}
-            style={styles.icon}
+          source={require('image!android_search_white')}
+          style={styles.icon}
         />
         <TextInput
-            autoCapitalize="none"
-            autoCorrect={false}
-            onChange={this.props.onSearchChange}
-            placeholder="Search a movie..."
-            onFocus={this.props.onFocus}
-            style={styles.searchBarInput}
-            selector = "text-input"
+          autoCapitalize="none"
+          autoCorrect={false}
+          onChange={this.props.onSearchChange}
+          placeholder="Search a movie..."
+          onFocus={this.props.onFocus}
+          style={styles.searchBarInput}
+          selector="text-input"
         />
         <ActivityIndicatorIOS
-            animating={this.props.isLoading}
-            style={styles.spinner}
+          animating={this.props.isLoading}
+          style={styles.spinner}
         />
       </CycleView>
     );
@@ -59,8 +59,8 @@ var SearchBar = React.createClass({
 
 var styles = StyleSheet.create({
   searchBar: {
-    //mergin for status bar?
-    //statusBarFrame.size.height
+    // mergin for status bar?
+    // statusBarFrame.size.height
     marginTop: 64,
     padding: 3,
     paddingLeft: 8,
