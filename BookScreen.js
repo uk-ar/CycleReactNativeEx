@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
+let { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
 var Icon = require('react-native-vector-icons/FontAwesome');
 
 import {
@@ -34,9 +34,9 @@ var BookScreen = React.createClass({
   /* render: function(){
      generateCycleRender(this.myRender)
      }, */
-  render: function() {
-    return(
-      <CycleView style={{flex: 1}}>
+  render: function () {
+    return (
+      <CycleView style={{ flex: 1 }}>
         <ToolbarAndroid
             actions={[]}
             navIcon={require('image!ic_arrow_back_white_24dp')}
@@ -53,18 +53,18 @@ var BookScreen = React.createClass({
                  style={styles.WebViewContainer}
         />
       </CycleView>
-    )
-      //TODO:navigationBar
-      //https://github.com/facebook/react-native/blob/cd89016ee7168bb6971f800779e0878e9a70206f/Examples/UIExplorer/Navigator/NavigationBarSample.js
-      /* 'document.querySelector("[value$=\'カートに入れる\']").click()'
-         injectedJavaScript='document.querySelector(".button").click()'
-         onError = {i => console.log("on err:%O", i)}
-         onLoad = {i => console.log("on load:%O", i)}
-         onLoadEnd = {i => console.log("on load end:%O", i)}
-         onLoadStart = {i => console.log("on load start:%O", i)}
-         onNavigationStateChange = {i => console.log("on nav:%O", i)}
-       */
-  }
+    );
+    //TODO:navigationBar
+    //https://github.com/facebook/react-native/blob/cd89016ee7168bb6971f800779e0878e9a70206f/Examples/UIExplorer/Navigator/NavigationBarSample.js
+    /* 'document.querySelector("[value$=\'カートに入れる\']").click()'
+       injectedJavaScript='document.querySelector(".button").click()'
+       onError = {i => console.log("on err:%O", i)}
+       onLoad = {i => console.log("on load:%O", i)}
+       onLoadEnd = {i => console.log("on load end:%O", i)}
+       onLoadStart = {i => console.log("on load start:%O", i)}
+       onNavigationStateChange = {i => console.log("on nav:%O", i)}
+     */
+  },
 });
 
 var styles = StyleSheet.create({
@@ -74,7 +74,7 @@ var styles = StyleSheet.create({
   },
   WebViewContainer: {
     flex: 1,
-  }
+  },
 });
 
 module.exports = BookScreen;

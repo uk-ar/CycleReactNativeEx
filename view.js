@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 var FAIcon = require('react-native-vector-icons/FontAwesome');
-import materialColor from 'material-colors'
+import materialColor from 'material-colors';
 
 import {
   TouchableOpacity,
@@ -35,19 +35,18 @@ import {
 import NavigationStateUtils from 'NavigationStateUtils';
 
 import Touchable from '@cycle/react-native/src/Touchable';
-Touchable["TouchableElement"] = Touchable.TouchableHighlight;
-var TouchableElement=TouchableHighlight;
+Touchable['TouchableElement'] = Touchable.TouchableHighlight;
+var TouchableElement = TouchableHighlight;
 if (Platform.OS === 'android') {
-  Touchable["TouchableElement"] = Touchable.TouchableNativeFeedback;
-  TouchableElement=TouchableNativeFeedback;
+  Touchable['TouchableElement'] = Touchable.TouchableNativeFeedback;
+  TouchableElement = TouchableNativeFeedback;
 }
 
+Touchable['FAIcon'] = Touchable.createCycleComponent(
+  FAIcon, Touchable.PRESS_ACTION_TYPES);
 
-Touchable["FAIcon"] = Touchable.createCycleComponent(
-  FAIcon,Touchable.PRESS_ACTION_TYPES);
-
-function onNavigateBack(action){
-  console.log("on:%O",action)
+function onNavigateBack(action) {
+  console.log('on:%O', action);
   const backActionHandler = getBackHandler();
   if (action.type === 'back' || action.type === 'BackAction') {
     backActionHandler.send();
@@ -56,7 +55,8 @@ function onNavigateBack(action){
 
 import NavigationCardStackStyleInterpolator from 'NavigationCardStackStyleInterpolator';
 
-function emptyFunction(){};
+function emptyFunction() {}
+
 function renderVCard(vdom, navigationProps) {
   return (
     //      onNavigate={onNavigateBack}
@@ -71,6 +71,7 @@ function renderVCard(vdom, navigationProps) {
     />
   );
 }
+
 function renderCard(vdom, navigationProps) {
   return (
     //      onNavigate={onNavigateBack}
@@ -87,11 +88,11 @@ function renderCard(vdom, navigationProps) {
   );
 }
 
-let {SearchScreen, InBoxScreen, GiftedNavigator,BookListView} = require('./SearchScreen');
+let { SearchScreen, InBoxScreen, GiftedNavigator, BookListView } = require('./SearchScreen');
 var SearchBar = require('./SearchBar');
-function SearchView({booksWithStatus,booksLoadingState}){
+function SearchView({ booksWithStatus, booksLoadingState }) {
   //console.log('navigationProps', model);
-  return(
+  return (
     <View style={styles.container}
           key = "searchScreen">
       <SearchBar
@@ -103,11 +104,12 @@ function SearchView({booksWithStatus,booksLoadingState}){
                     selectedOption='検索'
       />
     </View>
-  )
-};
-function InboxView({booksWithStatus,booksLoadingState}){
+  );
+}
+
+function InboxView({ booksWithStatus, booksLoadingState }) {
   //console.log('navigationProps', model);
-  return(
+  return (
     <View style={styles.container}
           key = "searchScreen">
       <View style={styles.separator} />
@@ -115,38 +117,38 @@ function InboxView({booksWithStatus,booksLoadingState}){
                     selectedOption='読みたい'
       />
     </View>
-  )
-};
+  );
+}
 
-import {BookCell,SwipeableRow} from './BookCell';
-Touchable["BookCell"] = Touchable.createCycleComponent(
-  BookCell,{
-    onRelease:'release',
+import { BookCell, SwipeableRow } from './BookCell';
+Touchable['BookCell'] = Touchable.createCycleComponent(
+  BookCell, {
+    onRelease: 'release',
   });
 
 var MyListView = React.createClass({
   //remove this.state.dataSource && this._listView
   propTypes: {
-    items: React.PropTypes.array.isRequired,
+    //items: React.PropTypes.array.isRequired,
     //selectedSection:selectedSection
   },
-  getInitialState(){
+  getInitialState() {
     const dataSource = new ListView.DataSource({
       //rowHasChanged: (r1, r2) => r1 !== r2,
       rowHasChanged: (r1, r2) => r1 !== r2,
-      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
     });
-    return {dataSource:dataSource.cloneWithRowsAndSections(this.props.items)};
+    return { dataSource: dataSource.cloneWithRowsAndSections(this.props.items) };
   },
 
-  componentWillReceiveProps({items,offset}) {
+  componentWillReceiveProps({ items, offset }) {
     /* if(this._listView && this.props.){
        this._listView.scrollTo({y:this.props.offset,animated:false})
        } */
 
     if (items !== this.props.items) {
       this.setState(
-        {dataSource: this.state.dataSource.cloneWithRowsAndSections(items)});
+        { dataSource: this.state.dataSource.cloneWithRowsAndSections(items) });
     }
   },
 
@@ -156,7 +158,7 @@ var MyListView = React.createClass({
 
   render() {
     //https://github.com/babel/babel-eslint/issues/95#issuecomment-102170872
-    const {items:_, ...listViewProps} = this.props;
+    const { items:_, ...listViewProps } = this.props;
     console.log(this._listView);
     return (
       //onResponderMove is too premitive
@@ -167,7 +169,7 @@ var MyListView = React.createClass({
           dataSource={this.state.dataSource}
           enableEmptySections={true}
           renderRow={(item, sectionID, rowID)=> {
-              if(item.isbn == undefined){
+              if (item.isbn == undefined) {
                 return (
                   <Touchable.TouchableElement
                   selector="section"
@@ -178,111 +180,120 @@ var MyListView = React.createClass({
                       </Text>
                     </View>
                   </Touchable.TouchableElement>
-                )
-              }else{
-                return(
+                );
+              }else {
+                return (
                   <Touchable.BookCell
                                 key={rowID}
                   selector="bookcell"
-                  onPanResponderMove={()=>{
-                      this._listView.setNativeProps({scrollEnabled:false})
+                  onPanResponderMove={()=> {
+                      this._listView.setNativeProps({ scrollEnabled: false });
                     }}
-                  onPanResponderEnd={()=>{
-                      this._listView.setNativeProps({scrollEnabled:true})
+
+                  onPanResponderEnd={()=> {
+                      this._listView.setNativeProps({ scrollEnabled: true });
                     }}
+
                   book={item}
                   title={sectionID}
-                  style ={{backgroundColor:materialColor.grey["50"]
-                  }}/>
-                )
+                  style ={{ backgroundColor: materialColor.grey['50'],
+                }}/>
+                );
               }
             }}
+
           {...listViewProps}
       />
     );
-  }
+  },
 });
 
-function booksToObject(books){
-  var obj={};
-  books.forEach((book)=>{
-    if(book.isbn){
-      obj["isbn-"+book.isbn]=book;
-    }else{
-      obj[book.key]=book;
+function booksToObject(books) {
+  var obj = {};
+  books.forEach((book)=> {
+    if (book.isbn) {
+      obj['isbn-' + book.isbn] = book;
+    }else {
+      obj[book.key] = book;
     }
   });
   return obj;
 }
 
-import {AnimView} from './SwipeableRow';
+import { AnimView } from './SwipeableRow';
 
 var Header = React.createClass({
-  getInitialState: function(){
-    return({toggle:true})
+  getInitialState: function () {
+    return ({ toggle: true });
   },
-  render: function(){
-    console.log("render header pad?",this.state.toggle)
-    return(
-      <View style={{padding:10,}}
+
+  render: function () {
+    console.log('render header pad?', this.state.toggle);
+    return (
+      
+
+
+
+
+<View style={{ padding: 10 }}
           >
         <AnimView
             ref="view1"
             style={{
               //height:this.state.toggle ? 10 : 20,
-              height:10,
-              backgroundColor:this.state.toggle ? "black" : "white",
+              height: 10,
+              backgroundColor: this.state.toggle ? 'black' : 'white',
             }}
         />
         <AnimView
             ref="view2"
             style={{
-                height:10,
-                backgroundColor:"green",}}
+                height: 10,
+                backgroundColor: 'green' }}
         />
         <Text
-            style={{color:"white"}}
-            onPress={()=>{
+            style={{ color: 'white' }}
+            onPress={()=> {
                 this.refs.view2.animate({
-                  height:10,
-                  backgroundColor:"yellow",
+                  height: 10,
+                  backgroundColor: 'yellow',
                 });
               }}>
-          {"animate"}
+          {'animate'}
         </Text>
         <Text
-            style={{color:"white"}}
-            onPress={()=>{
-                this.setState((prev,current)=>({toggle:!prev.toggle}))
+            style={{ color: 'white' }}
+            onPress={()=> {
+                this.setState((prev, current)=>({ toggle: !prev.toggle }));
               }}>
-          {"toggle"}
+          {'toggle'}
         </Text>
-      </View>)
+      </View>);
   },
 });
 
-function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
-  let borrowedBooks = allBooks.filter((book)=>book.bucket=="borrowed");
-  let likedBooks = allBooks.filter((book)=>book.bucket=="liked");
-  let doneBooks = allBooks.filter((book)=>book.bucket=="done");
+function MainView({ searchedBooks, allBooks, booksLoadingState, selectedSection }) {
+  let borrowedBooks = allBooks.filter((book)=>book.bucket == 'borrowed');
+  let likedBooks = allBooks.filter((book)=>book.bucket == 'liked');
+  let doneBooks = allBooks.filter((book)=>book.bucket == 'done');
   //todo transition to detail view
   var allItems = {
-    "検索"   :searchedBooks,
-    "読みたい":likedBooks,
-    "借りてる":borrowedBooks,
-    "読んだ"  :doneBooks,
-  }
-  console.log("render main");
+    '検索': searchedBooks,
+    '読みたい': likedBooks,
+    '借りてる': borrowedBooks,
+    '読んだ': doneBooks,
+  };
+  console.log('render main');
   //LayoutAnimation.easeInEaseOut();
-  var items={};
-  var header=null;
-  var closeButton=null;
+  var items = {};
+  var header = null;
+  var closeButton = null;
   //console.log("se:%O",selectedSection);
-  if(selectedSection == null){
-    const limit=2;
-    Object.keys(allItems).map((key)=>{
-      items[key]=booksToObject(allItems[key].slice(0,limit));
-      items[key][key]={type:"term",count:allItems[key].length};
+  if (selectedSection == null) {
+    const limit = 2;
+    Object.keys(allItems).map((key)=> {
+      items[key] = booksToObject(allItems[key].slice(0, limit));
+      items[key][key] = { type: 'term', count: allItems[key].length };
     });
     /* var items={
       "検索":booksToObject(searchedBooks,limit),
@@ -290,31 +301,32 @@ function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
       "借りてる":booksToObject(borrowedBooks,limit),
       "読んだ":booksToObject(doneBooks,limit),
     }*/
-    header=(
+    header = (
       <Header />
-    )
-  }else{
-    closeButton=(
+    );
+  }else {
+    closeButton = (
       <Touchable.FAIcon
       name="close"
       selector="close"
       payload="contentOffset.y"
       size={20}
-      style={{marginRight:5}}/>
-    )
+      style={{ marginRight: 5 }}/>
+    );
     //detail view
-    items[selectedSection]=booksToObject(allItems[selectedSection]);
-    items[selectedSection][selectedSection]=
-      {type:"term",count:allItems[selectedSection].length};
+    items[selectedSection] = booksToObject(allItems[selectedSection]);
+    items[selectedSection][selectedSection] =
+      { type: 'term', count: allItems[selectedSection].length };
     //console.log("detail",items)
-  };
+  }
+
   return (
     //main
     <View
         key="main"
         style={{
-          flex:1,
-          backgroundColor:"#1A237E",//indigo 900
+          flex: 1,
+          backgroundColor: '#1A237E',//indigo 900
           //backgroundColor:"#263238",//blue grey 800
         }}>
       {header}
@@ -335,75 +347,77 @@ function MainView({searchedBooks,allBooks,booksLoadingState,selectedSection}){
                      </Text>
                     </View>
                  </Touchable.TouchableElement>
-               )
-             }}
+               );
+              }}
+
            style={{
-               paddingHorizontal:3,
-               //height:100,
-             }}
+              paddingHorizontal: 3,
+              //height:100,
+            }}
         />
       </View>
-    )
-};
+    );
+}
 
-function BookView({booksWithStatus,booksLoadingState,selectedBook}){
+function BookView({ booksWithStatus, booksLoadingState, selectedBook }) {
   //console.log('navigationProps', model);
-  return(
+  return (
     <View style={{
-        flex:1,
-        backgroundColor:"#1A237E",//indigo 900
+        flex: 1,
+        backgroundColor: '#1A237E',//indigo 900
         //backgroundColor:"#263238",//blue grey 800
       }}>
       <Text>
         {selectedBook}
       </Text>
     </View>
-  )
-};
+  );
+}
 
-function view(model){
+function view(model) {
   /* NavigationExperimental.Transitioner calls twice when layout changed in
      android. But NavigationExperimental.CardStack cannot re-render by model
      change.So we should add random key or force update*/
   //http://stackoverflow.com/a/35004739
-  var navigationState=
+  var navigationState =
     NavigationStateUtils.replaceAtIndex(
       model.navigationState,//navigationState
       model.navigationState.index,//index
-      {key:model.navigationState.routes[model.navigationState.index].key,
-       id:Math.random(),
-      }//route
-    )//
-  console.log("mynav",navigationState);
-    return(
-      //<NavigationExperimental.Transitioner
-      <NavigationExperimental.CardStack
-      style={{flex: 1}}
-      navigationState={navigationState}
-      onNavigate={onNavigateBack}
-      renderScene={(navigationProps) => {
-          console.log("MyNav:renderScene",navigationProps);
-          //const key = navigationProps.scene.navigationState.key;
-          const key = navigationProps.scene.route.key;
-          switch (key) {
-            case 'Search':
-              return renderCard(SearchView(model), navigationProps);
-            case 'Inbox':
-              return renderCard(InboxView(model), navigationProps);
-            case 'Main':
-              //return (MainView(model))
-              return renderCard(MainView(model), navigationProps);
-            case 'Book':
-              return renderCard(BookView(model), navigationProps);
-            default:
-              console.error('Unexpected view', navigationProps,
-                            navigationProps.scene.navigationState);
-              return (<Text>bar</Text>)
-              //renderCard(<Text>Everything is fucked</Text>, navigationProps);
-          }
-        }}
-      />)
-};
+      { key: model.navigationState.routes[model.navigationState.index].key,
+      id: Math.random(),
+    }//route
+    );//
+  console.log('mynav', navigationState);
+  return (
+    //<NavigationExperimental.Transitioner
+    <NavigationExperimental.CardStack
+    style={{ flex: 1 }}
+    navigationState={navigationState}
+    onNavigate={onNavigateBack}
+    renderScene={(navigationProps) => {
+        console.log('MyNav:renderScene', navigationProps);
+        //const key = navigationProps.scene.navigationState.key;
+        const key = navigationProps.scene.route.key;
+        switch (key) {
+          case 'Search':
+            return renderCard(SearchView(model), navigationProps);
+          case 'Inbox':
+            return renderCard(InboxView(model), navigationProps);
+          case 'Main':
+            //return (MainView(model))
+            return renderCard(MainView(model), navigationProps);
+          case 'Book':
+            return renderCard(BookView(model), navigationProps);
+          default:
+            console.error('Unexpected view', navigationProps,
+                          navigationProps.scene.navigationState);
+            return (<Text>bar</Text>);
+            //renderCard(<Text>Everything is fucked</Text>, navigationProps);
+        }
+      }}
+
+    />);
+}
 /* renderOverlay={(props)=>{
    return (
    //NavigationExperimental.Header is not deplicated, but no examples.
@@ -413,6 +427,6 @@ function view(model){
    )
    }}
  */
-import {styles} from './styles';
+import { styles } from './styles';
 
 module.exports = view;

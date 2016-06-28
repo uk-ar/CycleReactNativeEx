@@ -26,13 +26,13 @@ import {
   PanResponder,
 } from 'react-native';
 
-let {makeReactNativeDriver, generateCycleRender} = require('@cycle/react-native');
+let { makeReactNativeDriver, generateCycleRender } = require('@cycle/react-native');
 import Touchable from '@cycle/react-native/src/Touchable';
 
 var IS_RIPPLE_EFFECT_SUPPORTED = Platform.Version >= 21;
 
 var SearchBar = React.createClass({
-  render: function() {
+  render: function () {
     var loadingView;
     //FIXME:dynamic view and cycle view?
     if (this.props.isLoading) {
@@ -48,6 +48,7 @@ var SearchBar = React.createClass({
                         key = "loadingView"
                         style={styles.spinner} />;
     }
+
     var background = IS_RIPPLE_EFFECT_SUPPORTED ?
       TouchableNativeFeedback.SelectableBackgroundBorderless() :
       TouchableNativeFeedback.SelectableBackground();
@@ -80,7 +81,7 @@ var SearchBar = React.createClass({
         {loadingView}
       </View>
     );
-  }
+  },
 });
 
 var styles = StyleSheet.create({
@@ -97,7 +98,7 @@ var styles = StyleSheet.create({
     color: 'white',
     height: 50,
     padding: 0,
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
   },
   spinner: {
     width: 30,

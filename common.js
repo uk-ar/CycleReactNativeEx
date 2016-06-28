@@ -1,76 +1,76 @@
-const STORAGE_KEY = '@CycleReactNativeEx:inBox'
+const STORAGE_KEY = '@CycleReactNativeEx:inBox';
 //books search api cannot use query keyword
 const RAKUTEN_SEARCH_API =
-'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&booksGenreId=001&applicationId=1088506385229803383&formatVersion=2&keyword='
+'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&booksGenreId=001&applicationId=1088506385229803383&formatVersion=2&keyword=';
 
-const LIBRARY_ID = "Tokyo_Fuchu";
+const LIBRARY_ID = 'Tokyo_Fuchu';
 
-const CALIL_STATUS_API = `http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=${LIBRARY_ID}&format=json&isbn=`
+const CALIL_STATUS_API = `http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=${LIBRARY_ID}&format=json&isbn=`;
 
 var MOCKED_MOVIES_DATA = [
-  {title: "ぐりとぐらの絵本7冊セット", author: "",
-   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/2147/9784834032147.jpg?_ex=200x200",
-   libraryStatus: {
-     exist: false,
-     rentable: false,
-     reserveUrl: ""
-   },
-   isbn: "9784834032147",
-   active: true
+  { title: 'ぐりとぐらの絵本7冊セット', author: '',
+  thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/2147/9784834032147.jpg?_ex=200x200',
+  libraryStatus: {
+    exist: false,
+    rentable: false,
+    reserveUrl: '',
   },
-  {title: "はじめてのABCえほん", author: "仲田利津子/黒田昌代",
-   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200",
-   isbn: "9784828867472",
-   active: true
+  isbn: '9784834032147',
+  active: true,
+},
+  { title: 'はじめてのABCえほん', author: '仲田利津子/黒田昌代',
+  thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200',
+  isbn: '9784828867472',
+  active: true,
+},
+  { title: 'ぐりとぐら(複数蔵書)', author: '中川李枝子/大村百合子',
+  thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/0825/9784834000825.jpg?_ex=200x200', isbn: '9784834000825',
+  libraryStatus: {
+    exist: true,
+    rentable: true,
+    reserveUrl: 'http://api.calil.jp/reserve?id=af299d780fe86cf8b116dfda4725dc0f',
   },
-  {title: "ぐりとぐら(複数蔵書)", author: "中川李枝子/大村百合子",
-   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/0825/9784834000825.jpg?_ex=200x200", isbn: "9784834000825",
-   libraryStatus: {
-     exist: true,
-     rentable: true,
-     reserveUrl: "http://api.calil.jp/reserve?id=af299d780fe86cf8b116dfda4725dc0f"
-   },
-   active: true
+  active: true,
+},
+  { title: 'ぐりとぐらの1ねんかん(単一蔵書)',
+  author: '中川李枝子/山脇百合子（絵本作家）', isbn: '9784834014655',
+  libraryStatus: {
+    exist: true,
+    rentable: true,
+    reserveUrl: 'https://library.city.fuchu.tokyo.jp/licsxp-opac/WOpacTifTilListToTifTilDetailAction.do?tilcod=1009710046217' },
+  thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/4655/9784834014655.jpg?_ex=200x200',
+  active: true,
+},
+  { title: 'IA／UXプラクティス',
+  author: '坂本貴史',
+  isbn: '9784862463241',
+  libraryStatus: {
+    exist: true,
+    rentable: false,
+    reserveUrl: '',
   },
-  {title: "ぐりとぐらの1ねんかん(単一蔵書)",
-   author: "中川李枝子/山脇百合子（絵本作家）", isbn: "9784834014655",
-   libraryStatus: {
-     exist: true,
-     rentable: true,
-     reserveUrl: "https://library.city.fuchu.tokyo.jp/licsxp-opac/WOpacTifTilListToTifTilDetailAction.do?tilcod=1009710046217"},
-   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/4655/9784834014655.jpg?_ex=200x200",
-   active: true
-  },
-  {title: "IA／UXプラクティス",
-   author: "坂本貴史",
-   isbn: "9784862463241",
-   libraryStatus: {
-     exist: true,
-     rentable: false,
-     reserveUrl: ""
-   },
-   thumbnail: "http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/3241/9784862463241.jpg?_ex=200x200",
-   active: true
-  }
+  thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/3241/9784862463241.jpg?_ex=200x200',
+  active: true,
+},
   //size 200x200 largeImageUrl 64x64
 ];
 
 var EventEmitter = require('EventEmitter');
 let Rx = require('rx');
 
-function makeEventEmitterDriver(){
-  var eventEmitter =new EventEmitter();
-  return function eventEmitterDriver(outgoing$){
+function makeEventEmitterDriver() {
+  var eventEmitter = new EventEmitter();
+  return function eventEmitterDriver(outgoing$) {
     outgoing$.subscribe(outgoing =>
-      eventEmitter.emit(outgoing.event,outgoing.args))
-      //event is string
-      //args is array
-      return{
-        events: function events(event) {
-          return Rx.Observable.fromEvent(eventEmitter,event)
-        }
-      }
-  }
+      eventEmitter.emit(outgoing.event, outgoing.args));
+    //event is string
+    //args is array
+    return {
+      events: function events(event) {
+        return Rx.Observable.fromEvent(eventEmitter, event);
+      },
+    };
+  };
 }
 
 /* function CycleCompo(source,func){
@@ -84,18 +84,18 @@ function makeEventEmitterDriver(){
      setState{
      vtree:
      }) */
-          //func() can use this.props & this.props$
-  //func() returns DOM & value
-  //then subscribe DOM & setstate
-  //and subscribe value & onNext
-          //call func
-          /* const sinks = {
+//func() can use this.props & this.props$
+//func() returns DOM & value
+//then subscribe DOM & setstate
+//and subscribe value & onNext
+//call func
+/* const sinks = {
              compo:compo
              DOM: vtree,
              value$,
              };
              return sinks; */
-  /* },
+/* },
      render():{
      return this.state.vtree
      }
@@ -103,9 +103,9 @@ function makeEventEmitterDriver(){
      });
      return compo
      }; */
-  /* CycleCompo1 = CycleCompo(source) */
-  /* render=CycleCompo1.DOM */
-  /* FooView=CycleCompo1.Compo */
+/* CycleCompo1 = CycleCompo(source) */
+/* render=CycleCompo1.DOM */
+/* FooView=CycleCompo1.Compo */
 
 module.exports = {
   STORAGE_KEY,
@@ -114,4 +114,4 @@ module.exports = {
   CALIL_STATUS_API,
   MOCKED_MOVIES_DATA,
   makeEventEmitterDriver,
-}
+};

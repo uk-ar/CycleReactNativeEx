@@ -3,13 +3,13 @@
 import React, { Component } from 'react';
 let Rx = require('rx');
 var _ = require('lodash');
-let {run} = require('@cycle/core');
-let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
-let {makeHTTPDriver} = require('@cycle/http');
+let { run } = require('@cycle/core');
+let { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
+let { makeHTTPDriver } = require('@cycle/http');
 
 var Icon = require('react-native-vector-icons/FontAwesome');
 var BookScreen = require('./BookScreen');
-let {SearchScreen, InBoxScreen, GiftedNavigator} = require('./SearchScreen');
+let { SearchScreen, InBoxScreen, GiftedNavigator } = require('./SearchScreen');
 
 let {
   STORAGE_KEY,
@@ -51,41 +51,41 @@ import NavigationStateUtils from 'NavigationStateUtils';
 const Realm = require('realm');
 class Book {}
 Book.schema = {
-  name: "Book",
-  primaryKey: "isbn",
-  properties:{
-    isbn:"string",
-    bucket: {type:"string", optional:true},
-    title: {type:"string", optional:true},
-    author: {type:"string", optional:true},
-    thumbnail:{type:"string", optional:true},
-    modifyDate:"date",
-  }
-}
-let realm = new Realm({schema:[Book],schemaVersion:3});
+  name: 'Book',
+  primaryKey: 'isbn',
+  properties: {
+    isbn: 'string',
+    bucket: { type: 'string', optional: true },
+    title: { type: 'string', optional: true },
+    author: { type: 'string', optional: true },
+    thumbnail: { type: 'string', optional: true },
+    modifyDate: 'date',
+  },
+};
+let realm = new Realm({ schema: [Book], schemaVersion: 3 });
 
-let mockBooks=[
-  {title:"like:SOFT SKILLS",isbn:"9784822251550",bucket:"liked",},
-  {title:"like:foo",isbn:"9784480064851",bucket:"liked",},
-  {title:"borrow:qux",isbn:"9784492314630",bucket:"borrowed",},
-  {title:"borrow:quxx",isbn:"9784798134208",bucket:"borrowed",},
-  {title:"done:bar",isbn:"9784105393069",bucket:"done",},
-  {title:"done:baz",isbn:"9784822285159",bucket:"done",},
-  {title:"done:toz",isbn:"9784757142794",bucket:"done",},
-]
-mockBooks //for lint
+let mockBooks = [
+  { title: 'like:SOFT SKILLS', isbn: '9784822251550', bucket: 'liked' },
+  { title: 'like:foo', isbn: '9784480064851', bucket: 'liked' },
+  { title: 'borrow:qux', isbn: '9784492314630', bucket: 'borrowed' },
+  { title: 'borrow:quxx', isbn: '9784798134208', bucket: 'borrowed' },
+  { title: 'done:bar', isbn: '9784105393069', bucket: 'done' },
+  { title: 'done:baz', isbn: '9784822285159', bucket: 'done' },
+  { title: 'done:toz', isbn: '9784757142794', bucket: 'done' },
+];
+mockBooks; //for lint
 
-realm.write(()=>{
+realm.write(()=> {
   /* mockBooks.reverse().map((book)=>{
       realm.create('Book',{...book,modifyDate: new Date(Date.now())},true)
      })*/
-})
+});
 
-var allBooks=realm.objects("Book")
-                  .sorted("modifyDate",true)//reverse sort
+var allBooks = realm.objects('Book')
+                  .sorted('modifyDate', true)//reverse sort
                   .map((elem)=>elem);
 
-function model(actions){
+function model(actions) {
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
 
   //model
@@ -97,94 +97,96 @@ function model(actions){
                                actions.booksStatus$.startWith([]),
                                (books, booksStatus) => {
       return books.map(book => {
-        if((booksStatus[book.isbn] !== undefined) && //not yet retrieve
+        if ((booksStatus[book.isbn] !== undefined) && //not yet retrieve
            //sub library exist?
-           (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)){
-             const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
-             //TODO:support error case
-             //if bookStatus.status == "Error"
-             var exist = Object.keys(bookStatus.libkey)
-                               .length !== 0;
-             var rentable = _.values(bookStatus.libkey)//Object.values
-                             .some(i => i === "貸出可");
-             book.libraryStatus = {
-               status: bookStatus.libkey,
-               reserveUrl: bookStatus.reserveurl,
-               rentable: rentable,
-               exist: exist
-             }}
+           (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)) {
+          const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
+          //TODO:support error case
+          //if bookStatus.status == "Error"
+          var exist = Object.keys(bookStatus.libkey)
+                            .length !== 0;
+          var rentable = _.values(bookStatus.libkey)//Object.values
+                          .some(i => i === '貸出可');
+          book.libraryStatus = {
+            status: bookStatus.libkey,
+            reserveUrl: bookStatus.reserveurl,
+            rentable: rentable,
+            exist: exist,
+          };
+        }
+
         return ({
-          title: book.title.replace(/^【バーゲン本】/, ""),
+          title: book.title.replace(/^【バーゲン本】/, ''),
           author: book.author,
           isbn: book.isbn,
           thumbnail: book.largeImageUrl,
           libraryStatus: book.libraryStatus,
-          active: true
-        })
+          active: true,
+        });
       }
-      )}).do(i => console.log("searchedBooks$:%O", i)
+      );}).do(i => console.log('searchedBooks$:%O', i)
       ).distinctUntilChanged();
-    /* .combineLatest(actions.openSwipe$.startWith(1), (books,rowID) => {
-       for (var i = 0; i < books.length; i++) {
-       if (i != rowID) books[i].active = false
-       else books[i].active = true
-       }
-       return books;
-       }) */
-    //.share();
-    /*
-  let navigatorPushRequest$ = actions
-              .openBook$
-              .map(i => {
-                if(i.libraryStatus && i.libraryStatus.exist){
-                  return i.libraryStatus.reserveUrl
-                }else{
-                  return i.thumbnail
-                }})
-    //.map(i => {return i.thumbnail})
-              .do(i => console.log("url:%O", i))
-    //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
-              .map(url => ({
-                title: 'detail',
-                component: BookScreen,
-                passProps: {url: url}
-       })); */
+  /* .combineLatest(actions.openSwipe$.startWith(1), (books,rowID) => {
+     for (var i = 0; i < books.length; i++) {
+     if (i != rowID) books[i].active = false
+     else books[i].active = true
+     }
+     return books;
+     }) */
+  //.share();
+  /*
+let navigatorPushRequest$ = actions
+            .openBook$
+            .map(i => {
+              if(i.libraryStatus && i.libraryStatus.exist){
+                return i.libraryStatus.reserveUrl
+              }else{
+                return i.thumbnail
+              }})
+  //.map(i => {return i.thumbnail})
+            .do(i => console.log("url:%O", i))
+  //.do(i => ToastAndroid.show(i, ToastAndroid.SHORT))
+            .map(url => ({
+              title: 'detail',
+              component: BookScreen,
+              passProps: {url: url}
+     })); */
 
   let allBooks$ = actions.changeBucket$.startWith(
     allBooks
-  ).scan((books, {type,book}) => {
-    console.log("type:",type);
+  ).scan((books, { type, book }) => {
+    console.log('type:', type);
     switch (type) {
       case 'remove':
-        return books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString())
+        return books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString());
       case 'add':
         return [book].concat(books);
       case 'replace':
-        return [book].concat(books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString()))
-     default:
-          return books;
+        return [book].concat(books.filter((elem)=> elem.isbn.toString() !== book.isbn.toString()));
+      default:
+        return books;
     }
   } //).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
-  ).do((books)=>{
-    realm.write(()=>{
-      books.map((book)=>{
-        realm.create('Book',book,true)
-      })
+  ).do((books)=> {
+    realm.write(()=> {
+      books.map((book)=> {
+        realm.create('Book', book, true);
+      });
     });
-  }).do((i)=> console.log("b&o:",i)
+  }).do((i)=> console.log('b&o:', i)
   ).shareReplay();
 
-            /* let borrowedBooks$ = allBooks$.map((books)=>
-               books.filter((book)=>book.bucket=="borrowed")
-               ).do((i)=>console.log("b:",i))
-               let likedBooks$ = allBooks$.map((books)=>
-               books.filter((book)=>book.bucket=="liked")
-               ).do((i)=>console.log("l:",i))
-               let doneBooks$ = allBooks$.map((books)=>
-               books.filter((book)=>book.bucket=="done")
-               ).do((i)=>console.log("d:",i))*/
-  let selectedBook$ = actions.goToBookView$
-                             //.map(({data})=>data)
+  /* let borrowedBooks$ = allBooks$.map((books)=>
+             books.filter((book)=>book.bucket=="borrowed")
+             ).do((i)=>console.log("b:",i))
+             let likedBooks$ = allBooks$.map((books)=>
+             books.filter((book)=>book.bucket=="liked")
+             ).do((i)=>console.log("l:",i))
+             let doneBooks$ = allBooks$.map((books)=>
+             books.filter((book)=>book.bucket=="done")
+             ).do((i)=>console.log("d:",i))*/
+  let selectedBook$ = actions.goToBookView$;
+  //.map(({data})=>data)
   // for android action
   /* function canPop(navigator){
     return (navigator && navigator.getCurrentRoutes().length > 1)
@@ -251,8 +253,8 @@ function model(actions){
     index: 0,
     title: 'Cycle Native',
     routes: [
-      {key: 'Main'},
-    ]
+      { key: 'Main' },
+    ],
   };
   //const navigationState$ = Rx.Observable.just(initialNavigationState)
   const navigationState$ =
@@ -267,9 +269,10 @@ function model(actions){
     .distinctUntilChanged(navigationState =>
       navigationState, (a, b) => {
         if (a.type === `back` && b.type === `back`) {
-          return false
+          return false;
         }
-        return a.key === b.key
+
+        return a.key === b.key;
       })
     .startWith(initialNavigationState)
     .scan((prevState, action) => {
@@ -285,15 +288,15 @@ function model(actions){
       }
     });
 
-  return  Rx.Observable
+  return Rx.Observable
             .combineLatest(searchedBooks$.startWith(MOCKED_MOVIES_DATA).distinctUntilChanged(),
                            allBooks$,
                            booksLoadingState$.startWith(false).distinctUntilChanged(),
                            navigationState$.distinctUntilChanged(),
                            selectedBook$.startWith(null).distinctUntilChanged(),
                            actions.selectedSection$.startWith(null),
-                           (searchedBooks,allBooks,booksLoadingState,navigationState,selectedBook,selectedSection) =>
-                             ({searchedBooks,allBooks,booksLoadingState,navigationState,selectedBook,selectedSection,}));
+                           (searchedBooks, allBooks, booksLoadingState, navigationState, selectedBook, selectedSection) =>
+                             ({ searchedBooks, allBooks, booksLoadingState, navigationState, selectedBook, selectedSection }));
 
   /*
   var state$ = {

@@ -15,9 +15,9 @@ TODO:
 import React, { Component } from 'react';
 let Rx = require('rx');
 var _ = require('lodash');
-let {run} = require('@cycle/core');
-import makeReactNativeDriver, {getBackHandler} from '@cycle/react-native/src/driver';
-let {makeHTTPDriver} = require('@cycle/http');
+let { run } = require('@cycle/core');
+import makeReactNativeDriver, { getBackHandler } from '@cycle/react-native/src/driver';
+let { makeHTTPDriver } = require('@cycle/http');
 
 var Icon = require('react-native-vector-icons/FontAwesome');
 
@@ -58,13 +58,13 @@ import NavigationStateUtils from 'NavigationStateUtils';
 
 UIManager.setLayoutAnimationEnabledExperimental &&   UIManager.setLayoutAnimationEnabledExperimental(true);
 
-let {SearchScreen, InBoxScreen, GiftedNavigator,BookListView} = require('./SearchScreen');
+let { SearchScreen, InBoxScreen, GiftedNavigator, BookListView } = require('./SearchScreen');
 
 var intent = require('./intent');
 var model = require('./model');
 var view = require('./view');
 
-function main({RN, HTTP, EE}) {
+function main({ RN, HTTP, EE }) {
   const actions = intent(RN, HTTP);
   const state$ = model(actions);
   //0192521722

@@ -26,10 +26,10 @@ import {
   PanResponder,
 } from 'react-native';
 
-let {makeReactNativeDriver, generateCycleRender, CycleView} = require('@cycle/react-native');
+let { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
 
 var SearchBar = React.createClass({
-  render: function() {
+  render: function () {
     //there is a search for ios
     //https://github.com/umhan35/react-native-search-bar
     //TODO:Add Icon
@@ -54,7 +54,7 @@ var SearchBar = React.createClass({
         />
       </CycleView>
     );
-  }
+  },
 });
 
 var styles = StyleSheet.create({

@@ -2,27 +2,27 @@ import {
   StyleSheet,
   PixelRatio,
 } from 'react-native';
-import materialColor from 'material-colors'
+import materialColor from 'material-colors';
 
 var cellWidth = 60;
 var styles = StyleSheet.create({
   //view.js
-  sectionHeader:{
-    backgroundColor:materialColor.grey["200"],
-    borderTopLeftRadius:5,
-    borderTopRightRadius:5,
+  sectionHeader: {
+    backgroundColor: materialColor.grey['200'],
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
     //marginTop:3,
-    padding:10,
-    flexDirection:"row",
+    padding: 10,
+    flexDirection: 'row',
   },
-  sectionFooter:{
+  sectionFooter: {
     //backgroundColor:materialColor.grey["200"],
-    backgroundColor:materialColor.grey["50"],
-    borderTopLeftRadius:0,
-    borderTopRightRadius:0,
-    borderRadius:5,
-    marginBottom:3,//separator is better?
-    padding:10,
+    backgroundColor: materialColor.grey['50'],
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderRadius: 5,
+    marginBottom: 3,//separator is better?
+    padding: 10,
     //height:30,
   },
   //for toolBar
@@ -30,7 +30,7 @@ var styles = StyleSheet.create({
     backgroundColor: '#e9eaed',
     height: 56,
   },
-  iconContainer:{
+  iconContainer: {
     /* backgroundColor: 'deepskyblue', */
     backgroundColor: 'orange',
     /* borderRadius: 15, */
@@ -38,12 +38,12 @@ var styles = StyleSheet.create({
     /* padding: 8, */
     paddingHorizontal: 8,
     paddingTop: 9,
-    paddingBottom: 7
+    paddingBottom: 7,
   },
   libIcon: {
     textAlign: 'center',
     width: 30,
-    color: "white",
+    color: 'white',
   },
   //for listview
   container: {
@@ -98,24 +98,24 @@ var styles = StyleSheet.create({
     height: 1 / PixelRatio.get(),
     marginLeft: 4,
   },
-  segmented:{
+  segmented: {
     flex: 1,
     backgroundColor: 'black',
   },
-  icon:{
+  icon: {
     //width: 50
   },
-  toolbarButton:{
+  toolbarButton: {
     //width: 50,            //Step 2
     //textAlign:'center',
-    flex:1                //Step 3
+    flex: 1,                //Step 3
   },
-  toolbarTitle:{
+  toolbarTitle: {
     //alignItems: 'center',
-    textAlign:'center',
-    fontWeight:'bold',
-    flex:1                //Step 3
+    textAlign: 'center',
+    fontWeight: 'bold',
+    flex: 1,                //Step 3
   },
 });
 
-module.exports = {styles,cellWidth};
+module.exports = { styles, cellWidth };
