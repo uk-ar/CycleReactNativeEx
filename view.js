@@ -155,7 +155,8 @@ var MyListView = React.createClass({
   },*/
 
   render() {
-    const {items, ...listViewProps} = this.props;
+    //https://github.com/babel/babel-eslint/issues/95#issuecomment-102170872
+    const {items:_, ...listViewProps} = this.props;
     console.log(this._listView);
     return (
       //onResponderMove is too premitive

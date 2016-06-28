@@ -73,6 +73,7 @@ let mockBooks=[
   {title:"done:baz",isbn:"9784822285159",bucket:"done",},
   {title:"done:toz",isbn:"9784757142794",bucket:"done",},
 ]
+mockBooks //for lint
 
 realm.write(()=>{
   /* mockBooks.reverse().map((book)=>{

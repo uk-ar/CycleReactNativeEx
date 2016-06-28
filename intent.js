@@ -77,8 +77,8 @@ function intent(RN, HTTP){
        navigatorBackPress$: RN.select('back').events('iconClicked'),*/
     goToInboxView$: RN.select('segmented').events('selection')
                       .distinctUntilChanged()
-                      .filter(([title,i])=>title=='読みたい')
-                      .map(profile=>({
+                      .filter(([title, _])=>title=='読みたい')
+                      .map(_=>({
                         type: 'push',
                         key: 'Inbox',
                       }))
@@ -86,8 +86,8 @@ function intent(RN, HTTP){
       ,
     goToSearchView$: RN.select('segmented').events('selection')
                        .distinctUntilChanged()
-                       .filter(([title,i])=>title=='検索')
-                       .map(profile=>({
+                       .filter(([title, _])=>title=='検索')
+                       .map(_=>({
                          type: 'push',
                          key: 'Search',
                        }))

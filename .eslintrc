@@ -13,6 +13,9 @@
   ],
   "rules": {
     "comma-dangle" : ["error","only-multiline"],
+    "no-unused-vars" : ["error", { "varsIgnorePattern": "_",
+                                   "args":"none",
+                                   "argsIgnorePattern": "_",}],
     "no-console" : "warn",
     "react/jsx-uses-vars": 1,
   },
