@@ -18,6 +18,8 @@
                                    "args":"none",
                                    "argsIgnorePattern": "_",}],
     "no-console" : "warn",
+    "react/prop-types": "warn",
+    "react/no-multi-comp": "warn",
     "react/jsx-uses-vars": "error",
     "import/no-unresolved":"off"
   },

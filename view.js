@@ -1,13 +1,9 @@
 import React from 'react';
 const FAIcon = require('react-native-vector-icons/FontAwesome');
 import materialColor from 'material-colors';
-
-import {
-  ListView,
-  Platform,
-  Text,
-  View,
-  NavigationExperimental,
+import { styles } from './styles';
+// there is 1 errors
+import { ListView, Platform, Text, View, NavigationExperimental,
 } from 'react-native';
 
 import NavigationStateUtils from 'NavigationStateUtils';
@@ -29,7 +25,7 @@ function onNavigateBack(action) {
   }
 }
 
-function renderCard(vdom, navigationProps) {
+function MyCard({ children, navigationProps }) {
   return (
     //      onNavigate={onNavigateBack}
     // NavigationExperimental.Card is not deplicated.
@@ -39,10 +35,10 @@ function renderCard(vdom, navigationProps) {
     // key={'View:' + navigationProps.scene.navigationState.key}
     <NavigationExperimental.Card
       {...navigationProps}
-      renderScene={() => vdom}
+      renderScene={() => children}
       onNavigate={onNavigateBack}
     />
-  );
+    );
 }
 
 import { BookCell } from './BookCell';
@@ -51,45 +47,44 @@ Touchable.BookCell = Touchable.createCycleComponent(
     onRelease: 'release',
   });
 
-var MyListView = React.createClass({
-  // remove this.state.dataSource && this._listView
-  propTypes: {
-    // items: React.PropTypes.array.isRequired,
-    // selectedSection:selectedSection
-  },
-  getInitialState() {
+class MyListView extends React.Component {
+  // remove this.state.dataSource && this.listview
+  constructor(props) {
+    super(props);
     const dataSource = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
       sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
     });
-    return { dataSource: dataSource.cloneWithRowsAndSections(this.props.items) };
-  },
+    this.state = {
+      dataSource: dataSource.cloneWithRowsAndSections(props.items)
+    };
+  }
 
   componentWillReceiveProps({ items, offset }) {
-    /* if(this._listView && this.props.){
-       this._listView.scrollTo({y:this.props.offset,animated:false})
+    /* if(this.listview && this.props.){
+       this.listview.scrollTo({y:this.props.offset,animated:false})
        } */
 
     if (items !== this.props.items) {
-      this.setState(
-        { dataSource: this.state.dataSource.cloneWithRowsAndSections(items) });
+      this.setState({
+        dataSource: this.state.dataSource.cloneWithRowsAndSections(items)
+      });
     }
-  },
-
+  }
   /* getScrollResponder() {
-    return this._listView.getScrollResponder();
+    return this.listview.getScrollResponder();
   },*/
 
   render() {
     // https://github.com/babel/babel-eslint/issues/95#issuecomment-102170872
     const { items: _, ...listViewProps } = this.props;
-    console.log(this._listView);
+    console.log(this.listview);
     return (
       // onResponderMove is too premitive
       //          directionalLockEnabled={true}
       // https://github.com/facebook/react-native/issues/6764
       <ListView
-        ref={listView => this._listView = listView}
+        ref={listView => (this.listview = listView)}
         dataSource={this.state.dataSource}
         enableEmptySections
         renderRow={(item, sectionID, rowID) => {
@@ -105,38 +100,43 @@ var MyListView = React.createClass({
                   </Text>
                 </View>
               </Touchable.TouchableElement>
-                );
-          } else {
-            return (
-              <Touchable.BookCell
-                key={rowID}
-                selector="bookcell"
-                onPanResponderMove={() => {
-                this._listView.setNativeProps({ scrollEnabled: false });
-                }}
-                onPanResponderEnd={() => {
-                    this._listView.setNativeProps({ scrollEnabled: true });
-                }}
-                book={item}
-                title={sectionID}
-                style={{ backgroundColor: materialColor.grey['50'],
-                }}
-              />
-                );
+            );
           }
+
+          return (
+            <Touchable.BookCell
+              key={rowID}
+              selector="bookcell"
+              onPanResponderMove={() => {
+                this.listView.setNativeProps({ scrollEnabled: false });
+              }}
+              onPanResponderEnd={() => {
+                this.listView.setNativeProps({ scrollEnabled: true });
+              }}
+              book={item}
+              title={sectionID}
+              style={{ backgroundColor: materialColor.grey['50'] }}
+            />);
         }}
 
         {...listViewProps}
       />
-    );
-  },
-});
+      );
+  }
+}
+
+MyListView.propTypes = {
+  items: React.PropTypes.array.isRequired,
+// selectedSection:selectedSection
+};
 
 function booksToObject(books) {
+  // https://github.com/eslint/eslint/issues/5284
+  /* eslint prefer-const:0 */
   let obj = {};
   books.forEach((book) => {
     if (book.isbn) {
-      obj['isbn-' + book.isbn] = book;
+      obj[`isbn-${book.isbn}!`] = book;
     } else {
       obj[book.key] = book;
     }
@@ -146,20 +146,22 @@ function booksToObject(books) {
 
 import { AnimView } from './SwipeableRow';
 
-var Header = React.createClass({
-  getInitialState() {
-    return ({ toggle: true });
-  },
+class Header extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { toggle: true };
+  }
 
   render() {
     console.log('render header pad?', this.state.toggle);
     return (
-
-<View style={{ padding: 10 }}>
+      <View
+        style={{ padding: 10 }}
+      >
         <AnimView
           ref="view1"
           style={{
-            // height:this.state.toggle ? 10 : 20,
+        // height:this.staten.toggle ? 10 : 20,
             height: 10,
             backgroundColor: this.state.toggle ? 'black' : 'white',
           }}
@@ -168,7 +170,8 @@ var Header = React.createClass({
           ref="view2"
           style={{
             height: 10,
-            backgroundColor: 'green', }}
+            backgroundColor: 'green',
+          }}
         />
         <Text
           style={{ color: 'white' }}
@@ -190,15 +193,15 @@ var Header = React.createClass({
           {'toggle'}
         </Text>
       </View>);
-  },
-});
+  }
+}
 
-function MainView({ searchedBooks, allBooks, booksLoadingState, selectedSection }) {
+function mainView({ searchedBooks, allBooks, booksLoadingState, selectedSection }) {
   const borrowedBooks = allBooks.filter((book) => book.bucket === 'borrowed');
   const likedBooks = allBooks.filter((book) => book.bucket === 'liked');
   const doneBooks = allBooks.filter((book) => book.bucket === 'done');
   // todo transition to detail view
-  var allItems = {
+  const allItems = {
     検索: searchedBooks,
     読みたい: likedBooks,
     借りてる: borrowedBooks,
@@ -206,15 +209,18 @@ function MainView({ searchedBooks, allBooks, booksLoadingState, selectedSection 
   };
   console.log('render main');
   // LayoutAnimation.easeInEaseOut();
-  var items = {};
-  var header = null;
-  var closeButton = null;
+  let items = {};
+  let header = null;
+  let closeButton = null;
   // console.log("se:%O",selectedSection);
   if (selectedSection === null) {
     const limit = 2;
-    Object.keys(allItems).map((key) => {
+    Object.keys(allItems).forEach((key) => {
       items[key] = booksToObject(allItems[key].slice(0, limit));
-      items[key][key] = { type: 'term', count: allItems[key].length };
+      items[key][key] = {
+        type: 'term',
+        count: allItems[key].length
+      };
     });
     /* var items={
       "検索":booksToObject(searchedBooks,limit),
@@ -237,9 +243,11 @@ function MainView({ searchedBooks, allBooks, booksLoadingState, selectedSection 
     );
     // detail view
     items[selectedSection] = booksToObject(allItems[selectedSection]);
-    items[selectedSection][selectedSection] =
-      { type: 'term', count: allItems[selectedSection].length };
-    // console.log("detail",items)
+    items[selectedSection][selectedSection] = {
+      type: 'term',
+      count: allItems[selectedSection].length
+    };
+  // console.log("detail",items)
   }
 
   return (
@@ -248,55 +256,37 @@ function MainView({ searchedBooks, allBooks, booksLoadingState, selectedSection 
       key="main"
       style={{
         flex: 1,
-        backgroundColor: '#1A237E', //indigo 900
-        //backgroundColor:"#263238",//blue grey 800
+        backgroundColor: '#1A237E', // indigo 900
+    // backgroundColor:"#263238",//blue grey 800
       }}
     >
       {header}
       <MyListView
         selectedSection={selectedSection}
         items={items}
-        renderSectionHeader={(sectionData, sectionID) => {
-          return (
-                  <Touchable.TouchableElement
-                    selector="section"
-                    key={sectionID}
-                    payload={sectionID}
-                  >
-                    <View
-                      style={styles.sectionHeader}
-                    >
-                            {closeButton}
-                      <Text>
-                            {sectionID}
-                     </Text>
-                    </View>
-                 </Touchable.TouchableElement>
-               );
-        }}
+        renderSectionHeader={(sectionData, sectionID) => <Touchable.TouchableElement
+          selector="section"
+          key={sectionID}
+          payload={sectionID}
+        >
+          <View
+            style={styles.sectionHeader}
+          >
+          {closeButton}
+            <Text>
+              {sectionID}
+            </Text>
+          </View>
+        </Touchable.TouchableElement>
+    }
 
         style={{
           paddingHorizontal: 3,
-          //height:100,
+    // height:100,
         }}
       />
-      </View>
-    );
-}
-
-function BookView({ booksWithStatus, booksLoadingState, selectedBook }) {
-  // console.log('navigationProps', model);
-  return (
-    <View style={{
-      flex: 1,
-      backgroundColor: '#1A237E', //indigo 900
-      //backgroundColor:"#263238",//blue grey 800
-    }}>
-      <Text>
-        {selectedBook}
-      </Text>
     </View>
-  );
+    );
 }
 
 function view(model) {
@@ -304,14 +294,14 @@ function view(model) {
      android. But NavigationExperimental.CardStack cannot re-render by model
      change.So we should add random key or force update*/
   // http://stackoverflow.com/a/35004739
-  var navigationState =
-    NavigationStateUtils.replaceAtIndex(
-      model.navigationState, // navigationState
-      model.navigationState.index, // index
-      { key: model.navigationState.routes[model.navigationState.index].key,
+  const navigationState = NavigationStateUtils.replaceAtIndex(
+    model.navigationState, // navigationState
+    model.navigationState.index, // index
+    {
+      key: model.navigationState.routes[model.navigationState.index].key,
       id: Math.random(),
-    }// route
-    );//
+    } // route
+  ); //
   console.log('mynav', navigationState);
   return (
     // <NavigationExperimental.Transitioner
@@ -321,23 +311,21 @@ function view(model) {
       onNavigate={onNavigateBack}
       renderScene={(navigationProps) => {
         console.log('MyNav:renderScene', navigationProps);
-        // const key = navigationProps.scene.navigationState.key;
+      // const key = navigationProps.scene.navigationState.key;
         const key = navigationProps.scene.route.key;
         switch (key) {
-          case 'Search':
-            return renderCard(SearchView(model), navigationProps);
-          case 'Inbox':
-            return renderCard(InboxView(model), navigationProps);
           case 'Main':
-            // return (MainView(model))
-            return renderCard(MainView(model), navigationProps);
-          case 'Book':
-            return renderCard(BookView(model), navigationProps);
+          // return (mainView(model))
+            return (
+              <MyCard navigationProps={navigationProps}>
+                {mainView(model)}
+              </MyCard>
+            );
           default:
             console.error('Unexpected view', navigationProps,
-                          navigationProps.scene.navigationState);
+            navigationProps.scene.navigationState);
             return (<Text>bar</Text>);
-            // renderCard(<Text>Everything is fucked</Text>, navigationProps);
+      // renderCard(<Text>Everything is fucked</Text>, navigationProps);
         }
       }}
 
@@ -352,6 +340,5 @@ function view(model) {
    )
    }}
  */
-import { styles } from './styles';
 
 module.exports = view;
