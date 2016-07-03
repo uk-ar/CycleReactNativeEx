@@ -3,7 +3,13 @@ const FAIcon = require('react-native-vector-icons/FontAwesome');
 import materialColor from 'material-colors';
 import { styles } from './styles';
 // there is 1 errors
-import { ListView, Platform, Text, View, NavigationExperimental,
+import {
+  ListView,
+  Platform,
+  Text,
+  View,
+  NavigationExperimental,
+  LayoutAnimation,
 } from 'react-native';
 
 import NavigationStateUtils from 'NavigationStateUtils';
@@ -78,7 +84,6 @@ class MyListView extends React.Component {
   render() {
     // https://github.com/babel/babel-eslint/issues/95#issuecomment-102170872
     const { items: _, ...listViewProps } = this.props;
-    console.log(this.listview);
     return (
       // onResponderMove is too premitive
       //          directionalLockEnabled={true}
@@ -87,38 +92,6 @@ class MyListView extends React.Component {
         ref={listView => (this.listview = listView)}
         dataSource={this.state.dataSource}
         enableEmptySections
-        renderRow={(item, sectionID, rowID) => {
-          if (item.isbn === undefined) {
-            return (
-              <Touchable.TouchableElement
-                selector="section"
-                payload={sectionID}
-              >
-                <View style={styles.sectionFooter}>
-                  <Text>
-                            {`すべて表示(${item.count})`}
-                  </Text>
-                </View>
-              </Touchable.TouchableElement>
-            );
-          }
-
-          return (
-            <Touchable.BookCell
-              key={rowID}
-              selector="bookcell"
-              onPanResponderMove={() => {
-                this.listView.setNativeProps({ scrollEnabled: false });
-              }}
-              onPanResponderEnd={() => {
-                this.listView.setNativeProps({ scrollEnabled: true });
-              }}
-              book={item}
-              title={sectionID}
-              style={{ backgroundColor: materialColor.grey['50'] }}
-            />);
-        }}
-
         {...listViewProps}
       />
       );
@@ -129,20 +102,6 @@ MyListView.propTypes = {
   items: React.PropTypes.array.isRequired,
 // selectedSection:selectedSection
 };
-
-function booksToObject(books) {
-  // https://github.com/eslint/eslint/issues/5284
-  /* eslint prefer-const:0 */
-  let obj = {};
-  books.forEach((book) => {
-    if (book.isbn) {
-      obj[`isbn-${book.isbn}!`] = book;
-    } else {
-      obj[book.key] = book;
-    }
-  });
-  return obj;
-}
 
 import { AnimView } from './SwipeableRow';
 
@@ -196,11 +155,69 @@ class Header extends React.Component {
   }
 }
 
+function ItemsFooter({ payload, count }) {
+  return (
+    <Touchable.TouchableElement
+      selector="section"
+      payload={payload}
+    >
+      <View style={styles.sectionFooter}>
+        <Text>
+          {`すべて表示(${count})`}
+        </Text>
+      </View>
+    </Touchable.TouchableElement>
+  );
+}
+
+function ItemsHeader({ selected, payload }) {
+  return (
+    <Touchable.TouchableElement
+      selector="section"
+      key={payload}
+      payload={payload}
+    >
+      <View style={styles.sectionHeader}>
+        {selected ?
+          <Touchable.FAIcon
+            name="close"
+            selector="close"
+            payload="contentOffset.y"
+            size={20}
+            style={{ marginRight: 5 }}
+          /> : null}
+        <Text>
+          {payload}
+        </Text>
+      </View>
+    </Touchable.TouchableElement>
+  );
+}
+
+function booksToObject(books) {
+  // https://github.com/eslint/eslint/issues/5284
+  /* eslint prefer-const:0 */
+  let obj = {};
+  books.forEach((book) => {
+    if (book.isbn) {
+      obj[`isbn-${book.isbn}!`] = book;
+    } else {
+      obj[book.key] = book.component;
+    }
+  });
+  return obj;
+}
+
 function mainView({ searchedBooks, allBooks, booksLoadingState, selectedSection }) {
   const borrowedBooks = allBooks.filter((book) => book.bucket === 'borrowed');
   const likedBooks = allBooks.filter((book) => book.bucket === 'liked');
   const doneBooks = allBooks.filter((book) => book.bucket === 'done');
   // todo transition to detail view
+  /* 検索: {
+     books:searchedBooks,
+     icons:
+     title:
+     }*/
   const allItems = {
     検索: searchedBooks,
     読みたい: likedBooks,
@@ -208,19 +225,32 @@ function mainView({ searchedBooks, allBooks, booksLoadingState, selectedSection 
     読んだ: doneBooks,
   };
   console.log('render main');
-  // LayoutAnimation.easeInEaseOut();
+  LayoutAnimation.easeInEaseOut();
+
   let items = {};
   let header = null;
   let closeButton = null;
   // console.log("se:%O",selectedSection);
   if (selectedSection === null) {
     const limit = 2;
+     // assign component to item
+     // TODO: verify layoutAnimation
     Object.keys(allItems).forEach((key) => {
-      items[key] = booksToObject(allItems[key].slice(0, limit));
-      items[key][key] = {
-        type: 'term',
-        count: allItems[key].length
-      };
+      if (key === '検索') {
+        items[key] = [];
+      } else {
+        items[key] = booksToObject(
+          allItems[key].slice(0, limit)
+                       .concat({
+                         key,
+                         component: (
+                           <ItemsFooter
+                             payload={key}
+                             count={allItems[key].length}
+                           />)
+                       }));
+      }
+       // console.log("i",items[key])
     });
     /* var items={
       "検索":booksToObject(searchedBooks,limit),
@@ -232,15 +262,6 @@ function mainView({ searchedBooks, allBooks, booksLoadingState, selectedSection 
       <Header />
     );
   } else {
-    closeButton = (
-      <Touchable.FAIcon
-        name="close"
-        selector="close"
-        payload="contentOffset.y"
-        size={20}
-        style={{ marginRight: 5 }}
-      />
-    );
     // detail view
     items[selectedSection] = booksToObject(allItems[selectedSection]);
     items[selectedSection][selectedSection] = {
@@ -251,33 +272,44 @@ function mainView({ searchedBooks, allBooks, booksLoadingState, selectedSection 
   }
 
   return (
-    // main
     <View
       key="main"
       style={{
         flex: 1,
         backgroundColor: '#1A237E', // indigo 900
-    // backgroundColor:"#263238",//blue grey 800
       }}
     >
       {header}
       <MyListView
         selectedSection={selectedSection}
         items={items}
-        renderSectionHeader={(sectionData, sectionID) => <Touchable.TouchableElement
-          selector="section"
-          key={sectionID}
-          payload={sectionID}
-        >
-          <View
-            style={styles.sectionHeader}
-          >
-          {closeButton}
-            <Text>
-              {sectionID}
-            </Text>
-          </View>
-        </Touchable.TouchableElement>
+        renderRow={(item, sectionID, rowID) => {
+          if (React.isValidElement(item)) {
+            return item;
+          }
+
+          return (
+            <Touchable.BookCell
+              key={rowID}
+              selector="bookcell"
+              onPanResponderMove={() => {
+                console.log(this.listview);
+                  // this.listView.setNativeProps({ scrollEnabled: false });
+              }}
+              onPanResponderEnd={() => {
+                console.log(this.listview);
+                // this.listView.setNativeProps({ scrollEnabled: true });
+              }}
+              book={item}
+              title={sectionID}
+              style={{ backgroundColor: materialColor.grey['50'] }}
+            />);
+        }}
+        renderSectionHeader={(sectionData, sectionID) =>
+          <ItemsHeader
+            payload={sectionID}
+            selected={selectedSection}
+          />
     }
 
         style={{
