@@ -1,50 +1,33 @@
 
-import React, { Component } from 'react';
-var ReactNative = require('react-native');
-let { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
-var FAIcon = require('react-native-vector-icons/FontAwesome');
-var MIcon = require('react-native-vector-icons/MaterialIcons');
+import React from 'react';
+const ReactNative = require('react-native');
+let FAIcon = require('react-native-vector-icons/FontAwesome');
 
 import materialColor from 'material-colors';
+import { styles } from './styles';
+import { itemsInfo } from './common';
 
-var _ = require('lodash');
+const _ = require('lodash');
 
-var {
-  TouchableOpacity,
+const {
   ActivityIndicator,
-  ListView,
-  Platform,
-  ProgressBarAndroid,
-  StyleSheet,
   Text,
   View,
   Image,
-  TouchableHighlight,
-  TouchableNativeFeedback,
-  LayoutAnimation,
-  // cell
-  PixelRatio,
-  // searchBar
-  TextInput,
-  ToolbarAndroid,
-  Navigator,
-  NavigatorIOS,
-  Animated,
-  ScrollView,
-  PanResponder,
-  ToastAndroid,
+  Platform,
+  StyleSheet,
 } = ReactNative;
 import Touchable from '@cycle/react-native/src/Touchable';
 
-var Dimensions = require('Dimensions');
-var {
+const Dimensions = require('Dimensions');
+const {
   width,
-  height,
 } = Dimensions.get('window');
 
 let { SwipeableRow, SwipeableRow2 } = require('./SwipeableRow');
 
 function LeftButton({ icon, text, style, backgroundColor, ...props }) {
+  // backgroundColor are used from SwipeableButtons
   return (
     <View
       {...props}
@@ -54,7 +37,8 @@ function LeftButton({ icon, text, style, backgroundColor, ...props }) {
         flex: 1, //vertical center
       }]}
     >
-      <FAIcon name={icon} size={20}
+      <FAIcon
+        name={icon} size={20}
         style={{ margin: 10, marginRight: 5 }}
       />
       <Text>
@@ -79,32 +63,28 @@ function RightButton({ icon, text, style, backgroundColor, ...props }) {
       <Text>
         {text}
       </Text>
-      <FAIcon name={icon} size={20}
+      <FAIcon
+        name={icon} size={20}
         style={{ margin: 10, marginLeft: 5 }}
       />
     </View>
   );
 }
 
-var LibraryStatus = React.createClass({
+let LibraryStatus = React.createClass({
   render() {
-    var libraryStatus = this.props.libraryStatus || {};
+    const libraryStatus = this.props.libraryStatus || {};
 
-    var text, name, backgroundColor;
+    let text, name, backgroundColor;
 
     if (libraryStatus.rentable) {
       text = '貸出可';// 利用可
-      // style={backgroundColor: "#03A9F4"} //light blue
-      // style={color: "#009688"} //Teal
       style = { color: '#4CAF50' }; // Green
     } else if (libraryStatus.exist) {
       text = '貸出中';
-      // style={backgroundColor: "#FFC107"} //yellow
-      // style={color: "#FFEB3B"} //yellow
       style = { color: '#FFC107' }; // amber
     } else if (libraryStatus.exist !== undefined) {
       text = 'なし';
-      // style={backgroundColor: "#9E9E9E"} //grey
       style = { color: '#F44336' }; // red
     } else {
       // text="取得中"
@@ -136,9 +116,10 @@ var LibraryStatus = React.createClass({
 });
 
 function getButtons(type, func, book) {
-  var leftButtons, rightButtons, likedButton,
-    borrowedButton, doneButton;
-  var selfProps = { text: '先頭に移動', icon: 'level-up', close: false };
+  let likedButton;
+  let borrowedButton;
+  let doneButton;
+  const selfProps = { text: '先頭に移動', icon: 'level-up', close: false };
   // MIcon publish,vertical align top,low priority
   switch (type) {
     case '読みたい':
@@ -150,78 +131,70 @@ function getButtons(type, func, book) {
     case '読んだ':
       doneButton = selfProps;
       break;
+    default:
+      break;
   }
-  // #e0e0e0 #03a9f4 #4caf50
-  var leftButtons = [
+
+  const leftButtons = [
     <LeftButton
-      icon="heart-o"
       close={false}
-      backgroundColor={materialColor.grey[300]}
-      style={{
-        justifyContent: 'flex-end',
-      }}
+      {...itemsInfo['読みたい']}
       {...likedButton}
       text={null}
+      backgroundColor={materialColor.grey[300]}
+      style={{ justifyContent: 'flex-end' }}
     />, // grey 300
     <LeftButton
-      icon="heart-o"
       close
       onRelease={() => {
         console.log('like'); func(book, 'liked');
       }}
-
-      backgroundColor={materialColor.lightBlue[500]}
-      text="読みたい"
-      style={{ width: width / 2 }}
+      {...itemsInfo['読みたい']}
       {...likedButton}
+      style={{ width: width / 2 }}
     />, // light blue "#03A9F4"
     // blue "#2196F3"
     <LeftButton
       onRelease={() => func(book, 'borrowed')}
       close
-      backgroundColor={materialColor.green[500]}
-      icon="bookmark-o"
-      text="借りてる"
-      style={{ width }}
+      {...itemsInfo['借りてる']}
       {...borrowedButton}
+      style={{ width }}
     />, //green
   ];
-  var rightButtons = [
+
+  const rightButtons = [
     <RightButton
-      backgroundColor={materialColor.grey[300]}
       close={false}
-      icon="check-square-o"
+      {...itemsInfo['読んだ']}
       {...doneButton}
+      backgroundColor={materialColor.grey[300]}
       text={null}
     />, // grey 300
     <RightButton
       onRelease={() => func(book, 'done')}
-      backgroundColor={materialColor.amber[500]}
       close
-      icon="check-square-o"
-      text="読んだ"
-      style={{
-        justifyContent: 'flex-end',
-      }}
+      {...itemsInfo['読んだ']}
       {...doneButton}
+      style={{ justifyContent: 'flex-end' }}
     />, //amber
   ];// Touchable
   return { leftButtons, rightButtons };
 }
 
 // ToastAndroid.show('foo', ToastAndroid.SHORT)
-var BookCell = React.createClass({
+const BookCell = React.createClass({
   render() {
-    var { book, onRelease, style, title, ...props } = this.props;
+    let { book, onRelease, style, title, ...props } = this.props;
     // There is 3 type of close behavior
     // animated left only
     // animated right and vertical close permanently
     // animated right and vertical close temporary
     // onSwipeEnd onSwipeStart
     // expand or close
-    var { leftButtons, rightButtons } = getButtons(title, onRelease, book);
+    let { leftButtons, rightButtons } = getButtons(title, onRelease, book);
     // onPress={()=>console.log("cell press")}
-    var TouchableElement = Touchable.TouchableHighlight;
+    let TouchableElement = Touchable.TouchableHighlight;
     if (Platform.OS === 'android') {
       TouchableElement = Touchable.TouchableNativeFeedback;
     }
@@ -316,100 +289,6 @@ var BookCell = React.createClass({
         </TouchableElement>
       </SwipeableRow>
     );
-  },
-});
-var cellWidth = 64;
-// https://www.google.com/design/spec/style/color.html#color-color-palette
-var styles = StyleSheet.create({
-  // application & lib
-  rowCenter: {
-    flexDirection: 'row',
-    // justifyContent:"center",
-    alignItems: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-  },
-  // for new swipe
-  /* container: {
-     flex: 1,
-     flexDirection: 'column'
-     },
-     outerScroll: {
-     flex: 1,
-     flexDirection: 'column'
-     },
-     row: {
-     flex: 1
-     }, */
-  container: {
-    flex: 1,
-    //backgroundColor: 'white',
-  },
-  // for cell
-  row: {
-    // alignItems: 'center',
-    // backgroundColor: 'white',
-    flexDirection: 'row',
-    //padding: 5,
-  },
-  bookTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 2,
-  },
-  bookAuthor: {
-    // color: '#999999',
-    color: '#9E9E9E', // grey
-    fontSize: 12,
-  },
-  cellImage: {
-    backgroundColor: '#dddddd',
-    height: 64, // PixelRatio 2
-    margin: 10,
-    width: cellWidth,
-  },
-  cellBorder: {
-    // backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    // Trick to get the thinest line the device can display
-    height: 1 / PixelRatio.get(),
-    marginLeft: 4,
-  },
-  segmented: {
-    flex: 1,
-    //backgroundColor: 'black',
-  },
-  icon: {
-    // width: 50
-  },
-  toolbarButton: {
-    // width: 50,            //Step 2
-    // textAlign:'center',
-    flex: 1,                //Step 3
-  },
-  toolbarTitle: {
-    // alignItems: 'center',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    flex: 1,                //Step 3
-  },
-  separator: {
-    height: 1,
-    //backgroundColor: '#CCCCCC',
-  },
-  test: {
-    borderWidth: 2,
-    borderColor: 'red',
-  },
-  Text: {
-    color: '#FFFFFF',
-    //width:30,
-    //textAlignVertical:"bottom",//not working?
-    //textAlign:'center',//ok
-    //biblio
-    //padding:5,//expand width for flex
-    //margin:5,//actual space for flex
-    //textAlign:"center",
   },
 });
 

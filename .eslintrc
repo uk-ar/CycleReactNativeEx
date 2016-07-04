@@ -21,6 +21,8 @@
     "react/prop-types": "warn",
     "react/no-multi-comp": "warn",
     "react/jsx-uses-vars": "error",
-    "import/no-unresolved":"off"
+    "import/no-unresolved":"off",
+    "react-native/no-unused-styles": "warn",
+    "react-native/no-inline-styles": "warn"
   },
 }

@@ -7,7 +7,7 @@ const LIBRARY_ID = 'Tokyo_Fuchu';
 
 const CALIL_STATUS_API = `http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=${LIBRARY_ID}&format=json&isbn=`;
 
-var MOCKED_MOVIES_DATA = [
+const MOCKED_MOVIES_DATA = [
   { title: 'ぐりとぐらの絵本7冊セット', author: '',
   thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/2147/9784834032147.jpg?_ex=200x200',
   libraryStatus: {
@@ -55,11 +55,11 @@ var MOCKED_MOVIES_DATA = [
   //size 200x200 largeImageUrl 64x64
 ];
 
-var EventEmitter = require('EventEmitter');
-let Rx = require('rx');
+const EventEmitter = require('EventEmitter');
+const Rx = require('rx');
 
 function makeEventEmitterDriver() {
-  var eventEmitter = new EventEmitter();
+  const eventEmitter = new EventEmitter();
   return function eventEmitterDriver(outgoing$) {
     outgoing$.subscribe(outgoing =>
       eventEmitter.emit(outgoing.event, outgoing.args));
@@ -107,7 +107,31 @@ function makeEventEmitterDriver() {
 /* render=CycleCompo1.DOM */
 /* FooView=CycleCompo1.Compo */
 
+import materialColor from 'material-colors';
+
+const itemsInfo = {
+  検索: {
+    icon: 'search'
+  },
+  読みたい: {
+    icon: 'heart-o',
+    backgroundColor: materialColor.lightBlue[500],
+    text: '読みたい'
+  },
+  借りてる: {
+    icon: 'bookmark-o',
+    backgroundColor: materialColor.green[500],
+    text: '借りてる'
+  },
+  読んだ: {
+    icon: 'check-square-o',
+    backgroundColor: materialColor.amber[500],
+    text: '読んだ'
+  }
+};
+
 module.exports = {
+  itemsInfo,
   STORAGE_KEY,
   RAKUTEN_SEARCH_API,
   LIBRARY_ID,

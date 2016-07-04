@@ -170,24 +170,36 @@ function ItemsFooter({ payload, count }) {
   );
 }
 
-function ItemsHeader({ selected, payload }) {
+import { itemsInfo } from './common';
+
+function ItemsHeader({ selectedSection, section }) {
+  let style = styles.sectionHeader;
+  if (section === '検索') {
+    style = [styles.sectionFooter, styles.sectionHeader];
+  }
   return (
     <Touchable.TouchableElement
       selector="section"
-      key={payload}
-      payload={payload}
+      key={section}
+      payload={section}
     >
-      <View style={styles.sectionHeader}>
-        {selected ?
+      <View style={style}>
+        {selectedSection ?
           <Touchable.FAIcon
             name="close"
             selector="close"
             payload="contentOffset.y"
             size={20}
             style={{ marginRight: 5 }}
-          /> : null}
+          /> :
+          <FAIcon
+            name={itemsInfo[section].icon}
+            size={20}
+            style={{ marginRight: 5 }}
+          />
+        }
         <Text>
-          {payload}
+          {section}
         </Text>
       </View>
     </Touchable.TouchableElement>
@@ -229,7 +241,6 @@ function mainView({ searchedBooks, allBooks, booksLoadingState, selectedSection 
 
   let items = {};
   let header = null;
-  let closeButton = null;
   // console.log("se:%O",selectedSection);
   if (selectedSection === null) {
     const limit = 2;
@@ -307,8 +318,8 @@ function mainView({ searchedBooks, allBooks, booksLoadingState, selectedSection 
         }}
         renderSectionHeader={(sectionData, sectionID) =>
           <ItemsHeader
-            payload={sectionID}
-            selected={selectedSection}
+            section={sectionID}
+            selectedSection={selectedSection}
           />
     }
 

@@ -4,8 +4,28 @@ import {
 } from 'react-native';
 import materialColor from 'material-colors';
 
-var cellWidth = 60;
-var styles = StyleSheet.create({
+const cellWidth = 64;
+const styles = StyleSheet.create({
+  // BookCell
+  row: {
+    flexDirection: 'row',
+  },
+  bookTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  bookAuthor: {
+    // color: '#999999',
+    color: '#9E9E9E', // grey
+    fontSize: 12,
+  },
+  cellImage: {
+    backgroundColor: '#dddddd',
+    height: 64, // PixelRatio 2
+    margin: 10,
+    width: cellWidth,
+  },
   // view.js
   sectionHeader: {
     backgroundColor: materialColor.grey['200'],
