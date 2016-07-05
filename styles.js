@@ -21,12 +21,36 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   cellImage: {
-    backgroundColor: '#dddddd',
+    backgroundColor: '#dddddd',//grey
     height: 64, // PixelRatio 2
     margin: 10,
     width: cellWidth,
   },
   // view.js
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#a9a9a9',
+    //height: 50,
+  },
+  searchBarInput: {
+    flex: 1,
+    fontSize: 16,
+    //height: 20,
+    padding: 4,
+    margin:-4,
+    //backgroundColor: 'transparent'
+  },
+  /* spinner: {
+   *   width: 30,
+   *   height: 30,
+   *   marginRight: 16,
+   * },
+   * icon: {
+   *   width: 24,
+   *   height: 24,
+   *   marginHorizontal: 8,
+   * },*/
   sectionHeader: {
     backgroundColor: materialColor.grey['200'],
     borderTopLeftRadius: 5,
@@ -108,22 +132,19 @@ const styles = StyleSheet.create({
   },
   row: {
     // alignItems: 'center',
-    backgroundColor: 'white',
+    //backgroundColor: 'white',
     flexDirection: 'row',
-    padding: 5,
+    //padding: 5,
   },
-  cellBorder: {
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    // Trick to get the thinest line the device can display
-    height: 1 / PixelRatio.get(),
-    marginLeft: 4,
-  },
+  /* cellBorder: {
+   *   backgroundColor: 'rgba(0, 0, 0, 0.1)',
+   *   // Trick to get the thinest line the device can display
+   *   height: StyleSheet.hairlineWidth*10,
+   *   marginLeft: 4,
+   * },*/
   segmented: {
     flex: 1,
     backgroundColor: 'black',
-  },
-  icon: {
-    // width: 50
   },
   toolbarButton: {
     // width: 50,            //Step 2

@@ -9,7 +9,9 @@ import {
   Text,
   View,
   NavigationExperimental,
-  LayoutAnimation,
+  TextInput,
+  // LayoutAnimation,
+  ActivityIndicator,
 } from 'react-native';
 
 import NavigationStateUtils from 'NavigationStateUtils';
@@ -117,6 +119,25 @@ class Header extends React.Component {
       <View
         style={{ padding: 10 }}
       >
+        <View style={styles.searchBar}>
+          <TextInput
+            ref="input"
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoFocus={true}
+            onChange={this.props.onSearchChange}
+            placeholder="Search a movie..."
+            placeholderTextColor="rgba(255, 255, 255, 0.5)"
+            onFocus={this.props.onFocus}
+            style={styles.searchBarInput}
+          />
+          {/* <ActivityIndicator
+          animating={true}
+          color="white"
+          size="large"
+          style={styles.spinner}
+          /> */}
+        </View>
         <AnimView
           ref="view1"
           style={{
@@ -174,8 +195,28 @@ import { itemsInfo } from './common';
 
 function ItemsHeader({ selectedSection, section }) {
   let style = styles.sectionHeader;
-  if (section === '検索') {
+  if (section === '検索' && selectedSection === null) {
     style = [styles.sectionFooter, styles.sectionHeader];
+  }
+  let content = (
+    <Text>
+      {section}
+    </Text>
+  );
+  if (section === '検索' && selectedSection === null) {
+    content = (
+      <TextInput
+        autoCapitalize="none"
+        autoCorrect={false}
+        multiline={false}
+        numberOfLines={1}
+        style={{
+          flex: 1,
+          textAlignVertical: "top",
+
+        }}
+      />
+    );
   }
   return (
     <Touchable.TouchableElement
@@ -183,7 +224,7 @@ function ItemsHeader({ selectedSection, section }) {
       key={section}
       payload={section}
     >
-      <View style={style}>
+      <View style={{flexDirection:"row",backgroundColor:"white"}}>
         {selectedSection ?
           <Touchable.FAIcon
             name="close"
@@ -194,13 +235,12 @@ function ItemsHeader({ selectedSection, section }) {
           /> :
           <FAIcon
             name={itemsInfo[section].icon}
+            color={itemsInfo[section].backgroundColor}
             size={20}
             style={{ marginRight: 5 }}
           />
         }
-        <Text>
-          {section}
-        </Text>
+        {content}
       </View>
     </Touchable.TouchableElement>
   );
@@ -237,7 +277,7 @@ function mainView({ searchedBooks, allBooks, booksLoadingState, selectedSection 
     読んだ: doneBooks,
   };
   console.log('render main');
-  LayoutAnimation.easeInEaseOut();
+  //LayoutAnimation.easeInEaseOut();
 
   let items = {};
   let header = null;

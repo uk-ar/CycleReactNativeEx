@@ -16,6 +16,7 @@ const {
   Image,
   Platform,
   StyleSheet,
+  PixelRatio,
 } = ReactNative;
 import Touchable from '@cycle/react-native/src/Touchable';
 
@@ -198,6 +199,7 @@ const BookCell = React.createClass({
     if (Platform.OS === 'android') {
       TouchableElement = Touchable.TouchableNativeFeedback;
     }
+    //console.log("hair:",StyleSheet.hairlineWidth,PixelRatio.roundToNearestPixel(StyleSheet.hairlineWidth),PixelRatio.get())
 
     return (
       //    style={{flex:1}}
@@ -242,8 +244,9 @@ const BookCell = React.createClass({
               </View>
               <View style={{ flex: 1 }} />
               <View style={{ height: StyleSheet.hairlineWidth,
-                            backgroundColor: '#CCCCCC',
-                            marginRight: 10,
+                             backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                             marginRight: 10,
+                             marginBottom: PixelRatio.get(),
                             //separator
                           }} />
             </View>
