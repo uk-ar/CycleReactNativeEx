@@ -263,7 +263,7 @@ let navigatorPushRequest$ = actions
       actions.goToInboxView$,
       actions.goToSearchView$,
       // actions.goToSectionView$,
-      // actions.goToBookView$,
+      actions.goToBookView$.map((e)=>({type:"push",key: "Book Detail", data:e})),
       actions.back$,
     )
     .distinctUntilChanged(navigationState =>
@@ -276,6 +276,7 @@ let navigatorPushRequest$ = actions
       })
     .startWith(initialNavigationState)
     .scan((prevState, action) => {
+      console.log("a:",action)
       switch (action.type) {
         case 'back':
           return NavigationStateUtils.pop(prevState);

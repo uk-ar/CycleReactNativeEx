@@ -650,18 +650,18 @@ var SwipeableRow2 = React.createClass({
 
   componentWillMount() {
     this._panX = new Animated.Value(0.01);
+    function isSwipeHorizontal(evt, gestureState){
+      return Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
+          && Math.abs(gestureState.dx) > 10;
+    }
 
     this._panResponder = PanResponder.create({
       // Ask to be the responder:
       onStartShouldSetPanResponder: (evt, gestureState) => false,
       onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        // allow vertical scroll
-        return Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
-            && Math.abs(gestureState.dx) > 10;
-      },
 
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => false,
+      onMoveShouldSetPanResponder: isSwipeHorizontal,
+      onMoveShouldSetPanResponderCapture: isSwipeHorizontal,
 
       onPanResponderGrant: (evt, gestureState) => {},
 
@@ -670,14 +670,14 @@ var SwipeableRow2 = React.createClass({
         // https://github.com/facebook/react-native/issues/1705
         if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
             && Math.abs(gestureState.dx) > 10) {
-          this.props.onPanResponderMove &&
-          this.props.onPanResponderMove(evt, gestureState);
+          /* this.props.onPanResponderMove &&
+           * this.props.onPanResponderMove(evt, gestureState);*/
         }
       },
 
       onPanResponderEnd: (evt, gestureState) => {
-        this.props.onPanResponderEnd &&
-        this.props.onPanResponderEnd(evt, gestureState);
+        /* this.props.onPanResponderEnd &&
+         * this.props.onPanResponderEnd(evt, gestureState);*/
       },
 
       onPanResponderTerminationRequest: (evt, gestureState) => false,

@@ -101,7 +101,7 @@ class MyListView extends React.Component {
 }
 
 MyListView.propTypes = {
-  items: React.PropTypes.array.isRequired,
+  items: React.PropTypes.object.isRequired,
 // selectedSection:selectedSection
 };
 
@@ -119,25 +119,6 @@ class Header extends React.Component {
       <View
         style={{ padding: 10 }}
       >
-        <View style={styles.searchBar}>
-          <TextInput
-            ref="input"
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoFocus={true}
-            onChange={this.props.onSearchChange}
-            placeholder="Search a movie..."
-            placeholderTextColor="rgba(255, 255, 255, 0.5)"
-            onFocus={this.props.onFocus}
-            style={styles.searchBarInput}
-          />
-          {/* <ActivityIndicator
-          animating={true}
-          color="white"
-          size="large"
-          style={styles.spinner}
-          /> */}
-        </View>
         <AnimView
           ref="view1"
           style={{
@@ -191,57 +172,66 @@ function ItemsFooter({ payload, count }) {
   );
 }
 
-import { itemsInfo } from './common';
+ function SearchHeader({selectedSection, children, loadingState }){
+   return ((selectedSection !== null) ? (
+     <ItemsHeader
+       selectedSection={selectedSection}
+       section="検索"
+     >
+       <TextInput
+         autoCapitalize="none"
+         autoCorrect={false}
+         autoFocus={true}
+         style={styles.searchBarInput}
+       />
+       {loadingState ?
+        <ActivityIndicator
+          animating={true}
+          color="white"
+          size="large"
+          style={styles.spinner}
+        /> : null}
+     </ItemsHeader>
+   ) : (
+     <ItemsHeader
+       style={[styles.sectionFooter, styles.sectionHeader]}
+       selectedSection={selectedSection}
+       section="検索"
+     />)
+   );
+ }
 
-function ItemsHeader({ selectedSection, section }) {
-  let style = styles.sectionHeader;
-  if (section === '検索' && selectedSection === null) {
-    style = [styles.sectionFooter, styles.sectionHeader];
-  }
-  let content = (
+import { itemsInfo } from './common';
+function ItemsHeader({ selectedSection, section, children, style }) {
+  let icon = (selectedSection === null) ? (
+    <FAIcon
+      name={itemsInfo[section].icon}
+      color={itemsInfo[section].backgroundColor}
+      size={20}
+      style={{ marginRight: 5 }}
+    />) : (
+    <Touchable.FAIcon
+      name="close"
+      selector="close"
+      payload="contentOffset.y"
+      size={20}
+      style={{ marginRight: 5 }}
+    />);
+  let content = children || (
     <Text>
       {section}
     </Text>
   );
-  if (section === '検索' && selectedSection === null) {
-    content = (
-      <TextInput
-        autoCapitalize="none"
-        autoCorrect={false}
-        multiline={false}
-        numberOfLines={1}
-        style={{
-          flex: 1,
-          textAlignVertical: "top",
-
-        }}
-      />
-    );
-  }
   return (
     <Touchable.TouchableElement
       selector="section"
       key={section}
       payload={section}
     >
-      <View style={{flexDirection:"row",backgroundColor:"white"}}>
-        {selectedSection ?
-          <Touchable.FAIcon
-            name="close"
-            selector="close"
-            payload="contentOffset.y"
-            size={20}
-            style={{ marginRight: 5 }}
-          /> :
-          <FAIcon
-            name={itemsInfo[section].icon}
-            color={itemsInfo[section].backgroundColor}
-            size={20}
-            style={{ marginRight: 5 }}
-          />
-        }
+      <View style={style || styles.sectionHeader}>
+        {icon}
         {content}
-      </View>
+    </View>
     </Touchable.TouchableElement>
   );
 }
@@ -277,7 +267,7 @@ function mainView({ searchedBooks, allBooks, booksLoadingState, selectedSection 
     読んだ: doneBooks,
   };
   console.log('render main');
-  //LayoutAnimation.easeInEaseOut();
+  // LayoutAnimation.easeInEaseOut();
 
   let items = {};
   let header = null;
@@ -357,11 +347,16 @@ function mainView({ searchedBooks, allBooks, booksLoadingState, selectedSection 
             />);
         }}
         renderSectionHeader={(sectionData, sectionID) =>
-          <ItemsHeader
-            section={sectionID}
-            selectedSection={selectedSection}
-          />
-    }
+          (sectionID === '検索') ? (
+            <SearchHeader
+              selectedSection={selectedSection}
+              loadingState={booksLoadingState}
+            />) : (
+            <ItemsHeader
+              section={sectionID}
+              selectedSection={selectedSection}
+            />
+          )}
 
         style={{
           paddingHorizontal: 3,
@@ -392,6 +387,12 @@ function view(model) {
       style={{ flex: 1 }}
       navigationState={navigationState}
       onNavigate={onNavigateBack}
+      renderOverlay={(navigationProps) => {
+          /* return (
+          <NavigationExperimental.NavigationHeader
+          {...navigationProps}
+          />); */
+        }}
       renderScene={(navigationProps) => {
         console.log('MyNav:renderScene', navigationProps);
       // const key = navigationProps.scene.navigationState.key;
@@ -403,6 +404,11 @@ function view(model) {
               <MyCard navigationProps={navigationProps}>
                 {mainView(model)}
               </MyCard>
+            );
+          case 'Book Detail':
+            // return (mainView(model))
+            return (
+              <Text>book detail</Text>
             );
           default:
             console.error('Unexpected view', navigationProps,

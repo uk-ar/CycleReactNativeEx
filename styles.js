@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#a9a9a9',
+    //backgroundColor: '#a9a9a9',
     //height: 50,
   },
   searchBarInput: {
@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
     // marginTop:3,
     padding: 10,
     flexDirection: 'row',
+    alignItems:'center'
   },
   sectionFooter: {
     // backgroundColor:materialColor.grey["200"],
