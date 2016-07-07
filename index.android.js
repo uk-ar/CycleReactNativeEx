@@ -13,11 +13,11 @@ TODO:
 'use strict';
 
 import React, { Component } from 'react';
-let Rx = require('rx');
+const Rx = require('rx');
 var _ = require('lodash');
-let { run } = require('@cycle/core');
+const { run } = require('@cycle/core');
 import makeReactNativeDriver, { getBackHandler } from '@cycle/react-native/src/driver';
-let { makeHTTPDriver } = require('@cycle/http');
+const { makeHTTPDriver } = require('@cycle/http');
 
 var Icon = require('react-native-vector-icons/FontAwesome');
 

@@ -1,6 +1,6 @@
 import React from 'react';
 const FAIcon = require('react-native-vector-icons/FontAwesome');
-import {getBackHandler} from '@cycle/react-native/src/driver';
+import { getBackHandler } from '@cycle/react-native/src/driver';
 import materialColor from 'material-colors';
 import { styles } from './styles';
 // there is 1 errors
@@ -27,11 +27,11 @@ Touchable.FAIcon = Touchable.createCycleComponent(
   FAIcon, Touchable.PRESS_ACTION_TYPES);
 
 function onNavigateBack(action) {
-  //console.log('on:%O,%O,%O', action,action.type,(action.type === 'back' || action.type === 'BackAction'));
+  // console.log('on:%O,%O,%O', action,action.type,(action.type === 'back' || action.type === 'BackAction'));
   const backActionHandler = getBackHandler();
-  //if (action.type === 'back' || action.type === 'BackAction') {
-    backActionHandler.send();
-//}
+  // if (action.type === 'back' || action.type === 'BackAction') {
+  backActionHandler.send();
+// }
 }
 
 function MyCard({ children, navigationProps }) {
@@ -173,8 +173,8 @@ function ItemsFooter({ payload, count }) {
   );
 }
 
- function SearchHeader({selectedSection, children, loadingState }){
-   return ((selectedSection !== null) ? (
+function SearchHeader({ selectedSection, children, loadingState }) {
+  return ((selectedSection !== null) ? (
      <ItemsHeader
        selectedSection={selectedSection}
        section="検索"
@@ -182,12 +182,12 @@ function ItemsFooter({ payload, count }) {
        <TextInput
          autoCapitalize="none"
          autoCorrect={false}
-         autoFocus={true}
+         autoFocus
          style={styles.searchBarInput}
        />
        {loadingState ?
         <ActivityIndicator
-          animating={true}
+          animating
           color="white"
           size="large"
           style={styles.spinner}
@@ -200,7 +200,7 @@ function ItemsFooter({ payload, count }) {
        section="検索"
      />)
    );
- }
+}
 
 import { itemsInfo } from './common';
 function ItemsHeader({ selectedSection, section, children, style }) {
@@ -381,35 +381,35 @@ function view(model) {
       id: Math.random(),
     } // route
   ); //
-  console.log('mynav', navigationState,onNavigateBack);
+  console.log('mynav', navigationState, onNavigateBack);
   return (
     // <NavigationExperimental.Transitioner
     <NavigationExperimental.CardStack
       style={{ flex: 1 }}
       navigationState={navigationState}
       onNavigate={onNavigateBack}
-      renderOverlay={(navigationProps) => {
-          //console.log("np:",navigationProps);
-          let style=null;
-          if(navigationProps.scene.route.key === "Main"){
-            style={opacity:0}
-            //return null;
-          }//          
-          return (
+renderOverlay={(navigationProps) => {
+          // console.log("np:",navigationProps);
+        let style = null;
+        if (navigationProps.scene.route.key === 'Main') {
+          style = { opacity: 0 };
+            // return null;
+        }//
+        return (
             <NavigationExperimental.Header
-          {...navigationProps}
-          onNavigateBack={onNavigateBack}
-          style={style}                         
-          renderTitleComponent={(props) =>{
-              return (
+              {...navigationProps}
+              onNavigateBack={onNavigateBack}
+              style={style}
+              renderTitleComponent={(props) => {
+                return (
                 <NavigationExperimental.Header.Title>
                                foo
                 </NavigationExperimental.Header.Title>
-              )
-            }}
-          />);
-          //return (<Text>overlay</Text>)
-        }}
+              );
+              }}
+            />);
+          // return (<Text>overlay</Text>)
+      }}
       renderScene={(navigationProps) => {
         console.log('MyNav:renderScene', navigationProps);
       // const key = navigationProps.scene.navigationState.key;

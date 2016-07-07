@@ -1,11 +1,11 @@
 
 'use strict';
 import React, { Component } from 'react';
-let Rx = require('rx');
+const Rx = require('rx');
 var _ = require('lodash');
-let { run } = require('@cycle/core');
+const { run } = require('@cycle/core');
 let { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
-let { makeHTTPDriver } = require('@cycle/http');
+const { makeHTTPDriver } = require('@cycle/http');
 
 let {
   STORAGE_KEY,

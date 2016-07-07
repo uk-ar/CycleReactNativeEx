@@ -650,7 +650,7 @@ var SwipeableRow2 = React.createClass({
 
   componentWillMount() {
     this._panX = new Animated.Value(0.01);
-    function isSwipeHorizontal(evt, gestureState){
+    function isSwipeHorizontal(evt, gestureState) {
       return Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
           && Math.abs(gestureState.dx) > 10;
     }

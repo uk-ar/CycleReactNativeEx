@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   cellImage: {
-    backgroundColor: '#dddddd',//grey
+    backgroundColor: '#dddddd', // grey
     height: 64, // PixelRatio 2
     margin: 10,
     width: cellWidth,
@@ -36,9 +36,9 @@ const styles = StyleSheet.create({
   searchBarInput: {
     flex: 1,
     fontSize: 16,
-    //height: 20,
+    // height: 20,
     padding: 4,
-    margin:-4,
+    margin: -4,
     //backgroundColor: 'transparent'
   },
   /* spinner: {
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     // marginTop:3,
     padding: 10,
     flexDirection: 'row',
-    alignItems:'center'
+    alignItems: 'center'
   },
   sectionFooter: {
     // backgroundColor:materialColor.grey["200"],
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   row: {
     // alignItems: 'center',
-    //backgroundColor: 'white',
+    // backgroundColor: 'white',
     flexDirection: 'row',
     //padding: 5,
   },

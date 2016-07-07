@@ -1,25 +1,17 @@
-import React, { Component } from 'react';
-let Rx = require('rx');
-var _ = require('lodash');
-let { run } = require('@cycle/core');
-let { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
-let { makeHTTPDriver } = require('@cycle/http');
+import Rx from 'rx';
+import _ from 'lodash';
 
-var Icon = require('react-native-vector-icons/FontAwesome');
-var BookScreen = require('./BookScreen');
-let { SearchScreen, InBoxScreen, GiftedNavigator } = require('./SearchScreen');
-
-let {
+import {
   STORAGE_KEY,
   RAKUTEN_SEARCH_API,
   LIBRARY_ID,
   CALIL_STATUS_API,
   MOCKED_MOVIES_DATA,
-} = require('./common');
+} from './common';
 
 import NavigationStateUtils from 'NavigationStateUtils';
 
-const mockBooks = [
+const mockbooks = [
   { title: 'like:SOFT SKILLS', isbn: '9784822251550', bucket: 'liked' },
   { title: 'like:foo', isbn: '9784480064851', bucket: 'liked' },
   { title: 'borrow:qux', isbn: '9784492314630', bucket: 'borrowed' },
@@ -28,7 +20,6 @@ const mockBooks = [
   { title: 'done:baz', isbn: '9784822285159', bucket: 'done' },
   { title: 'done:toz', isbn: '9784757142794', bucket: 'done' },
 ];
-mockBooks; // for lint
 
 const Realm = require('realm');
 class Book {}
@@ -46,14 +37,14 @@ Book.schema = {
 };
 const realm = new Realm({ schema: [Book], schemaVersion: 3 });
 realm.write(() => {
-  /* mockBooks.reverse().map((book)=>{
+  /* mockbooks.reverse().map((book)=>{
      realm.create('Book',{...book,modifyDate: new Date(Date.now())},true)
      })*/
 });
 
-var allBooks = realm.objects('Book')
-                  .sorted('modifyDate', true)// reverse sort
-                  .map((elem) => elem);
+const initialBooks = realm.objects('Book')
+                          .sorted('modifyDate', true)// reverse sort
+                          .map((elem) => elem);
 
 function model(actions) {
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
@@ -61,43 +52,44 @@ function model(actions) {
   // model
   // result items inbox favoritebox searchedbox
   // searchedBooks $
-  const searchedBooks$ = Rx.Observable
-                             .combineLatest(
-                               actions.booksResponse$,
-                               actions.booksStatus$.startWith([]),
-                               (books, booksStatus) => {
-                                 return books.map(book => {
-                                   if ((booksStatus[book.isbn] !== undefined) && // not yet retrieve
-           // sub library exist?
-           (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)) {
-                                     const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
-          // TODO:support error case
-          // if bookStatus.status == "Error"
-                                     var exist = Object.keys(bookStatus.libkey)
-                            .length !== 0;
-                                     var rentable = _.values(bookStatus.libkey)// Object.values
-                          .some(i => i === '貸出可');
-                                     book.libraryStatus = {
-                                       status: bookStatus.libkey,
-                                       reserveUrl: bookStatus.reserveurl,
-                                       rentable,
-                                       exist,
-                                     };
-                                   }
+  const searchedBooks$ =
+    Rx.Observable
+      .combineLatest(
+        actions.booksResponse$,
+        actions.booksStatus$.startWith([]),
+        (books, booksStatus) => {
+          return books.map(book => {
+            if ((booksStatus[book.isbn] !== undefined) && // not yet retrieve
+                // sub library exist?
+                (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)) {
+              const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
+              // TODO:support error case
+              // if bookStatus.status == "Error"
+              const exist = Object.keys(bookStatus.libkey)
+                                  .length !== 0;
+              const rentable = _.values(bookStatus.libkey)// Object.values
+                                .some(i => i === '貸出可');
+              book.libraryStatus = {
+                status: bookStatus.libkey,
+                reserveUrl: bookStatus.reserveurl,
+                rentable,
+                exist,
+              };
+            }
 
-                                   return ({
-                                     title: book.title.replace(/^【バーゲン本】/, ''),
-                                     author: book.author,
-                                     isbn: book.isbn,
-                                     thumbnail: book.largeImageUrl,
-                                     libraryStatus: book.libraryStatus,
-                                     active: true,
-                                   });
-                                 }
-      ); }).do(i => console.log('searchedBooks$:%O', i)
-      ).distinctUntilChanged();
+            return ({
+              title: book.title.replace(/^【バーゲン本】/, ''),
+              author: book.author,
+              isbn: book.isbn,
+              thumbnail: book.largeImageUrl,
+              libraryStatus: book.libraryStatus,
+              active: true,
+            });
+          }
+          ); }).do(i => console.log('searchedBooks$:%O', i)
+          ).distinctUntilChanged();
   /* .combineLatest(actions.openSwipe$.startWith(1), (books,rowID) => {
-     for (var i = 0; i < books.length; i++) {
+     for (let i = 0; i < books.length; i++) {
      if (i != rowID) books[i].active = false
      else books[i].active = true
      }
@@ -122,8 +114,8 @@ let navigatorPushRequest$ = actions
               passProps: {url: url}
      })); */
 
-  let allBooks$ = actions.changeBucket$.startWith(
-    allBooks
+  const allBooks$ = actions.changeBucket$.startWith(
+    initialBooks
   ).scan((books, { type, book }) => {
     console.log('type:', type);
     switch (type) {
@@ -155,7 +147,7 @@ let navigatorPushRequest$ = actions
              let doneBooks$ = allBooks$.map((books)=>
              books.filter((book)=>book.bucket=="done")
              ).do((i)=>console.log("d:",i))*/
-  let selectedBook$ = actions.goToBookView$;
+  const selectedBook$ = actions.goToBookView$;
   // .map(({data})=>data)
   // for android action
   /* function canPop(navigator){
@@ -210,8 +202,8 @@ let navigatorPushRequest$ = actions
       return Rx.Observable
                .fromPromise(
                  AsyncStorage.setItem(STORAGE_KEY,JSON.stringify(inbox)))
-    });*/
-  var booksLoadingState$ = actions.requestBooks$.map((_) => true)
+     });*/
+  const booksLoadingState$ = actions.requestBooks$.map((_) => true)
                                   .merge(
                                     // response event
                                     actions.booksResponse$.map((_) => false));
@@ -233,7 +225,7 @@ let navigatorPushRequest$ = actions
       actions.goToInboxView$,
       actions.goToSearchView$,
       // actions.goToSectionView$,
-      actions.goToBookView$.map((e)=>({type:"push",key: "Book Detail", data:e})),
+      actions.goToBookView$.map((e) => ({ type: 'push', key: 'Book Detail', data: e })),
       actions.back$,
     )
     .distinctUntilChanged(navigationState =>
@@ -246,7 +238,7 @@ let navigatorPushRequest$ = actions
       })
     .startWith(initialNavigationState)
     .scan((prevState, action) => {
-      console.log("a:",action)
+      console.log('a:', action);
       switch (action.type) {
         case 'back':
           return NavigationStateUtils.pop(prevState);
@@ -259,18 +251,19 @@ let navigatorPushRequest$ = actions
       }
     });
 
-  return Rx.Observable
-            .combineLatest(searchedBooks$.startWith(MOCKED_MOVIES_DATA).distinctUntilChanged(),
-                           allBooks$,
-                           booksLoadingState$.startWith(false).distinctUntilChanged(),
-                           navigationState$.distinctUntilChanged(),
-                           selectedBook$.startWith(null).distinctUntilChanged(),
-                           actions.selectedSection$.startWith(null),
-                           (searchedBooks, allBooks, booksLoadingState, navigationState, selectedBook, selectedSection) =>
-                             ({ searchedBooks, allBooks, booksLoadingState, navigationState, selectedBook, selectedSection }));
+  return Rx
+    .Observable
+    .combineLatest(searchedBooks$.startWith(MOCKED_MOVIES_DATA).distinctUntilChanged(),
+                   allBooks$,
+                   booksLoadingState$.startWith(false).distinctUntilChanged(),
+                   navigationState$.distinctUntilChanged(),
+                   selectedBook$.startWith(null).distinctUntilChanged(),
+                   actions.selectedSection$.startWith(null),
+                   (searchedBooks, allBooks, booksLoadingState, navigationState, selectedBook, selectedSection) =>
+                     ({ searchedBooks, allBooks, booksLoadingState, navigationState, selectedBook, selectedSection }));
 
   /*
-  var state$ = {
+  let state$ = {
     searchRequest$: searchRequest$,//request$
     statusRequest$: statusRequest$,
     booksWithStatus$: booksWithStatus$,
@@ -282,7 +275,7 @@ let navigatorPushRequest$ = actions
   actions.selectScene$
          .do(i => console.log("nav rep:%O", i) )
          .map(options =>{
-           var option = options[0];
+           let option = options[0];
            if(option == "検索"){
              return ({
                component:SearchScreen,

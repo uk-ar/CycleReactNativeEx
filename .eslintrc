@@ -17,6 +17,7 @@
     "no-unused-vars" : ["error", { "varsIgnorePattern": "_",
                                    "args":"none",
                                    "argsIgnorePattern": "_",}],
+    "no-shadow": ["error", { "allow": ["_"] }],
     "no-console" : "warn",
     "react/prop-types": "warn",
     "react/no-multi-comp": "warn",
