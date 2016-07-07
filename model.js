@@ -1,5 +1,3 @@
-'use strict';
-
 import React, { Component } from 'react';
 let Rx = require('rx');
 var _ = require('lodash');
@@ -19,34 +17,18 @@ let {
   MOCKED_MOVIES_DATA,
 } = require('./common');
 
-import {
-  TouchableOpacity,
-  ActivityIndicatorIOS,
-  ListView,
-  Platform,
-  ProgressBarAndroid,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableHighlight,
-  TouchableNativeFeedback,
-  LayoutAnimation,
-  // cell
-  PixelRatio,
-  // searchBar
-  TextInput,
-  ToolbarAndroid,
-  Navigator,
-  NavigatorIOS,
-  Animated,
-  ScrollView,
-  PanResponder,
-  BackAndroid,
-  AsyncStorage,
-} from 'react-native';
-
 import NavigationStateUtils from 'NavigationStateUtils';
+
+const mockBooks = [
+  { title: 'like:SOFT SKILLS', isbn: '9784822251550', bucket: 'liked' },
+  { title: 'like:foo', isbn: '9784480064851', bucket: 'liked' },
+  { title: 'borrow:qux', isbn: '9784492314630', bucket: 'borrowed' },
+  { title: 'borrow:quxx', isbn: '9784798134208', bucket: 'borrowed' },
+  { title: 'done:bar', isbn: '9784105393069', bucket: 'done' },
+  { title: 'done:baz', isbn: '9784822285159', bucket: 'done' },
+  { title: 'done:toz', isbn: '9784757142794', bucket: 'done' },
+];
+mockBooks; // for lint
 
 const Realm = require('realm');
 class Book {}
@@ -62,22 +44,10 @@ Book.schema = {
     modifyDate: 'date',
   },
 };
-let realm = new Realm({ schema: [Book], schemaVersion: 3 });
-
-let mockBooks = [
-  { title: 'like:SOFT SKILLS', isbn: '9784822251550', bucket: 'liked' },
-  { title: 'like:foo', isbn: '9784480064851', bucket: 'liked' },
-  { title: 'borrow:qux', isbn: '9784492314630', bucket: 'borrowed' },
-  { title: 'borrow:quxx', isbn: '9784798134208', bucket: 'borrowed' },
-  { title: 'done:bar', isbn: '9784105393069', bucket: 'done' },
-  { title: 'done:baz', isbn: '9784822285159', bucket: 'done' },
-  { title: 'done:toz', isbn: '9784757142794', bucket: 'done' },
-];
-mockBooks; // for lint
-
+const realm = new Realm({ schema: [Book], schemaVersion: 3 });
 realm.write(() => {
   /* mockBooks.reverse().map((book)=>{
-      realm.create('Book',{...book,modifyDate: new Date(Date.now())},true)
+     realm.create('Book',{...book,modifyDate: new Date(Date.now())},true)
      })*/
 });
 

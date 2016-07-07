@@ -1,5 +1,6 @@
 import React from 'react';
 const FAIcon = require('react-native-vector-icons/FontAwesome');
+import {getBackHandler} from '@cycle/react-native/src/driver';
 import materialColor from 'material-colors';
 import { styles } from './styles';
 // there is 1 errors
@@ -26,11 +27,11 @@ Touchable.FAIcon = Touchable.createCycleComponent(
   FAIcon, Touchable.PRESS_ACTION_TYPES);
 
 function onNavigateBack(action) {
-  console.log('on:%O', action);
+  //console.log('on:%O,%O,%O', action,action.type,(action.type === 'back' || action.type === 'BackAction'));
   const backActionHandler = getBackHandler();
-  if (action.type === 'back' || action.type === 'BackAction') {
+  //if (action.type === 'back' || action.type === 'BackAction') {
     backActionHandler.send();
-  }
+//}
 }
 
 function MyCard({ children, navigationProps }) {
@@ -380,7 +381,7 @@ function view(model) {
       id: Math.random(),
     } // route
   ); //
-  console.log('mynav', navigationState);
+  console.log('mynav', navigationState,onNavigateBack);
   return (
     // <NavigationExperimental.Transitioner
     <NavigationExperimental.CardStack
@@ -388,10 +389,26 @@ function view(model) {
       navigationState={navigationState}
       onNavigate={onNavigateBack}
       renderOverlay={(navigationProps) => {
-          /* return (
-          <NavigationExperimental.NavigationHeader
+          //console.log("np:",navigationProps);
+          let style=null;
+          if(navigationProps.scene.route.key === "Main"){
+            style={opacity:0}
+            //return null;
+          }//          
+          return (
+            <NavigationExperimental.Header
           {...navigationProps}
-          />); */
+          onNavigateBack={onNavigateBack}
+          style={style}                         
+          renderTitleComponent={(props) =>{
+              return (
+                <NavigationExperimental.Header.Title>
+                               foo
+                </NavigationExperimental.Header.Title>
+              )
+            }}
+          />);
+          //return (<Text>overlay</Text>)
         }}
       renderScene={(navigationProps) => {
         console.log('MyNav:renderScene', navigationProps);
