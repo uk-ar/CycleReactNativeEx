@@ -251,10 +251,10 @@ function booksToObject(books) {
   return obj;
 }
 
-function mainView({ searchedBooks, allBooks, booksLoadingState, selectedSection }) {
-  const borrowedBooks = allBooks.filter((book) => book.bucket === 'borrowed');
-  const likedBooks = allBooks.filter((book) => book.bucket === 'liked');
-  const doneBooks = allBooks.filter((book) => book.bucket === 'done');
+function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSection }) {
+  const borrowedBooks = savedBooks.filter((book) => book.bucket === 'borrowed');
+  const likedBooks = savedBooks.filter((book) => book.bucket === 'liked');
+  const doneBooks = savedBooks.filter((book) => book.bucket === 'done');
   // todo transition to detail view
   /* 検索: {
      books:searchedBooks,
@@ -377,7 +377,7 @@ function view(model) {
     model.navigationState, // navigationState
     model.navigationState.index, // index
     {
-      key: model.navigationState.routes[model.navigationState.index].key,
+      ...model.navigationState.routes[model.navigationState.index],
       id: Math.random(),
     } // route
   ); //
@@ -388,12 +388,12 @@ function view(model) {
       style={{ flex: 1 }}
       navigationState={navigationState}
       onNavigate={onNavigateBack}
-renderOverlay={(navigationProps) => {
+      renderOverlay={(navigationProps) => {
           // console.log("np:",navigationProps);
         let style = null;
         if (navigationProps.scene.route.key === 'Main') {
-          style = { opacity: 0 };
-            // return null;
+          // style = { opacity: 0 }; // cannot touch close button
+          return null;
         }//
         return (
             <NavigationExperimental.Header
@@ -425,7 +425,9 @@ renderOverlay={(navigationProps) => {
           case 'Book Detail':
             // return (mainView(model))
             return (
-              <Text>book detail</Text>
+              <View style={{ marginTop: 64, backgroundColor: 'red' }}>
+                <Text>book detail</Text>
+              </View>
             );
           default:
             console.error('Unexpected view', navigationProps,
