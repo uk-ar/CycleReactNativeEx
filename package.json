@@ -8,6 +8,7 @@
   "dependencies": {
     "@cycle/core": "7.0.0",
     "@cycle/http": "9.0.2",
+    "@cycle/fetch": "^4.0.0",
     "@cycle/react-native": "git+http://github.com/uk-ar/cycle-react-native.git",
     "isbn": "^0.4.0",
     "lodash": "^4.13.1",
