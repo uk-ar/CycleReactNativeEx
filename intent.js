@@ -42,6 +42,19 @@ function intent(RN, HTTP) {
                   .do(i => console.log('status req:%O', i));
   const request$ = Rx.Observable.merge(requestBooks$, requestStatus$);
 
+  fetch("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784834014655,9784834000825,9784862463241,9784834032147,9784828867472",{
+    'method': 'GET',
+    'headers': {
+      'Accept': 'text/plain',
+    }})
+    .then((response) => console.log("response:",response))
+  /* const savedBooksResponse$ =
+   *   HTTP.byKey('savedBooksStatus')
+   * //HTTP.select('savedBooksStatus')
+   * //HTTP.byUrl(CALIL_STATUS_API)
+   *       .switch()
+   *       .do(i => console.log('saved books:%O', i))
+   *       .subscribe()*/
   // release$.do((i)=>console.log("rel$")).subscribe()
   return {
     requestBooks$,

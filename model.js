@@ -90,28 +90,39 @@ function model(actions) {
              console.log('type:', type);
              switch (type) {
                case 'remove':
-                 return books.filter((elem) => elem.isbn.toString() !== book.isbn.toString());
+                 return books.filter((elem) =>
+                   elem.isbn.toString() !== book.isbn.toString());
                case 'add':
                  return [book].concat(books);
                case 'replace':
-                 return [book].concat(books.filter((elem) => elem.isbn.toString() !== book.isbn.toString()));
+                 return [book].concat(books.filter((elem) =>
+                   elem.isbn.toString() !== book.isbn.toString()));
                default:
                  return books;
              }
            } // ).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
            ).do((books) => {
              realm.write(() => {
-               books.map((book) => {
+               books.forEach((book) => {
                  realm.create('Book', book, true);
                });
              });
            }).shareReplay();
+
   const requestSavedBooksStatus$ =
     savedBooks$.startWith(initialBooks)
                .map((books) => books.map(book => book.isbn))
-               .map(q => CALIL_STATUS_API + encodeURI(q))
-               .do((i) => console.log('save status:', i));
-               // .subscribe();
+               //.map(q => CALIL_STATUS_API + encodeURI(q))
+               .map(q => (
+                 {
+                   key: 'savedBooksStatus',
+                   //category: 'savedBooksStatus',
+                   url: CALIL_STATUS_API + encodeURI(q)
+                 }))
+               .do((i) => console.log('save status:', i))
+               //.subscribe()
+
+               //.subscribe();
   const selectedBook$ = actions.goToBookView$;
   const booksLoadingState$ = actions.requestBooks$.map((_) => true)
                                     .merge(
@@ -128,6 +139,7 @@ function model(actions) {
       { key: 'Main' },
     ],
   };
+
   // const navigationState$ = Rx.Observable.just(initialNavigationState)
   const navigationState$ =
     Rx.Observable
@@ -158,6 +170,7 @@ function model(actions) {
             console.error('Unexpected action', navigationProps, key);
         }
       });
+
   const state$ = Rx
     .Observable
     .combineLatest(searchedBooks$.startWith(MOCKED_MOVIES_DATA).distinctUntilChanged(),

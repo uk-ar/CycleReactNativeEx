@@ -89,10 +89,11 @@ class MyListView extends React.Component {
     const { items: _, ...listViewProps } = this.props;
     return (
       // onResponderMove is too premitive
-      //          directionalLockEnabled={true}
+      // directionalLockEnabled disables horizontal scroll when scroll vertically
       // https://github.com/facebook/react-native/issues/6764
       <ListView
         ref={listView => (this.listview = listView)}
+        directionalLockEnabled={true}
         dataSource={this.state.dataSource}
         enableEmptySections
         {...listViewProps}

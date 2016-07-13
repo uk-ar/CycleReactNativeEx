@@ -3,7 +3,6 @@ let { makeReactNativeDriver, generateCycleRender } = require('@cycle/react-nativ
 var FAIcon = require('react-native-vector-icons/FontAwesome');
 var MIcon = require('react-native-vector-icons/MaterialIcons');
 
-import { RadioButtons, SegmentedControls } from 'react-native-radio-buttons';
 import ListView from '@cycle/react-native/src/ListView';
 
 import {
@@ -33,11 +32,6 @@ import {
 import Touchable from '@cycle/react-native/src/Touchable';
 Touchable['FAIcon'] = Touchable.createCycleComponent(
   FAIcon, Touchable.PRESS_ACTION_TYPES);
-
-Touchable['SegmentedControls'] = Touchable.createCycleComponent(
-  SegmentedControls, {
-    onSelection: 'selection',
-  });
 
 var GiftedNavigator = React.createClass({
   componentDidMount() {
@@ -129,16 +123,6 @@ var BookListView = React.createClass({
                 size={25}
                 color="#007AFF"
                 style={{ marginHorizontal: 8 }}
-              />
-              <Touchable.SegmentedControls
-                options={options}
-                selector="segmented"
-                style={styles.toolbarButton}
-                renderOption={(option, selected) => {
-                  return <Text allowFontScaling style={selected ? normalStyle : selectedStyle}>{option}</Text>;
-                }}
-
-                selectedOption={this.props.selectedOption}
               />
               <Touchable.FAIcon name="sort"
                 selector="sort"

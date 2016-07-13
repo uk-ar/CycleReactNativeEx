@@ -6,7 +6,6 @@ var MIcon = require('react-native-vector-icons/MaterialIcons');
 
 import materialColor from 'material-colors';
 
-import { RadioButtons, SegmentedControls } from 'react-native-radio-buttons';
 var _ = require('lodash');
 
 import {
