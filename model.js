@@ -35,16 +35,20 @@ Book.schema = {
     modifyDate: 'date',
   },
 };
-const realm = new Realm({ schema: [Book], schemaVersion: 3 });
+let realm = new Realm({ schema: [Book], schemaVersion: 3 });
 realm.write(() => {
-  /* mockbooks.reverse().map((book)=>{
-     realm.create('Book',{...book,modifyDate: new Date(Date.now())},true)
-     })*/
+  mockbooks.reverse().map((book) => {
+    realm.create('Book',
+                 {...book, modifyDate: new Date(Date.now())},
+                 true)
+  })
 });
 
-const initialBooks = realm.objects('Book')
-                          .sorted('modifyDate', true)// reverse sort
-                          .map((elem) => elem);
+/* const initialBooks = realm.objects('Book')
+ *                           .sorted('modifyDate', true)// reverse sort
+ *                           .map((elem) => elem);
+ * */
+const initialBooks = [];
 
 function model(actions) {
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
@@ -52,7 +56,7 @@ function model(actions) {
     Rx.Observable
       .combineLatest(
         actions.booksResponse$,
-        actions.booksStatus$.startWith([]),
+        //actions.booksStatus$.startWith([]),
         (books, booksStatus) => {
           return books.map(book => {
             let libraryStatus;

@@ -22,17 +22,20 @@ function intent(RN, HTTP) {
                 .filter(query => query.length > 1)
                 .map(q => RAKUTEN_SEARCH_API + encodeURI(q));
   const booksResponse$ =
-    HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
-        .switch()
-        .map(res =>
-          res.body.Items
-             .filter(book => book.isbn)
-          // reject non book
-             .filter(book => (book.isbn.startsWith('978')
-                           || book.isbn.startsWith('979')))
-        )
-        .do(i => console.log('books change:%O', i))
-        .share();
+    Rx.Observable.just([]);
+    //HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
+  /* HTTP.byUrl(RAKUTEN_SEARCH_API)
+   *     .switch()
+   *     .do((i)=>console.log("bo re",i))
+   *     .map(res =>
+   *       res.body.Items
+   *          .filter(book => book.isbn)
+   *       // reject non book
+   *          .filter(book => (book.isbn.startsWith('978')
+   *                        || book.isbn.startsWith('979')))
+   *     )
+   *     .do(i => console.log('books change:%O', i))
+   *     .share();*/
   const release$ = RN.select('bookcell')
                      .events('release');
   // move to model?
@@ -42,19 +45,14 @@ function intent(RN, HTTP) {
                   .do(i => console.log('status req:%O', i));
   const request$ = Rx.Observable.merge(requestBooks$, requestStatus$);
 
-  fetch("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784834014655,9784834000825,9784862463241,9784834032147,9784828867472",{
-    'method': 'GET',
-    'headers': {
-      'Accept': 'text/plain',
-    }})
-    .then((response) => console.log("response:",response))
   /* const savedBooksResponse$ =
    *   HTTP.byKey('savedBooksStatus')
    * //HTTP.select('savedBooksStatus')
    * //HTTP.byUrl(CALIL_STATUS_API)
    *       .switch()
-   *       .do(i => console.log('saved books:%O', i))
-   *       .subscribe()*/
+   *       .flatMap(i => i.text())
+   *       .do(i => console.log('saved books:%O', i))*/
+        //.subscribe()
   // release$.do((i)=>console.log("rel$")).subscribe()
   return {
     requestBooks$,
@@ -96,10 +94,13 @@ function intent(RN, HTTP) {
                   .do(i => console.log('sort:%O', i))
                   .subscribe(),
     booksResponse$,
-    booksStatus$: HTTP
-      .filter(res$ => res$.request.url.indexOf(CALIL_STATUS_API) === 0)
+    booksStatus$: //HTTP
+      //.filter(res$ => res$.request.url.indexOf(CALIL_STATUS_API) === 0)
+    //.filter(res$ => res$.request.url.indexOf("http://foo") === 0)
+    Rx.Observable.just(null)
       .switch()
-      .map(res$ => JSON.parse(res$.text.match(/callback\((.*)\)/)[1]))
+      .do(i => console.log('books status:%O', i))
+      //.map(res$ => JSON.parse(res$.text.match(/callback\((.*)\)/)[1]))
       .do(i => console.log('books status retry:%O', i))
       // FIXME:
       .flatMap(result => [Object.assign({}, result, { continue: 0 }), result])
