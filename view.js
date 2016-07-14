@@ -257,9 +257,10 @@ function booksToObject(books) {
 }
 
 function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSection }) {
-  const borrowedBooks = savedBooks.filter((book) => book.bucket === 'borrowed');
-  const likedBooks = savedBooks.filter((book) => book.bucket === 'liked');
-  const doneBooks = savedBooks.filter((book) => book.bucket === 'done');
+  console.log("s b",savedBooks);
+  const borrowedBooks = [{ title: 'like:SOFT SKILLS', isbn: '9784822251550' }]//savedBooks.filter((book) => book.bucket === 'borrowed');
+  const likedBooks = []//savedBooks.filter((book) => book.bucket === 'liked');
+  const doneBooks = []//savedBooks.filter((book) => book.bucket === 'done');
   // todo transition to detail view
   /* 検索: {
      books:searchedBooks,
@@ -317,7 +318,7 @@ function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSectio
     };
   // console.log("detail",items)
   }
-
+  console.log('render main2');
   return (
     <View
       key="main"

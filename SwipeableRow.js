@@ -511,6 +511,7 @@ var AnimView = React.createClass({
             this.counter,
             { toValue: 1,
               duration: (this.props.anim && this.props.anim.duration) || 180,
+              //duration: 180,
             }
           ).start(() => {
             resolve();

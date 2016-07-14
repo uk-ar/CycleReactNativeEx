@@ -200,6 +200,7 @@ const BookCell = React.createClass({
       TouchableElement = Touchable.TouchableNativeFeedback;
     }
     // console.log("hair:",StyleSheet.hairlineWidth,PixelRatio.roundToNearestPixel(StyleSheet.hairlineWidth),PixelRatio.get())
+    console.log("bookcell", book);
 
     return (
       //    style={{flex:1}}

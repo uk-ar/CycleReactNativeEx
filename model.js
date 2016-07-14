@@ -43,12 +43,9 @@ realm.write(() => {
                  true)
   })
 });
-
-/* const initialBooks = realm.objects('Book')
- *                           .sorted('modifyDate', true)// reverse sort
- *                           .map((elem) => elem);
- * */
-const initialBooks = [];
+const initialBooks = realm.objects('Book')
+                          .sorted('modifyDate', true)// reverse sort
+                          .map((i)=>i)//convert result to array
 
 function model(actions) {
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
@@ -90,6 +87,7 @@ function model(actions) {
 
   const savedBooks$ =
     actions.changeBucket$
+           .startWith(initialBooks)
            .scan((books, { type, book }) => {
              console.log('type:', type);
              switch (type) {
@@ -114,7 +112,7 @@ function model(actions) {
            }).shareReplay();
 
   const requestSavedBooksStatus$ =
-    savedBooks$.startWith(initialBooks)
+    savedBooks$
                .map((books) => books.map(book => book.isbn))
                //.map(q => CALIL_STATUS_API + encodeURI(q))
                .map(q => (
@@ -178,7 +176,7 @@ function model(actions) {
   const state$ = Rx
     .Observable
     .combineLatest(searchedBooks$.startWith(MOCKED_MOVIES_DATA).distinctUntilChanged(),
-                   savedBooks$.startWith(initialBooks),
+                   savedBooks$,
                    booksLoadingState$.startWith(false).distinctUntilChanged(),
                    navigationState$.distinctUntilChanged(),
                    selectedBook$.startWith(null).distinctUntilChanged(),
