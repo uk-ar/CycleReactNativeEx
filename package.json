@@ -22,7 +22,7 @@
   "devDependencies": {
     "babel-eslint": "^6.1.0",
     "babel-cli": "^6.0.0",
-    "esformatter": "^0.9.5",
+    "esformatter": "^0.9.6",
     "esformatter-jsx": "^7.0.1",
     "eslint": "^3.0.0",
     "eslint-config-airbnb": "^9.0.1",
