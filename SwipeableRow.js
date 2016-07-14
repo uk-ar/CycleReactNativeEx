@@ -479,10 +479,16 @@ var AnimView = React.createClass({
     this.counter = new Animated.Value(0);
     const current = StyleSheet.flatten(this.prevStyle);
     const next = StyleSheet.flatten(nextStyle);
-    var animatedStyle = Object.assign({}, next);
-
-      // console.log("rec",current,this.prevStyle,next,animatedStyle);
-
+    let animatedStyle = Object.assign({}, next);
+    // console.log("rec",current,this.prevStyle,next,animatedStyle);
+    /* if(current.height && next.height === null){
+     *   const orig = next.height;
+     *   this.refs.measure((x,y,width,height)=>{
+     *     next.height = height;
+     *     //replace
+     *     //anim.then(next.height=orig)
+     *   })
+     * }*/
     Object.keys(next).map((key) => {
           // remove if with filter & merge
           // console.log("k:",key,typeof next[key] === "number",key == "backgroundColor" || key == "color",current[key] != next[key],current[key],next[key])
@@ -504,7 +510,8 @@ var AnimView = React.createClass({
         Animated.timing(
             this.counter,
             { toValue: 1,
-            duration: 180 }
+              duration: (this.props.anim && this.props.anim.duration) || 180,
+            }
           ).start(() => {
             resolve();
           });
@@ -522,6 +529,7 @@ var AnimView = React.createClass({
     return (
       // style={[this.state.style,]}
       <Animated.View
+        ref="root"
         {...this.props}
         style={[this.state.animatedStyle]}
       >

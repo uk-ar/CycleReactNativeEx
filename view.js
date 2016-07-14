@@ -112,23 +112,27 @@ import { AnimView } from './SwipeableRow';
 class Header extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { toggle: true };
+    this.state = { toggle: true ,opacity: 0 };
   }
-
+  componentDidMount() {
+    this.setState({ opacity: 1 })
+  }
   render() {
     console.log('render header pad?', this.state.toggle);
     return (
-      <View
-        style={{ padding: 10 }}
+      <AnimView
+        style={{ padding: 10, opacity:this.state.opacity }}
+        anim={{ duration: 500 }}
       >
         <AnimView
           ref="view1"
           style={{
-        // height:this.staten.toggle ? 10 : 20,
-            height: 10,
+            height:this.state.toggle ? 10 : 20,
             backgroundColor: this.state.toggle ? 'black' : 'white',
           }}
-        />
+        >
+        <Text>foo</Text>
+        </AnimView>
         <AnimView
           ref="view2"
           style={{
@@ -155,7 +159,7 @@ class Header extends React.Component {
         >
           {'toggle'}
         </Text>
-      </View>);
+      </AnimView>);
   }
 }
 
