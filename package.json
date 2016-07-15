@@ -15,7 +15,7 @@
     "material-colors": "^1.0.0",
     "react": "15.2.1",
     "react-native": "0.29.0",
-    "react-native-search-bar": "^2.8.0",
+    "react-native-search-bar": "^2.12.0",
     "react-native-vector-icons": "^2.0.2",
     "realm": "0.14.1",
     "rx": "^4.1.0",
