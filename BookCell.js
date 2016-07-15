@@ -72,49 +72,43 @@ function RightButton({ icon, text, style, backgroundColor, ...props }) {
   );
 }
 
-let LibraryStatus = React.createClass({
-  render() {
-    const libraryStatus = this.props.libraryStatus || {};
+function LibraryStatus({ libraryStatus = {}, ...props }) {
+  let text;
+  let style;
 
-    let text, name, backgroundColor;
-
-    if (libraryStatus.rentable) {
-      text = '貸出可';// 利用可
-      style = { color: '#4CAF50' }; // Green
-    } else if (libraryStatus.exist) {
-      text = '貸出中';
-      style = { color: '#FFC107' }; // amber
-    } else if (libraryStatus.exist !== undefined) {
-      text = 'なし';
-      style = { color: '#F44336' }; // red
-    } else {
-      // text="取得中"
-    }
-    // http://www.google.com/design/spec/style/color.html#color-color-palette
-    if (text) {
-      return (
-        <View style={[styles.row]}>
-          <Text style={[
-            // {fontSize: 14,},//default?
-            style]}>
-            {text}
-          </Text>
-        </View>
-      );
-    } else {
-      return (
-        <View style={[styles.row]}>
-          <Text>
-            {'蔵書確認中'}
-          </Text>
-          <ActivityIndicator
-            size="small"
-          />
-        </View>
-      );
-    }
-  },
-});
+  if (libraryStatus.rentable) {
+    text = '貸出可';// 利用可
+    style = { color: '#4CAF50' }; // Green
+  } else if (libraryStatus.exist) {
+    text = '貸出中';
+    style = { color: '#FFC107' }; // amber
+  } else if (libraryStatus.exist !== undefined) {
+    text = 'なし';
+    style = { color: '#F44336' }; // red
+  } else {
+    // text="取得中"
+  }
+  // http://www.google.com/design/spec/style/color.html#color-color-palette
+  if (!text) {
+    return (
+      <View style={[styles.row]}>
+        <Text>
+          {'蔵書確認中'}
+        </Text>
+        <ActivityIndicator
+          size="small"
+        />
+      </View>
+    );
+  }
+  return (
+    <View style={[styles.row]}>
+      <Text style={style}>
+        {text}
+      </Text>
+    </View>
+  );
+}
 
 function getButtons(type, func, book) {
   let likedButton;
@@ -184,79 +178,71 @@ function getButtons(type, func, book) {
 }
 
 // ToastAndroid.show('foo', ToastAndroid.SHORT)
-const BookCell = React.createClass({
-  render() {
-    let { book, onRelease, style, title, ...props } = this.props;
-    // There is 3 type of close behavior
-    // animated left only
-    // animated right and vertical close permanently
-    // animated right and vertical close temporary
-    // onSwipeEnd onSwipeStart
-    // expand or close
-    let { leftButtons, rightButtons } = getButtons(title, onRelease, book);
-    // onPress={()=>console.log("cell press")}
-    let TouchableElement = Touchable.TouchableHighlight;
-    if (Platform.OS === 'android') {
-      TouchableElement = Touchable.TouchableNativeFeedback;
-    }
-    // console.log("hair:",StyleSheet.hairlineWidth,PixelRatio.roundToNearestPixel(StyleSheet.hairlineWidth),PixelRatio.get())
+function BookCell({ style, book, onRelease, title, onPanResponderMove, onPanResponderEnd, ...props }) {
+  // There is 3 type of close behavior
+  // animated left only
+  // animated right and vertical close permanently
+  // animated right and vertical close temporary
+  // onSwipeEnd onSwipeStart
+  // expand or close
+  let { leftButtons, rightButtons } = getButtons(title, onRelease, book);
+  let TouchableElement = Touchable.TouchableHighlight;
+  if (Platform.OS === 'android') {
+    TouchableElement = Touchable.TouchableNativeFeedback;
+  }
 
-    return (
-      //    style={{flex:1}}
-      // style={{backgroundColor:"red"}}
-      // style={{opacity:0.5}}
-      <SwipeableRow2
-        leftButtons={leftButtons}
-        rightButtons={rightButtons}
-        onPanResponderMove={() => {
-              // prevent vertical scroll
-          this.props.onPanResponderMove &&
-              this.props.onPanResponderMove();
-        }}
-
-        onPanResponderEnd={() => {
-          this.props.onPanResponderEnd &&
-              this.props.onPanResponderEnd();
-        }}
+  return (
+    <SwipeableRow2
+      leftButtons={leftButtons}
+      rightButtons={rightButtons}
+      onPanResponderMove={() => {
+          // prevent vertical scroll
+          onPanResponderMove && onPanResponderMove();
+      }}
+      onPanResponderEnd={() => {
+          onPanResponderEnd && onPanResponderEnd();
+      }}
+    >
+      <TouchableElement
+        selector="cell"
+        payload={book}
       >
-        <TouchableElement
-          selector="cell"
-          payload={book}
+        <View
+          {...props}
+          style={[styles.row, style]}
         >
-          <View style={[styles.row, this.props.style]}>
-            <Image
-              source={{ uri: book.thumbnail || undefined
-                /* Image source cannot accpet null */ }}
-              resizeMode="contain"
-              style={[styles.cellImage]}
-            />
-            <View style={[{ flexDirection: 'column',
+          <Image
+            source={{ uri: book.thumbnail || undefined
+              /* Image source cannot accpet null */ }}
+            resizeMode="contain"
+            style={[styles.cellImage]}
+          />
+          <View style={[{ flexDirection: 'column',
                           flex: 1,
                           //backgroundColor:"red",
-                        }]}>
-              <View style={[{ padding: 10, justifyContent: 'center' },
-                ]}>
-                <Text style={styles.bookTitle} numberOfLines={1}>
-                  {book.title}
-                </Text>
-                <Text style={styles.bookAuthor} numberOfLines={1}>
-                  {book.author}
-                </Text>
-                <LibraryStatus libraryStatus={book.libraryStatus} />
-              </View>
-              <View style={{ flex: 1 }} />
-              <View style={{ height: StyleSheet.hairlineWidth,
-                             backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                             marginRight: 10,
-                             marginBottom: PixelRatio.get(),
-                            //separator
-                          }} />
+            }]}>
+            <View style={[{ padding: 10, justifyContent: 'center' },
+              ]}>
+              <Text style={styles.bookTitle} numberOfLines={1}>
+                {book.title}
+              </Text>
+              <Text style={styles.bookAuthor} numberOfLines={1}>
+                {book.author}
+              </Text>
+              <LibraryStatus libraryStatus={book.libraryStatus} />
             </View>
+            <View style={{ flex: 1 }} />
+            <View style={{ height: StyleSheet.hairlineWidth,
+                           backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                           marginRight: 10,
+                           marginBottom: PixelRatio.get(),
+                           //separator
+            }} />
           </View>
-        </TouchableElement>
-      </SwipeableRow2>
-    );
-  }
-});
+        </View>
+      </TouchableElement>
+    </SwipeableRow2>
+  );
+};
 
 module.exports = { BookCell, SwipeableRow };

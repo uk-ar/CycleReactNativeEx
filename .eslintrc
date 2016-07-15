@@ -18,6 +18,7 @@
                                    "args":"none",
                                    "argsIgnorePattern": "_",}],
     "no-shadow": ["error", { "allow": ["_"] }],
+    "no-unused-expression": ["error", { "allowShortCircuit": true }],
     "no-console" : "warn",
     "react/prop-types": "warn",
     "react/no-multi-comp": "warn",
