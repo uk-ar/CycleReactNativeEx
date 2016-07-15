@@ -25,7 +25,7 @@ const {
   width,
 } = Dimensions.get('window');
 
-let { SwipeableRow, SwipeableRow2 } = require('./SwipeableRow');
+const { SwipeableRow, SwipeableRow2 } = require('./SwipeableRow');
 
 function LeftButton({ icon, text, style, backgroundColor, ...props }) {
   // backgroundColor are used from SwipeableButtons
@@ -200,7 +200,6 @@ const BookCell = React.createClass({
       TouchableElement = Touchable.TouchableNativeFeedback;
     }
     // console.log("hair:",StyleSheet.hairlineWidth,PixelRatio.roundToNearestPixel(StyleSheet.hairlineWidth),PixelRatio.get())
-    console.log("bookcell", book);
 
     return (
       //    style={{flex:1}}
@@ -225,7 +224,9 @@ const BookCell = React.createClass({
           payload={book}
         >
           <View style={[styles.row, this.props.style]}>
-            <Image source={{ uri: book.thumbnail }}
+            <Image
+              source={{ uri: book.thumbnail || undefined
+                /* Image source cannot accpet null */ }}
               resizeMode="contain"
               style={[styles.cellImage]}
             />
@@ -255,45 +256,7 @@ const BookCell = React.createClass({
         </TouchableElement>
       </SwipeableRow2>
     );
-    // TODO:flex-start & flex-end
-    return (
-      // probrem with hard coded width
-      <SwipeableRow
-        leftButtons={leftButtons}
-        rightButtons={rightButtons}
-        {...props}
-      >
-        <TouchableElement
-          selector="cell"
-          payload={book}
-        >
-          <View style={[styles.row, this.props.style]}>
-            <Image source={{ uri: book.thumbnail }}
-              resizeMode="contain"
-              style={[styles.cellImage]}
-            />
-            <View style={[{ flexDirection: 'column' }]}>
-              <View style={[{ padding: 10, justifyContent: 'center' },
-                ]}>
-                <Text style={styles.bookTitle} numberOfLines={1}>
-                  {book.title}
-                </Text>
-                <Text style={styles.bookAuthor} numberOfLines={1}>
-                  {book.author}
-                </Text>
-                <LibraryStatus libraryStatus={book.libraryStatus} />
-              </View>
-              <View style={{ height: StyleSheet.hairlineWidth,
-                            backgroundColor: '#CCCCCC',
-                            marginRight: 10,
-                            //separator
-                          }} />
-            </View>
-          </View>
-        </TouchableElement>
-      </SwipeableRow>
-    );
-  },
+  }
 });
 
 module.exports = { BookCell, SwipeableRow };

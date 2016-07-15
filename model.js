@@ -31,7 +31,8 @@ Book.schema = {
     bucket: { type: 'string', optional: true },
     title: { type: 'string', optional: true },
     author: { type: 'string', optional: true },
-    thumbnail: { type: 'string', optional: true },
+    //Image raise error when src is null
+    thumbnail: { type: 'string', default: undefined },
     modifyDate: 'date',
   },
 };
