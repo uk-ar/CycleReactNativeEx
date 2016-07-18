@@ -55,23 +55,23 @@ const MOCKED_MOVIES_DATA = [
   //size 200x200 largeImageUrl 64x64
 ];
 
-const EventEmitter = require('EventEmitter');
-const Rx = require('rx');
-
-function makeEventEmitterDriver() {
-  const eventEmitter = new EventEmitter();
-  return function eventEmitterDriver(outgoing$) {
-    outgoing$.subscribe(outgoing =>
-      eventEmitter.emit(outgoing.event, outgoing.args));
-    // event is string
-    // args is array
-    return {
-      events: function events(event) {
-        return Rx.Observable.fromEvent(eventEmitter, event);
-      },
-    };
-  };
-}
+/* const EventEmitter = require('EventEmitter');
+ * const Rx = require('rx');
+ *
+ * function makeEventEmitterDriver() {
+ *   const eventEmitter = new EventEmitter();
+ *   return function eventEmitterDriver(outgoing$) {
+ *     outgoing$.subscribe(outgoing =>
+ *       eventEmitter.emit(outgoing.event, outgoing.args));
+ *     // event is string
+ *     // args is array
+ *     return {
+ *       events: function events(event) {
+ *         return Rx.Observable.fromEvent(eventEmitter, event);
+ *       },
+ *     };
+ *   };
+ * }*/
 
 /* function CycleCompo(source,func){
      //var value$
@@ -137,5 +137,5 @@ module.exports = {
   LIBRARY_ID,
   CALIL_STATUS_API,
   MOCKED_MOVIES_DATA,
-  makeEventEmitterDriver,
+  //makeEventEmitterDriver,
 };
