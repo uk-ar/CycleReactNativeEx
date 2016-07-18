@@ -45,16 +45,31 @@ function intent(RN, HTTP) {
                   .do(i => console.log('status req:%O', i));
   const request$ = Rx.Observable.merge(requestBooks$, requestStatus$);
 
-  /* const savedBooksResponse$ =
-   *   HTTP.byKey('savedBooksStatus')
-   * //HTTP.select('savedBooksStatus')
-   * //HTTP.byUrl(CALIL_STATUS_API)
-   *       .switch()
-   *       .flatMap(i => i.text())
-   *       .do(i => console.log('saved books:%O', i))*/
-        //.subscribe()
+  const savedBooksResponse$ =
+    HTTP.byKey('savedBooksStatus')
+  //HTTP.select('savedBooksStatus')
+        .switch()
+        .flatMap(i => i.text())
+        .do(i => console.log('saved books:%O', i))
+        .map(res => JSON.parse(res.match(/callback\((.*)\)/)[1]))
+  //.subscribe();
+
+  const retryResponse$ =
+    savedBooksResponse$.map((i)=>console.log("retry",i))
+                       .map(result => {
+                         if (result.continue === 1) {
+                           throw result;
+                         }
+                         return result; // don't use?
+                       })
+                       .retryWhen((errors) =>
+                         errors.delay(2000) // .map(log)
+                       )
+
   // release$.do((i)=>console.log("rel$")).subscribe()
   return {
+    savedBooksResponse$,
+    retryResponse$,
     requestBooks$,
     request$,
     selectedSection$: RN.select('section')

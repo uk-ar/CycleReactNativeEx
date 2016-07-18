@@ -33,7 +33,7 @@ function main({ RN, HTTP, EE }) {
     /* HTTP: Rx.Observable
      *         .merge(actions.request$, request$), //state$.map(request),*/
     //HTTP: actions.request$
-    //HTTP: request$
+    HTTP: request$
   };
 }
 

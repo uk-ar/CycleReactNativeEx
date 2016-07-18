@@ -36,13 +36,13 @@ Book.schema = {
     modifyDate: 'date',
   },
 };
-let realm = new Realm({ schema: [Book], schemaVersion: 3 });
+const realm = new Realm({ schema: [Book], schemaVersion: 4 });
 realm.write(() => {
-  mockbooks.reverse().map((book) => {
-    realm.create('Book',
-                 {...book, modifyDate: new Date(Date.now())},
-                 true)
-  })
+  /* mockbooks.reverse().map((book) => {
+   *   realm.create('Book',
+   *                {...book, modifyDate: new Date(Date.now())},
+   *                true)
+   * })*/
 });
 const initialBooks = realm.objects('Book')
                           .sorted('modifyDate', true)// reverse sort
@@ -124,8 +124,13 @@ function model(actions) {
                  }))
                .do((i) => console.log('save status:', i))
                //.subscribe()
+  const savedBooksStatus$ =
+    Rx.Observable
+      .merge(actions.retryResponse$, actions.savedBooksResponse$)
+      .map(result => result.books)
+      .map(i=> console.log("sbs:", i))
+      .subscribe()
 
-               //.subscribe();
   const selectedBook$ = actions.goToBookView$;
   const booksLoadingState$ = actions.requestBooks$.map((_) => true)
                                     .merge(
