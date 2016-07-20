@@ -22,7 +22,7 @@
     "xstream": "^5.2.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.0.0",
+    "babel-cli": "^6.10.1",
     "babel-eslint": "^6.1.0",
     "eslint": "^3.0.0",
     "eslint-config-airbnb": "^9.0.1",
