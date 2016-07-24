@@ -1,50 +1,26 @@
 
-import React, { Component } from 'react';
-let { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
-var FAIcon = require('react-native-vector-icons/FontAwesome');
-var MIcon = require('react-native-vector-icons/MaterialIcons');
+import React from 'react';
 
-import materialColor from 'material-colors';
-
-var _ = require('lodash');
+const _ = require('lodash');
 
 import {
-  TouchableOpacity,
-  ActivityIndicator,
-  ListView,
-  Platform,
-  ProgressBarAndroid,
   StyleSheet,
-  Text,
   View,
-  Image,
-  TouchableHighlight,
-  TouchableNativeFeedback,
-  LayoutAnimation,
-  // cell
-  PixelRatio,
-  // searchBar
-  TextInput,
-  ToolbarAndroid,
-  Navigator,
-  NavigatorIOS,
   Animated,
-  ScrollView,
   PanResponder,
-  ToastAndroid,
 } from 'react-native';
 
-var Dimensions = require('Dimensions');
-var {
+const Dimensions = require('Dimensions');
+const {
   width,
   height,
 } = Dimensions.get('window');
 
-// variable for debug layout
-// var SWIPEABLE_MAIN_WIDTH = 300;
-var SWIPEABLE_MAIN_WIDTH = width;
+// constiable for debug layout
+// const SWIPEABLE_MAIN_WIDTH = 300;
+const SWIPEABLE_MAIN_WIDTH = width;
 
-var Expandable = React.createClass({
+const Expandable = React.createClass({
   getInitialState() {
     return {
       index: 0,
@@ -59,7 +35,7 @@ var Expandable = React.createClass({
 
   componentWillReceiveProps(nextProps) {
     // console.log("next:%O",nextProps);
-    var width = nextProps.width;
+    const width = nextProps.width;
     this.setState({ width });
     if (this.props.lock) { return; }
     // this.width = width;
@@ -127,7 +103,7 @@ var Expandable = React.createClass({
   },
 });
 
-var AnimatedExpandable = Animated.createAnimatedComponent(Expandable);
+const AnimatedExpandable = Animated.createAnimatedComponent(Expandable);
 
 /* usage:
    <AnimatableBackGroundColor
@@ -140,7 +116,7 @@ var AnimatedExpandable = Animated.createAnimatedComponent(Expandable);
    }}>foo</Text>
    </AnimatableBackGroundColor> */
 // TODO:migrate to AnimatableView
-var AnimatableBackGroundColor = React.createClass({
+const AnimatableBackGroundColor = React.createClass({
   componentWillMount() {
     this.colorIndex = new Animated.Value(this.props.colorIndex);
   },
@@ -172,7 +148,7 @@ var AnimatableBackGroundColor = React.createClass({
 });
 
 // Visible toggle hidden display
-var AnimatableView = React.createClass({
+const AnimatableView = React.createClass({
   getInitialState() {
     return {
       style: this.props.style,
@@ -193,10 +169,10 @@ var AnimatableView = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    var current = StyleSheet.flatten(this.props.style);
-    var next = StyleSheet.flatten(nextProps.style);
-    var style = Object.assign({}, next);
-    var values = Object.keys(StyleSheet.flatten(nextProps.style))
+    const current = StyleSheet.flatten(this.props.style);
+    const next = StyleSheet.flatten(nextProps.style);
+    const style = Object.assign({}, next);
+    const values = Object.keys(StyleSheet.flatten(nextProps.style))
                        .filter((key) => current[key] !== next[key])
                        .filter((key) =>
                          ((typeof current[key] !== 'string') ||
@@ -233,7 +209,7 @@ var AnimatableView = React.createClass({
 
   render() {
     // drop own props
-    var { style, ...props } = this.props;
+    const { style, ...props } = this.props;
     return (
       <Animated.View
         {...props}
@@ -245,7 +221,7 @@ var AnimatableView = React.createClass({
   },
 });
 
-var SwipeableButtons = React.createClass({
+const SwipeableButtons = React.createClass({
   getInitialState() {
     return {
       componentIndex: 0,
@@ -303,8 +279,8 @@ var SwipeableButtons = React.createClass({
   release(callback) {
     // need release listener?
     // Execute button action
-    var currentButton = this.props.buttons[this.state.componentIndex];
-    var close = currentButton.props.close;
+    const currentButton = this.props.buttons[this.state.componentIndex];
+    const close = currentButton.props.close;
     this.setState({ releasing: true });
 
     return new Promise((resolve, reject) => {
@@ -341,8 +317,8 @@ var SwipeableButtons = React.createClass({
   },
 
   render() {
-    var styles = this.styles;
-    var { width, ...props } = this.props;
+    const styles = this.styles;
+    const { width, ...props } = this.props;
     //               colors={this.props.colors}
     // console.log("w:%O", width);
     return (
@@ -382,7 +358,7 @@ var SwipeableButtons = React.createClass({
   },
 });
 
-var MeasureableView = React.createClass({
+const MeasureableView = React.createClass({
   // TODO:remove this.mounted
   // TODO:position absolute
   render() {
@@ -409,7 +385,7 @@ var MeasureableView = React.createClass({
   },
 });
 
-/* var SelectableView = React.createClass({
+/* const SelectableView = React.createClass({
    getInitialState:function(){
    return({
    containerStyle:{position:"absolute"}
@@ -438,7 +414,7 @@ var MeasureableView = React.createClass({
    }
 }); */
 
-/* var MeasureableViews = React.createClass({
+/* const MeasureableViews = React.createClass({
  *   //TODO:remove this.widths
  *   render: function(){
  *     return (React.Children.toArray(this.props.children))
@@ -459,14 +435,21 @@ var MeasureableView = React.createClass({
  *   }
  * })*/
 
-var AnimView = React.createClass({
+const AnimView = React.createClass({
   // Use LayoutAnimation if you want to use height or width null
   getInitialState() {
     return {
       animatedStyle: StyleSheet.flatten(this.props.style),
     };
   },
-
+  componentWillEnter(callback) {
+    console.log("component will enter");
+    callback();
+  },
+  componentWillLeave(callback) {
+    console.log("component will leave");
+    callback();
+  },
   componentWillMount() {
     this.prevStyle = StyleSheet.flatten(this.props.style);
     // this.animating = false;
@@ -480,6 +463,7 @@ var AnimView = React.createClass({
     const current = StyleSheet.flatten(this.prevStyle);
     const next = StyleSheet.flatten(nextStyle);
     let animatedStyle = Object.assign({}, next);
+    // check for initial
     // console.log("rec",current,this.prevStyle,next,animatedStyle);
     /* if(current.height && next.height === null){
      *   const orig = next.height;
@@ -501,6 +485,24 @@ var AnimView = React.createClass({
           inputRange: [0, 1],
           outputRange: [current[key], next[key]],
         });
+      }else if(key === 'transform' && current['transform']){
+        //current next
+        // transform is ordered array!!
+        /* console.log("ab",current['transform'],next['transform']);
+         * animatedStyle['transform'] =
+         *   [Object.keys(next['transform'][0])
+         *         .map((transformKey)=>console.log("ke",transformKey))
+         *         .filter((transformKey)=>
+         *           next['transform'][0][transformKey]!==
+         *             current['transform'][0][transformKey])
+         *         .reduce((acc,transformKey)=>{
+         *           acc[transformKey] = this.counter.interpolate({
+         *             inputRange: [0, 1],
+         *             outputRange: [current[key], next[key]],
+         *           })
+         *           return acc;
+         *         },{...next['transform'][0]})] || next['transform']
+         * console.log("as",animatedStyle['transform']);*/
       }
     });
 
@@ -539,7 +541,7 @@ var AnimView = React.createClass({
   },
 });
 
-var SwipeableButtons2 = React.createClass({
+const SwipeableButtons2 = React.createClass({
   getInitialState() {
     return {
       index: 0,
@@ -552,7 +554,7 @@ var SwipeableButtons2 = React.createClass({
   },
 
   release() {
-    var close = this.currentButton.props.close;
+    const close = this.currentButton.props.close;
     this.releasing = true;
 
     Animated.timing(this.props.width,
@@ -572,7 +574,7 @@ var SwipeableButtons2 = React.createClass({
     // console.log("mul",Animated.multiply(this._panX,-1))
     // console.log("buttons")
     // react-native cannot set width for clipped subview in ios
-    var { width, props } = this.props;
+    const { width, props } = this.props;
     this.currentButton = this.props.buttons[this.state.index];
     if (this.props.direction == 'right') {
       this.width = Animated.multiply(this.props.width, -1);
@@ -604,7 +606,7 @@ var SwipeableButtons2 = React.createClass({
                    this.props.width.addListener(({ value: value }) => {
                      if (this.releasing) { return; }
 
-                     var index = calcIndex(value, this.thresholds);
+                     let index = calcIndex(value, this.thresholds);
                      if (this.props.direction == 'right') {
                        index = calcIndex(-value, this.thresholds);
                      }
@@ -649,7 +651,7 @@ function calcIndex(value, thresholds) {
 
 // scroll view base
 // ref: http://browniefed.com/blog/react-native-animated-listview-row-swipe/
-var SwipeableRow2 = React.createClass({
+const SwipeableRow2 = React.createClass({
   getInitialState() {
     return {
       positiveSwipe: true,
@@ -745,7 +747,7 @@ var SwipeableRow2 = React.createClass({
   },
 });
 
-var SwipeableRow = React.createClass({
+const SwipeableRow = React.createClass({
   componentWillMount() {
     this._panX = new Animated.Value(0);
 
@@ -796,7 +798,7 @@ var SwipeableRow = React.createClass({
   },
 
   render() {
-    var leftButtons = (
+    const leftButtons = (
       // cannot convert animatedvalue because of release function
       // <SwipeableButtons
       <SwipeableButtons
@@ -809,7 +811,7 @@ var SwipeableRow = React.createClass({
       />);
     // button input color, component, release action
     // close flag is parent props
-    var rightButtons = (
+    const rightButtons = (
       <SwipeableButtons
         ref="rightButtons"
         direction="right"
@@ -848,7 +850,7 @@ var SwipeableRow = React.createClass({
   },
 });
 
-var styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',

@@ -5,7 +5,7 @@ const RAKUTEN_SEARCH_API =
 
 const LIBRARY_ID = 'Tokyo_Fuchu';
 
-const CALIL_STATUS_API = `http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=${LIBRARY_ID}&format=json&isbn=`;
+const CALIL_STATUS_API = `http://api.calil.jp/check?callback=no&appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=${LIBRARY_ID}&format=json&isbn=`;
 
 const MOCKED_MOVIES_DATA = [
   { title: 'ぐりとぐらの絵本7冊セット', author: '',

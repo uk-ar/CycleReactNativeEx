@@ -1,5 +1,5 @@
-const Rx = require('rx');
-const _ = require('lodash');
+import Rx from 'rx';
+import _ from 'lodash';
 
 import {
   STORAGE_KEY,
@@ -8,41 +8,76 @@ import {
   LIBRARY_ID,
 } from './common';
 
-import {
-  AsyncStorage,
-} from 'react-native';
-
 function intent(RN, HTTP) {
   // Actions
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')
+                         .map(([text])=>text)
                          .do(i => console.log('search text change:%O', i));
   const requestBooks$ =
     changeQuery$.debounce(500)
                 .filter(query => query.length > 1)
-                .map(q => RAKUTEN_SEARCH_API + encodeURI(q));
+                .map(q => (
+                  {key: 'search',
+                   url: RAKUTEN_SEARCH_API + encodeURI(q)
+                  }))
+                .do(i=>console.log("requestBooks"))
+                //.subscribe();
   const booksResponse$ =
-    Rx.Observable.just([]);
+    //Rx.Observable.just([]);
     //HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
-  /* HTTP.byUrl(RAKUTEN_SEARCH_API)
-   *     .switch()
-   *     .do((i)=>console.log("bo re",i))
-   *     .map(res =>
-   *       res.body.Items
-   *          .filter(book => book.isbn)
-   *       // reject non book
-   *          .filter(book => (book.isbn.startsWith('978')
-   *                        || book.isbn.startsWith('979')))
-   *     )
-   *     .do(i => console.log('books change:%O', i))
-   *     .share();*/
+    HTTP.byKey('search')
+        .switch()
+        //.do((i)=>console.log("bo re",i))
+        .flatMap((res)=>res.text())
+        .map((res)=>JSON.parse(res))
+        //.do((i)=>console.log("re",i))
+        .map(body =>
+          body.Items
+             .filter(book => book.isbn)
+          // reject non book
+             .filter(book => (book.isbn.startsWith('978')
+                           || book.isbn.startsWith('979')))
+        )
+        .do(i => console.log('books change:%O', i))
+        .share();
   const release$ = RN.select('bookcell')
                      .events('release');
   // move to model?
   const requestStatus$ =
     booksResponse$.map(books => books.map(book => book.isbn))
-                  .map(q => CALIL_STATUS_API + encodeURI(q))
+                  .map(q =>
+                    ({key: 'searchedBooksStatus',
+                     url: CALIL_STATUS_API + encodeURI(q)
+                    }))
                   .do(i => console.log('status req:%O', i));
+
+  const booksStatusResponse$ =
+    HTTP.byKey('searchedBooksStatus')
+      .switch()
+      .do(i => console.log('books status:%O', i))
+  //.map(res$ => JSON.parse(res$.text.match(/callback\((.*)\)/)[1]))
+      .do(i => console.log('books status retry:%O', i))
+  // FIXME:
+      .flatMap(result => [Object.assign({}, result, { continue: 0 }), result])
+      .map(result => {
+        if (result.continue === 1) {
+          throw result;
+        }
+
+        return result; // don't use?
+      })
+  // cannot capture retry stream
+      .retryWhen((errors) =>
+        errors.delay(2000) // .map(log)
+      )
+      .map(result => result.books)
+      .distinctUntilChanged()
+  /* .do(books =>
+     Object.keys(books).map(function(v) { return obj[k] })
+     books.filter(book => book["Tokyo_Fuchu"]["status"] == "OK")) */
+      .do(i => console.log('books status change:%O', i));
+
   const request$ = Rx.Observable.merge(requestBooks$, requestStatus$);
 
   const savedBooksResponse$ =
@@ -50,8 +85,8 @@ function intent(RN, HTTP) {
   //HTTP.select('savedBooksStatus')
         .switch()
         .flatMap(i => i.text())
-        .do(i => console.log('saved books:%O', i))
-        .map(res => JSON.parse(res.match(/callback\((.*)\)/)[1]))
+        .map(i=> JSON.parse(i))
+        .do(i => console.log('saved books:%O', i));
   //.subscribe();
 
   const retryResponse$ =
@@ -109,33 +144,7 @@ function intent(RN, HTTP) {
                   .do(i => console.log('sort:%O', i))
                   .subscribe(),
     booksResponse$,
-    booksStatus$: //HTTP
-      //.filter(res$ => res$.request.url.indexOf(CALIL_STATUS_API) === 0)
-    //.filter(res$ => res$.request.url.indexOf("http://foo") === 0)
-    Rx.Observable.just(null)
-      .switch()
-      .do(i => console.log('books status:%O', i))
-      //.map(res$ => JSON.parse(res$.text.match(/callback\((.*)\)/)[1]))
-      .do(i => console.log('books status retry:%O', i))
-      // FIXME:
-      .flatMap(result => [Object.assign({}, result, { continue: 0 }), result])
-      .map(result => {
-        if (result.continue === 1) {
-          throw result;
-        }
-
-        return result; // don't use?
-      })
-      // cannot capture retry stream
-      .retryWhen((errors) =>
-        errors.delay(2000) // .map(log)
-      )
-      .map(result => result.books)
-      .distinctUntilChanged()
-      /* .do(books =>
-         Object.keys(books).map(function(v) { return obj[k] })
-         books.filter(book => book["Tokyo_Fuchu"]["status"] == "OK")) */
-      .do(i => console.log('books status change:%O', i)),
+    booksStatusResponse$
   };
 }
 

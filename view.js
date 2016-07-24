@@ -23,6 +23,9 @@ if (Platform.OS === 'android') {
   Touchable.TouchableElement = Touchable.TouchableNativeFeedback;
 }
 
+Touchable.TextInput = Touchable.createCycleComponent(
+  TextInput);
+
 Touchable.FAIcon = Touchable.createCycleComponent(
   FAIcon, Touchable.PRESS_ACTION_TYPES);
 
@@ -108,6 +111,7 @@ MyListView.propTypes = {
 };
 
 import { AnimView } from './SwipeableRow';
+const ReactTransitionGroup = require('react-addons-transition-group')
 
 class Header extends React.Component {
   constructor(props) {
@@ -140,6 +144,29 @@ class Header extends React.Component {
             backgroundColor: 'green',
           }}
         />
+        <AnimView
+          ref="view4"
+          style={{
+            height:10,
+            width:10,
+            backgroundColor: 'yellow',
+            transform: this.state.toggle ? [{scale:1}] : [{scale:2},{scale:3}],
+          }}
+        />
+        <ReactTransitionGroup component={View}>
+          {this.state.toggle ?
+           <AnimView
+             ref="view3"
+             style={{
+               height: 10,
+               backgroundColor: 'red',
+             }}
+             componentWillEnter={(callback) => {
+                 console.log("component will enter2");
+                 callback();
+               }}
+           /> : null}
+        </ReactTransitionGroup>
         <Text
           style={{ color: 'white' }}
           onPress={() => {
@@ -184,9 +211,10 @@ function SearchHeader({ selectedSection, children, loadingState }) {
        selectedSection={selectedSection}
        section="検索"
      >
-       <TextInput
+       <Touchable.TextInput
          autoCapitalize="none"
          autoCorrect={false}
+         selector="text-input"
          autoFocus
          style={styles.searchBarInput}
        />

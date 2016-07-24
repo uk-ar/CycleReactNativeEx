@@ -22,7 +22,6 @@
     "rx": "^4.1.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.0.0",
     "babel-eslint": "^6.1.0",
     "eslint": "^3.0.0",
     "eslint-config-airbnb": "^9.0.1",

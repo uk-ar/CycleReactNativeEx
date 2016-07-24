@@ -50,41 +50,50 @@ const initialBooks = realm.objects('Book')
 
 function model(actions) {
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
+  function mergeBooksStatus(books,booksStatus){
+    return books.map(book => {
+      console.log("book:",book,booksStatus)
+      let libraryStatus;
+      if ((booksStatus[book.isbn] !== undefined) && // not yet retrieve
+          // sub library exist?
+          (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)) {
+        const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
+        // TODO:support error case
+        // if bookStatus.status == "Error"
+        libraryStatus = {
+          status: bookStatus.libkey,
+          reserveUrl: bookStatus.reserveurl,
+          rentable: _.values(bookStatus.libkey)
+                     .some(i => i === '貸出可'),
+          exist: Object.keys(bookStatus.libkey)
+                       .length !== 0,
+        };
+      }
+
+      return ({
+        title: book.title.replace(/^【バーゲン本】/, ''),
+        author: book.author,
+        isbn: book.isbn,
+        thumbnail: book.largeImageUrl,
+        libraryStatus,
+        //active: true,
+      });
+    }
+    );
+  }
+  /* actions.requestStatus$
+   *        .do(i=>console.log("req",i))
+   *        .subscribe();*/
   const searchedBooks$ =
     Rx.Observable
       .combineLatest(
         actions.booksResponse$,
+        actions.booksStatusResponse$,
+        mergeBooksStatus,
         //actions.booksStatus$.startWith([]),
-        (books, booksStatus) => {
-          return books.map(book => {
-            let libraryStatus;
-            if ((booksStatus[book.isbn] !== undefined) && // not yet retrieve
-                // sub library exist?
-                (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)) {
-              const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
-              // TODO:support error case
-              // if bookStatus.status == "Error"
-              libraryStatus = {
-                status: bookStatus.libkey,
-                reserveUrl: bookStatus.reserveurl,
-                rentable: _.values(bookStatus.libkey)
-                           .some(i => i === '貸出可'),
-                exist: Object.keys(bookStatus.libkey)
-                             .length !== 0,
-              };
-            }
-
-            return ({
-              title: book.title.replace(/^【バーゲン本】/, ''),
-              author: book.author,
-              isbn: book.isbn,
-              thumbnail: book.largeImageUrl,
-              libraryStatus,
-              //active: true,
-            });
-          }
-          ); }).do(i => console.log('searchedBooks$:%O', i)
-          ).distinctUntilChanged();
+        ).do(i => console.log('searchedBooks$:%O', i)
+        ).distinctUntilChanged();
+  searchedBooks$.subscribe();
 
   const savedBooks$ =
     actions.changeBucket$
@@ -125,11 +134,30 @@ function model(actions) {
                .do((i) => console.log('save status:', i))
                //.subscribe()
   const savedBooksStatus$ =
-    Rx.Observable
-      .merge(actions.retryResponse$, actions.savedBooksResponse$)
+    /* Rx.Observable
+     *   .merge(actions.retryResponse$, )*/
+    actions.savedBooksResponse$
       .map(result => result.books)
-      .map(i=> console.log("sbs:", i))
-      .subscribe()
+      .do(i=> console.log("sbs:", i))
+
+  const savedBooks2$ =
+    savedBooks$.combineLatest(
+      //Rx.Observable.interval(100),
+      savedBooksStatus$.startWith({}),
+      mergeBooksStatus
+      //savedBooksStatus$.startWith({}),
+      //(a,b)=>console.log("cl",a,b)
+        //actions.booksStatus$.startWith([]),
+      ).do(i => console.log('savedBooks2$:%O', i)
+        /* Rx.Observable
+         *   .combineLatest(
+         *     savedBooks$,
+         *     savedBooksStatus$,
+         *     (a,b)=>console.log("cl",a,b)
+         *     //actions.booksStatus$.startWith([]),
+         *   ).do(i => console.log('savedBooks2$:%O', i)*/
+      ).distinctUntilChanged()
+      .subscribe();
 
   const selectedBook$ = actions.goToBookView$;
   const booksLoadingState$ = actions.requestBooks$.map((_) => true)

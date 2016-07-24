@@ -27,11 +27,14 @@ function main({ RN, HTTP, EE }) {
   const { state$, request$ } = model(actions);
   // 0192521722
   // qwerty
+  request$.map((r) => console.log("r:", r))
+          .subscribe()
+
   return {
     RN: state$.map(view),
     // App Transport Security
-    /* HTTP: Rx.Observable
-     *         .merge(actions.request$, request$), //state$.map(request),*/
+    HTTP: Rx.Observable
+            .merge(actions.request$, request$), //state$.map(request),
     //HTTP: actions.request$
     //HTTP: request$
   };
