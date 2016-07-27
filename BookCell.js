@@ -110,7 +110,7 @@ function LibraryStatus({ libraryStatus = {}, ...props }) {
   );
 }
 
-function getButtons(type, func, book) {
+function getButtons(type, func, isbn) {
   let likedButton;
   let borrowedButton;
   let doneButton;
@@ -142,7 +142,7 @@ function getButtons(type, func, book) {
     <LeftButton
       close
       onRelease={() => {
-        console.log('like'); func(book, 'liked');
+        console.log('like'); func(isbn, 'liked');
       }}
       {...itemsInfo['読みたい']}
       {...likedButton}
@@ -150,7 +150,7 @@ function getButtons(type, func, book) {
     />, // light blue "#03A9F4"
     // blue "#2196F3"
     <LeftButton
-      onRelease={() => func(book, 'borrowed')}
+      onRelease={() => func(isbn, 'borrowed')}
       close
       {...itemsInfo['借りてる']}
       {...borrowedButton}
@@ -167,7 +167,7 @@ function getButtons(type, func, book) {
       text={null}
     />, // grey 300
     <RightButton
-      onRelease={() => func(book, 'done')}
+      onRelease={() => func(isbn, 'done')}
       close
       {...itemsInfo['読んだ']}
       {...doneButton}
@@ -177,40 +177,30 @@ function getButtons(type, func, book) {
   return { leftButtons, rightButtons };
 }
 
++ /* SwipeableRow2
++  *   onPanResponderMove, onPanResponderEnd,
++  *   onRelease,
++  *   bucket,
++  * children
++  *   book
++  *   ...props
++  *   style*/
 // ToastAndroid.show('foo', ToastAndroid.SHORT)
-function BookCell({ style, book, onRelease, title, onPanResponderMove, onPanResponderEnd, ...props }) {
-  // There is 3 type of close behavior
-  // animated left only
-  // animated right and vertical close permanently
-  // animated right and vertical close temporary
-  // onSwipeEnd onSwipeStart
-  // expand or close
-  let { leftButtons, rightButtons } = getButtons(title, onRelease, book);
+
+ function BookCell({ book, ...props }) {
   let TouchableElement = Touchable.TouchableHighlight;
   if (Platform.OS === 'android') {
     TouchableElement = Touchable.TouchableNativeFeedback;
+     //BUG:TouchableNativeFeedback TouchableOpacity TouchableWithoutFeedback not support style
   }
 
-  return (
-    <SwipeableRow2
-      leftButtons={leftButtons}
-      rightButtons={rightButtons}
-      onPanResponderMove={() => {
-          // prevent vertical scroll
-          onPanResponderMove && onPanResponderMove();
-      }}
-      onPanResponderEnd={() => {
-          onPanResponderEnd && onPanResponderEnd();
-      }}
+  return(
+     <View {...props}>
+    <TouchableElement
+    selector="cell"
+    payload={book}
     >
-      <TouchableElement
-        selector="cell"
-        payload={book}
-      >
-        <View
-          {...props}
-          style={[styles.row, style]}
-        >
+    <View style={styles.row}>
           <Image
             source={{ uri: book.thumbnail || undefined
               /* Image source cannot accpet null */ }}
@@ -241,8 +231,38 @@ function BookCell({ style, book, onRelease, title, onPanResponderMove, onPanResp
           </View>
         </View>
       </TouchableElement>
+    </View>)
+}
+
+function BookContainer({ isbn, onRelease, bucket, onPanResponderMove, onPanResponderEnd,children }) {
+  // There is 3 type of close behavior
+  // animated left only
+  // animated right and vertical close permanently
+  // animated right and vertical close temporary
+  // onSwipeEnd onSwipeStart
+  // expand or close
+  // skip close behavior
+  // (book,bucket)=>closeanimate.start(onRelease)
+  // onRelease is cycle:touchable element
+  let { leftButtons, rightButtons } = getButtons(bucket, onRelease, isbn)
+  return (
+    //CloseableCompo
+    // need ref & React.cloneElement?
+    <SwipeableRow2
+      leftButtons={leftButtons}
+      rightButtons={rightButtons}
+      onPanResponderMove={() => {
+          // prevent vertical scroll
+          onPanResponderMove && onPanResponderMove();
+      }}
+      onPanResponderEnd={() => {
+          onPanResponderEnd && onPanResponderEnd();
+      }}
+    >
+      {children}
     </SwipeableRow2>
   );
 };
 
-module.exports = { BookCell, SwipeableRow };
+module.exports = { BookContainer, BookCell, SwipeableRow };
+//module.exports = { BookCell, SwipeableRow };

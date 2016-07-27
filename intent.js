@@ -124,6 +124,7 @@ function intent(RN, HTTP) {
              .map({ type: 'back' }),
     changeBucket$: release$
       .do(i => console.log('release:', i))
+    // TODO:change to isbn
       .map(([book, bucket]) => (
         { type: 'replace',
           book: Object.assign(

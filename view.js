@@ -53,9 +53,9 @@ function MyCard({ children, navigationProps }) {
     );
 }
 
-import { BookCell } from './BookCell';
-Touchable.BookCell = Touchable.createCycleComponent(
-  BookCell, {
+import { BookContainer, BookCell } from './BookCell';
+Touchable.BookContainer = Touchable.createCycleComponent(
+  BookContainer, {
     onRelease: 'release',
   });
 
@@ -131,7 +131,8 @@ class Header extends React.Component {
         <AnimView
           ref="view1"
           style={{
-            height:this.state.toggle ? 10 : 20,
+            //height:this.state.toggle ? 10 : 20,
+            height:10,
             backgroundColor: this.state.toggle ? 'black' : 'white',
           }}
         >
@@ -144,29 +145,24 @@ class Header extends React.Component {
             backgroundColor: 'green',
           }}
         />
-        <AnimView
-          ref="view4"
+        <View
+          ref="view5"
           style={{
-            height:10,
-            width:10,
-            backgroundColor: 'yellow',
-            transform: this.state.toggle ? [{scale:1}] : [{scale:2},{scale:3}],
+            height:20,
+            width:20,
+            backgroundColor: 'gray',
           }}
-        />
-        <ReactTransitionGroup component={View}>
-          {this.state.toggle ?
-           <AnimView
-             ref="view3"
+        >
+           <View
+             ref="view4"
              style={{
-               height: 10,
-               backgroundColor: 'red',
-             }}
-             componentWillEnter={(callback) => {
-                 console.log("component will enter2");
-                 callback();
-               }}
-           /> : null}
-        </ReactTransitionGroup>
+               height:40,
+               width:40,
+               backgroundColor: 'yellow',
+               //transform: this.state.toggle ? [{scale:3}] : [{scale:2},{scale:3}],
+              }}
+            />
+         </View>
         <Text
           style={{ color: 'white' }}
           onPress={() => {
@@ -181,6 +177,11 @@ class Header extends React.Component {
         <Text
           style={{ color: 'white' }}
           onPress={() => {
+              console.log("refs",this.refs)
+              this.refs.view4.measure((x,y,width,height)=>
+                console.log("view4:",width,height))
+              this.refs.view5.measure((x,y,width,height)=>
+                console.log("view5:",width,height))
             this.setState((prev, current) => ({ toggle: !prev.toggle }));
           }}
         >
@@ -276,7 +277,7 @@ function booksToObject(books) {
   let obj = {};
   books.forEach((book) => {
     if (book.isbn) {
-      obj[`isbn-${book.isbn}!`] = book;
+      obj[`isbn-${book.isbn}`] = book;
     } else {
       obj[book.key] = book.component;
     }
@@ -359,15 +360,18 @@ function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSectio
       <MyListView
         selectedSection={selectedSection}
         items={items}
-        renderRow={(item, sectionID, rowID) => {
-          if (React.isValidElement(item)) {
-            return item;
-          }
-
-          return (
-            <Touchable.BookCell
-              key={rowID}
-              selector="bookcell"
+                 renderRow={(rowData, sectionID, rowID) => {
+             if (React.isValidElement(rowData)) {
+               //for section footer rendering
+               return rowData;
+             }
+             console.log("row:",rowData, sectionID, rowID.replace('isbn-',''))
+             return (
+               <Touchable.BookContainer
+               key={rowID}
+               selector="bookcell"
+               bucket={sectionID}
+               isbn={rowID.replace('isbn-','')}
               onPanResponderMove={() => {
                 console.log(this.listview);
                   // this.listView.setNativeProps({ scrollEnabled: false });
@@ -376,10 +380,14 @@ function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSectio
                 console.log(this.listview);
                 // this.listView.setNativeProps({ scrollEnabled: true });
               }}
-              book={item}
-              title={sectionID}
               style={{ backgroundColor: materialColor.grey['50'] }}
-            />);
+                    >
+                 <BookCell
+                      book={rowData}
+                      style={{ backgroundColor: materialColor.grey['50'] }}
+                            />
+               </Touchable.BookContainer>
+           );
         }}
         renderSectionHeader={(sectionData, sectionID) =>
           (sectionID === '検索') ? (

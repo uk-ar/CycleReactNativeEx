@@ -33,8 +33,8 @@ function main({ RN, HTTP, EE }) {
   // qwerty
   return {
     RN: state$.map(view),
-    HTTP: Rx.Observable
-            .merge(actions.request$, request$), //state$.map(request),*/
+    /* HTTP: Rx.Observable
+     *         .merge(actions.request$, request$), //state$.map(request),*/
     //HTTP: actions.request$, //state$.map(request),
   };
 }
