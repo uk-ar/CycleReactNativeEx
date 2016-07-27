@@ -122,7 +122,7 @@ class Header extends React.Component {
     this.setState({ opacity: 1 })
   }
   render() {
-    console.log('render header pad?', this.state.toggle);
+    //console.log('render header pad?', this.state.toggle);
     return (
       <AnimView
         style={{ padding: 10, opacity:this.state.opacity }}
@@ -131,8 +131,8 @@ class Header extends React.Component {
         <AnimView
           ref="view1"
           style={{
-            //height:this.state.toggle ? 10 : 20,
-            height:10,
+            height:this.state.toggle ? 10 : 20,
+            //height:10,
             backgroundColor: this.state.toggle ? 'black' : 'white',
           }}
         >
@@ -177,11 +177,11 @@ class Header extends React.Component {
         <Text
           style={{ color: 'white' }}
           onPress={() => {
-              console.log("refs",this.refs)
+              /* console.log("refs",this.refs)
               this.refs.view4.measure((x,y,width,height)=>
-                console.log("view4:",width,height))
+              console.log("view4:",width,height))
               this.refs.view5.measure((x,y,width,height)=>
-                console.log("view5:",width,height))
+              console.log("view5:",width,height)) */
             this.setState((prev, current) => ({ toggle: !prev.toggle }));
           }}
         >
@@ -357,6 +357,7 @@ function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSectio
       }}
     >
       {header}
+      { /* listView should have onRelease method */ }
       <MyListView
         selectedSection={selectedSection}
         items={items}

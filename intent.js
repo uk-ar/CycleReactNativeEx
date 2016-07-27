@@ -125,11 +125,16 @@ function intent(RN, HTTP) {
     changeBucket$: release$
       .do(i => console.log('release:', i))
     // TODO:change to isbn
-      .map(([book, bucket]) => (
-        { type: 'replace',
-          book: Object.assign(
-            {}, book, { bucket, modifyDate: new Date(Date.now()) }) }))
-      .do(i => console.log('rel:%O', i)),
+       .map(([isbn, bucket]) => (
+         { type: 'replace',
+           isbn,
+           bucket,
+         }))
+     /* .map(([book, bucket]) => (
+      *   { type: 'replace',
+      *     book: Object.assign(
+      *       {}, book, { bucket, modifyDate: new Date(Date.now()) }) }))*/
+     .do(i => console.log('rel:%O', i)),
     filterState$: RN.select('filter')
                     .events('press')
                     .startWith(false)

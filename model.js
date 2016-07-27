@@ -101,11 +101,11 @@ function model(actions) {
            .scan((books, { type, book }) => {
              console.log('type:', type);
              switch (type) {
-               case 'remove':
-                 return books.filter((elem) =>
-                   elem.isbn.toString() !== book.isbn.toString());
-               case 'add':
-                 return [book].concat(books);
+                 /* case 'remove':
+                  *   return books.filter((elem) =>
+                  *     elem.isbn.toString() !== book.isbn.toString());
+                  * case 'add':
+                  *   return [book].concat(books);*/
                case 'replace':
                  return [book].concat(books.filter((elem) =>
                    elem.isbn.toString() !== book.isbn.toString()));

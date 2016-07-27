@@ -454,7 +454,7 @@ const AnimView = React.createClass({
     this.prevStyle = StyleSheet.flatten(this.props.style);
     // this.animating = false;
   },
-
+  //https://github.com/joshwcomeau/react-flip-move#enterleave-animations
   animate(nextStyle) {
       // duration,easing jquery
     console.log('animate');
