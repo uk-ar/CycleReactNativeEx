@@ -93,7 +93,7 @@ function model(actions) {
         //actions.booksStatus$.startWith([]),
         ).do(i => console.log('searchedBooks$:%O', i)
         ).distinctUntilChanged();
-  searchedBooks$.subscribe();
+  //searchedBooks$.subscribe();
 
   const savedBooks$ =
     actions.changeBucket$
@@ -157,7 +157,7 @@ function model(actions) {
          *     //actions.booksStatus$.startWith([]),
          *   ).do(i => console.log('savedBooks2$:%O', i)*/
       ).distinctUntilChanged()
-      .subscribe();
+               //.subscribe();
 
   const selectedBook$ = actions.goToBookView$;
   const booksLoadingState$ = actions.requestBooks$.map((_) => true)

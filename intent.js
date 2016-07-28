@@ -26,21 +26,27 @@ function intent(RN, HTTP) {
   const booksResponse$ =
     //Rx.Observable.just([]);
     //HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
-    HTTP.byKey('search')
-        .switch()
-        //.do((i)=>console.log("bo re",i))
-        .flatMap((res)=>res.text())
-        .map((res)=>JSON.parse(res))
-        //.do((i)=>console.log("re",i))
-        .map(body =>
-          body.Items
-             .filter(book => book.isbn)
-          // reject non book
-             .filter(book => (book.isbn.startsWith('978')
-                           || book.isbn.startsWith('979')))
-        )
-        .do(i => console.log('books change:%O', i))
-        .share();
+    //HTTP.byKey('search')
+    //Rx.Observable.empty()
+    /* HTTP.select('search')
+     *     .do(i=>console.log("i?:",i));*/
+    console.log("sel:",HTTP)//.select('search')
+        //.switch()
+  // .map(res=>res.text)*/
+  /* .switch()
+   * //.do((i)=>console.log("bo re",i))
+   * .flatMap((res)=>res.text())
+   * .map((res)=>JSON.parse(res))
+   * //.do((i)=>console.log("re",i))
+   * .map(body =>
+   *   body.Items
+   *      .filter(book => book.isbn)
+   *   // reject non book
+   *      .filter(book => (book.isbn.startsWith('978')
+   *                    || book.isbn.startsWith('979')))
+   * )
+   * .do(i => console.log('books change:%O', i))
+   * .share();*/
   const release$ = RN.select('bookcell')
                      .events('release');
   // move to model?
@@ -53,7 +59,8 @@ function intent(RN, HTTP) {
                   .do(i => console.log('status req:%O', i));
 
   const booksStatusResponse$ =
-    HTTP.byKey('searchedBooksStatus')
+    //HTTP.select('searchedBooksStatus')
+    Rx.Observable.empty()
       .switch()
       .do(i => console.log('books status:%O', i))
   //.map(res$ => JSON.parse(res$.text.match(/callback\((.*)\)/)[1]))
@@ -81,8 +88,9 @@ function intent(RN, HTTP) {
   const request$ = Rx.Observable.merge(requestBooks$, requestStatus$);
 
   const savedBooksResponse$ =
-    HTTP.byKey('savedBooksStatus')
-  //HTTP.select('savedBooksStatus')
+    //HTTP.byKey('savedBooksStatus')
+    //HTTP.select('savedBooksStatus')
+  Rx.Observable.empty()
         .switch()
         .flatMap(i => i.text())
         .map(i=> JSON.parse(i))
@@ -140,7 +148,7 @@ function intent(RN, HTTP) {
                     .startWith(false)
                     .scan((current, event) => !current)
                     .do(i => console.log('filter change:%O', i))
-                    .subscribe(),
+    ,
     sortState$: RN.select('sort')
                   .events('press')
                   .do(i => console.log('sort change:%O', i))
@@ -148,7 +156,7 @@ function intent(RN, HTTP) {
                   .startWith(false)
                   .scan((current, event) => !current)
                   .do(i => console.log('sort:%O', i))
-                  .subscribe(),
+    ,
     booksResponse$,
     booksStatusResponse$
   };

@@ -15,8 +15,13 @@ const Rx = require('rx');
 const { run } = require('@cycle/core');
 //import {run} from '@cycle/rx-run';
 import makeReactNativeDriver from '@cycle/react-native/src/driver';
-//const { makeHTTPDriver } = require('@cycle/http');
-const { makeFetchDriver } = require('@cycle/fetch');
+import { makeHTTPDriver } from '@cycle/http';
+//import RxAdapter from '@cycle/rx-adapter';
+import xsSA from '@cycle/xstream-adapter';
+//const { makeFetchDriver } = require('@cycle/fetch');
+import xs from 'xstream';
+
+const HTTPDriver = makeHTTPDriver();
 
 const intent = require('./intent');
 const model = require('./model');
@@ -27,21 +32,33 @@ function main({ RN, HTTP, EE }) {
   const { state$, request$ } = model(actions);
   // 0192521722
   // qwerty
-  request$.map((r) => console.log("r:", r))
-          .subscribe()
+  /* request$.map((r) => console.log("r:", r))
+   *         .subscribe()*/
 
   return {
     RN: state$.map(view),
     // App Transport Security
-    HTTP: Rx.Observable
-            .merge(actions.request$, request$), //state$.map(request),
-    //HTTP: actions.request$
+    /* HTTP: xs.of({
+     *   //'http://localhost:8080/hello'
+     *   url: "http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472", // GET method by default
+     *   category: 'search',
+     * })*/
+    /* HTTP: Rx.Observable.of({
+     *   //'http://localhost:8080/hello'
+     *   url: "http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472", // GET method by default
+     *   category: 'search',
+     * })*/
+    /* HTTP: Rx.Observable
+     *         .merge(actions.request$, request$), //state$.map(request),*/
+     //HTTP: actions.request$
     //HTTP: request$
   };
 }
 
 run(main, {
   RN: makeReactNativeDriver('CycleReactNativeEx'),
-  HTTP: makeFetchDriver(),
-  //HTTP: makeHTTPDriver(),
+  //HTTP: makeFetchDriver(),
+  //HTTP: sink$ => HTTPDriver(sink$, RxAdapter),
+  //HTTP: sink$ => HTTPDriver(sink$, xsSA),
+  HTTP: makeHTTPDriver()
 });
