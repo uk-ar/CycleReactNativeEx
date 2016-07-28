@@ -177,14 +177,14 @@ function getButtons(type, func, isbn) {
   return { leftButtons, rightButtons };
 }
 
-+ /* SwipeableRow2
-+  *   onPanResponderMove, onPanResponderEnd,
-+  *   onRelease,
-+  *   bucket,
-+  * children
-+  *   book
-+  *   ...props
-+  *   style*/
+/* SwipeableRow2
+ *   onPanResponderMove, onPanResponderEnd,
+ *   onRelease,
+ *   bucket,
+ * children
+ *   book
+ *   ...props
+ *   style*/
 // ToastAndroid.show('foo', ToastAndroid.SHORT)
 
  function BookCell({ book, ...props }) {
@@ -234,7 +234,7 @@ function getButtons(type, func, isbn) {
     </View>)
 }
 
-function BookContainer({ isbn, onRelease, bucket, onPanResponderMove, onPanResponderEnd,children }) {
+function BookRow({ bucket, book, onRelease, style }) {
   // There is 3 type of close behavior
   // animated left only
   // animated right and vertical close permanently
@@ -244,7 +244,7 @@ function BookContainer({ isbn, onRelease, bucket, onPanResponderMove, onPanRespo
   // skip close behavior
   // (book,bucket)=>closeanimate.start(onRelease)
   // onRelease is cycle:touchable element
-  let { leftButtons, rightButtons } = getButtons(bucket, onRelease, isbn)
+  let { leftButtons, rightButtons } = getButtons(bucket, onRelease, book)
   return (
     //CloseableCompo
     // need ref & React.cloneElement?
@@ -253,16 +253,19 @@ function BookContainer({ isbn, onRelease, bucket, onPanResponderMove, onPanRespo
       rightButtons={rightButtons}
       onPanResponderMove={() => {
           // prevent vertical scroll
-          onPanResponderMove && onPanResponderMove();
+          //onPanResponderMove && onPanResponderMove();
       }}
       onPanResponderEnd={() => {
-          onPanResponderEnd && onPanResponderEnd();
+          //onPanResponderEnd && onPanResponderEnd();
       }}
     >
-      {children}
+      <BookCell
+        book={book}
+        style={style}
+      />
     </SwipeableRow2>
   );
 };
 
-module.exports = { BookContainer, BookCell, SwipeableRow };
+module.exports = { BookRow };
 //module.exports = { BookCell, SwipeableRow };

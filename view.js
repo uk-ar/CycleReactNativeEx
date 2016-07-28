@@ -53,9 +53,9 @@ function MyCard({ children, navigationProps }) {
     );
 }
 
-import { BookContainer, BookCell } from './BookCell';
-Touchable.BookContainer = Touchable.createCycleComponent(
-  BookContainer, {
+import { BookRow } from './BookCell';
+Touchable.BookRow = Touchable.createCycleComponent(
+  BookRow, {
     onRelease: 'release',
   });
 
@@ -357,39 +357,25 @@ function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSectio
       }}
     >
       {header}
-      { /* listView should have onRelease method */ }
+      { /* listView should have onRelease method? */ }
       <MyListView
         selectedSection={selectedSection}
         items={items}
-                 renderRow={(rowData, sectionID, rowID) => {
-             if (React.isValidElement(rowData)) {
-               //for section footer rendering
-               return rowData;
-             }
-             console.log("row:",rowData, sectionID, rowID.replace('isbn-',''))
-             return (
-               <Touchable.BookContainer
-               key={rowID}
-               selector="bookcell"
-               bucket={sectionID}
-               isbn={rowID.replace('isbn-','')}
-              onPanResponderMove={() => {
-                console.log(this.listview);
-                  // this.listView.setNativeProps({ scrollEnabled: false });
-              }}
-              onPanResponderEnd={() => {
-                console.log(this.listview);
-                // this.listView.setNativeProps({ scrollEnabled: true });
-              }}
-              style={{ backgroundColor: materialColor.grey['50'] }}
-                    >
-                 <BookCell
-                      book={rowData}
-                      style={{ backgroundColor: materialColor.grey['50'] }}
-                            />
-               </Touchable.BookContainer>
-           );
-        }}
+        renderRow={(rowData, sectionID, rowID) => {
+            if (React.isValidElement(rowData)) {
+              //for section footer rendering
+              return rowData;
+            }
+            //console.log("row:",rowData, sectionID, rowID.replace('isbn-',''))
+            return (
+              <Touchable.BookRow
+                key={rowID}
+                selector="bookcell"
+                bucket={sectionID}
+                book={rowData}
+                style={{ backgroundColor: materialColor.grey['50'] }}/>
+            );
+          }}
         renderSectionHeader={(sectionData, sectionID) =>
           (sectionID === '検索') ? (
             <SearchHeader
