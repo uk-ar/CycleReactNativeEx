@@ -24,15 +24,15 @@ function intent(RN, HTTP) {
                 .do(i=>console.log("requestBooks"))
                 //.subscribe();
   const booksResponse$ =
-    //Rx.Observable.just([]);
+    Rx.Observable.just([]);
     //HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
     //HTTP.byKey('search')
     //Rx.Observable.empty()
     /* HTTP.select('search')
-     *     .do(i=>console.log("i?:",i));*/
-    console.log("sel:",HTTP)//.select('search')
-        //.switch()
-  // .map(res=>res.text)*/
+     *     .do(i=>console.log("i?:",i))
+     * //console.log("sel:",HTTP)//.select('search')
+     *     .switch()
+     *     .map(res=>res.text)*/
   /* .switch()
    * //.do((i)=>console.log("bo re",i))
    * .flatMap((res)=>res.text())
