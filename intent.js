@@ -24,15 +24,12 @@ function intent(RN, HTTP) {
                 .do(i=>console.log("requestBooks"))
                 //.subscribe();
   const booksResponse$ =
-    Rx.Observable.just([]);
-    //HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
-    //HTTP.byKey('search')
     //Rx.Observable.empty()
-    /* HTTP.select('search')
-     *     .do(i=>console.log("i?:",i))
-     * //console.log("sel:",HTTP)//.select('search')
-     *     .switch()
-     *     .map(res=>res.text)*/
+    HTTP.select('search')
+        .do(i=>console.log("i?:",i))
+  //console.log("sel:",HTTP)//.select('search')
+        .switch()
+        .map(res=>res.text)
   /* .switch()
    * //.do((i)=>console.log("bo re",i))
    * .flatMap((res)=>res.text())
@@ -59,8 +56,8 @@ function intent(RN, HTTP) {
                   .do(i => console.log('status req:%O', i));
 
   const booksStatusResponse$ =
-    //HTTP.select('searchedBooksStatus')
-    Rx.Observable.empty()
+    HTTP.select('searchedBooksStatus')
+    //Rx.Observable.empty()
       .switch()
       .do(i => console.log('books status:%O', i))
   //.map(res$ => JSON.parse(res$.text.match(/callback\((.*)\)/)[1]))
@@ -87,33 +84,55 @@ function intent(RN, HTTP) {
 
   const request$ = Rx.Observable.merge(requestBooks$, requestStatus$);
 
+  function createBooksStatusStream(httpResponseStream){
+    const booksStatusResponse$ =
+      httpResponseStream.switch()
+                        .map(res => res.text)
+                        .map(i => JSON.parse(i))
+                        .do(i => console.log('saved books:%O', i))
+
+    const retryResponse$ =
+      booksStatusResponse$
+        .do(i => console.log("retry:",i,i.continue))
+        .map(result => {
+          if (result.continue === 1) {
+            throw result;
+          }
+          return result; // don't use?
+        })
+        .retryWhen((errors) =>
+          errors.delay(2000) // .map(log)
+        )
+        .subscribe()
+  }
   const savedBooksResponse$ =
-    //HTTP.byKey('savedBooksStatus')
-    //HTTP.select('savedBooksStatus')
-  Rx.Observable.empty()
+    //Rx.Observable.empty()
+    HTTP.select('savedBooksStatus')
         .switch()
-        .flatMap(i => i.text())
+        .map(res=>res.text)
         .map(i=> JSON.parse(i))
-        .do(i => console.log('saved books:%O', i));
-  //.subscribe();
+        .do(i => console.log('saved books:%O', i))
+        //.subscribe()
 
   const retryResponse$ =
-    savedBooksResponse$.map((i)=>console.log("retry",i))
-                       .map(result => {
-                         if (result.continue === 1) {
-                           throw result;
-                         }
-                         return result; // don't use?
-                       })
-                       .retryWhen((errors) =>
-                         errors.delay(2000) // .map(log)
-                       )
+    savedBooksResponse$
+      .do(i=>console.log("retry:",i,i.continue))
+      .map(result => {
+        if (result.continue === 1) {
+          throw result;
+        }
+        return result; // don't use?
+      })
+      .retryWhen((errors) =>
+        errors.delay(2000) // .map(log)
+      )
+      .subscribe()
 
   // release$.do((i)=>console.log("rel$")).subscribe()
   return {
     savedBooksResponse$,
     retryResponse$,
-    requestBooks$,
+    requestBooks$, // for loading status
     request$,
     selectedSection$: RN.select('section')
                         .events('press')

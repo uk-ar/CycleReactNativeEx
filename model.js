@@ -127,8 +127,8 @@ function model(actions) {
                //.map(q => CALIL_STATUS_API + encodeURI(q))
                .map(q => (
                  {
-                   key: 'savedBooksStatus',
-                   //category: 'savedBooksStatus',
+                   //key: 'savedBooksStatus',
+                   category: 'savedBooksStatus',
                    url: CALIL_STATUS_API + encodeURI(q)
                  }))
                .do((i) => console.log('save status:', i))
@@ -136,7 +136,8 @@ function model(actions) {
   const savedBooksStatus$ =
     /* Rx.Observable
      *   .merge(actions.retryResponse$, )*/
-    actions.savedBooksResponse$
+    //actions.savedBooksResponse$
+    Rx.Observable.empty()
       .map(result => result.books)
       .do(i=> console.log("sbs:", i))
 

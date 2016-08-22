@@ -523,7 +523,7 @@ const AnimView = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    console.log('willReceiveProps');
+    //console.log('willReceiveProps');
     this.animate(nextProps.style);
   },
 
@@ -711,7 +711,7 @@ const SwipeableRow2 = React.createClass({
   },
 
   render() {
-    console.log('sr2:');
+    //console.log('sr2:');
     return (
       <View
         {...this._panResponder.panHandlers}
