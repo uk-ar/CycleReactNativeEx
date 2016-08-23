@@ -1,4 +1,5 @@
-import Rx from 'rx';
+var Rx = require('rx');//for debug http://stackoverflow.com/questions/32211649/debugging-with-webpack-es6-and-babel
+//import Rx from 'rx';
 import _ from 'lodash';
 
 import {
@@ -161,10 +162,12 @@ function model(actions) {
                //.subscribe();
 
   const selectedBook$ = actions.goToBookView$;
-  const booksLoadingState$ = actions.requestBooks$.map((_) => true)
-                                    .merge(
-                                      // response event
-                                      actions.booksResponse$.map((_) => false));
+  const booksLoadingState$ =
+    Rx.Observable.just([])
+  /* actions.requestBooks$.map((_) => true)
+   *        .merge(
+   *          // response event
+   *          actions.booksResponse$.map((_) => false));*/
   /* searchRequest$,statusRequest$
      searchRequest,statusRequest, */
 
@@ -218,10 +221,11 @@ function model(actions) {
                    actions.selectedSection$.startWith(null),
                    (searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection) =>
                      ({ searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection }));
-  return {
-    state$,
-    request$: requestSavedBooksStatus$
-  };
+  return state$
+  /* return {
+   *   state$,
+   *   request$: requestSavedBooksStatus$
+   * };*/
 }
 
 module.exports = model;

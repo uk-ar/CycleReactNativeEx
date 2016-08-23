@@ -17,42 +17,37 @@ function intent(RN, HTTP) {
   const requestBooks$ =
     changeQuery$.debounce(500)
                 .filter(query => query.length > 1)
-                .map(q => (
-                  {key: 'search',
-                   url: RAKUTEN_SEARCH_API + encodeURI(q)
-                  }))
+                .map(q => ({
+                  category: 'search',
+                  url: RAKUTEN_SEARCH_API + encodeURI(q)
+                }))
                 .do(i=>console.log("requestBooks"))
                 //.subscribe();
   const booksResponse$ =
-    //Rx.Observable.empty()
     HTTP.select('search')
         .do(i=>console.log("i?:",i))
-  //console.log("sel:",HTTP)//.select('search')
         .switch()
         .map(res=>res.text)
-  /* .switch()
-   * //.do((i)=>console.log("bo re",i))
-   * .flatMap((res)=>res.text())
-   * .map((res)=>JSON.parse(res))
-   * //.do((i)=>console.log("re",i))
-   * .map(body =>
-   *   body.Items
-   *      .filter(book => book.isbn)
-   *   // reject non book
-   *      .filter(book => (book.isbn.startsWith('978')
-   *                    || book.isbn.startsWith('979')))
-   * )
-   * .do(i => console.log('books change:%O', i))
-   * .share();*/
+        .map(res=>JSON.parse(res))
+        .do(i=>console.log("b re?:",i))
+        .map(body =>
+          body.Items
+              .filter(book => book.isbn)
+          // reject non book
+              .filter(book => (book.isbn.startsWith('978')
+                            || book.isbn.startsWith('979')))
+        )
+        .do(i => console.log('books change:%O', i))
+        .share();
   const release$ = RN.select('bookcell')
                      .events('release');
   // move to model?
   const requestStatus$ =
     booksResponse$.map(books => books.map(book => book.isbn))
-                  .map(q =>
-                    ({key: 'searchedBooksStatus',
-                     url: CALIL_STATUS_API + encodeURI(q)
-                    }))
+                  .map(q => ({
+                    category: 'searchedBooksStatus',
+                    url: CALIL_STATUS_API + encodeURI(q)
+                  }))
                   .do(i => console.log('status req:%O', i));
 
   const booksStatusResponse$ =
@@ -81,8 +76,6 @@ function intent(RN, HTTP) {
      Object.keys(books).map(function(v) { return obj[k] })
      books.filter(book => book["Tokyo_Fuchu"]["status"] == "OK")) */
       .do(i => console.log('books status change:%O', i));
-
-  const request$ = Rx.Observable.merge(requestBooks$, requestStatus$);
 
   function createBooksStatusStream(httpResponseStream){
     const booksStatusResponse$ =
@@ -132,8 +125,9 @@ function intent(RN, HTTP) {
   return {
     savedBooksResponse$,
     retryResponse$,
+    requestStatus$,
     requestBooks$, // for loading status
-    request$,
+    //request$,
     selectedSection$: RN.select('section')
                         .events('press')
                         .merge(RN.select('close')
