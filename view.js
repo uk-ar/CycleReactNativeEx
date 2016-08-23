@@ -113,6 +113,60 @@ MyListView.propTypes = {
 import { AnimView } from './SwipeableRow';
 const ReactTransitionGroup = require('react-addons-transition-group')
 
+class Closeable extends React.Component {
+  constructor(props) {
+    super(props);
+    //this.state = { height: null ,width: null };
+  }
+  /* componentWillReceiveProps(nextProps) {
+   *   if(this.props.close !== nextProps.close){
+   *     //foo.bar
+   *     //cannot measure animatedView
+   *     this.refs.inner.measure((x,y,width,height) => {        
+   *       //this.props.refs.outer.animate
+   *       //null or else
+   *       console.log("next:",nextProps.close,x,y,width,height)
+   *       if(nextProps.close){
+   *         //animate from height to 0.01
+   *         //this.refs.outer
+   *           //.animate({height:height},{height:0.01})
+   *         // rendered
+   *         //.animateTo({height:0.01})
+   *         //this.refs.outer.animateTo({height:0.01})
+   *       }else{
+   *         //animate from 0.01   to height
+   *         //this.refs.outer
+   *           //.animate({height:0.01},{height:height})
+   *         //.animateTo({height:height})
+   *         //this.refs.outer.animateTo({height:0.01});
+   *       }
+   *     })
+   *   }
+   * }*/
+  render() {
+    //style={{ height:0.01 }}
+    // not to optimize
+    console.log("rend close");
+    return(
+      <View
+        ref="outer"
+        collapsable={false}
+      >
+        <View
+          ref="inner"
+          collapsable={false}
+          onLayout={({ nativeEvent: { layout: {x, y, width, height } } }) => {
+              this.style={width:width,height:height};
+              //this.props.close ? trace func : none
+            }}
+        >
+          {this.props.children}
+        </View>
+      </View>
+      )
+  }
+}
+
 class Header extends React.Component {
   constructor(props) {
     super(props);
@@ -131,12 +185,16 @@ class Header extends React.Component {
         <AnimView
           ref="view1"
           style={{
-            height:this.state.toggle ? 10 : 20,
+            //height:this.state.toggle ? 10 : 20,
             //height:10,
             backgroundColor: this.state.toggle ? 'black' : 'white',
           }}
         >
-        <Text>foo</Text>
+          <Closeable
+            close={!this.state.toggle}
+            ref="close">
+            <Text>foo</Text>
+          </Closeable>
         </AnimView>
         <AnimView
           ref="view2"
@@ -163,13 +221,18 @@ class Header extends React.Component {
               }}
             />
          </View>
-        <Text
+         <Text
           style={{ color: 'white' }}
           onPress={() => {
-            this.refs.view2.animate({
+              this.refs.view2.animate(
+                {
+                  height: 10,
+                  backgroundColor: 'black',
+                },
+                {
               height: 10,
-              backgroundColor: 'yellow',
-            });
+              backgroundColor: 'orange',
+            },);
           }}
         >
           {'animate'}

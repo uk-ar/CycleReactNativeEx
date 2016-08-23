@@ -442,6 +442,7 @@ const AnimView = React.createClass({
       animatedStyle: StyleSheet.flatten(this.props.style),
     };
   },
+  // for ReactTransitionGroup
   componentWillEnter(callback) {
     console.log("component will enter");
     callback();
@@ -453,9 +454,13 @@ const AnimView = React.createClass({
   componentWillMount() {
     this.prevStyle = StyleSheet.flatten(this.props.style);
     // this.animating = false;
+  },  
+  animate(fromValues, toValues){
+    this.prevStyle = fromValues;
+    this.animateTo(toValues);
   },
   //https://github.com/joshwcomeau/react-flip-move#enterleave-animations
-  animate(nextStyle) {
+  animateTo(nextStyle) {
       // duration,easing jquery
     console.log('animate');
       // this.animating = true;
@@ -473,6 +478,8 @@ const AnimView = React.createClass({
      *     //anim.then(next.height=orig)
      *   })
      * }*/
+    //console.log("n:",next,nextStyle)
+    next && 
     Object.keys(next).map((key) => {
           // remove if with filter & merge
           // console.log("k:",key,typeof next[key] === "number",key == "backgroundColor" || key == "color",current[key] != next[key],current[key],next[key])
@@ -512,7 +519,7 @@ const AnimView = React.createClass({
         Animated.timing(
             this.counter,
             { toValue: 1,
-              duration: (this.props.anim && this.props.anim.duration) || 180,
+              duration: (this.props.anim && this.props.anim.duration) || 900,//180,
               //duration: 180,
             }
           ).start(() => {
@@ -524,9 +531,12 @@ const AnimView = React.createClass({
 
   componentWillReceiveProps(nextProps) {
     console.log('willReceiveProps');
-    this.animate(nextProps.style);
+    this.animateTo(nextProps.style);
   },
-
+  measure(callback){
+    //not needed?
+    callback(...Object.values(this.layout));
+  },
   render() {
     // console.log("rend anim,view1,view2",this.state.animatedStyle,this.props.style)
     return (
@@ -534,6 +544,12 @@ const AnimView = React.createClass({
       <Animated.View
         ref="root"
         {...this.props}
+        onLayout={
+          this.props.onLayout ? this.props.onLayout :
+          ({ nativeEvent: { layout: {x, y, width, height } } }) => {
+            //Animated.View cannot measure
+            this.layout = {x, y, width, height }            
+          }}
         style={[this.state.animatedStyle]}
       >
         {this.props.children}
