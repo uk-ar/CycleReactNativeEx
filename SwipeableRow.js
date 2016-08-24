@@ -465,7 +465,7 @@ const AnimView = React.createClass({
   //https://github.com/joshwcomeau/react-flip-move#enterleave-animations
   animateTo(nextStyle) {
       // duration,easing jquery
-    console.log('animate');
+    //console.log('animate');
       // this.animating = true;
     this.counter = new Animated.Value(0);
     const current = StyleSheet.flatten(this.prevStyle);
@@ -534,7 +534,7 @@ const AnimView = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    console.log('willReceiveProps');
+    //console.log('willReceiveProps');
     this.animateTo(nextProps.style);
   },
   measure(callback){
@@ -644,7 +644,7 @@ const SwipeableButtons2 = React.createClass({
             )}
          </View>);
     } else {
-      console.log('rend buttons');
+      //console.log('rend buttons');
       return (
         <AnimView
           {...props}

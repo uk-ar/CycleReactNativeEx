@@ -53,7 +53,7 @@ function model(actions) {
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
   function mergeBooksStatus(books,booksStatus){
     return books.map(book => {
-      console.log("book:",book,booksStatus)
+      //console.log("book:",book,booksStatus)
       let libraryStatus;
       if ((booksStatus[book.isbn] !== undefined) && // not yet retrieve
           // sub library exist?
@@ -86,14 +86,15 @@ function model(actions) {
    *        .do(i=>console.log("req",i))
    *        .subscribe();*/
   const searchedBooks$ =
-    Rx.Observable
-      .combineLatest(
-        actions.booksResponse$,
-        actions.booksStatusResponse$,
-        mergeBooksStatus,
-        //actions.booksStatus$.startWith([]),
-        ).do(i => console.log('searchedBooks$:%O', i)
-        ).distinctUntilChanged();
+    actions.searchedBooksStatus$
+  /* Rx.Observable
+   *   .combineLatest(
+   *     actions.booksResponse$,
+   *     actions.booksStatusResponse$,
+   *     mergeBooksStatus,
+   *     //actions.booksStatus$.startWith([]),
+   *     ).do(i => console.log('searchedBooks$:%O', i)
+   *     ).distinctUntilChanged();*/
   //searchedBooks$.subscribe();
 
   const savedBooks$ =
@@ -177,6 +178,7 @@ function model(actions) {
     title: 'Cycle Native',
     routes: [
       { key: 'Main' },
+      //{ key: 'Search' },
     ],
   };
 
@@ -218,7 +220,8 @@ function model(actions) {
                    booksLoadingState$.startWith(false).distinctUntilChanged(),
                    navigationState$.distinctUntilChanged(),
                    selectedBook$.startWith(null).distinctUntilChanged(),
-                   actions.selectedSection$.startWith(null),
+                   //actions.selectedSection$.startWith(null),
+                   actions.selectedSection$.startWith("検索"),
                    (searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection) =>
                      ({ searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection }));
   return state$

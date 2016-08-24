@@ -10,6 +10,9 @@ import {
 
 function intent(RN, HTTP) {
   // Actions
+  const release$ = RN.select('bookcell')
+                     .events('release');
+
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')
                          .map(([text])=>text)
@@ -22,14 +25,17 @@ function intent(RN, HTTP) {
                   url: RAKUTEN_SEARCH_API + encodeURI(q)
                 }))
                 .do(i=>console.log("requestBooks"))
-                //.subscribe();
+
+  function createResponseStream(category){
+    return(
+      HTTP.select(category)
+          .switch()
+          .map(res=>res.text)
+          .map(res=>JSON.parse(res))
+    )}
+
   const booksResponse$ =
-    HTTP.select('search')
-        .do(i=>console.log("i?:",i))
-        .switch()
-        .map(res=>res.text)
-        .map(res=>JSON.parse(res))
-        .do(i=>console.log("b re?:",i))
+    createResponseStream('search')
         .map(body =>
           body.Items
               .filter(book => book.isbn)
@@ -39,92 +45,106 @@ function intent(RN, HTTP) {
         )
         .do(i => console.log('books change:%O', i))
         .share();
-  const release$ = RN.select('bookcell')
-                     .events('release');
-  // move to model?
-  const requestStatus$ =
-    booksResponse$.map(books => books.map(book => book.isbn))
-                  .map(q => ({
-                    category: 'searchedBooksStatus',
-                    url: CALIL_STATUS_API + encodeURI(q)
-                  }))
-                  .do(i => console.log('status req:%O', i));
 
-  const booksStatusResponse$ =
-    HTTP.select('searchedBooksStatus')
-    //Rx.Observable.empty()
-      .switch()
-      .do(i => console.log('books status:%O', i))
-  //.map(res$ => JSON.parse(res$.text.match(/callback\((.*)\)/)[1]))
-      .do(i => console.log('books status retry:%O', i))
-  // FIXME:
-      .flatMap(result => [Object.assign({}, result, { continue: 0 }), result])
-      .map(result => {
-        if (result.continue === 1) {
-          throw result;
+  function createBooksStatusStream(books$, category) {
+    function mergeBooksStatus(books, booksStatus) {
+      return books.map(book => {
+        //console.log("book:",book,booksStatus)
+        let libraryStatus;
+        if ((booksStatus[book.isbn] !== undefined) && // not yet retrieve
+            // sub library exist?
+            (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)) {
+          const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
+          // TODO:support error case
+          // if bookStatus.status == "Error"
+          libraryStatus = {
+            status: bookStatus.libkey,
+            reserveUrl: bookStatus.reserveurl,
+            rentable: _.values(bookStatus.libkey)
+                       .some(i => i === '貸出可'),
+            exist: Object.keys(bookStatus.libkey)
+                         .length !== 0,
+          };
         }
 
-        return result; // don't use?
-      })
-  // cannot capture retry stream
-      .retryWhen((errors) =>
-        errors.delay(2000) // .map(log)
-      )
-      .map(result => result.books)
-      .distinctUntilChanged()
-  /* .do(books =>
-     Object.keys(books).map(function(v) { return obj[k] })
-     books.filter(book => book["Tokyo_Fuchu"]["status"] == "OK")) */
-      .do(i => console.log('books status change:%O', i));
+        return ({
+          title: book.title.replace(/^【バーゲン本】/, ''),
+          author: book.author,
+          isbn: book.isbn,
+          thumbnail: book.largeImageUrl,
+          libraryStatus,
+          //active: true,
+        });
+      }
+      );
+    }
 
-  function createBooksStatusStream(httpResponseStream){
+    const requestStatus$ =
+      //booksResponse$.map(books => books.map(book => book.isbn))
+      books$.map(books => books.map(book => book.isbn))
+            .filter(isbns => isbns.length > 0)
+            .map(q => ({
+              category: category, //'searchedBooksStatus',
+              url: CALIL_STATUS_API + encodeURI(q)
+            }))
+            .do(i => console.log('status req:%O', i));
+
     const booksStatusResponse$ =
-      httpResponseStream.switch()
-                        .map(res => res.text)
-                        .map(i => JSON.parse(i))
-                        .do(i => console.log('saved books:%O', i))
-
-    const retryResponse$ =
-      booksStatusResponse$
-        .do(i => console.log("retry:",i,i.continue))
+      //createResponseStream('searchedBooksStatus')
+      createResponseStream(category)
+        .do(i => console.log('books status:%O', i,i.continue))//executed by retry
+    //ok to retry but not output stream
+    // .flatMap(result => result.continue === 1 ?
+    //                 [result, Observable.throw(error)] : [result])
+        .flatMap(result => [{...result, continue: 0},result])
         .map(result => {
           if (result.continue === 1) {
             throw result;
           }
-          return result; // don't use?
+          return result;
         })
         .retryWhen((errors) =>
-          errors.delay(2000) // .map(log)
+          errors.delay(2000)
         )
-        .subscribe()
-  }
-  const savedBooksResponse$ =
-    //Rx.Observable.empty()
-    HTTP.select('savedBooksStatus')
-        .switch()
-        .map(res=>res.text)
-        .map(i=> JSON.parse(i))
-        .do(i => console.log('saved books:%O', i))
-        //.subscribe()
+        .distinctUntilChanged(i => JSON.stringify(i))
+        .map(result => result.books)
+    /* .do(books =>
+       Object.keys(books).map(function(v) { return obj[k] })
+       books.filter(book => book["Tokyo_Fuchu"]["status"] == "OK")) */
+        .do(i => console.log('books status change:%O', i));
 
-  const retryResponse$ =
-    savedBooksResponse$
-      .do(i=>console.log("retry:",i,i.continue))
-      .map(result => {
-        if (result.continue === 1) {
-          throw result;
-        }
-        return result; // don't use?
-      })
-      .retryWhen((errors) =>
-        errors.delay(2000) // .map(log)
-      )
-      .subscribe()
+    const booksStatus$ =
+      Rx.Observable
+        .combineLatest(
+          books$,
+          booksStatusResponse$,
+          mergeBooksStatus,
+        ).do(i => console.log('books$:', category, i))
+    return ({
+      booksStatus$,
+      requestStatus$ });
+  }
+  //const { booksStatus$: searchedBooksStatus$, requestStatus$: requestSearchedBooksStatus$} =
+  const { booksStatus$: searchedBooksStatus$, requestStatus$ } =
+    createBooksStatusStream(booksResponse$, 'searchedBooksStatus');
+  //mojibake "nas" "ai"
+
+  /* const { booksStatus$: searchedBooksStatus$, requestStatus$ } =
+   *   createBooksStatusStream(booksResponse$, 'savedBooksStatus');
+   *
+   * const savedBooksResponse$ =
+   *   //Rx.Observable.empty()
+   *   HTTP.select('savedBooksStatus')
+   *       .switch()
+   *       .map(res=>res.text)
+   *       .map(i=> JSON.parse(i))
+   *       .do(i => console.log('saved books:%O', i))
+   *       //.subscribe()*/
 
   // release$.do((i)=>console.log("rel$")).subscribe()
   return {
-    savedBooksResponse$,
-    retryResponse$,
+    //savedBooksResponse$,
+    //retryResponse$,
     requestStatus$,
     requestBooks$, // for loading status
     //request$,
@@ -170,8 +190,9 @@ function intent(RN, HTTP) {
                   .scan((current, event) => !current)
                   .do(i => console.log('sort:%O', i))
     ,
-    booksResponse$,
-    booksStatusResponse$
+    //booksResponse$,
+    //booksStatusResponse$,
+    searchedBooksStatus$,
   };
 }
 
