@@ -482,7 +482,7 @@ const AnimView = React.createClass({
      *   })
      * }*/
     //console.log("n:",next,nextStyle)
-    next && 
+    next &&
     Object.keys(next).map((key) => {
           // remove if with filter & merge
           // console.log("k:",key,typeof next[key] === "number",key == "backgroundColor" || key == "color",current[key] != next[key],current[key],next[key])
@@ -552,7 +552,7 @@ const AnimView = React.createClass({
           this.props.onLayout ? this.props.onLayout :
           ({ nativeEvent: { layout: {x, y, width, height } } }) => {
             //Animated.View cannot measure
-            this.layout = {x, y, width, height }            
+            this.layout = {x, y, width, height }
           }}
         style={[this.state.animatedStyle]}
       >
@@ -731,7 +731,7 @@ const SwipeableRow2 = React.createClass({
   },
 
   render() {
-    console.log('sr2:');
+    //console.log('sr2:');
     return (
       <View
         {...this._panResponder.panHandlers}

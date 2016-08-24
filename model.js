@@ -1,4 +1,5 @@
-import Rx from 'rx';
+var Rx = require('rx');//for debug http://stackoverflow.com/questions/32211649/debugging-with-webpack-es6-and-babel
+//import Rx from 'rx';
 import _ from 'lodash';
 
 import {
@@ -93,7 +94,7 @@ function model(actions) {
         //actions.booksStatus$.startWith([]),
         ).do(i => console.log('searchedBooks$:%O', i)
         ).distinctUntilChanged();
-  searchedBooks$.subscribe();
+  //searchedBooks$.subscribe();
 
   const savedBooks$ =
     actions.changeBucket$
@@ -127,8 +128,8 @@ function model(actions) {
                //.map(q => CALIL_STATUS_API + encodeURI(q))
                .map(q => (
                  {
-                   key: 'savedBooksStatus',
-                   //category: 'savedBooksStatus',
+                   //key: 'savedBooksStatus',
+                   category: 'savedBooksStatus',
                    url: CALIL_STATUS_API + encodeURI(q)
                  }))
                .do((i) => console.log('save status:', i))
@@ -136,7 +137,8 @@ function model(actions) {
   const savedBooksStatus$ =
     /* Rx.Observable
      *   .merge(actions.retryResponse$, )*/
-    actions.savedBooksResponse$
+    //actions.savedBooksResponse$
+    Rx.Observable.empty()
       .map(result => result.books)
       .do(i=> console.log("sbs:", i))
 
@@ -157,13 +159,15 @@ function model(actions) {
          *     //actions.booksStatus$.startWith([]),
          *   ).do(i => console.log('savedBooks2$:%O', i)*/
       ).distinctUntilChanged()
-      .subscribe();
+               //.subscribe();
 
   const selectedBook$ = actions.goToBookView$;
-  const booksLoadingState$ = actions.requestBooks$.map((_) => true)
-                                    .merge(
-                                      // response event
-                                      actions.booksResponse$.map((_) => false));
+  const booksLoadingState$ =
+    Rx.Observable.just([])
+  /* actions.requestBooks$.map((_) => true)
+   *        .merge(
+   *          // response event
+   *          actions.booksResponse$.map((_) => false));*/
   /* searchRequest$,statusRequest$
      searchRequest,statusRequest, */
 
@@ -217,10 +221,11 @@ function model(actions) {
                    actions.selectedSection$.startWith(null),
                    (searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection) =>
                      ({ searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection }));
-  return {
-    state$,
-    request$: requestSavedBooksStatus$
-  };
+  return state$
+  /* return {
+   *   state$,
+   *   request$: requestSavedBooksStatus$
+   * };*/
 }
 
 module.exports = model;

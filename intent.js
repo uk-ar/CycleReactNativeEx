@@ -17,27 +17,25 @@ function intent(RN, HTTP) {
   const requestBooks$ =
     changeQuery$.debounce(500)
                 .filter(query => query.length > 1)
-                .map(q => (
-                  {key: 'search',
-                   url: RAKUTEN_SEARCH_API + encodeURI(q)
-                  }))
+                .map(q => ({
+                  category: 'search',
+                  url: RAKUTEN_SEARCH_API + encodeURI(q)
+                }))
                 .do(i=>console.log("requestBooks"))
                 //.subscribe();
   const booksResponse$ =
-    //Rx.Observable.just([]);
-    //HTTP.filter(res$ => res$.request.url.indexOf(RAKUTEN_SEARCH_API) === 0)
-    HTTP.byKey('search')
+    HTTP.select('search')
+        .do(i=>console.log("i?:",i))
         .switch()
-        //.do((i)=>console.log("bo re",i))
-        .flatMap((res)=>res.text())
-        .map((res)=>JSON.parse(res))
-        //.do((i)=>console.log("re",i))
+        .map(res=>res.text)
+        .map(res=>JSON.parse(res))
+        .do(i=>console.log("b re?:",i))
         .map(body =>
           body.Items
-             .filter(book => book.isbn)
+              .filter(book => book.isbn)
           // reject non book
-             .filter(book => (book.isbn.startsWith('978')
-                           || book.isbn.startsWith('979')))
+              .filter(book => (book.isbn.startsWith('978')
+                            || book.isbn.startsWith('979')))
         )
         .do(i => console.log('books change:%O', i))
         .share();
@@ -46,14 +44,15 @@ function intent(RN, HTTP) {
   // move to model?
   const requestStatus$ =
     booksResponse$.map(books => books.map(book => book.isbn))
-                  .map(q =>
-                    ({key: 'searchedBooksStatus',
-                     url: CALIL_STATUS_API + encodeURI(q)
-                    }))
+                  .map(q => ({
+                    category: 'searchedBooksStatus',
+                    url: CALIL_STATUS_API + encodeURI(q)
+                  }))
                   .do(i => console.log('status req:%O', i));
 
   const booksStatusResponse$ =
-    HTTP.byKey('searchedBooksStatus')
+    HTTP.select('searchedBooksStatus')
+    //Rx.Observable.empty()
       .switch()
       .do(i => console.log('books status:%O', i))
   //.map(res$ => JSON.parse(res$.text.match(/callback\((.*)\)/)[1]))
@@ -78,35 +77,57 @@ function intent(RN, HTTP) {
      books.filter(book => book["Tokyo_Fuchu"]["status"] == "OK")) */
       .do(i => console.log('books status change:%O', i));
 
-  const request$ = Rx.Observable.merge(requestBooks$, requestStatus$);
+  function createBooksStatusStream(httpResponseStream){
+    const booksStatusResponse$ =
+      httpResponseStream.switch()
+                        .map(res => res.text)
+                        .map(i => JSON.parse(i))
+                        .do(i => console.log('saved books:%O', i))
 
+    const retryResponse$ =
+      booksStatusResponse$
+        .do(i => console.log("retry:",i,i.continue))
+        .map(result => {
+          if (result.continue === 1) {
+            throw result;
+          }
+          return result; // don't use?
+        })
+        .retryWhen((errors) =>
+          errors.delay(2000) // .map(log)
+        )
+        .subscribe()
+  }
   const savedBooksResponse$ =
-    HTTP.byKey('savedBooksStatus')
-  //HTTP.select('savedBooksStatus')
+    //Rx.Observable.empty()
+    HTTP.select('savedBooksStatus')
         .switch()
-        .flatMap(i => i.text())
+        .map(res=>res.text)
         .map(i=> JSON.parse(i))
-        .do(i => console.log('saved books:%O', i));
-  //.subscribe();
+        .do(i => console.log('saved books:%O', i))
+        //.subscribe()
 
   const retryResponse$ =
-    savedBooksResponse$.map((i)=>console.log("retry",i))
-                       .map(result => {
-                         if (result.continue === 1) {
-                           throw result;
-                         }
-                         return result; // don't use?
-                       })
-                       .retryWhen((errors) =>
-                         errors.delay(2000) // .map(log)
-                       )
+    savedBooksResponse$
+      .do(i=>console.log("retry:",i,i.continue))
+      .map(result => {
+        if (result.continue === 1) {
+          throw result;
+        }
+        return result; // don't use?
+      })
+      .retryWhen((errors) =>
+        errors.delay(2000) // .map(log)
+      )
+      .subscribe()
 
   // release$.do((i)=>console.log("rel$")).subscribe()
   return {
     savedBooksResponse$,
     retryResponse$,
-    requestBooks$,
-    request$,
+    requestStatus$,
+    requestBooks$, // for loading status
+    //request$,
     selectedSection$: RN.select('section')
                         .events('press')
                         .merge(RN.select('close')
@@ -140,7 +161,7 @@ function intent(RN, HTTP) {
                     .startWith(false)
                     .scan((current, event) => !current)
                     .do(i => console.log('filter change:%O', i))
-                    .subscribe(),
+    ,
     sortState$: RN.select('sort')
                   .events('press')
                   .do(i => console.log('sort change:%O', i))
@@ -148,7 +169,7 @@ function intent(RN, HTTP) {
                   .startWith(false)
                   .scan((current, event) => !current)
                   .do(i => console.log('sort:%O', i))
-                  .subscribe(),
+    ,
     booksResponse$,
     booksStatusResponse$
   };
