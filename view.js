@@ -110,59 +110,44 @@ MyListView.propTypes = {
 // selectedSection:selectedSection
 };
 
-import { AnimView } from './SwipeableRow';
+import { AnimView,MeasureableView } from './SwipeableRow';
 const ReactTransitionGroup = require('react-addons-transition-group')
 
 class Closeable extends React.Component {
   constructor(props) {
     super(props);
-    //this.state = { height: null ,width: null };
+    this.state = { layouted: false };
   }
-  /* componentWillReceiveProps(nextProps) {
-   *   if(this.props.close !== nextProps.close){
-   *     //foo.bar
-   *     //cannot measure animatedView
-   *     this.refs.inner.measure((x,y,width,height) => {        
-   *       //this.props.refs.outer.animate
-   *       //null or else
-   *       console.log("next:",nextProps.close,x,y,width,height)
-   *       if(nextProps.close){
-   *         //animate from height to 0.01
-   *         //this.refs.outer
-   *           //.animate({height:height},{height:0.01})
-   *         // rendered
-   *         //.animateTo({height:0.01})
-   *         //this.refs.outer.animateTo({height:0.01})
-   *       }else{
-   *         //animate from 0.01   to height
-   *         //this.refs.outer
-   *           //.animate({height:0.01},{height:height})
-   *         //.animateTo({height:height})
-   *         //this.refs.outer.animateTo({height:0.01});
-   *       }
-   *     })
-   *   }
-   * }*/
+  //horizontal
+  //promise
   render() {
-    //style={{ height:0.01 }}
-    // not to optimize
-    console.log("rend close");
+    // on the fly measureing cannot working when closed -> open
+    style = !this.state.layouted ?
+            {width: null , height: null} : this.props.close ?
+            {width:0.01,height:0.01} : this.style
+    if(this.props.direction == "horizontal"){
+      style.height = null;
+    }else if(this.props.direction == "vertical"){
+      style.width  = null;
+    }
     return(
-      <View
-        ref="outer"
-        collapsable={false}
-      >
-        <View
-          ref="inner"
-          collapsable={false}
-          onLayout={({ nativeEvent: { layout: {x, y, width, height } } }) => {
-              this.style={width:width,height:height};
-              //this.props.close ? trace func : none
-            }}
+      // not to optimize
+        <AnimView
+          style={[{//.vertical closable
+              overflow:"hidden",
+              flexDirection:"row",//not to resize text
+            },style]}
         >
-          {this.props.children}
-        </View>
-      </View>
+          <MeasureableView
+            onFirstLayout={({ nativeEvent: { layout: { x, y, width, height } } })=>{
+                this.style = {width:width,height:height}
+                this.setState({layouted:true})
+              }}
+            style={this.props.style}
+          >
+            {this.props.children}
+          </MeasureableView>
+        </AnimView>
       )
   }
 }
@@ -170,32 +155,36 @@ class Closeable extends React.Component {
 class Header extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { toggle: true ,opacity: 0 };
+    //this.state = { toggle: true ,opacity: 0 };
+    this.state = { toggle: true };
   }
   componentDidMount() {
-    this.setState({ opacity: 1 })
+    //this.setState({ opacity: 1 })
   }
   render() {
-    //console.log('render header pad?', this.state.toggle);
+    console.log('render header pad?', this.state.toggle);
+    //            close={this.state.toggle}
     return (
       <AnimView
         style={{ padding: 10, opacity:this.state.opacity }}
         anim={{ duration: 500 }}
       >
-        <AnimView
-          ref="view1"
-          style={{
-            //height:this.state.toggle ? 10 : 20,
-            //height:10,
-            backgroundColor: this.state.toggle ? 'black' : 'white',
-          }}
-        >
           <Closeable
-            close={!this.state.toggle}
+            style={{justifyContent:"center",
+                    backgroundColor:"red"}}
+            direction="vertical"
             ref="close">
-            <Text>foo</Text>
+            <AnimView
+              ref="view1"
+              style={{
+                //height:this.state.toggle ? 10 : 20,
+                //height:10,
+                //backgroundColor: this.state.toggle ? 'black' : 'white',
+              }}
+            >
+              <Text>foo</Text>
+            </AnimView>
           </Closeable>
-        </AnimView>
         <AnimView
           ref="view2"
           style={{
@@ -245,7 +234,8 @@ class Header extends React.Component {
               console.log("view4:",width,height))
               this.refs.view5.measure((x,y,width,height)=>
               console.log("view5:",width,height)) */
-            this.setState((prev, current) => ({ toggle: !prev.toggle }));
+              //this.setState((prev, current) => ({ toggle: !prev.toggle }));
+              this.refs.close.close();
           }}
         >
           {'toggle'}

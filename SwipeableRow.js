@@ -358,32 +358,35 @@ const SwipeableButtons = React.createClass({
   },
 });
 
-const MeasureableView = React.createClass({
-  // TODO:remove this.mounted
+class MeasureableView extends React.Component {
+//const MeasureableView = React.createClass({
   // TODO:position absolute
+  constructor(props) {
+    super(props);
+    this.state = { layouted: false };
+  }
   render() {
-    return this.mounted ? (
+    return this.state.layouted ? (
       <View
         {...this.props}
       >
         {this.props.children}
       </View>) : (
-
-
 <View
   {...this.props}
+  style={[this.props.style,{position:"absolute"}] }
   onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
     this.props.onFirstLayout &&
                 this.props.onFirstLayout(
                   { nativeEvent: { layout: { x, y, width, height } } });
-    this.mounted = true;
-  }}
+      this.setState({layouted:true})
+    }}
 >
           {this.props.children}
         </View>
       );
-  },
-});
+  }
+};
 
 /* const SelectableView = React.createClass({
    getInitialState:function(){
@@ -454,7 +457,7 @@ const AnimView = React.createClass({
   componentWillMount() {
     this.prevStyle = StyleSheet.flatten(this.props.style);
     // this.animating = false;
-  },  
+  },
   animate(fromValues, toValues){
     this.prevStyle = fromValues;
     this.animateTo(toValues);
@@ -483,9 +486,10 @@ const AnimView = React.createClass({
     Object.keys(next).map((key) => {
           // remove if with filter & merge
           // console.log("k:",key,typeof next[key] === "number",key == "backgroundColor" || key == "color",current[key] != next[key],current[key],next[key])
-      if ((typeof next[key] === 'number' ||
-              key.endsWith('Color') || key == 'color')
-              && current[key] !== next[key]
+      if (((typeof current[key] === 'number' && typeof next[key] === 'number')|
+           key.endsWith('Color') ||
+           key == 'color')
+          && current[key] !== next[key]
           ) {
             // console.log("an",current[key],next[key]);
         animatedStyle[key] = this.counter.interpolate({
@@ -519,7 +523,7 @@ const AnimView = React.createClass({
         Animated.timing(
             this.counter,
             { toValue: 1,
-              duration: (this.props.anim && this.props.anim.duration) || 900,//180,
+              duration: (this.props.anim && this.props.anim.duration) || 360,//180,
               //duration: 180,
             }
           ).start(() => {
@@ -880,4 +884,4 @@ const styles = StyleSheet.create({
   },
 });
 
-module.exports = { SwipeableRow, SwipeableRow2, AnimView };
+module.exports = { SwipeableRow, SwipeableRow2, AnimView,MeasureableView };
