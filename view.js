@@ -114,10 +114,59 @@ MyListView.propTypes = {
 import { AnimView,MeasureableView } from './SwipeableRow';
 const ReactTransitionGroup = require('react-addons-transition-group')
 
+class Closeable2 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      close: this.props.close,
+    };
+    this.style = this.props.close ? {height: 0.01} : {height: null};
+  }
+  open(){
+    this.refs.inner.measure((x,y,width,height)=>{
+      this.style = {height:height}
+      this.setState({close:false},()=>
+        this.refs.outer.animate({height:0.01},this.style))
+    })
+  }
+  close(){
+    this.refs.inner.measure((x,y,width,height)=>{
+      this.style = {height:0.01}
+      this.refs.outer.animate({height:height},this.style)
+          .then(() => this.setState({close:true}));
+    })
+  }
+  toggle(){
+      if(this.state.close){
+        this.open();
+      }else{
+        this.close();
+      }
+  }
+  render() {
+    return (
+      <AnimView
+        style={this.style}
+        ref="outer"
+      >
+        <View
+          ref="inner"
+          style={[this.props.style, this.state.close ? {position:"absolute"} : null]}>
+          {this.props.children}
+        </View>
+      </AnimView>
+    );
+  }
+}
+
+//TODO:refactor
 class Closeable extends React.Component {
   constructor(props) {
     super(props);
     this.state = { layouted: false };
+    /* this.initialStyle = { height: null };
+     * this.closedStyle = { height: 0.01 };
+     * this.state = { style: this.initialStyle };*/
   }
   close() {
     this.style = this.calcStyle(true);
@@ -148,7 +197,7 @@ class Closeable extends React.Component {
       return { width: style.width}
     }else if(this.props.direction == "vertical"){
       //style.width  = null;
-      return {height: style.width}
+      return {height: style.height}
     }else{
       return style
     }
@@ -162,6 +211,8 @@ class Closeable extends React.Component {
     return(
       // not to optimize
       // add absolute from parent when measureing
+      // first:  close -> absolute, open -> null
+      // second: close -> absolute, open -> null
         <AnimView
           style={[{//.vertical closable
               overflow:"hidden",
@@ -169,8 +220,10 @@ class Closeable extends React.Component {
             },this.style]}
           ref="root"
         >
+          { /* open ? tracking view : non tracking */ }
           <MeasureableView
             onFirstLayout={({nativeEvent:{layout:{x, y, width, height }}})=>{
+                console.log("h:",height);
                 this.contentWidth = width;
                 this.contentHeight= height;
                 this.setState({layouted:true})
@@ -201,7 +254,7 @@ class Header extends React.Component {
         style={{ padding: 10, opacity:this.state.opacity }}
         anim={{ duration: 500 }}
       >
-          <Closeable
+          <Closeable2
             style={{justifyContent:"center",
                     backgroundColor:"red"}}
             direction="vertical"
@@ -216,7 +269,7 @@ class Header extends React.Component {
             >
               <Text>foo</Text>
             </AnimView>
-          </Closeable>
+          </Closeable2>
         <AnimView
           ref="view2"
           style={{
@@ -269,9 +322,10 @@ class Header extends React.Component {
               this.refs.view5.measure((x,y,width,height)=>
               console.log("view5:",width,height)) */
               //this.setState((prev, current) => ({ toggle: !prev.toggle }));
-              this.refs.close.toggle().then(()=>
-                ToastAndroid.show('Toggled', ToastAndroid.SHORT)
-              );
+              this.refs.close.toggle()
+              /* .then(()=>
+                 ToastAndroid.show('Toggled', ToastAndroid.SHORT)
+                 ); */
               //FIXME:why width is shurinked?
           }}
         >

@@ -460,7 +460,7 @@ const AnimView = React.createClass({
   },
   animate(fromValues, toValues){
     this.prevStyle = fromValues;
-    this.animateTo(toValues);
+    return this.animateTo(toValues);
   },
   //https://github.com/joshwcomeau/react-flip-move#enterleave-animations
   animateTo(nextStyle) {
