@@ -17,6 +17,7 @@ function intent(RN, HTTP) {
                          .events('changeText')
                          .map(([text])=>text)
                          .do(i => console.log('search text change:%O', i));
+
   const requestBooks$ =
     changeQuery$.debounce(500)
                 .filter(query => query.length > 1)

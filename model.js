@@ -220,8 +220,8 @@ function model(actions) {
                    booksLoadingState$.startWith(false).distinctUntilChanged(),
                    navigationState$.distinctUntilChanged(),
                    selectedBook$.startWith(null).distinctUntilChanged(),
-                   //actions.selectedSection$.startWith(null),
-                   actions.selectedSection$.startWith("検索"),
+                   actions.selectedSection$.startWith(null),
+                   //actions.selectedSection$.startWith("検索"),
                    (searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection) =>
                      ({ searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection }));
   return state$

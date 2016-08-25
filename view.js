@@ -13,6 +13,7 @@ import {
   TextInput,
   // LayoutAnimation,
   ActivityIndicator,
+  ToastAndroid,
 } from 'react-native';
 
 import NavigationStateUtils from 'NavigationStateUtils';
@@ -118,37 +119,68 @@ class Closeable extends React.Component {
     super(props);
     this.state = { layouted: false };
   }
+  close() {
+    this.style = this.calcStyle(true);
+    return this.refs.root.animateTo(this.style);
+  }
+  open() {
+    this.style = this.calcStyle(false);
+    return this.refs.root.animateTo(this.style);
+  }
+  toggle(){
+    const closedStyle = this.calcStyle(true);
+    if((this.style.width === closedStyle.width) &&
+       (this.style.height === closedStyle.height)){
+      this.style = this.calcStyle(false);
+    }else{
+      this.style = this.calcStyle(true);
+    }
+    console.log("st:",this.style);
+    return this.refs.root.animateTo(this.style);
+  }
+  calcStyle(close){
+    let style = !this.state.layouted ?
+                {width: null, height: null} : close ?
+                {width: 0.01, height: 0.01} :
+                {width: this.contentWidth, height: this.contentHeight}
+    if(this.props.direction == "horizontal"){
+      //style.height = null;
+      return { width: style.width}
+    }else if(this.props.direction == "vertical"){
+      //style.width  = null;
+      return {height: style.width}
+    }else{
+      return style
+    }
+  }
   //horizontal
   //promise
   render() {
     // on the fly measureing cannot working when closed -> open
-    style = !this.state.layouted ?
-            {width: null , height: null} : this.props.close ?
-            {width:0.01,height:0.01} : this.style
-    if(this.props.direction == "horizontal"){
-      style.height = null;
-    }else if(this.props.direction == "vertical"){
-      style.width  = null;
-    }
+    this.style = this.calcStyle(this.props.close)
+    console.log("st:",this.style);
     return(
       // not to optimize
+      // add absolute from parent when measureing
         <AnimView
           style={[{//.vertical closable
               overflow:"hidden",
-              flexDirection:"row",//not to resize text
-            },style]}
+              //flexDirection:"row",//not to resize text when horizontal
+            },this.style]}
+          ref="root"
         >
           <MeasureableView
-            onFirstLayout={({ nativeEvent: { layout: { x, y, width, height } } })=>{
-                this.style = {width:width,height:height}
+            onFirstLayout={({nativeEvent:{layout:{x, y, width, height }}})=>{
+                this.contentWidth = width;
+                this.contentHeight= height;
                 this.setState({layouted:true})
               }}
-            style={this.props.style}
+            style={[this.props.style,{overflow:"hidden"}]}
           >
             {this.props.children}
           </MeasureableView>
         </AnimView>
-      )
+    )
   }
 }
 
@@ -225,7 +257,9 @@ class Header extends React.Component {
           }}
         >
           {'animate'}
-        </Text>
+         </Text>
+         <View style={{
+           backgroundColor:"purple"}}>
         <Text
           style={{ color: 'white' }}
           onPress={() => {
@@ -235,11 +269,15 @@ class Header extends React.Component {
               this.refs.view5.measure((x,y,width,height)=>
               console.log("view5:",width,height)) */
               //this.setState((prev, current) => ({ toggle: !prev.toggle }));
-              this.refs.close.close();
+              this.refs.close.toggle().then(()=>
+                ToastAndroid.show('Toggled', ToastAndroid.SHORT)
+              );
+              //FIXME:why width is shurinked?
           }}
         >
           {'toggle'}
         </Text>
+         </View>
       </AnimView>);
   }
 }
