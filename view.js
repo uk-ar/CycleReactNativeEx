@@ -114,34 +114,47 @@ MyListView.propTypes = {
 import { AnimView,MeasureableView } from './SwipeableRow';
 const ReactTransitionGroup = require('react-addons-transition-group')
 
+// test(isSelected,componentA,componentB)
+//https://gist.github.com/sebmarkbage/ef0bf1f338a7182b6775#gistcomment-1574787
 class Closeable2 extends React.Component {
+  //TODO:High Order Component can remove inner view
   constructor(props) {
     super(props);
-    this.state = {
-      close: this.props.close,
-    };
+    this.state = { close: this.props.close };
     this.style = this.props.close ? {height: 0.01} : {height: null};
   }
   open(){
-    this.refs.inner.measure((x,y,width,height)=>{
-      this.style = {height:height}
-      this.setState({close:false},()=>
-        this.refs.outer.animate({height:0.01},this.style))
+    return new Promise((resolve, reject) => {
+      this.refs.inner.measure((x,y,width,height) => {
+        this.style = {height:height}
+        this.setState({close:false},() => {//widen
+          this.refs.outer.animate({height:0.01},this.style)
+              .then(()=>{
+                resolve()
+              })
+        })
+      })
     })
   }
   close(){
-    this.refs.inner.measure((x,y,width,height)=>{
-      this.style = {height:0.01}
-      this.refs.outer.animate({height:height},this.style)
-          .then(() => this.setState({close:true}));
+    return new Promise((resolve, reject) => {
+      this.refs.inner.measure((x,y,width,height) => {
+        this.style = {height:0.01}
+        this.refs.outer.animate({height:height},this.style)
+            .then(() => {
+              this.setState({close:true})//shrink
+              resolve()
+            })
+      })
     })
   }
   toggle(){
-      if(this.state.close){
-        this.open();
-      }else{
-        this.close();
-      }
+    return (this.state.close ? this.open() : this.close())
+  }
+  componentWillReceiveProps(nextProps){
+    if(this.props.close !== nextProps.close){
+      this.toggle()
+    }
   }
   render() {
     return (
@@ -249,6 +262,8 @@ class Header extends React.Component {
   render() {
     console.log('render header pad?', this.state.toggle);
     //            close={this.state.toggle}
+    //            close={true}
+    //            close={!this.state.toggle}
     return (
       <AnimView
         style={{ padding: 10, opacity:this.state.opacity }}
@@ -258,6 +273,7 @@ class Header extends React.Component {
             style={{justifyContent:"center",
                     backgroundColor:"red"}}
             direction="vertical"
+            close={this.state.toggle}
             ref="close">
             <AnimView
               ref="view1"
@@ -323,9 +339,9 @@ class Header extends React.Component {
               console.log("view5:",width,height)) */
               //this.setState((prev, current) => ({ toggle: !prev.toggle }));
               this.refs.close.toggle()
-              /* .then(()=>
-                 ToastAndroid.show('Toggled', ToastAndroid.SHORT)
-                 ); */
+                  .then(()=>
+                    ToastAndroid.show('Toggled', ToastAndroid.SHORT)
+                  );
               //FIXME:why width is shurinked?
           }}
         >
