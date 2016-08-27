@@ -171,6 +171,31 @@ class Closeable2 extends React.Component {
     );
   }
 }
+//willRecieveProps
+//withPropsWillChange("key",(old,new)=>)
+//{key1:,key2:}
+//[key1,key2],func
+function willRecieveProps(key,fn){
+  //console.log("p:",key,Object.keys(key))
+  return (WrappedComponent) => {
+    return class extends WrappedComponent {
+      render() {
+        //console.log("iiHOC",this.props,this.state)
+        return super.render()
+      }
+      componentWillReceiveProps(nextProps){
+        super.componentWillReceiveProps(nextProps)
+        //this.close.bind(this)();
+        fn(this);
+        /* if(this.props[key] !== nextProps[key]){
+         *   fn.bind(this)(this.props[key],nextProps[key]);
+         * }*/
+      }
+    }
+  }
+}
+//this.toggle
+//const Closeable3 = willRecieveProps(key, (inst) => inst.toggle())(Closeable2)
 
 //TODO:refactor
 class Closeable extends React.Component {
@@ -273,7 +298,7 @@ class Header extends React.Component {
             style={{justifyContent:"center",
                     backgroundColor:"red"}}
             direction="vertical"
-            close={this.state.toggle}
+            close={!this.state.toggle}
             ref="close">
             <AnimView
               ref="view1"
@@ -337,11 +362,11 @@ class Header extends React.Component {
               console.log("view4:",width,height))
               this.refs.view5.measure((x,y,width,height)=>
               console.log("view5:",width,height)) */
-              //this.setState((prev, current) => ({ toggle: !prev.toggle }));
-              this.refs.close.toggle()
-                  .then(()=>
-                    ToastAndroid.show('Toggled', ToastAndroid.SHORT)
-                  );
+              this.setState((prev, current) => ({ toggle: !prev.toggle }));
+              /* this.refs.close.toggle()
+              .then(()=>
+              ToastAndroid.show('Toggled', ToastAndroid.SHORT)
+              ); */
               //FIXME:why width is shurinked?
           }}
         >
