@@ -1,7 +1,7 @@
 
 import React from 'react';
 const ReactNative = require('react-native');
-let FAIcon = require('react-native-vector-icons/FontAwesome');
+const FAIcon = require('react-native-vector-icons/FontAwesome');
 
 import materialColor from 'material-colors';
 import { styles } from './styles';
@@ -187,18 +187,18 @@ function getButtons(type, func, isbn) {
  *   style*/
 // ToastAndroid.show('foo', ToastAndroid.SHORT)
 
- function BookCell({ book, ...props }) {
+function BookCell({ book, ...props }) {
   let TouchableElement = Touchable.TouchableHighlight;
   if (Platform.OS === 'android') {
     TouchableElement = Touchable.TouchableNativeFeedback;
-     //BUG:TouchableNativeFeedback TouchableOpacity TouchableWithoutFeedback not support style
+     // BUG:TouchableNativeFeedback TouchableOpacity TouchableWithoutFeedback not support style
   }
 
-  return(
+  return (
      <View {...props}>
     <TouchableElement
-    selector="cell"
-    payload={book}
+      selector="cell"
+      payload={book}
     >
     <View style={styles.row}>
           <Image
@@ -231,7 +231,7 @@ function getButtons(type, func, isbn) {
           </View>
         </View>
       </TouchableElement>
-    </View>)
+    </View>);
 }
 
 function BookRow({ bucket, book, onRelease, style }) {
@@ -244,19 +244,19 @@ function BookRow({ bucket, book, onRelease, style }) {
   // skip close behavior
   // (book,bucket)=>closeanimate.start(onRelease)
   // onRelease is cycle:touchable element
-  let { leftButtons, rightButtons } = getButtons(bucket, onRelease, book)
+  let { leftButtons, rightButtons } = getButtons(bucket, onRelease, book);
   return (
-    //CloseableCompo
+    // CloseableCompo
     // need ref & React.cloneElement?
     <SwipeableRow2
       leftButtons={leftButtons}
       rightButtons={rightButtons}
       onPanResponderMove={() => {
           // prevent vertical scroll
-          //onPanResponderMove && onPanResponderMove();
+          // onPanResponderMove && onPanResponderMove();
       }}
       onPanResponderEnd={() => {
-          //onPanResponderEnd && onPanResponderEnd();
+          // onPanResponderEnd && onPanResponderEnd();
       }}
     >
       <BookCell
@@ -265,7 +265,7 @@ function BookRow({ bucket, book, onRelease, style }) {
       />
     </SwipeableRow2>
   );
-};
+}
 
 module.exports = { BookRow };
-//module.exports = { BookCell, SwipeableRow };
+// module.exports = { BookCell, SwipeableRow };

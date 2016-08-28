@@ -15,7 +15,7 @@ function intent(RN, HTTP) {
 
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')
-                         .map(([text])=>text)
+                         .map(([text]) => text)
                          .do(i => console.log('search text change:%O', i));
 
   const requestBooks$ =
@@ -25,15 +25,15 @@ function intent(RN, HTTP) {
                   category: 'search',
                   url: RAKUTEN_SEARCH_API + encodeURI(q)
                 }))
-                .do(i=>console.log("requestBooks"))
+                .do(i => console.log('requestBooks'));
 
-  function createResponseStream(category){
-    return(
+  function createResponseStream(category) {
+    return (
       HTTP.select(category)
           .switch()
-          .map(res=>res.text)
-          .map(res=>JSON.parse(res))
-    )}
+          .map(res => res.text)
+          .map(res => JSON.parse(res))
+    ); }
 
   const booksResponse$ =
     createResponseStream('search')
@@ -50,7 +50,7 @@ function intent(RN, HTTP) {
   function createBooksStatusStream(books$, category) {
     function mergeBooksStatus(books, booksStatus) {
       return books.map(book => {
-        //console.log("book:",book,booksStatus)
+        // console.log("book:",book,booksStatus)
         let libraryStatus;
         if ((booksStatus[book.isbn] !== undefined) && // not yet retrieve
             // sub library exist?
@@ -81,23 +81,23 @@ function intent(RN, HTTP) {
     }
 
     const requestStatus$ =
-      //booksResponse$.map(books => books.map(book => book.isbn))
+      // booksResponse$.map(books => books.map(book => book.isbn))
       books$.map(books => books.map(book => book.isbn))
             .filter(isbns => isbns.length > 0)
             .map(q => ({
-              category: category, //'searchedBooksStatus',
+              category, // 'searchedBooksStatus',
               url: CALIL_STATUS_API + encodeURI(q)
             }))
             .do(i => console.log('status req:%O', i));
 
     const booksStatusResponse$ =
-      //createResponseStream('searchedBooksStatus')
+      // createResponseStream('searchedBooksStatus')
       createResponseStream(category)
-        .do(i => console.log('books status:%O', i,i.continue))//executed by retry
-    //ok to retry but not output stream
+        .do(i => console.log('books status:%O', i, i.continue))// executed by retry
+    // ok to retry but not output stream
     // .flatMap(result => result.continue === 1 ?
     //                 [result, Observable.throw(error)] : [result])
-        .flatMap(result => [{...result, continue: 0},result])
+        .flatMap(result => [{ ...result, continue: 0 }, result])
         .map(result => {
           if (result.continue === 1) {
             throw result;
@@ -120,15 +120,15 @@ function intent(RN, HTTP) {
           books$,
           booksStatusResponse$,
           mergeBooksStatus,
-        ).do(i => console.log('books$:', category, i))
+        ).do(i => console.log('books$:', category, i));
     return ({
       booksStatus$,
       requestStatus$ });
   }
-  //const { booksStatus$: searchedBooksStatus$, requestStatus$: requestSearchedBooksStatus$} =
+  // const { booksStatus$: searchedBooksStatus$, requestStatus$: requestSearchedBooksStatus$} =
   const { booksStatus$: searchedBooksStatus$, requestStatus$ } =
     createBooksStatusStream(booksResponse$, 'searchedBooksStatus');
-  //mojibake "nas" "ai"
+  // mojibake "nas" "ai"
 
   /* const { booksStatus$: searchedBooksStatus$, requestStatus$ } =
    *   createBooksStatusStream(booksResponse$, 'savedBooksStatus');
@@ -144,11 +144,11 @@ function intent(RN, HTTP) {
 
   // release$.do((i)=>console.log("rel$")).subscribe()
   return {
-    //savedBooksResponse$,
-    //retryResponse$,
+    // savedBooksResponse$,
+    // retryResponse$,
     requestStatus$,
     requestBooks$, // for loading status
-    //request$,
+    // request$,
     selectedSection$: RN.select('section')
                         .events('press')
                         .merge(RN.select('close')
@@ -191,8 +191,8 @@ function intent(RN, HTTP) {
                   .scan((current, event) => !current)
                   .do(i => console.log('sort:%O', i))
     ,
-    //booksResponse$,
-    //booksStatusResponse$,
+    // booksResponse$,
+    // booksStatusResponse$,
     searchedBooksStatus$,
   };
 }

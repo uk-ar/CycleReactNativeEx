@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 let { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
-var Icon = require('react-native-vector-icons/FontAwesome');
+const Icon = require('react-native-vector-icons/FontAwesome');
 
 import {
   TouchableOpacity,
@@ -30,7 +30,7 @@ import {
 
 // rx js output confusing message when component not imported
 
-var BookScreen = React.createClass({
+const BookScreen = React.createClass({
   /* render: function(){
      generateCycleRender(this.myRender)
      }, */
@@ -67,7 +67,7 @@ var BookScreen = React.createClass({
   },
 });
 
-var styles = StyleSheet.create({
+let styles = StyleSheet.create({
   toolbar: {
     backgroundColor: '#a9a9a9',
     height: 56,

@@ -10,14 +10,14 @@ TODO:
    - add done state
    - add sort feature
  */
-import {run} from '@cycle/rx-run';
+import { run } from '@cycle/rx-run';
 
 import makeReactNativeDriver from '@cycle/react-native/src/driver';
 import { makeHTTPDriver } from '@cycle/http';
 
 import RxAdapter from '@cycle/rx-adapter';
 import xsSA from '@cycle/xstream-adapter';
-//const { makeFetchDriver } = require('@cycle/fetch');
+// const { makeFetchDriver } = require('@cycle/fetch');
 import xs from 'xstream';
 
 const HTTPDriver = makeHTTPDriver();
@@ -35,8 +35,8 @@ function main({ RN, HTTP, EE }) {
   const request$ = Rx.Observable.merge(actions.requestBooks$, actions.requestStatus$);
   // 0192521722
   // qwerty
-  request$.map((r) => console.log("r:", r))
-          .subscribe()
+  request$.map((r) => console.log('r:', r))
+          .subscribe();
   return {
     RN: state$.map(view),
     // App Transport Security
@@ -46,13 +46,13 @@ function main({ RN, HTTP, EE }) {
      * })*/
     /* HTTP: Rx.Observable
      *         .merge(actions.request$, request$), //state$.map(request),*/
-    //HTTP: actions.request$
+    // HTTP: actions.request$
     HTTP: request$
   };
 }
 
 run(main, {
-  //RN: makeReactNativeDriver('CycleReactNativeEx'),
+  // RN: makeReactNativeDriver('CycleReactNativeEx'),
   RN: sink$ => RNDriver(sink$, RxAdapter),
   HTTP: makeHTTPDriver()
 });

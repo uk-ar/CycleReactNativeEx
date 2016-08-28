@@ -1,5 +1,5 @@
-var Rx = require('rx');//for debug http://stackoverflow.com/questions/32211649/debugging-with-webpack-es6-and-babel
-//import Rx from 'rx';
+const Rx = require('rx');// for debug http://stackoverflow.com/questions/32211649/debugging-with-webpack-es6-and-babel
+// import Rx from 'rx';
 import _ from 'lodash';
 
 import {
@@ -32,7 +32,7 @@ Book.schema = {
     bucket: { type: 'string', optional: true },
     title: { type: 'string', optional: true },
     author: { type: 'string', optional: true },
-    //Image raise error when src is null
+    // Image raise error when src is null
     thumbnail: { type: 'string', default: undefined },
     modifyDate: 'date',
   },
@@ -47,13 +47,13 @@ realm.write(() => {
 });
 const initialBooks = realm.objects('Book')
                           .sorted('modifyDate', true)// reverse sort
-                          .map((i)=>i)//convert result to array
+                          .map((i) => i);// convert result to array
 
 function model(actions) {
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
-  function mergeBooksStatus(books,booksStatus){
+  function mergeBooksStatus(books, booksStatus) {
     return books.map(book => {
-      //console.log("book:",book,booksStatus)
+      // console.log("book:",book,booksStatus)
       let libraryStatus;
       if ((booksStatus[book.isbn] !== undefined) && // not yet retrieve
           // sub library exist?
@@ -86,7 +86,7 @@ function model(actions) {
    *        .do(i=>console.log("req",i))
    *        .subscribe();*/
   const searchedBooks$ =
-    actions.searchedBooksStatus$
+    actions.searchedBooksStatus$;
   /* Rx.Observable
    *   .combineLatest(
    *     actions.booksResponse$,
@@ -95,7 +95,7 @@ function model(actions) {
    *     //actions.booksStatus$.startWith([]),
    *     ).do(i => console.log('searchedBooks$:%O', i)
    *     ).distinctUntilChanged();*/
-  //searchedBooks$.subscribe();
+  // searchedBooks$.subscribe();
 
   const savedBooks$ =
     actions.changeBucket$
@@ -126,31 +126,31 @@ function model(actions) {
   const requestSavedBooksStatus$ =
     savedBooks$
                .map((books) => books.map(book => book.isbn))
-               //.map(q => CALIL_STATUS_API + encodeURI(q))
+               // .map(q => CALIL_STATUS_API + encodeURI(q))
                .map(q => (
                  {
-                   //key: 'savedBooksStatus',
+                   // key: 'savedBooksStatus',
                    category: 'savedBooksStatus',
                    url: CALIL_STATUS_API + encodeURI(q)
                  }))
-               .do((i) => console.log('save status:', i))
-               //.subscribe()
+               .do((i) => console.log('save status:', i));
+               // .subscribe()
   const savedBooksStatus$ =
     /* Rx.Observable
      *   .merge(actions.retryResponse$, )*/
-    //actions.savedBooksResponse$
+    // actions.savedBooksResponse$
     Rx.Observable.empty()
       .map(result => result.books)
-      .do(i=> console.log("sbs:", i))
+      .do(i => console.log('sbs:', i));
 
   const savedBooks2$ =
     savedBooks$.combineLatest(
-      //Rx.Observable.interval(100),
+      // Rx.Observable.interval(100),
       savedBooksStatus$.startWith({}),
       mergeBooksStatus
-      //savedBooksStatus$.startWith({}),
-      //(a,b)=>console.log("cl",a,b)
-        //actions.booksStatus$.startWith([]),
+      // savedBooksStatus$.startWith({}),
+      // (a,b)=>console.log("cl",a,b)
+        // actions.booksStatus$.startWith([]),
       ).do(i => console.log('savedBooks2$:%O', i)
         /* Rx.Observable
          *   .combineLatest(
@@ -159,12 +159,12 @@ function model(actions) {
          *     (a,b)=>console.log("cl",a,b)
          *     //actions.booksStatus$.startWith([]),
          *   ).do(i => console.log('savedBooks2$:%O', i)*/
-      ).distinctUntilChanged()
-               //.subscribe();
+      ).distinctUntilChanged();
+               // .subscribe();
 
   const selectedBook$ = actions.goToBookView$;
   const booksLoadingState$ =
-    Rx.Observable.just([])
+    Rx.Observable.just([]);
   /* actions.requestBooks$.map((_) => true)
    *        .merge(
    *          // response event
@@ -221,10 +221,10 @@ function model(actions) {
                    navigationState$.distinctUntilChanged(),
                    selectedBook$.startWith(null).distinctUntilChanged(),
                    actions.selectedSection$.startWith(null),
-                   //actions.selectedSection$.startWith("検索"),
+                   // actions.selectedSection$.startWith("検索"),
                    (searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection) =>
                      ({ searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection }));
-  return state$
+  return state$;
   /* return {
    *   state$,
    *   request$: requestSavedBooksStatus$

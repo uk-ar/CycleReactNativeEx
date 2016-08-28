@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 let { makeReactNativeDriver, generateCycleRender } = require('@cycle/react-native');
-var FAIcon = require('react-native-vector-icons/FontAwesome');
-var MIcon = require('react-native-vector-icons/MaterialIcons');
+const FAIcon = require('react-native-vector-icons/FontAwesome');
+const MIcon = require('react-native-vector-icons/MaterialIcons');
 
 import ListView from '@cycle/react-native/src/ListView';
 
@@ -33,7 +33,7 @@ import Touchable from '@cycle/react-native/src/Touchable';
 Touchable['FAIcon'] = Touchable.createCycleComponent(
   FAIcon, Touchable.PRESS_ACTION_TYPES);
 
-var GiftedNavigator = React.createClass({
+const GiftedNavigator = React.createClass({
   componentDidMount() {
     // console.log("nav this:%O", this);
     // var navigatorDidMount = this.props.navigatorDidMount.bind(this);
@@ -64,13 +64,13 @@ var GiftedNavigator = React.createClass({
   },
 });
 
-var { AnimatedFlick, BookCell } = require('./BookCell');
+let { AnimatedFlick, BookCell } = require('./BookCell');
 
 /* var dataSource = new ListView.DataSource({
   rowHasChanged: (row1, row2) => row1 !== row2,
 }); */
 
-var BookListView = React.createClass({
+const BookListView = React.createClass({
   render() {
     const options = [
       '検索',
@@ -147,7 +147,7 @@ var BookListView = React.createClass({
      }, */
 });
 
-var InBoxScreen = React.createClass({
+const InBoxScreen = React.createClass({
   render() {
     return (
       <View style={styles.container}
@@ -165,7 +165,7 @@ var InBoxScreen = React.createClass({
 });
 
 // var SearchBar = require('SearchBar');
-var SearchBar = require('./SearchBar');
+const SearchBar = require('./SearchBar');
 
 /* var SearchScreen = React.createClass({
   getInitialState(){
@@ -210,8 +210,8 @@ var SearchBar = require('./SearchBar');
   //https://github.com/facebook/react-native/blob/master/Examples/Movies/SearchScreen.js
 });*/
 
-var cellWidth = 60;
-var styles = StyleSheet.create({
+const cellWidth = 60;
+let styles = StyleSheet.create({
   // for toolBar
   toolbar: {
     backgroundColor: '#e9eaed',

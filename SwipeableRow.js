@@ -359,7 +359,7 @@ const SwipeableButtons = React.createClass({
 });
 
 class MeasureableView extends React.Component {
-//const MeasureableView = React.createClass({
+// const MeasureableView = React.createClass({
   // TODO:position absolute
   constructor(props) {
     super(props);
@@ -374,19 +374,19 @@ class MeasureableView extends React.Component {
       </View>) : (
 <View
   {...this.props}
-  style={[this.props.style,{position:"absolute"}] }
+  style={[this.props.style, { position: 'absolute' }]}
   onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
     this.props.onFirstLayout &&
                 this.props.onFirstLayout(
                   { nativeEvent: { layout: { x, y, width, height } } });
-      this.setState({layouted:true})
-    }}
+    this.setState({ layouted: true });
+  }}
 >
           {this.props.children}
         </View>
       );
   }
-};
+}
 
 /* const SelectableView = React.createClass({
    getInitialState:function(){
@@ -447,30 +447,30 @@ const AnimView = React.createClass({
   },
   // for ReactTransitionGroup
   componentWillEnter(callback) {
-    console.log("component will enter");
+    console.log('component will enter');
     callback();
   },
   componentWillLeave(callback) {
-    console.log("component will leave");
+    console.log('component will leave');
     callback();
   },
   componentWillMount() {
     this.prevStyle = StyleSheet.flatten(this.props.style);
     // this.animating = false;
   },
-  animate(fromValues, toValues){
+  animate(fromValues, toValues) {
     this.prevStyle = fromValues;
     return this.animateTo(toValues);
   },
-  //https://github.com/joshwcomeau/react-flip-move#enterleave-animations
+  // https://github.com/joshwcomeau/react-flip-move#enterleave-animations
   animateTo(nextStyle) {
       // duration,easing jquery
-    //console.log('animate');
+    // console.log('animate');
       // this.animating = true;
     this.counter = new Animated.Value(0);
     const current = StyleSheet.flatten(this.prevStyle);
     const next = StyleSheet.flatten(nextStyle);
-    let animatedStyle = Object.assign({}, next);
+    const animatedStyle = Object.assign({}, next);
     // check for initial
     // console.log("rec",current,this.prevStyle,next,animatedStyle);
     /* if(current.height && next.height === null){
@@ -481,12 +481,12 @@ const AnimView = React.createClass({
      *     //anim.then(next.height=orig)
      *   })
      * }*/
-    //console.log("n:",next,nextStyle)
+    // console.log("n:",next,nextStyle)
     next &&
     Object.keys(next).map((key) => {
           // remove if with filter & merge
           // console.log("k:",key,typeof next[key] === "number",key == "backgroundColor" || key == "color",current[key] != next[key],current[key],next[key])
-      if (((typeof current[key] === 'number' && typeof next[key] === 'number')|
+      if (((typeof current[key] === 'number' && typeof next[key] === 'number') |
            key.endsWith('Color') ||
            key == 'color')
           && current[key] !== next[key]
@@ -496,8 +496,8 @@ const AnimView = React.createClass({
           inputRange: [0, 1],
           outputRange: [current[key], next[key]],
         });
-      }else if(key === 'transform' && current['transform']){
-        //current next
+      } else if (key === 'transform' && current['transform']) {
+        // current next
         // transform is ordered array!!
         /* console.log("ab",current['transform'],next['transform']);
          * animatedStyle['transform'] =
@@ -523,7 +523,7 @@ const AnimView = React.createClass({
         Animated.timing(
             this.counter,
             { toValue: 1,
-              duration: (this.props.anim && this.props.anim.duration) || 360,//180,
+              duration: (this.props.anim && this.props.anim.duration) || 360, //180,
               //duration: 180,
             }
           ).start(() => {
@@ -534,11 +534,11 @@ const AnimView = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    //console.log('willReceiveProps');
+    // console.log('willReceiveProps');
     this.animateTo(nextProps.style);
   },
-  measure(callback){
-    //not needed?
+  measure(callback) {
+    // not needed?
     callback(...Object.values(this.layout));
   },
   render() {
@@ -550,9 +550,9 @@ const AnimView = React.createClass({
         {...this.props}
         onLayout={
           this.props.onLayout ? this.props.onLayout :
-          ({ nativeEvent: { layout: {x, y, width, height } } }) => {
-            //Animated.View cannot measure
-            this.layout = {x, y, width, height }
+          ({ nativeEvent: { layout: { x, y, width, height } } }) => {
+            // Animated.View cannot measure
+            this.layout = { x, y, width, height };
           }}
         style={[this.state.animatedStyle]}
       >
@@ -623,7 +623,7 @@ const SwipeableButtons2 = React.createClass({
                  this.thresholds[i] = width;
                  if (Object.keys(this.thresholds).length == array.length) {
                   // console.log(this.thresholds)
-                   this.props.width.addListener(({ value: value }) => {
+                   this.props.width.addListener(({ value }) => {
                      if (this.releasing) { return; }
 
                      let index = calcIndex(value, this.thresholds);
@@ -644,7 +644,7 @@ const SwipeableButtons2 = React.createClass({
             )}
          </View>);
     } else {
-      //console.log('rend buttons');
+      // console.log('rend buttons');
       return (
         <AnimView
           {...props}
@@ -721,7 +721,7 @@ const SwipeableRow2 = React.createClass({
 
       onShouldBlockNativeResponder: (evt, gestureState) => true,
     });
-    this._panX.addListener(({ value: value }) => {
+    this._panX.addListener(({ value }) => {
       if (0 < value && this.state.positiveSwipe != true) {
         this.setState({ positiveSwipe: true });
       } else if (value <= 0 && this.state.positiveSwipe != false) {
@@ -731,7 +731,7 @@ const SwipeableRow2 = React.createClass({
   },
 
   render() {
-    //console.log('sr2:');
+    // console.log('sr2:');
     return (
       <View
         {...this._panResponder.panHandlers}
@@ -801,7 +801,7 @@ const SwipeableRow = React.createClass({
 
       onShouldBlockNativeResponder: (evt, gestureState) => true,
     });
-    this._panX.addListener(({ value: value }) => {
+    this._panX.addListener(({ value }) => {
       // if(0 < value){
       // }
       // TODO:heavy
@@ -884,4 +884,4 @@ const styles = StyleSheet.create({
   },
 });
 
-module.exports = { SwipeableRow, SwipeableRow2, AnimView,MeasureableView };
+module.exports = { SwipeableRow, SwipeableRow2, AnimView, MeasureableView };

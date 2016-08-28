@@ -28,7 +28,7 @@ import {
 
 let { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
 
-var SearchBar = React.createClass({
+const SearchBar = React.createClass({
   render() {
     // there is a search for ios
     // https://github.com/umhan35/react-native-search-bar
@@ -57,7 +57,7 @@ var SearchBar = React.createClass({
   },
 });
 
-var styles = StyleSheet.create({
+let styles = StyleSheet.create({
   searchBar: {
     // mergin for status bar?
     // statusBarFrame.size.height
