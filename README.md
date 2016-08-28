@@ -1,1 +1,1 @@
-![Dependencies Status](https://david-dm.org/uk-ar/CycleReactNativeEx.svg)
+[<img src="https://david-dm.org/uk-ar/CycleReactNativeEx.svg">](https://david-dm.org/uk-ar/CycleReactNativeEx)
