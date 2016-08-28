@@ -478,6 +478,7 @@ function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSectio
   const borrowedBooks = savedBooks.filter((book) => book.bucket === 'borrowed');
   const likedBooks = savedBooks.filter((book) => book.bucket === 'liked');
   const doneBooks = savedBooks.filter((book) => book.bucket === 'done');
+  console.log('s b', likedBooks);
   // todo transition to detail view
   /* 検索: {
      books:searchedBooks,
@@ -535,7 +536,7 @@ function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSectio
     };
   // console.log("detail",items)
   }
-  console.log('render main2');
+  console.log('render main2', items);
   return (
     <View
       key="main"
@@ -550,11 +551,11 @@ function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSectio
         selectedSection={selectedSection}
         items={items}
         renderRow={(rowData, sectionID, rowID) => {
+          // console.log("row:",rowData, sectionID, rowID.replace('isbn-',''))
           if (React.isValidElement(rowData)) {
               // for section footer rendering
             return rowData;
           }
-            // console.log("row:",rowData, sectionID, rowID.replace('isbn-',''))
           return (
               <Touchable.BookRow
                 key={rowID}

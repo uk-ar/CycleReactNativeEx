@@ -83,7 +83,7 @@ function LibraryStatus({ libraryStatus = {}, ...props }) {
     text = '貸出中';
     style = { color: '#FFC107' }; // amber
   } else if (libraryStatus.exist !== undefined) {
-    text = 'なし';
+    text = '蔵書なし';
     style = { color: '#F44336' }; // red
   } else {
     // text="取得中"
@@ -213,6 +213,9 @@ function BookCell({ book, ...props }) {
             }]}>
             <View style={[{ padding: 10, justifyContent: 'center' },
               ]}>
+              <Text>
+                bucket:{book.bucket}
+              </Text>
               <Text style={styles.bookTitle} numberOfLines={1}>
                 {book.title}
               </Text>

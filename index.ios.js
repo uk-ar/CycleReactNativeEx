@@ -32,10 +32,10 @@ import Rx from 'rx';
 function main({ RN, HTTP, EE }) {
   const actions = intent(RN, HTTP);
   const state$ = model(actions);
-  const request$ = Rx.Observable.merge(actions.requestBooks$, actions.requestStatus$);
+  // const request$ = Rx.Observable.merge(actions.requestBooks$, actions.requestStatus$);
   // 0192521722
   // qwerty
-  request$.map((r) => console.log('r:', r))
+  actions.request$.map((r) => console.log('request:', r))
           .subscribe();
   return {
     RN: state$.map(view),
@@ -47,7 +47,7 @@ function main({ RN, HTTP, EE }) {
     /* HTTP: Rx.Observable
      *         .merge(actions.request$, request$), //state$.map(request),*/
     // HTTP: actions.request$
-    HTTP: request$
+    HTTP: actions.request$
   };
 }
 

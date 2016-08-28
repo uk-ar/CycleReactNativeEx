@@ -8,10 +8,62 @@ import {
   LIBRARY_ID,
 } from './common';
 
+const mockbooks = [
+  { title: 'like:SOFT SKILLS', isbn: '9784822251550', bucket: 'liked' },
+  { title: 'like:foo', isbn: '9784480064851', bucket: 'liked' },
+  { title: 'borrow:qux', isbn: '9784492314630', bucket: 'borrowed' },
+  { title: 'borrow:quxx', isbn: '9784798134208', bucket: 'borrowed' },
+  { title: 'done:bar', isbn: '9784105393069', bucket: 'done' },
+  { title: 'done:baz', isbn: '9784822285159', bucket: 'done' },
+  { title: 'done:toz', isbn: '9784757142794', bucket: 'done' },
+];
+
+const Realm = require('realm');
+class Book {}
+Book.schema = {
+  name: 'Book',
+  primaryKey: 'isbn',
+  properties: {
+    isbn: 'string',
+    bucket: { type: 'string', optional: true },
+    title: { type: 'string', optional: true },
+    author: { type: 'string', optional: true },
+    // Image raise error when src is null
+    thumbnail: { type: 'string', default: undefined },
+    modifyDate: 'date',
+  },
+};
+const realm = new Realm({ schema: [Book], schemaVersion: 4 });
+realm.write(() => {
+  /* mockbooks.reverse().map((book) => {
+   *   realm.create('Book',
+   *                {...book, modifyDate: new Date(Date.now())},
+   *                true)
+   * })*/
+});
+const initialBooks = realm.objects('Book')
+                          .sorted('modifyDate', true)// reverse sort
+                          .map((i) => i);// convert result to array
+
 function intent(RN, HTTP) {
   // Actions
   const release$ = RN.select('bookcell')
                      .events('release');
+
+  const changeBucket$ =
+    release$
+      .do(i => console.log('release:', i))
+  // TODO:change to isbn
+      .map(([isbn, bucket]) => (
+        { type: 'replace',
+          isbn,
+          bucket,
+        }))
+  /* .map(([book, bucket]) => (
+   *   { type: 'replace',
+   *     book: Object.assign(
+   *       {}, book, { bucket, modifyDate: new Date(Date.now()) }) }))*/
+      .do(i => console.log('rel:%O', i));
 
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')
@@ -21,17 +73,25 @@ function intent(RN, HTTP) {
   const requestBooks$ =
     changeQuery$.debounce(500)
                 .filter(query => query.length > 1)
+                .do(i => console.log('requestBooks', i))
                 .map(q => ({
                   category: 'search',
-                  url: RAKUTEN_SEARCH_API + encodeURI(q)
-                }))
-                .do(i => console.log('requestBooks'));
+                  url: RAKUTEN_SEARCH_API + encodeURI(q),
+                  headers: { 'Content-Type':
+                             'application/json; charset=utf-8' },
+                  /* accept: { 'Accept-Language':
+                   *           'ja,en-US;q=0.8,en;q=0.6' }*/
+                  accept: 'Accept-Language:ja,en-US;q=0.8,en;q=0.6'
+                }));
+  // NGsearch:ぐらと
+  // ああ　あ
 
   function createResponseStream(category) {
     return (
       HTTP.select(category)
           .switch()
           .map(res => res.text)
+          .do(res => console.log(res))
           .map(res => JSON.parse(res))
     ); }
 
@@ -67,11 +127,18 @@ function intent(RN, HTTP) {
                          .length !== 0,
           };
         }
-
+        /* return ({
+         *   ...book,
+         *   libraryStatus,
+         *   //active: true,
+         * });*/
+        // TODO:support books from search result
+        // TODO:support books from saved result
         return ({
           title: book.title.replace(/^【バーゲン本】/, ''),
           author: book.author,
           isbn: book.isbn,
+          bucket: book.bucket,
           thumbnail: book.largeImageUrl,
           libraryStatus,
           //active: true,
@@ -81,17 +148,17 @@ function intent(RN, HTTP) {
     }
 
     const requestStatus$ =
-      // booksResponse$.map(books => books.map(book => book.isbn))
-      books$.map(books => books.map(book => book.isbn))
+      books$.do(i => console.log('connect:%O', i))
+            .map(books => books.map(book => book.isbn))
+            .do(i => console.log('isbns:%O', i))
             .filter(isbns => isbns.length > 0)
             .map(q => ({
-              category, // 'searchedBooksStatus',
+              category,
               url: CALIL_STATUS_API + encodeURI(q)
             }))
             .do(i => console.log('status req:%O', i));
 
     const booksStatusResponse$ =
-      // createResponseStream('searchedBooksStatus')
       createResponseStream(category)
         .do(i => console.log('books status:%O', i, i.continue))// executed by retry
     // ok to retry but not output stream
@@ -118,35 +185,113 @@ function intent(RN, HTTP) {
       Rx.Observable
         .combineLatest(
           books$,
-          booksStatusResponse$,
+          booksStatusResponse$.startWith({}),
           mergeBooksStatus,
-        ).do(i => console.log('books$:', category, i));
+        ) // .do(i => console.log('books$:', category, i))
+        .shareReplay();
     return ({
       booksStatus$,
       requestStatus$ });
   }
-  // const { booksStatus$: searchedBooksStatus$, requestStatus$: requestSearchedBooksStatus$} =
-  const { booksStatus$: searchedBooksStatus$, requestStatus$ } =
-    createBooksStatusStream(booksResponse$, 'searchedBooksStatus');
+
+  const savedBooks$ =
+    changeBucket$
+      .startWith(initialBooks)
+  /* .of(initialBooks)
+   * .merge()*/
+      .scan((books, { type, book }) => {
+        console.log('type:', type);
+        switch (type) {
+            /* case 'remove':
+             *   return books.filter((elem) =>
+             *     elem.isbn.toString() !== book.isbn.toString());
+             * case 'add':
+             *   return [book].concat(books);*/
+          case 'replace':
+            return [book].concat(books.filter((elem) =>
+              elem.isbn.toString() !== book.isbn.toString()));
+          default:
+            return books;
+        }
+      } // ).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
+      ).do((books) => {
+        realm.write(() => {
+          books.forEach((book) => {
+            realm.create('Book', book, true);
+          });
+        });
+      }).shareReplay();
+
+  const { booksStatus$: savedBooksStatus$,
+          requestStatus$: requestSavedBooksStatus$ } =
+            createBooksStatusStream(savedBooks$, 'savedBooksStatus');
+
+  // array to object
+  function arrayToObject(books) { // Books to dict
+    return books.reduce((acc, book) => {
+      acc[book.isbn] = book;
+      return acc;
+    }, {});
+  }
+
+  const { booksStatus$: searchedBooksStatus$,
+          requestStatus$: requestSearchedBooksStatus$ } =
+            createBooksStatusStream(
+              booksResponse$
+                .combineLatest(
+                  savedBooks$.map(arrayToObject),
+                  (searchedBooks, savedBooks) =>
+                    searchedBooks.map((book) =>
+                      savedBooks[book.isbn] || book))
+              // booksResponse$
+                .do(i => console.log('in:', i))
+                .do(i => console.log('booksres0:', i))
+              // .map(books => books.map((book) => ({...book, bucket:"foo"})))
+              // .map(books => books.map((book) => book.isbn ))
+                .do(i => console.log('booksres1:', i))
+              //
+              ,
+              'searchedBooksStatus');
   // mojibake "nas" "ai"
 
+  /* savedBooks$
+   *   .do(i => console.log('saved:', i))
+   *   .subscribe()
+
+   * savedBooksStatus$
+   *   .do(i => console.log('saved sta:', i))
+   *   .subscribe()
+
+   * searchedBooksStatus$
+   *   .do(i => console.log('searched sta:', i))
+   *   .subscribe()
+
+   * requestSearchedBooksStatus$
+   *   .do(i => console.log('req searched sta:', i))
+   *   .subscribe()*/
+
+  // TODO:
+  const request$ = Rx.Observable
+                     .merge(requestSavedBooksStatus$,
+                            requestBooks$,
+                            requestSearchedBooksStatus$);
   /* const { booksStatus$: searchedBooksStatus$, requestStatus$ } =
-   *   createBooksStatusStream(booksResponse$, 'savedBooksStatus');
-   *
-   * const savedBooksResponse$ =
+   *   createBooksStatusStream(booksResponse$, 'savedBooksStatus');*/
+
+  /* const savedBooksResponse$ =
    *   //Rx.Observable.empty()
    *   HTTP.select('savedBooksStatus')
    *       .switch()
    *       .map(res=>res.text)
    *       .map(i=> JSON.parse(i))
-   *       .do(i => console.log('saved books:%O', i))
-   *       //.subscribe()*/
+   *       .do(i => console.log('saved books:%O', i))*/
+  // .subscribe()
 
   // release$.do((i)=>console.log("rel$")).subscribe()
   return {
-    // savedBooksResponse$,
-    // retryResponse$,
-    requestStatus$,
+    savedBooks$,
+    savedBooksStatus$,
+    request$,
     requestBooks$, // for loading status
     // request$,
     selectedSection$: RN.select('section')
@@ -164,19 +309,6 @@ function intent(RN, HTTP) {
              .merge(RN.navigateBack(),
                     )
              .map({ type: 'back' }),
-    changeBucket$: release$
-      .do(i => console.log('release:', i))
-    // TODO:change to isbn
-       .map(([isbn, bucket]) => (
-         { type: 'replace',
-           isbn,
-           bucket,
-         }))
-     /* .map(([book, bucket]) => (
-      *   { type: 'replace',
-      *     book: Object.assign(
-      *       {}, book, { bucket, modifyDate: new Date(Date.now()) }) }))*/
-     .do(i => console.log('rel:%O', i)),
     filterState$: RN.select('filter')
                     .events('press')
                     .startWith(false)
