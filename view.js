@@ -66,11 +66,7 @@ Touchable.BookRow = Touchable.createCycleComponent(
 /* getScrollResponder() {
    return this.listview.getScrollResponder();
    },*/
-/* const dataSource = new ListView.DataSource({
- *   rowHasChanged: (r1, r2) => r1 !== r2,
- *   sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
- * });
- * */
+// Smart compo
 class MyListView0 extends React.Component {
   // remove this.state.dataSource && this.listview
   constructor(props) {
@@ -79,12 +75,12 @@ class MyListView0 extends React.Component {
       rowHasChanged: (r1, r2) => r1 !== r2,
       sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
     });
-    //getSectionLengths
+    // getSectionLengths
   }
 
   render() {
     // https://github.com/babel/babel-eslint/issues/95#issuecomment-102170872
-    const { items, ...other } = this.props;
+    const { items, sectionIDs, ...other } = this.props;
     return (
       // onResponderMove is too premitive
       // directionalLockEnabled disables horizontal scroll when scroll vertically
@@ -92,53 +88,80 @@ class MyListView0 extends React.Component {
       <ListView
         ref={listView => (this.listview = listView)}
         directionalLockEnabled
-        dataSource = {this.dataSource.cloneWithRowsAndSections(items)
-          //TODO:rowIdentities
-                   }
+        dataSource={this.dataSource.cloneWithRowsAndSections(items, sectionIDs)}
         enableEmptySections
         {...other}
       />
       );
   }
 }
-//filter by getSectionLengths?
-//react renderSectionFooter
+
+// Dumb compo
+// filter by getSectionLengths?
+// react renderSectionFooter
 class MyListView extends React.Component {
   render() {
-    //filter selectedSection or full
-    //console.log("li",this.props)
-    const {selectedSection, limit, items,
-           renderRow, renderSectionFooter, ...other} = this.props
-    const limited = Object
-      .keys(items)
-      .filter((key) => selectedSection ? selectedSection === key : true)
-      .reduce((acc,key) => {
-        acc[key]= items[key]
-          .slice(0, limit || undefined)
-          .concat({
-            payload: key,
-            count:items[key].length
-          })
-
+    function booksToObject(books) {
+      // https://github.com/eslint/eslint/issues/5284
+      /* eslint prefer-const:0 */
+      return books.reduce((acc, book) => {
+        acc[book.key] = book;
         return acc;
-      },{})
-    //(rowData, sectionID, rowID) => {
-    //renderSectionFooter={(sectionData, sectionID) =>{
+      }, {});
+    }
+    function filterBooks(savedBook, bucket, limit) {
+      let ret = {};
+      let books = savedBook.filter((book) => book.bucket === bucket);
+      ret[bucket] = booksToObject(books.slice(0, limit || undefined));
+      ret[`${bucket}_end`] = { payload: bucket, count: books.length };
+      return ret;
+    }
+    const { selectedSection, limit, searchedBooks, savedBooks,
+            renderRow, renderSectionHeader, renderSectionFooter,
+            ...other } = this.props;
+
+    const search_end =
+      selectedSection === "search" ?
+      {search_end: {payload:"search"}} : {}
+
+    const limited = {
+      search: searchedBooks,
+      ...search_end,
+      ...filterBooks(savedBooks, 'liked', limit),
+      ...filterBooks(savedBooks, 'borrowed', limit),
+      ...filterBooks(savedBooks, 'done', limit),
+    };
+    //console.log('li:', limited);
     return (
       <MyListView0
         items={limited}
+        renderSectionHeader={(sectionData, sectionID) => {
+          return sectionID.endsWith('_end') ?
+                   renderSectionFooter(sectionData, sectionID) :
+                   renderSectionHeader(sectionData, sectionID);
+        }}
         renderRow={(rowData, sectionID, rowID) => {
-            return rowData.count ?
-                   this.props.renderSectionFooter(limited[sectionID], sectionID) :
-                   this.props.renderRow(rowData, sectionID, rowID);
-          }}
-        {...other}/>)
+          return sectionID.endsWith('_end') ? null :
+                   renderRow(rowData, sectionID, rowID);
+        }}
+        sectionIDs={selectedSection ?
+                    [selectedSection, `${selectedSection}_end`] : undefined}
+        {...other}
+      />);
   }
 }
 
+/* const { selectedSection, limit, searchedBooks, savedBooks,
+ *         renderRow, renderSectionHeader, renderSectionFooter,
+ * */
 MyListView.propTypes = {
-  items: React.PropTypes.objectOf(React.PropTypes.array),
   selectedSection: React.PropTypes.string,
+  limit: React.PropTypes.number,
+  searchedBooks: React.PropTypes.array.isRequired,
+  savedBooks: React.PropTypes.array.isRequired,
+  renderRow: React.PropTypes.func.isRequired,
+  renderSectionHeader: React.PropTypes.func.isRequired,
+  renderSectionFooter: React.PropTypes.func.isRequired
 };
 
 import { AnimView, MeasureableView } from './SwipeableRow';
@@ -472,7 +495,7 @@ function ItemsHeader({ selectedSection, section, children, style }) {
     />);
   let content = children || (
     <Text>
-      {section}
+      {itemsInfo[section].text}
     </Text>
   );
   return (
@@ -489,28 +512,14 @@ function ItemsHeader({ selectedSection, section, children, style }) {
   );
 }
 
-function booksToObject(books) {
-  // https://github.com/eslint/eslint/issues/5284
-  /* eslint prefer-const:0 */
-  return books.reduce((acc,book)=> {
-    acc[book.key] = book;
-    return acc
-  },{})
-};
-
 function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSection }) {
   console.log('s b', savedBooks);
   // TODO: transition to detail view
-  const items = {
-    search: searchedBooks,
-    liked: savedBooks.filter((book) => book.bucket === 'liked'),
-    borrowed: savedBooks.filter((book) => book.bucket === 'borrowed'),
-    done: savedBooks.filter((book) => book.bucket === 'done')
-  };
   console.log('render main');
 
   let header = <Header />;
-  console.log('render main2', items);
+  // console.log('render main2', items);
+  // items={items}
   return (
     <View
       key="main"
@@ -523,39 +532,39 @@ function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSectio
       { /* listView should have onRelease method? */ }
       <MyListView
         selectedSection={selectedSection}
-        items={items}
+        searchedBooks={searchedBooks}
+        savedBooks={savedBooks}
         limit={selectedSection ? null : 2}
         renderRow={(rowData, sectionID, rowID) => {
-            return (!selectedSection && sectionID === 'search') ?
+          return (!selectedSection && sectionID === 'search') ?
                    null : (
                      <Touchable.BookRow
-         key={rowID}
-         selector="bookcell"
-         bucket={sectionID}
-         book={rowData}
-         style={{ backgroundColor: materialColor.grey['50'] }}
-               />)
-          }}
-        renderSectionFooter={(sectionData, sectionID) =>{
-            const [,,rowData] = sectionData
-            return (!selectedSection && sectionID === 'search') ? null :
-                   <ItemsFooter
-                payload={rowData.payload}
-                              count={rowData.count}
-                                    />
-          }}
+                       key={rowID}
+                       selector="bookcell"
+                       bucket={sectionID}
+                       book={rowData}
+                       style={{ backgroundColor: materialColor.grey['50'] }}
+                     />);
+        }}
+        renderSectionFooter={(sectionData, sectionID) => {
+            //console.log('foo', sectionData, sectionID);
+            // return null;
+            // const [,,rowData] = sectionData
+          return (!selectedSection && sectionID === 'search') ? null :
+                   <ItemsFooter {...sectionData} />;
+        }}
         renderSectionHeader={(sectionData, sectionID) => {
-            console.log("header",sectionData, sectionID)
-            return (sectionID === 'search') ? (
+          //console.log('header', sectionData, sectionID);
+          return (sectionID === 'search') ? (
               <SearchHeader
- selectedSection={selectedSection}
- loadingState={booksLoadingState}
+                selectedSection={selectedSection}
+                loadingState={booksLoadingState}
               />) : (
                 <ItemsHeader
- selectedSection={selectedSection}
- section={sectionID}
-         />)
-          }}
+                  selectedSection={selectedSection}
+                  section={sectionID}
+                />);
+        }}
         style={{
           paddingHorizontal: 3,
     // height:100,

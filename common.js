@@ -111,7 +111,8 @@ import materialColor from 'material-colors';
 
 const itemsInfo = {
   search: {
-    icon: 'search'
+    icon: 'search',
+    text: '検索'
   },
   liked: {
     icon: 'heart-o',

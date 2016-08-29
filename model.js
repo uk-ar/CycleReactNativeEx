@@ -71,7 +71,7 @@ function model(actions) {
 
   const state$ = Rx
     .Observable
-    .combineLatest(//searchedBooks$.startWith(MOCKED_MOVIES_DATA).distinctUntilChanged(),
+    .combineLatest(// searchedBooks$.startWith(MOCKED_MOVIES_DATA).distinctUntilChanged(),
                    actions.searchedBooksStatus$.startWith(MOCKED_MOVIES_DATA),
                    actions.savedBooksStatus$.do(i => console.log('s:', i)),
                    // actions.savedBooks$,

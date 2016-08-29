@@ -28,6 +28,7 @@ const {
 const { SwipeableRow, SwipeableRow2 } = require('./SwipeableRow');
 
 function LeftButton({ icon, text, style, backgroundColor, ...props }) {
+  //console.log("props:",icon, text, style, backgroundColor, props)
   // backgroundColor are used from SwipeableButtons
   return (
     <View
@@ -117,13 +118,13 @@ function getButtons(type, func, isbn) {
   const selfProps = { text: '先頭に移動', icon: 'level-up', close: false };
   // MIcon publish,vertical align top,low priority
   switch (type) {
-    case '読みたい':
+    case 'liked':
       likedButton = selfProps;
       break;
-    case '借りてる':
+    case 'borrowed':
       borrowedButton = selfProps;
       break;
-    case '読んだ':
+    case 'done':
       doneButton = selfProps;
       break;
     default:
@@ -133,7 +134,7 @@ function getButtons(type, func, isbn) {
   const leftButtons = [
     <LeftButton
       close={false}
-      {...itemsInfo['読みたい']}
+      {...itemsInfo['liked']}
       {...likedButton}
       text={null}
       backgroundColor={materialColor.grey[300]}
@@ -144,7 +145,7 @@ function getButtons(type, func, isbn) {
       onRelease={() => {
         console.log('like'); func(isbn, 'liked');
       }}
-      {...itemsInfo['読みたい']}
+      {...itemsInfo['liked']}
       {...likedButton}
       style={{ width: width / 2 }}
     />, // light blue "#03A9F4"
@@ -152,7 +153,7 @@ function getButtons(type, func, isbn) {
     <LeftButton
       onRelease={() => func(isbn, 'borrowed')}
       close
-      {...itemsInfo['借りてる']}
+      {...itemsInfo['borrowed']}
       {...borrowedButton}
       style={{ width }}
     />, //green
@@ -161,7 +162,7 @@ function getButtons(type, func, isbn) {
   const rightButtons = [
     <RightButton
       close={false}
-      {...itemsInfo['読んだ']}
+      {...itemsInfo['done']}
       {...doneButton}
       backgroundColor={materialColor.grey[300]}
       text={null}
@@ -169,7 +170,7 @@ function getButtons(type, func, isbn) {
     <RightButton
       onRelease={() => func(isbn, 'done')}
       close
-      {...itemsInfo['読んだ']}
+      {...itemsInfo['done']}
       {...doneButton}
       style={{ justifyContent: 'flex-end' }}
     />, //amber
@@ -213,12 +214,17 @@ function BookCell({ book, ...props }) {
             }]}>
             <View style={[{ padding: 10, justifyContent: 'center' },
               ]}>
-              <Text>
-                bucket:{book.bucket}
-              </Text>
-              <Text style={styles.bookTitle} numberOfLines={1}>
-                {book.title}
-              </Text>
+              <View style={{ flexDirection: 'row'}}>
+                { book.bucket ?
+                 <FAIcon
+                   name={itemsInfo[book.bucket].icon} size={20}
+                   style={{ marginRight: 5 ,
+                            color: itemsInfo[book.bucket].backgroundColor}}
+                 /> : null }
+                <Text style={styles.bookTitle} numberOfLines={1}>
+                  {book.title}
+                </Text>
+              </View>
               <Text style={styles.bookAuthor} numberOfLines={1}>
                 {book.author}
               </Text>
