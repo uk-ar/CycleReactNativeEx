@@ -110,20 +110,20 @@ const MOCKED_MOVIES_DATA = [
 import materialColor from 'material-colors';
 
 const itemsInfo = {
-  検索: {
+  search: {
     icon: 'search'
   },
-  読みたい: {
+  liked: {
     icon: 'heart-o',
     backgroundColor: materialColor.lightBlue[500],
     text: '読みたい'
   },
-  借りてる: {
+  borrowed: {
     icon: 'bookmark-o',
     backgroundColor: materialColor.green[500],
     text: '借りてる'
   },
-  読んだ: {
+  done: {
     icon: 'check-square-o',
     backgroundColor: materialColor.amber[500],
     text: '読んだ'

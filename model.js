@@ -14,51 +14,6 @@ import NavigationStateUtils from 'NavigationStateUtils';
 
 function model(actions) {
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
-  function mergeBooksStatus(books, booksStatus) {
-    return books.map(book => {
-      // console.log("book:",book,booksStatus)
-      let libraryStatus;
-      if ((booksStatus[book.isbn] !== undefined) && // not yet retrieve
-          // sub library exist?
-          (booksStatus[book.isbn][LIBRARY_ID].libkey !== undefined)) {
-        const bookStatus = booksStatus[book.isbn][LIBRARY_ID];
-        // TODO:support error case
-        // if bookStatus.status == "Error"
-        libraryStatus = {
-          status: bookStatus.libkey,
-          reserveUrl: bookStatus.reserveurl,
-          rentable: _.values(bookStatus.libkey)
-                     .some(i => i === '貸出可'),
-          exist: Object.keys(bookStatus.libkey)
-                       .length !== 0,
-        };
-      }
-
-      return ({
-        title: book.title.replace(/^【バーゲン本】/, ''),
-        author: book.author,
-        isbn: book.isbn,
-        thumbnail: book.largeImageUrl,
-        libraryStatus,
-        //active: true,
-      });
-    }
-    );
-  }
-  /* actions.requestStatus$
-   *        .do(i=>console.log("req",i))
-   *        .subscribe();*/
-  const searchedBooks$ =
-    actions.searchedBooksStatus$;
-  /* Rx.Observable
-   *   .combineLatest(
-   *     actions.booksResponse$,
-   *     actions.booksStatusResponse$,
-   *     mergeBooksStatus,
-   *     //actions.booksStatus$.startWith([]),
-   *     ).do(i => console.log('searchedBooks$:%O', i)
-   *     ).distinctUntilChanged();*/
-  // searchedBooks$.subscribe();
 
   const selectedBook$ = actions.goToBookView$;
   const booksLoadingState$ =
@@ -111,9 +66,13 @@ function model(actions) {
         }
       });
 
+  const searchedBooks$ =
+    actions.searchedBooksStatus$;
+
   const state$ = Rx
     .Observable
-    .combineLatest(searchedBooks$.startWith(MOCKED_MOVIES_DATA).distinctUntilChanged(),
+    .combineLatest(//searchedBooks$.startWith(MOCKED_MOVIES_DATA).distinctUntilChanged(),
+                   actions.searchedBooksStatus$.startWith(MOCKED_MOVIES_DATA),
                    actions.savedBooksStatus$.do(i => console.log('s:', i)),
                    // actions.savedBooks$,
                    booksLoadingState$.startWith(false).distinctUntilChanged(),
@@ -124,10 +83,6 @@ function model(actions) {
                    (searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection) =>
                      ({ searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection }));
   return state$;
-  /* return {
-   *   state$,
-   *   request$: requestSavedBooksStatus$
-   * };*/
 }
 
 module.exports = model;

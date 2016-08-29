@@ -16,9 +16,7 @@ import makeReactNativeDriver from '@cycle/react-native/src/driver';
 import { makeHTTPDriver } from '@cycle/http';
 
 import RxAdapter from '@cycle/rx-adapter';
-import xsSA from '@cycle/xstream-adapter';
 // const { makeFetchDriver } = require('@cycle/fetch');
-import xs from 'xstream';
 
 const HTTPDriver = makeHTTPDriver();
 

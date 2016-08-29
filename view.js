@@ -60,37 +60,31 @@ Touchable.BookRow = Touchable.createCycleComponent(
     onRelease: 'release',
   });
 
-class MyListView extends React.Component {
+/* if(this.listview && this.props.){
+   this.listview.scrollTo({y:this.props.offset,animated:false})
+   } */
+/* getScrollResponder() {
+   return this.listview.getScrollResponder();
+   },*/
+/* const dataSource = new ListView.DataSource({
+ *   rowHasChanged: (r1, r2) => r1 !== r2,
+ *   sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+ * });
+ * */
+class MyListView0 extends React.Component {
   // remove this.state.dataSource && this.listview
   constructor(props) {
     super(props);
-    const dataSource = new ListView.DataSource({
+    this.dataSource = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
       sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
     });
-    this.state = {
-      dataSource: dataSource.cloneWithRowsAndSections(props.items)
-    };
+    //getSectionLengths
   }
-
-  componentWillReceiveProps({ items, offset }) {
-    /* if(this.listview && this.props.){
-       this.listview.scrollTo({y:this.props.offset,animated:false})
-       } */
-
-    if (items !== this.props.items) {
-      this.setState({
-        dataSource: this.state.dataSource.cloneWithRowsAndSections(items)
-      });
-    }
-  }
-  /* getScrollResponder() {
-    return this.listview.getScrollResponder();
-  },*/
 
   render() {
     // https://github.com/babel/babel-eslint/issues/95#issuecomment-102170872
-    const { items: _, ...listViewProps } = this.props;
+    const { items, ...other } = this.props;
     return (
       // onResponderMove is too premitive
       // directionalLockEnabled disables horizontal scroll when scroll vertically
@@ -98,17 +92,53 @@ class MyListView extends React.Component {
       <ListView
         ref={listView => (this.listview = listView)}
         directionalLockEnabled
-        dataSource={this.state.dataSource}
+        dataSource = {this.dataSource.cloneWithRowsAndSections(items)
+          //TODO:rowIdentities
+                   }
         enableEmptySections
-        {...listViewProps}
+        {...other}
       />
       );
   }
 }
+//filter by getSectionLengths?
+//react renderSectionFooter
+class MyListView extends React.Component {
+  render() {
+    //filter selectedSection or full
+    //console.log("li",this.props)
+    const {selectedSection, limit, items,
+           renderRow, renderSectionFooter, ...other} = this.props
+    const limited = Object
+      .keys(items)
+      .filter((key) => selectedSection ? selectedSection === key : true)
+      .reduce((acc,key) => {
+        acc[key]= items[key]
+          .slice(0, limit || undefined)
+          .concat({
+            payload: key,
+            count:items[key].length
+          })
+
+        return acc;
+      },{})
+    //(rowData, sectionID, rowID) => {
+    //renderSectionFooter={(sectionData, sectionID) =>{
+    return (
+      <MyListView0
+        items={limited}
+        renderRow={(rowData, sectionID, rowID) => {
+            return rowData.count ?
+                   this.props.renderSectionFooter(limited[sectionID], sectionID) :
+                   this.props.renderRow(rowData, sectionID, rowID);
+          }}
+        {...other}/>)
+  }
+}
 
 MyListView.propTypes = {
-  items: React.PropTypes.object.isRequired,
-// selectedSection:selectedSection
+  items: React.PropTypes.objectOf(React.PropTypes.array),
+  selectedSection: React.PropTypes.string,
 };
 
 import { AnimView, MeasureableView } from './SwipeableRow';
@@ -398,7 +428,7 @@ function SearchHeader({ selectedSection, children, loadingState }) {
   return ((selectedSection !== null) ? (
      <ItemsHeader
        selectedSection={selectedSection}
-       section="検索"
+       section="search"
      >
        <Touchable.TextInput
          autoCapitalize="none"
@@ -419,7 +449,7 @@ function SearchHeader({ selectedSection, children, loadingState }) {
      <ItemsHeader
        style={[styles.sectionFooter, styles.sectionHeader]}
        selectedSection={selectedSection}
-       section="検索"
+       section="search"
      />)
    );
 }
@@ -462,80 +492,24 @@ function ItemsHeader({ selectedSection, section, children, style }) {
 function booksToObject(books) {
   // https://github.com/eslint/eslint/issues/5284
   /* eslint prefer-const:0 */
-  let obj = {};
-  books.forEach((book) => {
-    if (book.isbn) {
-      obj[`isbn-${book.isbn}`] = book;
-    } else {
-      obj[book.key] = book.component;
-    }
-  });
-  return obj;
-}
+  return books.reduce((acc,book)=> {
+    acc[book.key] = book;
+    return acc
+  },{})
+};
 
 function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSection }) {
   console.log('s b', savedBooks);
-  const borrowedBooks = savedBooks.filter((book) => book.bucket === 'borrowed');
-  const likedBooks = savedBooks.filter((book) => book.bucket === 'liked');
-  const doneBooks = savedBooks.filter((book) => book.bucket === 'done');
-  console.log('s b', likedBooks);
-  // todo transition to detail view
-  /* 検索: {
-     books:searchedBooks,
-     icons:
-     title:
-     }*/
-  const allItems = {
-    検索: searchedBooks,
-    読みたい: likedBooks,
-    借りてる: borrowedBooks,
-    読んだ: doneBooks,
+  // TODO: transition to detail view
+  const items = {
+    search: searchedBooks,
+    liked: savedBooks.filter((book) => book.bucket === 'liked'),
+    borrowed: savedBooks.filter((book) => book.bucket === 'borrowed'),
+    done: savedBooks.filter((book) => book.bucket === 'done')
   };
   console.log('render main');
-  // LayoutAnimation.easeInEaseOut();
 
-  let items = {};
-  let header = null;
-  // console.log("se:%O",selectedSection);
-  if (selectedSection === null) {
-    const limit = 2;
-     // assign component to item
-     // TODO: verify layoutAnimation
-    Object.keys(allItems).forEach((key) => {
-      if (key === '検索') {
-        items[key] = [];
-      } else {
-        items[key] = booksToObject(
-          allItems[key].slice(0, limit)
-                       .concat({
-                         key,
-                         component: (
-                           <ItemsFooter
-                             payload={key}
-                             count={allItems[key].length}
-                           />)
-                       }));
-      }
-       // console.log("i",items[key])
-    });
-    /* var items={
-      "検索":booksToObject(searchedBooks,limit),
-      "読みたい":booksToObject(likedBooks,limit),
-      "借りてる":booksToObject(borrowedBooks,limit),
-      "読んだ":booksToObject(doneBooks,limit),
-    }*/
-    header = (
-      <Header />
-    );
-  } else {
-    // detail view
-    items[selectedSection] = booksToObject(allItems[selectedSection]);
-    items[selectedSection][selectedSection] = {
-      type: 'term',
-      count: allItems[selectedSection].length
-    };
-  // console.log("detail",items)
-  }
+  let header = <Header />;
   console.log('render main2', items);
   return (
     <View
@@ -550,34 +524,38 @@ function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSectio
       <MyListView
         selectedSection={selectedSection}
         items={items}
+        limit={selectedSection ? null : 2}
         renderRow={(rowData, sectionID, rowID) => {
-          // console.log("row:",rowData, sectionID, rowID.replace('isbn-',''))
-          if (React.isValidElement(rowData)) {
-              // for section footer rendering
-            return rowData;
-          }
-          return (
-              <Touchable.BookRow
-                key={rowID}
-                selector="bookcell"
-                bucket={sectionID}
-                book={rowData}
-                style={{ backgroundColor: materialColor.grey['50'] }}
-              />
-            );
-        }}
-        renderSectionHeader={(sectionData, sectionID) =>
-          (sectionID === '検索') ? (
-            <SearchHeader
-              selectedSection={selectedSection}
-              loadingState={booksLoadingState}
-            />) : (
-            <ItemsHeader
-              section={sectionID}
-              selectedSection={selectedSection}
-            />
-          )}
-
+            return (!selectedSection && sectionID === 'search') ?
+                   null : (
+                     <Touchable.BookRow
+         key={rowID}
+         selector="bookcell"
+         bucket={sectionID}
+         book={rowData}
+         style={{ backgroundColor: materialColor.grey['50'] }}
+               />)
+          }}
+        renderSectionFooter={(sectionData, sectionID) =>{
+            const [,,rowData] = sectionData
+            return (!selectedSection && sectionID === 'search') ? null :
+                   <ItemsFooter
+                payload={rowData.payload}
+                              count={rowData.count}
+                                    />
+          }}
+        renderSectionHeader={(sectionData, sectionID) => {
+            console.log("header",sectionData, sectionID)
+            return (sectionID === 'search') ? (
+              <SearchHeader
+ selectedSection={selectedSection}
+ loadingState={booksLoadingState}
+              />) : (
+                <ItemsHeader
+ selectedSection={selectedSection}
+ section={sectionID}
+         />)
+          }}
         style={{
           paddingHorizontal: 3,
     // height:100,

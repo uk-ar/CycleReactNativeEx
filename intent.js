@@ -134,12 +134,14 @@ function intent(RN, HTTP) {
          * });*/
         // TODO:support books from search result
         // TODO:support books from saved result
+        // TODO:move to booksStatusResponse$
         return ({
           title: book.title.replace(/^【バーゲン本】/, ''),
           author: book.author,
           isbn: book.isbn,
           bucket: book.bucket,
           thumbnail: book.largeImageUrl,
+          key: book.key,
           libraryStatus,
           //active: true,
         });
@@ -184,7 +186,10 @@ function intent(RN, HTTP) {
     const booksStatus$ =
       Rx.Observable
         .combineLatest(
-          books$,
+          //books$.map((book) => ({...book, key: book.isbn})),
+          //books$.map((book) => book),
+          books$.map(books => books.map(book => ({...book, key:`isbn-${book.isbn}`}))),
+          //books$,
           booksStatusResponse$.startWith({}),
           mergeBooksStatus,
         ) // .do(i => console.log('books$:', category, i))
@@ -298,7 +303,9 @@ function intent(RN, HTTP) {
                         .events('press')
                         .merge(RN.select('close')
                                  .events('press').map(() => null))
-                        .do(i => console.log('section selected:%O', i))
+                        .do(i => console.log('section selected0:%O', i))
+                        .distinctUntilChanged()
+                        .do(i => console.log('section selected1:%O', i))
     // .do((books)=>LayoutAnimation.easeInEaseOut())//there is bug in iOS
     // Will be fixed in RN 0.28?
     // ref: https://github.com/facebook/react-native/pull/7942
