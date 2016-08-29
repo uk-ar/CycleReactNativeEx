@@ -50,21 +50,6 @@ function intent(RN, HTTP) {
   const release$ = RN.select('bookcell')
                      .events('release');
 
-  const changeBucket$ =
-    release$
-      .do(i => console.log('release:', i))
-  // TODO:change to isbn
-      .map(([isbn, bucket]) => (
-        { type: 'replace',
-          isbn,
-          bucket,
-        }))
-  /* .map(([book, bucket]) => (
-   *   { type: 'replace',
-   *     book: Object.assign(
-   *       {}, book, { bucket, modifyDate: new Date(Date.now()) }) }))*/
-      .do(i => console.log('rel:%O', i));
-
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')
                          .map(([text]) => text)
@@ -195,22 +180,45 @@ function intent(RN, HTTP) {
       requestStatus$ });
   }
 
+  const changeBucket$ =
+    release$
+      .do(i => console.log('release:', i))
+  // TODO:change to isbn
+  /* .map(([book, bucket]) => (
+   *   { type: 'replace',
+   *     book,
+   *     bucket,
+   *   }))*/
+  /* .map(([isbn, bucket]) => (
+   *   { type: 'replace',
+   *     isbn,
+   *     bucket,
+   *   }))*/
+      .flatMap(([book, bucket]) =>
+        [{ type: 'remove' , book },
+         { type: 'add'    , book, bucket }])
+  /* .map(([book, bucket]) => (
+   *   { type: 'replace',
+   *     book: Object.assign(
+   *       {}, book, { bucket, modifyDate: new Date(Date.now()) }) }))*/
+      .do(i => console.log('rel:%O', i));
+
+  //[{isbn:,mod},{isbn:,mod}]
   const savedBooks$ =
     changeBucket$
       .startWith(initialBooks)
-  /* .of(initialBooks)
-   * .merge()*/
-      .scan((books, { type, book }) => {
+      .scan((books, { type, book, bucket}) => {
         console.log('type:', type);
         switch (type) {
-            /* case 'remove':
-             *   return books.filter((elem) =>
-             *     elem.isbn.toString() !== book.isbn.toString());
-             * case 'add':
-             *   return [book].concat(books);*/
-          case 'replace':
-            return [book].concat(books.filter((elem) =>
-              elem.isbn.toString() !== book.isbn.toString()));
+          case 'remove':
+            return books.filter((elem) =>
+              elem.isbn.toString() !== book.isbn.toString());
+          case 'add':
+            return [book].concat(books);
+            /* case 'replace':
+             *    return [book].concat(
+             *     books.filter((elem) => elem.isbn.toString() !== book.isbn.toString()));
+             *   return [{...book,bucket,modifyDate: new Date(Date.now())}].concat(books)*/
           default:
             return books;
         }

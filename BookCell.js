@@ -111,13 +111,13 @@ function LibraryStatus({ libraryStatus = {}, ...props }) {
   );
 }
 
-function getButtons(type, func, isbn) {
+function getButtons(bucket, isbn) {
   let likedButton;
   let borrowedButton;
   let doneButton;
   const selfProps = { text: '先頭に移動', icon: 'level-up', close: false };
   // MIcon publish,vertical align top,low priority
-  switch (type) {
+  switch (bucket) {
     case 'liked':
       likedButton = selfProps;
       break;
@@ -253,11 +253,12 @@ function BookRow({ bucket, book, onRelease, style }) {
   // skip close behavior
   // (book,bucket)=>closeanimate.start(onRelease)
   // onRelease is cycle:touchable element
-  let { leftButtons, rightButtons } = getButtons(bucket, onRelease, book);
+  const { leftButtons, rightButtons } = getButtons(bucket, book);
   return (
     // CloseableCompo
     // need ref & React.cloneElement?
     <SwipeableRow2
+      onRelease={() => onRelease(book, bucket)}
       leftButtons={leftButtons}
       rightButtons={rightButtons}
       onPanResponderMove={() => {

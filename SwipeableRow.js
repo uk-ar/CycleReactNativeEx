@@ -713,9 +713,11 @@ const SwipeableRow2 = React.createClass({
       onPanResponderTerminationRequest: (evt, gestureState) => false,
       onPanResponderRelease: (evt, gestureState) => {
         if (this.state.positiveSwipe) {
-          this.refs.leftButtons.release();
+          //this.refs.leftButtons.release();
+          this.props.onRelease();
         } else {
-          this.refs.rightButtons.release();
+          this.props.onRelease();
+          //this.refs.rightButtons.release();
         }
       },
 
