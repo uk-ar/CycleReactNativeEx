@@ -1,6 +1,6 @@
-const Rx = require('rx');// for debug http://stackoverflow.com/questions/32211649/debugging-with-webpack-es6-and-babel
-// import Rx from 'rx';
+import Rx from 'rx';
 import _ from 'lodash';
+import NavigationStateUtils from 'NavigationStateUtils';
 
 import {
   STORAGE_KEY,
@@ -9,8 +9,6 @@ import {
   CALIL_STATUS_API,
   MOCKED_MOVIES_DATA,
 } from './common';
-
-import NavigationStateUtils from 'NavigationStateUtils';
 
 function model(actions) {
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
@@ -62,26 +60,76 @@ function model(actions) {
           case 'replace':
             return NavigationStateUtils.replace(prevState, action);
           default:
-            console.error('Unexpected action', navigationProps, key);
+            return console.error('Unexpected action');
         }
       });
 
+  function genItems(searchedBooks, savedBooks) {
+    // move to model?
+    function booksToObject(books) {
+      // https://github.com/eslint/eslint/issues/5284
+      /* eslint prefer-const:0 */
+      return books.reduce((acc, book) => {
+        acc[book.key] = book;
+        return acc;
+      }, {});
+    }
+    function filterBooks(saved, bucket) {
+      let ret = {};
+      let books = saved.filter((book) => book.bucket === bucket);
+      ret[bucket] = booksToObject(books);
+      ret[`${bucket}_end`] = {};
+      return ret;
+    }
+    return {
+      search: booksToObject(searchedBooks),
+      search_end: {},
+      ...filterBooks(savedBooks, 'liked'),
+      ...filterBooks(savedBooks, 'borrowed'),
+      ...filterBooks(savedBooks, 'done'),
+    };
+  }
+
+  function genCounts(items) {
+    return {
+      search_end: Object.keys(items.search).length,
+      liked_end: Object.keys(items.liked).length,
+      borrowed_end: Object.keys(items.borrowed).length,
+      done_end: Object.keys(items.done).length
+    };
+  }
   const searchedBooks$ =
-    actions.searchedBooksStatus$;
+    actions.searchedBooksStatus$
+           .startWith(MOCKED_MOVIES_DATA)
+           .map(books =>
+             books.map(book => ({ ...book, key: `isbn-${book.isbn}` })))
+           .shareReplay();
+
+  const items$ =
+    Rx.Observable.combineLatest(
+      searchedBooks$, actions.savedBooksStatus$,
+      genItems);
+
+  const counts$ =
+    items$.map(genCounts);
+  // const items = genItems(searchedBooks, savedBooks);
+  // const counts = genCounts(items);
 
   const state$ = Rx
     .Observable
-    .combineLatest(// searchedBooks$.startWith(MOCKED_MOVIES_DATA).distinctUntilChanged(),
-                   actions.searchedBooksStatus$.startWith(MOCKED_MOVIES_DATA),
-                   actions.savedBooksStatus$.do(i => console.log('s:', i)),
-                   // actions.savedBooks$,
-                   booksLoadingState$.startWith(false).distinctUntilChanged(),
-                   navigationState$.distinctUntilChanged(),
-                   selectedBook$.startWith(null).distinctUntilChanged(),
-                   actions.selectedSection$.startWith(null),
-                   // actions.selectedSection$.startWith("検索"),
-                   (searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection) =>
-                     ({ searchedBooks, savedBooks, booksLoadingState, navigationState, selectedBook, selectedSection }));
+    .combineLatest(
+      /* searchedBooks$,
+       * actions.savedBooksStatus$,*/
+      items$,
+      counts$,
+      // actions.savedBooks$,
+      booksLoadingState$.startWith(false).distinctUntilChanged(),
+      navigationState$.distinctUntilChanged(),
+      selectedBook$.startWith(null).distinctUntilChanged(),
+      actions.selectedSection$.startWith(null),
+      // actions.selectedSection$.startWith("検索"),
+      (items, counts, booksLoadingState, navigationState, selectedBook, selectedSection) =>
+        ({ items, counts, booksLoadingState, navigationState, selectedBook, selectedSection }));
   return state$;
 }
 

@@ -28,7 +28,7 @@ const {
 const { SwipeableRow, SwipeableRow2 } = require('./SwipeableRow');
 
 function LeftButton({ icon, text, style, backgroundColor, ...props }) {
-  //console.log("props:",icon, text, style, backgroundColor, props)
+  // console.log("props:",icon, text, style, backgroundColor, props)
   // backgroundColor are used from SwipeableButtons
   return (
     <View
@@ -214,12 +214,12 @@ function BookCell({ book, ...props }) {
             }]}>
             <View style={[{ padding: 10, justifyContent: 'center' },
               ]}>
-              <View style={{ flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 { book.bucket ?
                  <FAIcon
                    name={itemsInfo[book.bucket].icon} size={20}
-                   style={{ marginRight: 5 ,
-                            color: itemsInfo[book.bucket].backgroundColor}}
+                   style={{ marginRight: 5,
+                            color: itemsInfo[book.bucket].backgroundColor }}
                  /> : null }
                 <Text style={styles.bookTitle} numberOfLines={1}>
                   {book.title}

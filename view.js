@@ -1,11 +1,8 @@
 import React from 'react';
-const FAIcon = require('react-native-vector-icons/FontAwesome');
 import { getBackHandler } from '@cycle/react-native/src/driver';
 import materialColor from 'material-colors';
-import { styles } from './styles';
 // there is 1 errors
 import {
-  ListView,
   Platform,
   Text,
   View,
@@ -13,12 +10,13 @@ import {
   TextInput,
   // LayoutAnimation,
   ActivityIndicator,
-  ToastAndroid,
 } from 'react-native';
-
 import NavigationStateUtils from 'NavigationStateUtils';
-
 import Touchable from '@cycle/react-native/src/Touchable';
+import { styles } from './styles';
+
+const FAIcon = require('react-native-vector-icons/FontAwesome');
+
 Touchable.TouchableElement = Touchable.TouchableHighlight;
 if (Platform.OS === 'android') {
   Touchable.TouchableElement = Touchable.TouchableNativeFeedback;
@@ -60,109 +58,22 @@ Touchable.BookRow = Touchable.createCycleComponent(
     onRelease: 'release',
   });
 
-/* if(this.listview && this.props.){
-   this.listview.scrollTo({y:this.props.offset,animated:false})
-   } */
-/* getScrollResponder() {
-   return this.listview.getScrollResponder();
-   },*/
-// Smart compo
-class MyListView0 extends React.Component {
-  // remove this.state.dataSource && this.listview
-  constructor(props) {
-    super(props);
-    this.dataSource = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2,
-      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
-    });
-    // getSectionLengths
-  }
+import { BookListView } from './BookListView';
 
-  render() {
-    // https://github.com/babel/babel-eslint/issues/95#issuecomment-102170872
-    const { items, sectionIDs, ...other } = this.props;
-    return (
-      // onResponderMove is too premitive
-      // directionalLockEnabled disables horizontal scroll when scroll vertically
-      // https://github.com/facebook/react-native/issues/6764
-      <ListView
-        ref={listView => (this.listview = listView)}
-        directionalLockEnabled
-        dataSource={this.dataSource.cloneWithRowsAndSections(items, sectionIDs)}
-        enableEmptySections
-        {...other}
-      />
-      );
-  }
+function ItemsFooter({ payload, count }) {
+  return (
+    <Touchable.TouchableElement
+      selector="section"
+      payload={payload}
+    >
+      <View style={styles.sectionFooter}>
+        <Text>
+          {`すべて表示(${count})`}
+        </Text>
+      </View>
+    </Touchable.TouchableElement>
+  );
 }
-
-// Dumb compo
-// filter by getSectionLengths?
-// react renderSectionFooter
-class MyListView extends React.Component {
-  render() {
-    function booksToObject(books) {
-      // https://github.com/eslint/eslint/issues/5284
-      /* eslint prefer-const:0 */
-      return books.reduce((acc, book) => {
-        acc[book.key] = book;
-        return acc;
-      }, {});
-    }
-    function filterBooks(savedBook, bucket, limit) {
-      let ret = {};
-      let books = savedBook.filter((book) => book.bucket === bucket);
-      ret[bucket] = booksToObject(books.slice(0, limit || undefined));
-      ret[`${bucket}_end`] = { payload: bucket, count: books.length };
-      return ret;
-    }
-    const { selectedSection, limit, searchedBooks, savedBooks,
-            renderRow, renderSectionHeader, renderSectionFooter,
-            ...other } = this.props;
-
-    const search_end =
-      selectedSection === "search" ?
-      {search_end: {payload:"search"}} : {}
-
-    const limited = {
-      search: searchedBooks,
-      ...search_end,
-      ...filterBooks(savedBooks, 'liked', limit),
-      ...filterBooks(savedBooks, 'borrowed', limit),
-      ...filterBooks(savedBooks, 'done', limit),
-    };
-    //console.log('li:', limited);
-    return (
-      <MyListView0
-        items={limited}
-        renderSectionHeader={(sectionData, sectionID) => {
-          return sectionID.endsWith('_end') ?
-                   renderSectionFooter(sectionData, sectionID) :
-                   renderSectionHeader(sectionData, sectionID);
-        }}
-        renderRow={(rowData, sectionID, rowID) => {
-          return sectionID.endsWith('_end') ? null :
-                   renderRow(rowData, sectionID, rowID);
-        }}
-        sectionIDs={selectedSection ?
-                    [selectedSection, `${selectedSection}_end`] : undefined}
-        {...other}
-      />);
-  }
-}
-
-/* const { selectedSection, limit, searchedBooks, savedBooks,
- *         renderRow, renderSectionHeader, renderSectionFooter,
- * */
-MyListView.propTypes = {
-  selectedSection: React.PropTypes.string,
-  limit: React.PropTypes.number,
-  searchedBooks: React.PropTypes.array.isRequired,
-  savedBooks: React.PropTypes.array.isRequired,
-  renderRow: React.PropTypes.func.isRequired,
-  renderSectionHeader: React.PropTypes.func.isRequired,
-  renderSectionFooter: React.PropTypes.func.isRequired
-};
 
 import { AnimView, MeasureableView } from './SwipeableRow';
 const ReactTransitionGroup = require('react-addons-transition-group');
@@ -280,7 +191,7 @@ class Closeable extends React.Component {
     return this.refs.root.animateTo(this.style);
   }
   calcStyle(close) {
-    let style = !this.state.layouted ?
+    const style = !this.state.layouted ?
                 { width: null, height: null } : close ?
                 { width: 0.01, height: 0.01 } :
                 { width: this.contentWidth, height: this.contentHeight };
@@ -432,21 +343,6 @@ class Header extends React.Component {
   }
 }
 
-function ItemsFooter({ payload, count }) {
-  return (
-    <Touchable.TouchableElement
-      selector="section"
-      payload={payload}
-    >
-      <View style={styles.sectionFooter}>
-        <Text>
-          {`すべて表示(${count})`}
-        </Text>
-      </View>
-    </Touchable.TouchableElement>
-  );
-}
-
 function SearchHeader({ selectedSection, children, loadingState }) {
   return ((selectedSection !== null) ? (
      <ItemsHeader
@@ -479,7 +375,7 @@ function SearchHeader({ selectedSection, children, loadingState }) {
 
 import { itemsInfo } from './common';
 function ItemsHeader({ selectedSection, section, children, style }) {
-  let icon = (selectedSection === null) ? (
+  const icon = (selectedSection === null) ? (
     <FAIcon
       name={itemsInfo[section].icon}
       color={itemsInfo[section].backgroundColor}
@@ -493,7 +389,7 @@ function ItemsHeader({ selectedSection, section, children, style }) {
       size={20}
       style={{ marginRight: 5 }}
     />);
-  let content = children || (
+  const content = children || (
     <Text>
       {itemsInfo[section].text}
     </Text>
@@ -512,12 +408,13 @@ function ItemsHeader({ selectedSection, section, children, style }) {
   );
 }
 
-function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSection }) {
-  console.log('s b', savedBooks);
+function mainView({ items, counts, booksLoadingState, selectedSection }) {
+  // console.log('s b', savedBooks);
   // TODO: transition to detail view
   console.log('render main');
 
-  let header = <Header />;
+  // let header = <Header />;
+  const header = null;
   // console.log('render main2', items);
   // items={items}
   return (
@@ -530,31 +427,30 @@ function mainView({ searchedBooks, savedBooks, booksLoadingState, selectedSectio
     >
       {header}
       { /* listView should have onRelease method? */ }
-      <MyListView
+      <BookListView
         selectedSection={selectedSection}
-        searchedBooks={searchedBooks}
-        savedBooks={savedBooks}
+        items={items}
         limit={selectedSection ? null : 2}
         renderRow={(rowData, sectionID, rowID) => {
-          return (!selectedSection && sectionID === 'search') ?
-                   null : (
-                     <Touchable.BookRow
-                       key={rowID}
-                       selector="bookcell"
-                       bucket={sectionID}
-                       book={rowData}
-                       style={{ backgroundColor: materialColor.grey['50'] }}
-                     />);
+          return (
+          <Touchable.BookRow
+            key={rowID}
+            selector="bookcell"
+            bucket={sectionID}
+            book={rowData}
+            style={{ backgroundColor: materialColor.grey['50'] }}
+          />);
         }}
         renderSectionFooter={(sectionData, sectionID) => {
-            //console.log('foo', sectionData, sectionID);
-            // return null;
-            // const [,,rowData] = sectionData
-          return (!selectedSection && sectionID === 'search') ? null :
-                   <ItemsFooter {...sectionData} />;
+          console.log('footer', sectionData, sectionID, sectionID.slice(0, -4));
+          return (
+              <ItemsFooter
+                payload={sectionID.slice(0, -1 * '-end'.length)}
+                count={counts[sectionID]}
+              />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {
-          //console.log('header', sectionData, sectionID);
+          console.log('header', sectionData, sectionID);
           return (sectionID === 'search') ? (
               <SearchHeader
                 selectedSection={selectedSection}
@@ -596,7 +492,7 @@ function view(model) {
       onNavigate={onNavigateBack}
       renderOverlay={(navigationProps) => {
           // console.log("np:",navigationProps);
-        let style = null;
+        const style = null;
         if (navigationProps.scene.route.key === 'Main') {
           // style = { opacity: 0 }; // cannot touch close button
           return null;

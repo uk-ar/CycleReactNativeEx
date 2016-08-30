@@ -76,7 +76,7 @@ function intent(RN, HTTP) {
       HTTP.select(category)
           .switch()
           .map(res => res.text)
-          //.do(res => console.log(res))
+          // .do(res => console.log(res))
           .map(res => JSON.parse(res))
     ); }
 
@@ -88,7 +88,7 @@ function intent(RN, HTTP) {
         // reject non book
             .filter(book =>
               book.isbn.startsWith('978') || book.isbn.startsWith('979'))
-            .map(({title,author,isbn, largeImageUrl}) => ({
+            .map(({ title, author, isbn, largeImageUrl }) => ({
               title: title.replace(/^【バーゲン本】/, ''),
               author,
               isbn,
@@ -169,7 +169,8 @@ function intent(RN, HTTP) {
         .combineLatest(
           // books$.map((book) => ({...book, key: book.isbn})),
           // books$.map((book) => book),
-          books$.map(books => books.map(book => ({ ...book, key: `isbn-${book.isbn}` }))),
+          books$.map(books =>
+            books.map(book => ({ ...book, key: `isbn-${book.isbn}` }))),
           // books$,
           booksStatusResponse$.startWith({}),
           mergeBooksStatus,
@@ -195,19 +196,19 @@ function intent(RN, HTTP) {
    *     bucket,
    *   }))*/
       .flatMap(([book, bucket]) =>
-        [{ type: 'remove' , book },
-         { type: 'add'    , book, bucket }])
+        [{ type: 'remove', book },
+         { type: 'add', book, bucket }])
   /* .map(([book, bucket]) => (
    *   { type: 'replace',
    *     book: Object.assign(
    *       {}, book, { bucket, modifyDate: new Date(Date.now()) }) }))*/
       .do(i => console.log('rel:%O', i));
 
-  //[{isbn:,mod},{isbn:,mod}]
+  // [{isbn:,mod},{isbn:,mod}]
   const savedBooks$ =
     changeBucket$
       .startWith(initialBooks)
-      .scan((books, { type, book, bucket}) => {
+      .scan((books, { type, book, bucket }) => {
         console.log('type:', type);
         switch (type) {
           case 'remove':
