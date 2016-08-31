@@ -58,7 +58,7 @@ Touchable.BookRow = Touchable.createCycleComponent(
     onRelease: 'release',
   });
 
-import { BookListView } from './BookListView';
+import { BookListView,InfSmartListView } from './BookListView';
 
 function ItemsFooter({ payload, count }) {
   return (
@@ -408,7 +408,8 @@ function ItemsHeader({ selectedSection, section, children, style }) {
   );
 }
 
-function mainView({ items, counts, booksLoadingState, selectedSection }) {
+function MainView({ items, counts, booksLoadingState, selectedSection }) {
+  // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
   // TODO: transition to detail view
   console.log('render main');
@@ -475,15 +476,20 @@ function view(model) {
      android. But NavigationExperimental.CardStack cannot re-render by model
      change.So we should add random key or force update*/
   // http://stackoverflow.com/a/35004739
-  const navigationState = NavigationStateUtils.replaceAtIndex(
-    model.navigationState, // navigationState
-    model.navigationState.index, // index
-    {
-      ...model.navigationState.routes[model.navigationState.index],
-      id: Math.random(),
-    } // route
-  ); //
-  console.log('mynav', navigationState, onNavigateBack);
+  console.log("view")
+  return (<InfSmartListView {...model}/>)
+  /* const navigationState = NavigationStateUtils.replaceAtIndex(
+   *   model.navigationState, // navigationState
+   *   model.navigationState.index, // index
+   *   {
+   *     ...model.navigationState.routes[model.navigationState.index],
+   *     id: Math.random(),
+   *   } // route
+   * );*/
+  const navigationState = model.navigationState
+  //return MainView(model);
+  //return <MainView  {...model}/>;
+  //console.log('mynav', navigationState, onNavigateBack);
   return (
     // <NavigationExperimental.Transitioner
     <NavigationExperimental.CardStack
@@ -518,14 +524,14 @@ function view(model) {
         const key = navigationProps.scene.route.key;
         switch (key) {
           case 'Main':
-          // return (mainView(model))
+          // return (MainView(model))
             return (
               <MyCard navigationProps={navigationProps}>
-                {mainView(model)}
+                {MainView(model)}
               </MyCard>
             );
           case 'Book Detail':
-            // return (mainView(model))
+            // return (MainView(model))
             return (
               <View style={{ marginTop: 64, backgroundColor: 'red' }}>
                 <Text>book detail</Text>

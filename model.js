@@ -127,9 +127,11 @@ function model(actions) {
       navigationState$.distinctUntilChanged(),
       selectedBook$.startWith(null).distinctUntilChanged(),
       actions.selectedSection$.startWith(null),
+      Rx.Observable.interval(1000).do(i=>console.log("int",i)),
+      //Rx.Observable.just(1000),
       // actions.selectedSection$.startWith("検索"),
-      (items, counts, booksLoadingState, navigationState, selectedBook, selectedSection) =>
-        ({ items, counts, booksLoadingState, navigationState, selectedBook, selectedSection }));
+      (items, counts, booksLoadingState, navigationState, selectedBook, selectedSection, i) =>
+        ({ items, counts, booksLoadingState, navigationState, selectedBook, selectedSection , i}));
   return state$;
 }
 

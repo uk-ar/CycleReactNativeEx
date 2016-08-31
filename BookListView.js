@@ -1,9 +1,9 @@
 import React from 'react';
 
 import {
-  ListView,
-  Text,
   View,
+  Text,
+  ListView,
 } from 'react-native';
 
 /* if(this.listview && this.props.){
@@ -12,40 +12,6 @@ import {
 /* getScrollResponder() {
    return this.listview.getScrollResponder();
    },*/
-import util from 'util';
-function debugRenderRow(rowData,sectionID,columnID){
-  console.log("row:",rowData,sectionID,columnID)
-  return(<View style={{height:400,borderColor:columnID % 2 ? "yellow": "green",borderWidth:3}}><Text>row:{util.inspect(rowData)}</Text></View>)
-}
-
-// Smart compo
-class InfSmartListView extends React.Component {
-  constructor(props) {
-    super(props);
-    dataSource = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2,
-      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
-    });
-    this.state = {
-      dataSource:dataSource.cloneWithRows([{a:1},{a:2},{a:3},{a:4},{a:5},{a:6},{a:7},{a:8}])
-    }
-  }
-  render() {
-    const { items, sectionIDs, rowIDs, ...other } = this.props;
-    console.log("smart")
-    return (
-      <ListView
-        dataSource={this.state.dataSource}
-        renderRow={debugRenderRow}
-        onEndReached={()=>{
-            console.log("end");
-            this.setState({
-              dataSource:this.state.dataSource.cloneWithRows([{a:1,b:1},{a:2,b:1},{a:3,b:1},{a:4,b:1},{a:5,b:1},{a:6,b:1},{a:7,b:1},{a:8,b:1},{a:9,b:1}])
-            })}}
-      />
-    );
-  }
-}
 
 // Smart compo
 class SmartListView extends React.Component {
@@ -74,26 +40,41 @@ class SmartListView extends React.Component {
   }
 }
 
-//TODO:interval timer
-class InfBookListView extends React.Component {
+import util from 'util';
+function debugRenderRow(rowData,sectionID,columnID){
+  console.log("row:",rowData,sectionID,columnID)
+  return(<View style={{height:400,borderColor:columnID % 2 ? "yellow": "green",borderWidth:3}}><Text>row:{util.inspect(rowData)}</Text></View>)
+}
+
+class InfSmartListView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {items: this.props.items}
+    this.dataSource = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+    });
+    this.state = {
+      dataSource:this.dataSource
+        .cloneWithRows([{a:1},{a:2},{a:3},{a:4},{a:5},{a:6}])
+    }
   }
   render() {
-    const { items, ...other } = this.props;
+    const { items, sectionIDs, rowIDs, i, ...other } = this.props;
+    console.log("smart")
+    //dataSource={this.state.dataSource}
     return (
-    <SmartListView
-      {...other}
-      items={this.state.items}
-      onEndReachedThreshold={500}
-      renderSectionHeader={null}
-      onEndReached={()=>{
-          this.setState({items: {...this.props.items,
-                                 dummy:{"isbn-100":{title:"d1",isbn:100}}}})
-          console.log("EEE")
-        }}
-    />)
+      <ListView
+        dataSource={this.dataSource.cloneWithRows(Array(3).fill(i))}
+        renderRow={debugRenderRow}
+        onEndReached={()=>{
+            console.log("end");
+            this.setState({
+              dataSource:this
+                .state.dataSource
+                .cloneWithRows([{a:1,b:2},{a:2},{a:3},{a:4},{a:5},{a:6},{a:7}])
+            })}}
+      />
+    );
   }
 }
 
@@ -144,4 +125,4 @@ BookListView.propTypes = {
   renderSectionFooter: React.PropTypes.func.isRequired
 };
 
-module.exports = { BookListView };
+module.exports = { BookListView,InfSmartListView };

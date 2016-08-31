@@ -47,6 +47,7 @@ const initialBooks = realm.objects('Book')
 
 function intent(RN, HTTP) {
   // Actions
+  //mojibake シンプ Q思考
   const release$ = RN.select('bookcell')
                      .events('release');
 
