@@ -131,6 +131,17 @@ const itemsInfo = {
   }
 };
 
+import {
+  Text,
+  View,
+} from 'react-native';
+
+import util from 'util';
+function debugRenderRow(rowData,sectionID,columnID){
+  console.log("row:",rowData,sectionID,columnID)
+  return(<View style={{height:400,borderColor:columnID % 2 ? "yellow": "green",borderWidth:3}}><Text>row:{util.inspect(rowData)}</Text></View>)
+}
+
 module.exports = {
   itemsInfo,
   STORAGE_KEY,

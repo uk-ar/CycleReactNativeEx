@@ -442,7 +442,7 @@ function mainView({ items, counts, booksLoadingState, selectedSection }) {
           />);
         }}
         renderSectionFooter={(sectionData, sectionID) => {
-          console.log('footer', sectionData, sectionID, sectionID.slice(0, -4));
+          //console.log('footer', sectionData, sectionID));
           return (
               <ItemsFooter
                 payload={sectionID.slice(0, -1 * '-end'.length)}
@@ -450,7 +450,7 @@ function mainView({ items, counts, booksLoadingState, selectedSection }) {
               />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {
-          console.log('header', sectionData, sectionID);
+          //console.log('header', sectionData, sectionID);
           return (sectionID === 'search') ? (
               <SearchHeader
                 selectedSection={selectedSection}

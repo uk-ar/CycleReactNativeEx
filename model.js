@@ -100,7 +100,7 @@ function model(actions) {
   }
   const searchedBooks$ =
     actions.searchedBooksStatus$
-           .startWith(MOCKED_MOVIES_DATA)
+           //.startWith(MOCKED_MOVIES_DATA)
            .map(books =>
              books.map(book => ({ ...book, key: `isbn-${book.isbn}` })))
            .shareReplay();

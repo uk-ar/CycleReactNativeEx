@@ -139,7 +139,8 @@ function intent(RN, HTTP) {
               category,
               url: CALIL_STATUS_API + encodeURI(q)
             }))
-            .do(i => console.log('status req:%O', i));
+            .do(i => console.log('status req:%O', i))
+            .shareReplay();
 
     const booksStatusResponse$ =
       createResponseStream(category)
@@ -244,11 +245,21 @@ function intent(RN, HTTP) {
     }, {});
   }
 
+  const mockSearcheBooks = [
+    { title: 'like:SOFT SKILLS', isbn: '9784822251550'},
+    { title: 'borrow:youji kyouiku keizai', isbn: '9784492314630'},
+    { title: 'done:simpsons', isbn: '9784105393069'},
+    { title: 'none:container', isbn: '9784822245641'},
+    { title: 'guri', isbn: '9784834032147'},
+    { title: 'ABC',  isbn: '9784828867472',},
+  ];
+
   const { booksStatus$: searchedBooksStatus$,
           requestStatus$: requestSearchedBooksStatus$ } =
             createBooksStatusStream(
-              // merge savedBooks to searchedBooks
+              // merge savedBooks to searchedBooks              
               booksResponse$
+                .startWith(mockSearcheBooks)
                 .combineLatest(
                   savedBooks$.map(arrayToObject),
                   (searchedBooks, savedBooks) =>
