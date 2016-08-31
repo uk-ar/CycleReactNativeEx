@@ -58,7 +58,7 @@ Touchable.BookRow = Touchable.createCycleComponent(
     onRelease: 'release',
   });
 
-import { BookListView,InfSmartListView } from './BookListView';
+import { BookListView,InfSmartListView,SmartListView,ListViewWithFooter } from './BookListView';
 
 function ItemsFooter({ payload, count }) {
   return (
@@ -344,16 +344,16 @@ class Header extends React.Component {
 }
 
 function SearchHeader({ selectedSection, children, loadingState }) {
+  console.log("search",selectedSection, children, loadingState)
   return ((selectedSection !== null) ? (
      <ItemsHeader
        selectedSection={selectedSection}
        section="search"
      >
-       <Touchable.TextInput
+       <TextInput
          autoCapitalize="none"
          autoCorrect={false}
          selector="text-input"
-         autoFocus
          style={styles.searchBarInput}
        />
        {loadingState ?
@@ -408,6 +408,19 @@ function ItemsHeader({ selectedSection, section, children, style }) {
   );
 }
 
+class MainView2 extends React.Component {
+  constructor(props) {
+    super(props);
+    // this.state = { toggle: true ,opacity: 0 };
+    let { items, counts, booksLoadingState, selectedSection } = this.props
+    this.state = { items, counts, booksLoadingState, selectedSection };
+  }
+  render(){
+    console.log("MainView2")
+    return <MainView {...this.state} />
+  }
+}
+
 function MainView({ items, counts, booksLoadingState, selectedSection }) {
   // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
@@ -451,7 +464,7 @@ function MainView({ items, counts, booksLoadingState, selectedSection }) {
               />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {
-          //console.log('header', sectionData, sectionID);
+          console.log('header', sectionData, sectionID);
           return (sectionID === 'search') ? (
               <SearchHeader
                 selectedSection={selectedSection}
@@ -476,8 +489,52 @@ function view(model) {
      android. But NavigationExperimental.CardStack cannot re-render by model
      change.So we should add random key or force update*/
   // http://stackoverflow.com/a/35004739
-  console.log("view")
-  return (<InfSmartListView {...model}/>)
+  const { items, counts, booksLoadingState, selectedSection } = model;
+  console.log("view",selectedSection,selectedSection !== null ? true : false)
+  //return <MainView2  {...model}/>;
+  //<BookListView
+  //<ListViewWithFooter
+  //<SmartListView
+  const renderSectionHeader =
+    selectedSection !== null ?
+    (sectionData, sectionID) => { console.log("foo");return null} :
+                              (sectionData, sectionID) => { console.log("bar");
+                                return <ItemsHeader
+                                selectedSection={selectedSection}
+                                section={sectionID}
+                                />} ;
+  //http://stackcode.xyz/sc?id=is38000667
+  //ref.forceRender?
+  //https://www.bountysource.com/issues/10230166-listview-renders-all-rows
+  return (<SmartListView
+            key={selectedSection}
+            selectedSection={selectedSection}
+            items={items}
+            limit={selectedSection ? null : 2}
+            renderRow={(rowData, sectionID, rowID) => {
+                return (
+                  <Touchable.BookRow
+            key={rowID}
+            selector="bookcell"
+            bucket={sectionID}
+            book={rowData}
+            style={{ backgroundColor: materialColor.grey['50'] }}
+                  />);
+              }}
+            renderSectionFooter={(sectionData, sectionID) => {
+                console.log('footer', sectionData, sectionID);
+                return (
+                  <ItemsFooter
+                payload={sectionID.slice(0, -1 * '-end'.length)}
+                count={counts[sectionID]}
+                      />);
+              }}
+    renderSectionHeader={renderSectionHeader}
+            style={{
+              paddingHorizontal: 3,
+              // height:100,
+            }}
+          />)
   /* const navigationState = NavigationStateUtils.replaceAtIndex(
    *   model.navigationState, // navigationState
    *   model.navigationState.index, // index

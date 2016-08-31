@@ -78,22 +78,22 @@ class InfSmartListView extends React.Component {
   }
 }
 
+function ListViewWithFooter({
+  renderSectionHeader, renderSectionFooter, ...smartProps }) {
+  return (
+    <SmartListView
+      renderSectionHeader={(sectionData, sectionID) => {
+          return sectionID.endsWith('_end') ?
+                 renderSectionFooter(sectionData, sectionID) :
+                 renderSectionHeader(sectionData, sectionID);
+        }}
+      {...smartProps}
+    />
+  );
+}
+
 // Dumb compo
 function BookListView({ limit, items, selectedSection, ...other }) {
-  function ListViewWithFooter({
-    renderSectionHeader, renderSectionFooter, ...smartProps }) {
-    return (
-      <SmartListView
-        renderSectionHeader={(sectionData, sectionID) => {
-          return sectionID.endsWith('_end') ?
-                   renderSectionFooter(sectionData, sectionID) :
-                   renderSectionHeader(sectionData, sectionID);
-        }}
-        {...smartProps}
-      />
-    );
-  }
-
   const sectionIDs =
     selectedSection ?
     [selectedSection, `${selectedSection}_end`] :
@@ -125,4 +125,4 @@ BookListView.propTypes = {
   renderSectionFooter: React.PropTypes.func.isRequired
 };
 
-module.exports = { BookListView,InfSmartListView };
+module.exports = { BookListView,InfSmartListView,SmartListView,ListViewWithFooter };
