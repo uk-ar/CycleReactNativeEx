@@ -375,6 +375,7 @@ function SearchHeader({ selectedSection, children, loadingState }) {
 
 import { itemsInfo } from './common';
 function ItemsHeader({ selectedSection, section, children, style }) {
+  if(!itemsInfo[section]){return null}
   const icon = (selectedSection === null) ? (
     <FAIcon
       name={itemsInfo[section].icon}
@@ -432,13 +433,13 @@ function MainView({ items, counts, booksLoadingState, selectedSection }) {
         flex: 1,
         backgroundColor: '#1A237E', // indigo 900
       }}
-    >      
+    >
       { /* listView should have onRelease method? */ }
       { /* key is for rerender header */ }
       <BookListView
         selectedSection={selectedSection}
         items={items}
-        limit={selectedSection ? null : 2}
+        limit={selectedSection ? undefined : 2}
         renderRow={(rowData, sectionID, rowID) => {
           return (
           <Touchable.BookRow
@@ -483,7 +484,7 @@ function view(model) {
      android. But NavigationExperimental.CardStack cannot re-render by model
      change.So we should add random key or force update*/
   // http://stackoverflow.com/a/35004739
-  return <MainView {...model}/>;  
+  return <MainView {...model}/>;
   /* const navigationState = NavigationStateUtils.replaceAtIndex(
    *   model.navigationState, // navigationState
    *   model.navigationState.index, // index
