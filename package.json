@@ -13,7 +13,7 @@
     "@cycle/rx-run": "^7.0.1",
     "isbn": "^0.4.0",
     "lodash": "^4.13.1",
-    "material-colors": "^1.0.0",
+    "material-colors": "^1.1.1",
     "react": "^15.3.1",
     "react-addons-transition-group": "^15.2.1",
     "react-native": "0.32.0",
