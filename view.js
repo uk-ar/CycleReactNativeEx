@@ -8,7 +8,7 @@ import {
   View,
   NavigationExperimental,
   TextInput,
-  // LayoutAnimation,
+  LayoutAnimation,
   ActivityIndicator,
 } from 'react-native';
 import NavigationStateUtils from 'NavigationStateUtils';
@@ -408,29 +408,23 @@ function ItemsHeader({ selectedSection, section, children, style }) {
   );
 }
 
-class MainView2 extends React.Component {
-  constructor(props) {
-    super(props);
-    // this.state = { toggle: true ,opacity: 0 };
-    let { items, counts, booksLoadingState, selectedSection } = this.props
-    this.state = { items, counts, booksLoadingState, selectedSection };
-  }
-  render(){
-    console.log("MainView2")
-    return <MainView {...this.state} />
-  }
-}
-
 function MainView({ items, counts, booksLoadingState, selectedSection }) {
   // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
   // TODO: transition to detail view
   console.log('render main');
-
-  // let header = <Header />;
-  const header = null;
+  /* LayoutAnimation.configureNext(
+   *   LayoutAnimation.create(1000,
+   *                          LayoutAnimation.Types.easeInEaseOut,
+   *                          LayoutAnimation.Properties.opacity))*/
+  //let header = <Header />;
+  //const header = null;
   // console.log('render main2', items);
   // items={items}
+  //        key={selectedSection}
+  //props.animations.start()
+  //scroll
+  //<BookListView
   return (
     <View
       key="main"
@@ -438,9 +432,9 @@ function MainView({ items, counts, booksLoadingState, selectedSection }) {
         flex: 1,
         backgroundColor: '#1A237E', // indigo 900
       }}
-    >
-      {header}
+    >      
       { /* listView should have onRelease method? */ }
+      { /* key is for rerender header */ }
       <BookListView
         selectedSection={selectedSection}
         items={items}
@@ -456,7 +450,7 @@ function MainView({ items, counts, booksLoadingState, selectedSection }) {
           />);
         }}
         renderSectionFooter={(sectionData, sectionID) => {
-          //console.log('footer', sectionData, sectionID));
+          //console.log('footer', sectionData, sectionID);
           return (
               <ItemsFooter
                 payload={sectionID.slice(0, -1 * '-end'.length)}
@@ -464,7 +458,7 @@ function MainView({ items, counts, booksLoadingState, selectedSection }) {
               />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {
-          console.log('header', sectionData, sectionID);
+          //console.log('header', sectionData, sectionID);
           return (sectionID === 'search') ? (
               <SearchHeader
                 selectedSection={selectedSection}
@@ -489,52 +483,7 @@ function view(model) {
      android. But NavigationExperimental.CardStack cannot re-render by model
      change.So we should add random key or force update*/
   // http://stackoverflow.com/a/35004739
-  const { items, counts, booksLoadingState, selectedSection } = model;
-  console.log("view",selectedSection,selectedSection !== null ? true : false)
-  //return <MainView2  {...model}/>;
-  //<BookListView
-  //<ListViewWithFooter
-  //<SmartListView
-  const renderSectionHeader =
-    selectedSection !== null ?
-    (sectionData, sectionID) => { console.log("foo");return null} :
-                              (sectionData, sectionID) => { console.log("bar");
-                                return <ItemsHeader
-                                selectedSection={selectedSection}
-                                section={sectionID}
-                                />} ;
-  //http://stackcode.xyz/sc?id=is38000667
-  //ref.forceRender?
-  //https://www.bountysource.com/issues/10230166-listview-renders-all-rows
-  return (<SmartListView
-            key={selectedSection}
-            selectedSection={selectedSection}
-            items={items}
-            limit={selectedSection ? null : 2}
-            renderRow={(rowData, sectionID, rowID) => {
-                return (
-                  <Touchable.BookRow
-            key={rowID}
-            selector="bookcell"
-            bucket={sectionID}
-            book={rowData}
-            style={{ backgroundColor: materialColor.grey['50'] }}
-                  />);
-              }}
-            renderSectionFooter={(sectionData, sectionID) => {
-                console.log('footer', sectionData, sectionID);
-                return (
-                  <ItemsFooter
-                payload={sectionID.slice(0, -1 * '-end'.length)}
-                count={counts[sectionID]}
-                      />);
-              }}
-    renderSectionHeader={renderSectionHeader}
-            style={{
-              paddingHorizontal: 3,
-              // height:100,
-            }}
-          />)
+  return <MainView {...model}/>;  
   /* const navigationState = NavigationStateUtils.replaceAtIndex(
    *   model.navigationState, // navigationState
    *   model.navigationState.index, // index

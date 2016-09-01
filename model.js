@@ -1,6 +1,15 @@
 import Rx from 'rx';
 import _ from 'lodash';
 import NavigationStateUtils from 'NavigationStateUtils';
+import {
+  Platform,
+  Text,
+  View,
+  NavigationExperimental,
+  TextInput,
+  LayoutAnimation,
+  ActivityIndicator,
+} from 'react-native';
 
 import {
   STORAGE_KEY,
@@ -126,6 +135,7 @@ function model(actions) {
       booksLoadingState$.startWith(false).distinctUntilChanged(),
       navigationState$.distinctUntilChanged(),
       selectedBook$.startWith(null).distinctUntilChanged(),
+      // LayoutAnimation treate listview as different
       actions.selectedSection$.startWith(null),
       //Rx.Observable.interval(1000).do(i=>console.log("int",i)),
       //Rx.Observable.just(1000),
