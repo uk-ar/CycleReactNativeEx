@@ -4,6 +4,7 @@ import {
   View,
   Text,
   ListView,
+  ScrollView,
   findNodeHandle,
 } from 'react-native';
 
@@ -13,8 +14,20 @@ import {
 /* getScrollResponder() {
    return this.listview.getScrollResponder();
    },*/
-function withItems(Component) {
-  return class extends Component {
+//dataBlob, sectionIdentities, rowIdentities
+class BaseListView extends React.Component {
+  getMetrics(...args){
+    return this.instance.getMetrics(...args);
+  }
+  scrollTo(...args){
+    console.log("fi:",findNodeHandle(this))
+    //findNodeHandle(this).scrollTo(...args)
+    //React.findDOMNode(this).scrollTo(...args)
+    return this.instance.scrollTo(...args);
+  }
+}
+function withItems(ListViewComponent) {
+  return class extends BaseListView {
     constructor(props) {
       super(props);
       this.dataSource = new ListView.DataSource({
@@ -26,22 +39,39 @@ function withItems(Component) {
       const { items, sectionIDs, rowIDs, ...other } = this.props;
       this.dataSource =
         this.dataSource.cloneWithRowsAndSections(items, sectionIDs, rowIDs);
-      //this.refs.listview.scrollTo(10,20,true)
-      console.log("ref",this.refs.listview)
+      //console.log("ref",this.refs.listview)
       return (
-        // onResponderMove is too premitive
-        // directionalLockEnabled disables horizontal scroll when scroll vertically
-        // https://github.com/facebook/react-native/issues/6764
-        <Component
-          ref={(c)=>c.scrollTo({x:0,y:50,animated:true})}
-          directionalLockEnabled
+        <ListViewComponent
+          ref={c => this.instance = c}
           dataSource={this.dataSource}
           {...other}
+          renderScrollComponent={(props) => <BookScrollView {...props} />}
+          renderRow={debugRenderRow}
         />)
-      //return <Component {...this.props}>
+      //
     }
   }
 }
+
+function withScrollPosition(ScrollableComponent){
+  return class extends React.Component {
+    scrollTo(...args){
+      return this.instance.scrollTo(...args);
+    }
+    render() {
+      return <ScrollableComponent
+               ref={c => this.instance = c}
+               {...this.props}
+               onScroll={e =>
+                 console.log("foo:",e)
+                        }
+             />
+    }
+  }
+}
+
+const BookScrollView = withScrollPosition(ScrollView);
+
 // Smart compo
 class SmartListView extends React.Component {
   constructor(props) {
@@ -82,8 +112,28 @@ class SmartListView extends React.Component {
 import util from 'util';
 function debugRenderRow(rowData,sectionID,columnID){
   console.log("row:",rowData,sectionID,columnID)
-  return(<View style={{height:400,borderColor:columnID % 2 ? "yellow": "green",borderWidth:3}}><Text>row:{util.inspect(rowData)}</Text></View>)
+  return(<View style={{height:200,borderColor:columnID % 2 ? "yellow": "green",borderWidth:3}}><Text>row:{util.inspect(rowData)}</Text></View>)
 }
+
+const BookListView = withItems(ListView);
+
+/* a.withFoo.withBar.withRender({Comp}{
+ * })*/
+/* class MyListView extends React.Component {
+ *   render(){
+ *     return (
+ *       <Text
+ *         style={{ color: 'white' }}
+ *         onPress={() => {
+ *             console.log("onpress",this)
+ *             //this.setState((prev, current) => ({ toggle: !prev.toggle }));
+ *             this.listview.scrollTo({x:0,y:100,animated:true})
+ *           }}
+ *       >
+ *         {'toggle'}
+ *       </Text>)
+ *   }
+ * }*/
 
 class InfSmartListView extends React.Component {
   constructor(props) {
@@ -177,7 +227,7 @@ class ListViewWithFilter extends React.Component {
 }
 }
 
-class BookListView extends React.Component {
+class BookListView0 extends React.Component {
   constructor(props) {
     super(props);
     this.sec   = {}

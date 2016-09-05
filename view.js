@@ -434,12 +434,25 @@ function MainView({ items, counts, booksLoadingState, selectedSection }) {
         backgroundColor: '#1A237E', // indigo 900
       }}
     >
+      
       { /* listView should have onRelease method? */ }
       { /* key is for rerender header */ }
       <BookListView
+        ref={(c)=>{
+            console.log("ref:",c);
+            //this.listview=c
+            //c.scrollTo({x:0,y:100,animated:true})
+          }}
+        renderScrollComponent={(props) =>{
+            return (
+              <ScrollView
+                 ref={c=> this.listview = c }
+               {...props} />)
+          }}
         selectedSection={selectedSection}
         items={items}
         limit={selectedSection ? undefined : 2}
+        enableEmptySections
         renderRow={(rowData, sectionID, rowID) => {
           return (
           <Touchable.BookRow
