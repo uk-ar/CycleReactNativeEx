@@ -8,26 +8,8 @@ import {
   findNodeHandle,
 } from 'react-native';
 
-/* if(this.listview && this.props.){
-   this.listview.scrollTo({y:this.props.offset,animated:false})
-   } */
-/* getScrollResponder() {
-   return this.listview.getScrollResponder();
-   },*/
-//dataBlob, sectionIdentities, rowIdentities
-class BaseListView extends React.Component {
-  getMetrics(...args){
-    return this.instance.getMetrics(...args);
-  }
-  scrollTo(...args){
-    console.log("fi:",findNodeHandle(this))
-    //findNodeHandle(this).scrollTo(...args)
-    //React.findDOMNode(this).scrollTo(...args)
-    return this.instance.scrollTo(...args);
-  }
-}
 function withItems(ListViewComponent) {
-  return class extends BaseListView {
+  return class extends React.Component {
     constructor(props) {
       super(props);
       this.dataSource = new ListView.DataSource({
@@ -42,35 +24,12 @@ function withItems(ListViewComponent) {
       //console.log("ref",this.refs.listview)
       return (
         <ListViewComponent
-          ref={c => this.instance = c}
           dataSource={this.dataSource}
           {...other}
-          renderScrollComponent={(props) => <BookScrollView {...props} />}
-          renderRow={debugRenderRow}
         />)
-      //
     }
   }
 }
-
-function withScrollPosition(ScrollableComponent){
-  return class extends React.Component {
-    scrollTo(...args){
-      return this.instance.scrollTo(...args);
-    }
-    render() {
-      return <ScrollableComponent
-               ref={c => this.instance = c}
-               {...this.props}
-               onScroll={e =>
-                 console.log("foo:",e)
-                        }
-             />
-    }
-  }
-}
-
-const BookScrollView = withScrollPosition(ScrollView);
 
 // Smart compo
 class SmartListView extends React.Component {
@@ -84,9 +43,6 @@ class SmartListView extends React.Component {
   scrollTo(arg){
     console.log("scrolledto")
     this.refs.root.scrollTo(arg)//{x,y,animated}
-  }
-  getScrollResponder(arg){
-    return this.refs.root.getScrollResponder(arg)//{x,y,animated}
   }
   render() {
     // https://github.com/babel/babel-eslint/issues/95#issuecomment-102170872
@@ -115,57 +71,65 @@ function debugRenderRow(rowData,sectionID,columnID){
   return(<View style={{height:200,borderColor:columnID % 2 ? "yellow": "green",borderWidth:3}}><Text>row:{util.inspect(rowData)}</Text></View>)
 }
 
-const BookListView = withItems(ListView);
 
-/* a.withFoo.withBar.withRender({Comp}{
- * })*/
-/* class MyListView extends React.Component {
- *   render(){
- *     return (
- *       <Text
- *         style={{ color: 'white' }}
- *         onPress={() => {
- *             console.log("onpress",this)
- *             //this.setState((prev, current) => ({ toggle: !prev.toggle }));
- *             this.listview.scrollTo({x:0,y:100,animated:true})
- *           }}
- *       >
- *         {'toggle'}
- *       </Text>)
- *   }
- * }*/
-
-class InfSmartListView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.dataSource = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2,
-      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
-    });
-    this.state = {
-      dataSource:this.dataSource
-        .cloneWithRows([{a:1},{a:2},{a:3},{a:4},{a:5},{a:6}])
-    }
-  }
-  render() {
-    const { items, sectionIDs, rowIDs, i, ...other } = this.props;
-    console.log("smart")
-    //dataSource={this.state.dataSource}
-    return (
-      <ListView
-        dataSource={this.dataSource.cloneWithRows(Array(3).fill(i))}
-        renderRow={debugRenderRow}
-        onEndReached={()=>{
-            console.log("end");
-            this.setState({
-              dataSource:this
-                .state.dataSource
-                .cloneWithRows([{a:1,b:2},{a:2},{a:3},{a:4},{a:5},{a:6},{a:7}])
-            })}}
-      />
-    );
-  }
+function BookListView(props){
+  const { sectionIDs, rowIDs, ...other } = props;
+  return <My
+           {...other}
+         />
 }
+import { compose, mapProps, withState,toClass,withProps,withHandlers } from 'recompose'
+
+//http://blog.koba04.com/post/2016/07/15/a-brief-note-of-reacteurope2016-sessions/
+/* const enhance = compose(
+ *   //toClass,
+ *   //withItems
+ *   withState(("dataSource","updateDataSource", new ListView.DataSource({
+ *     rowHasChanged: (r1, r2) => r1 !== r2,
+ *     sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+ *   }))),
+ *   withProps(({items})=>
+ *     ({dataSource:dataSource.cloneWithRowsAndSections(items)}))
+ * )*/
+const enhance = compose(
+  withItems,
+  withHandlers({
+    onScroll: props => e => console.log("foo:",e.nativeEvent.contentOffset.y)
+  }),
+  withHandlers({
+    renderSectionHeader: props => (sectionData, sectionID) => {
+      return sectionID.endsWith('_end') ?
+             props.renderSectionFooter(sectionData, sectionID) :
+             props.renderSectionHeader(sectionData, sectionID);
+    }
+  })
+)
+
+const BookListView = enhance(({...other}) => {
+  return (
+    <View style={{flex:1}}>
+      <View style={{height:50}} />
+      <Text
+        style={{ color: 'white' }}
+        onPress={() => {
+            console.log("onpress",this)
+            this.scrollview.scrollTo({x:0,y:100,animated:true})
+          }}
+      >
+        {'toggle'}
+      </Text>
+      <ListView
+        {...other}
+        renderScrollComponent={(props) =>
+          <ScrollView ref={(c)=>{
+              console.log("c:",c)
+              this.scrollview = c
+            }} {...props} />}
+        renderRow={debugRenderRow}
+      />
+    </View>
+  )
+})
 
 class ListViewWithFooter extends React.Component {
   /* function ListViewWithFooter({
@@ -301,4 +265,4 @@ BookListView.propTypes = {
   renderSectionFooter: React.PropTypes.func.isRequired
 };
 
-module.exports = { BookListView,InfSmartListView,SmartListView,ListViewWithFooter };
+module.exports = { BookListView,SmartListView,ListViewWithFooter };
