@@ -83,10 +83,10 @@ function model(actions) {
         return acc;
       }, {});
     }
-    function filterBooks(saved, bucket) {
+    function filterBooks(books, bucket) {
       let ret = {};
-      let books = saved.filter((book) => book.bucket === bucket);
-      ret[bucket] = booksToObject(books);
+      let booksInBucket = books.filter((book) => book.bucket === bucket);
+      ret[bucket] = booksToObject(booksInBucket);
       ret[`${bucket}_end`] = {};
       return ret;
     }
@@ -99,14 +99,14 @@ function model(actions) {
     };
   }
 
-  function genCounts(items) {
-    return {
-      search_end: Object.keys(items.search).length,
-      liked_end: Object.keys(items.liked).length,
-      borrowed_end: Object.keys(items.borrowed).length,
-      done_end: Object.keys(items.done).length
-    };
-  }
+  /* function genCounts(items) {
+   *   return {
+   *     search_end: Object.keys(items.search).length,
+   *     liked_end: Object.keys(items.liked).length,
+   *     borrowed_end: Object.keys(items.borrowed).length,
+   *     done_end: Object.keys(items.done).length
+   *   };
+   * }*/
   const searchedBooks$ =
     actions.searchedBooksStatus$
            //.startWith(MOCKED_MOVIES_DATA)
@@ -119,8 +119,27 @@ function model(actions) {
       searchedBooks$, actions.savedBooksStatus$,
       genItems);
 
-  const counts$ =
-    items$.map(genCounts);
+  const sectionIDs$ =
+    actions.selectedSection$.map(selectedSection =>
+      selectedSection ? [selectedSection, `${selectedSection}_end`] : undefined;
+    )
+  const limit = 2;
+  /* const rowIDs$ =
+   *   actions.selectedSection$.map
+   * (selectedSection =>
+   *     selectedSection ?
+   *     undefined :
+   *     sectionIDs.map(sectionID =>
+   *       Object.keys(items[sectionID]).slice(0, limit || undefined));*/
+    /* const rowIDs =
+     * selectedSection ?
+     * undefined :
+     * sectionIDs.map(sectionID =>
+     *   Object.keys(items[sectionID]).slice(0, limit || undefined));
+     * console.log("row:",rowIDs);*/
+
+  /* const counts$ =
+   *   items$.map(genCounts);*/
   // const items = genItems(searchedBooks, savedBooks);
   // const counts = genCounts(items);
 
@@ -130,18 +149,18 @@ function model(actions) {
       /* searchedBooks$,
        * actions.savedBooksStatus$,*/
       items$,
-      counts$,
+      //counts$,
       // actions.savedBooks$,
       booksLoadingState$.startWith(false).distinctUntilChanged(),
       navigationState$.distinctUntilChanged(),
       selectedBook$.startWith(null).distinctUntilChanged(),
       // LayoutAnimation treate listview as different
-      actions.selectedSection$.startWith(null),
+      actions.selectedSection$,
       //Rx.Observable.interval(1000).do(i=>console.log("int",i)),
       //Rx.Observable.just(1000),
       // actions.selectedSection$.startWith("検索"),
-      (items, counts, booksLoadingState, navigationState, selectedBook, selectedSection, i) =>
-        ({ items, counts, booksLoadingState, navigationState, selectedBook, selectedSection , i}));
+      (items, booksLoadingState, navigationState, selectedBook, selectedSection, i) =>
+        ({ items, booksLoadingState, navigationState, selectedBook, selectedSection , i}));
   return state$;
 }
 

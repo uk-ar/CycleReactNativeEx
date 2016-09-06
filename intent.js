@@ -258,7 +258,7 @@ function intent(RN, HTTP) {
   const { booksStatus$: searchedBooksStatus$,
           requestStatus$: requestSearchedBooksStatus$ } =
             createBooksStatusStream(
-              // merge savedBooks to searchedBooks              
+              // merge savedBooks to searchedBooks
               booksResponse$
                 .startWith(mockSearcheBooks)
                 .combineLatest(
@@ -324,6 +324,8 @@ function intent(RN, HTTP) {
                         .do(i => console.log('section selected0:%O', i))
                         .distinctUntilChanged()
                         .do(i => console.log('section selected1:%O', i))
+                        .shareReplay()
+                        .startWith(null)
     // .do((books)=>LayoutAnimation.easeInEaseOut())//there is bug in iOS
     // Will be fixed in RN 0.28?
     // ref: https://github.com/facebook/react-native/pull/7942

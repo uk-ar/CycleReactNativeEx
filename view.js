@@ -409,7 +409,7 @@ function ItemsHeader({ selectedSection, section, children, style }) {
   );
 }
 
-function MainView({ items, counts, booksLoadingState, selectedSection }) {
+function MainView({ items, booksLoadingState, selectedSection }) {
   // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
   // TODO: transition to detail view
@@ -434,7 +434,7 @@ function MainView({ items, counts, booksLoadingState, selectedSection }) {
         backgroundColor: '#1A237E', // indigo 900
       }}
     >
-      
+
       { /* listView should have onRelease method? */ }
       { /* key is for rerender header */ }
       <BookListView
@@ -464,11 +464,12 @@ function MainView({ items, counts, booksLoadingState, selectedSection }) {
           />);
         }}
         renderSectionFooter={(sectionData, sectionID) => {
-          //console.log('footer', sectionData, sectionID);
+            //console.log('footer', sectionData, sectionID);
+            const section = sectionID.slice(0, -1 * '-end'.length);
           return (
               <ItemsFooter
-                payload={sectionID.slice(0, -1 * '-end'.length)}
-                count={counts[sectionID]}
+                payload={section}
+                count={Object.keys(items[section]).length}
               />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {

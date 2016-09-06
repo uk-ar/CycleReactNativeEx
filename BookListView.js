@@ -68,7 +68,7 @@ class SmartListView extends React.Component {
 import util from 'util';
 function debugRenderRow(rowData,sectionID,columnID){
   console.log("row:",rowData,sectionID,columnID)
-  return(<View style={{height:200,borderColor:columnID % 2 ? "yellow": "green",borderWidth:3}}><Text>row:{util.inspect(rowData)}</Text></View>)
+  return(<View style={{height:200,borderColor:columnID % 2 ? "yellow": "green",borderWidth:3}}><Text>row:{columnID}:{util.inspect(rowData)}</Text></View>)
 }
 
 
@@ -131,35 +131,9 @@ const BookListView = enhance(({...other}) => {
   )
 })
 
-class ListViewWithFooter extends React.Component {
-  /* function ListViewWithFooter({
-   *   renderSectionHeader, renderSectionFooter, ...smartProps }) {*/
-  scrollTo(arg){
-    this.refs.root.scrollTo(arg)//{x,y,animated}
-  }
-  render(){
-  const { renderSectionHeader, renderSectionFooter, ...smartProps } =
-    this.props;
-  return (
-    <SmartListView
-      ref="root"
-      renderSectionHeader={(sectionData, sectionID) => {
-        //console.log("with:",sectionData, sectionID)
-          return sectionID.endsWith('_end') ?
-                 renderSectionFooter(sectionData, sectionID) :
-                 renderSectionHeader(sectionData, sectionID);
-        }}
-      {...smartProps}
-    />
-  );
-}
-}
 
 // Dumb compo
 class ListViewWithFilter extends React.Component {
-  scrollTo(arg){
-    this.refs.root.scrollTo(arg)//{x,y,animated}
-  }
   render(){
     const { limit, items, selectedSection, ...other } = this.props;
     //function ListViewWithFilter({ limit, items, selectedSection, ...other }) {
@@ -265,4 +239,4 @@ BookListView.propTypes = {
   renderSectionFooter: React.PropTypes.func.isRequired
 };
 
-module.exports = { BookListView,SmartListView,ListViewWithFooter };
+module.exports = { BookListView,SmartListView };
