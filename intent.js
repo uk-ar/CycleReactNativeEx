@@ -311,25 +311,38 @@ function intent(RN, HTTP) {
   // .subscribe()
 
   // release$.do((i)=>console.log("rel$")).subscribe()
+  const changeSection$ =
+    RN.select('section')
+      .events('press')
+      .merge(RN.select('close')
+               .events('press').map(() => null))
+      .do(i => console.log('section selected0:%O', i,this))
+      .distinctUntilChanged()
+
+  const selectedSection$ =
+    changeSection$
+      .do(i => console.log('section selected1:%O', i))
+      .shareReplay()
+      .startWith(null)
+
+  /* const foo$ = console.log("self:",
+   *                          //RN.select('section').my().map(i),
+   *                          RN.select('section'))*/
+  RN.select('listview').my().do(i=>console.log("me:",i)).subscribe()
+  //selector has many instances
+
+  
   return {
     savedBooks$,
     savedBooksStatus$,
     request$,
     requestBooks$, // for loading status
     // request$,
-    selectedSection$: RN.select('section')
-                        .events('press')
-                        .merge(RN.select('close')
-                                 .events('press').map(() => null))
-                        .do(i => console.log('section selected0:%O', i))
-                        .distinctUntilChanged()
-                        .do(i => console.log('section selected1:%O', i))
-                        .shareReplay()
-                        .startWith(null)
+    //onpress -> triggers animation -> change selectedSection
+    selectedSection$,
     // .do((books)=>LayoutAnimation.easeInEaseOut())//there is bug in iOS
     // Will be fixed in RN 0.28?
     // ref: https://github.com/facebook/react-native/pull/7942
-    ,
     goToBookView$: RN.select('cell').events('press')
                      .do(i => console.log('cell press:%O', i)),
     back$: Rx.Observable

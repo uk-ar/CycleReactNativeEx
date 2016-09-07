@@ -107,6 +107,7 @@ function model(actions) {
    *     done_end: Object.keys(items.done).length
    *   };
    * }*/
+  
   const searchedBooks$ =
     actions.searchedBooksStatus$
            //.startWith(MOCKED_MOVIES_DATA)
@@ -114,23 +115,26 @@ function model(actions) {
              books.map(book => ({ ...book, key: `isbn-${book.isbn}` })))
            .shareReplay();
 
+  //selectedSection triggers scroll and update value when animation end
+  //update with animation when selectedSection$ changed
   const items$ =
     Rx.Observable.combineLatest(
       searchedBooks$, actions.savedBooksStatus$,
       genItems);
 
+  //update with animation when selectedSection$ changed
   const sectionIDs$ =
     actions.selectedSection$.map(selectedSection =>
-      selectedSection ? [selectedSection, `${selectedSection}_end`] : undefined;
+      selectedSection ? [selectedSection, `${selectedSection}_end`] : undefined
     )
+
   const limit = 2;
   /* const rowIDs$ =
-   *   actions.selectedSection$.map
-   * (selectedSection =>
+   *   actions.selectedSection$.map(selectedSection =>
    *     selectedSection ?
-   *     undefined :
-   *     sectionIDs.map(sectionID =>
-   *       Object.keys(items[sectionID]).slice(0, limit || undefined));*/
+   *                   undefined :
+   *                   sectionIDs.map(sectionID =>
+   *                     Object.keys(items[sectionID]).slice(0, limit || undefined));*/
     /* const rowIDs =
      * selectedSection ?
      * undefined :

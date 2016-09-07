@@ -21,7 +21,10 @@ function withItems(ListViewComponent) {
       const { items, sectionIDs, rowIDs, ...other } = this.props;
       this.dataSource =
         this.dataSource.cloneWithRowsAndSections(items, sectionIDs, rowIDs);
-      //console.log("ref",this.refs.listview)
+      console.log("dataSource:",
+                  this.dataSource.getRowCount(),
+                  this.dataSource.getRowAndSectionCount(),
+                  this.dataSource.getSectionLengths())
       return (
         <ListViewComponent
           dataSource={this.dataSource}

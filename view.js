@@ -10,6 +10,8 @@ import {
   TextInput,
   LayoutAnimation,
   ActivityIndicator,
+  //TouchableHighlight,
+  //TouchableNativeFeedback
 } from 'react-native';
 import NavigationStateUtils from 'NavigationStateUtils';
 import Touchable from '@cycle/react-native/src/Touchable';
@@ -17,9 +19,11 @@ import { styles } from './styles';
 
 const FAIcon = require('react-native-vector-icons/FontAwesome');
 
+//TouchableElement = TouchableHighlight;
 Touchable.TouchableElement = Touchable.TouchableHighlight;
 if (Platform.OS === 'android') {
   Touchable.TouchableElement = Touchable.TouchableNativeFeedback;
+  //TouchableElement = TouchableNativeFeedback;
 }
 
 Touchable.TextInput = Touchable.createCycleComponent(
@@ -409,6 +413,9 @@ function ItemsHeader({ selectedSection, section, children, style }) {
   );
 }
 
+Touchable.BookListView = Touchable.createCycleComponent(
+  BookListView);
+
 function MainView({ items, booksLoadingState, selectedSection }) {
   // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
@@ -434,10 +441,10 @@ function MainView({ items, booksLoadingState, selectedSection }) {
         backgroundColor: '#1A237E', // indigo 900
       }}
     >
-
       { /* listView should have onRelease method? */ }
       { /* key is for rerender header */ }
-      <BookListView
+      <Touchable.BookListView
+        selector="listview"
         ref={(c)=>{
             console.log("ref:",c);
             //this.listview=c
