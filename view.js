@@ -8,10 +8,11 @@ import {
   View,
   NavigationExperimental,
   TextInput,
+  ScrollView,
   LayoutAnimation,
   ActivityIndicator,
-  //TouchableHighlight,
-  //TouchableNativeFeedback
+  // TouchableHighlight,
+  // TouchableNativeFeedback
 } from 'react-native';
 import NavigationStateUtils from 'NavigationStateUtils';
 import Touchable from '@cycle/react-native/src/Touchable';
@@ -19,11 +20,11 @@ import { styles } from './styles';
 
 const FAIcon = require('react-native-vector-icons/FontAwesome');
 
-//TouchableElement = TouchableHighlight;
+// TouchableElement = TouchableHighlight;
 Touchable.TouchableElement = Touchable.TouchableHighlight;
 if (Platform.OS === 'android') {
   Touchable.TouchableElement = Touchable.TouchableNativeFeedback;
-  //TouchableElement = TouchableNativeFeedback;
+  // TouchableElement = TouchableNativeFeedback;
 }
 
 Touchable.TextInput = Touchable.createCycleComponent(
@@ -62,7 +63,7 @@ Touchable.BookRow = Touchable.createCycleComponent(
     onRelease: 'release',
   });
 
-import { BookListView,InfSmartListView,SmartListView,ListViewWithFooter } from './BookListView';
+import { BookListView } from './BookListView';
 
 function ItemsFooter({ payload, count }) {
   return (
@@ -348,7 +349,7 @@ class Header extends React.Component {
 }
 
 function SearchHeader({ selectedSection, children, loadingState }) {
-  console.log("search",selectedSection, children, loadingState)
+  console.log('search', selectedSection, children, loadingState);
   return ((selectedSection !== null) ? (
      <ItemsHeader
        selectedSection={selectedSection}
@@ -379,7 +380,7 @@ function SearchHeader({ selectedSection, children, loadingState }) {
 
 import { itemsInfo } from './common';
 function ItemsHeader({ selectedSection, section, children, style }) {
-  if(!itemsInfo[section]){return null}
+  if (!itemsInfo[section]) { return null; }
   const icon = (selectedSection === null) ? (
     <FAIcon
       name={itemsInfo[section].icon}
@@ -416,23 +417,24 @@ function ItemsHeader({ selectedSection, section, children, style }) {
 Touchable.BookListView = Touchable.createCycleComponent(
   BookListView);
 
-function MainView({ items, booksLoadingState, selectedSection }) {
+function MainView({ items, sectionIDs, booksLoadingState, selectedSection }) {
   // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
   // TODO: transition to detail view
-  console.log('render main');
+  console.log('render main', { items, sectionIDs, booksLoadingState, selectedSection });
   /* LayoutAnimation.configureNext(
    *   LayoutAnimation.create(1000,
    *                          LayoutAnimation.Types.easeInEaseOut,
    *                          LayoutAnimation.Properties.opacity))*/
-  //let header = <Header />;
-  //const header = null;
+  // let header = <Header />;
+  // const header = null;
   // console.log('render main2', items);
   // items={items}
   //        key={selectedSection}
-  //props.animations.start()
-  //scroll
-  //<BookListView
+  // props.animations.start()
+  // scroll
+  // <BookListView
+  //        key={selectedSection}
   return (
     <View
       key="main"
@@ -445,20 +447,14 @@ function MainView({ items, booksLoadingState, selectedSection }) {
       { /* key is for rerender header */ }
       <Touchable.BookListView
         selector="listview"
-        ref={(c)=>{
-            console.log("ref:",c);
-            //this.listview=c
-            //c.scrollTo({x:0,y:100,animated:true})
-          }}
-        renderScrollComponent={(props) =>{
-            return (
-              <ScrollView
-                 ref={c=> this.listview = c }
-               {...props} />)
-          }}
-        selectedSection={selectedSection}
         items={items}
-        limit={selectedSection ? undefined : 2}
+        sectionIDs={sectionIDs}
+        ref={(c) => {
+            // console.log("ref:",c);
+            // this.listview=c
+            // c.scrollTo({x:0,y:100,animated:false})
+        }}
+        directionalLockEnabled
         enableEmptySections
         renderRow={(rowData, sectionID, rowID) => {
           return (
@@ -471,8 +467,8 @@ function MainView({ items, booksLoadingState, selectedSection }) {
           />);
         }}
         renderSectionFooter={(sectionData, sectionID) => {
-            //console.log('footer', sectionData, sectionID);
-            const section = sectionID.slice(0, -1 * '-end'.length);
+            // console.log('footer', sectionData, sectionID);
+          const section = sectionID.slice(0, -1 * '-end'.length);
           return (
               <ItemsFooter
                 payload={section}
@@ -480,13 +476,14 @@ function MainView({ items, booksLoadingState, selectedSection }) {
               />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {
-          //console.log('header', sectionData, sectionID);
+          //console.log('header', sectionData, sectionID, selectedSection);
           return (sectionID === 'search') ? (
               <SearchHeader
                 selectedSection={selectedSection}
                 loadingState={booksLoadingState}
               />) : (
                 <ItemsHeader
+                  key={sectionID}
                   selectedSection={selectedSection}
                   section={sectionID}
                 />);
@@ -505,7 +502,7 @@ function view(model) {
      android. But NavigationExperimental.CardStack cannot re-render by model
      change.So we should add random key or force update*/
   // http://stackoverflow.com/a/35004739
-  return <MainView {...model}/>;
+  return <MainView {...model} />;
   /* const navigationState = NavigationStateUtils.replaceAtIndex(
    *   model.navigationState, // navigationState
    *   model.navigationState.index, // index
@@ -514,10 +511,10 @@ function view(model) {
    *     id: Math.random(),
    *   } // route
    * );*/
-  const navigationState = model.navigationState
-  //return MainView(model);
-  //return <MainView  {...model}/>;
-  //console.log('mynav', navigationState, onNavigateBack);
+  const navigationState = model.navigationState;
+  // return MainView(model);
+  // return <MainView  {...model}/>;
+  // console.log('mynav', navigationState, onNavigateBack);
   return (
     // <NavigationExperimental.Transitioner
     <NavigationExperimental.CardStack

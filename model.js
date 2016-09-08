@@ -17,6 +17,7 @@ import {
   LIBRARY_ID,
   CALIL_STATUS_API,
   MOCKED_MOVIES_DATA,
+  log
 } from './common';
 
 function model(actions) {
@@ -107,26 +108,26 @@ function model(actions) {
    *     done_end: Object.keys(items.done).length
    *   };
    * }*/
-  
+
   const searchedBooks$ =
     actions.searchedBooksStatus$
-           //.startWith(MOCKED_MOVIES_DATA)
+           // .startWith(MOCKED_MOVIES_DATA)
            .map(books =>
              books.map(book => ({ ...book, key: `isbn-${book.isbn}` })))
            .shareReplay();
 
-  //selectedSection triggers scroll and update value when animation end
-  //update with animation when selectedSection$ changed
+  // selectedSection triggers scroll and update value when animation end
+  // update with animation when selectedSection$ changed
   const items$ =
     Rx.Observable.combineLatest(
       searchedBooks$, actions.savedBooksStatus$,
       genItems);
 
-  //update with animation when selectedSection$ changed
+  // update with animation when selectedSection$ changed
   const sectionIDs$ =
     actions.selectedSection$.map(selectedSection =>
       selectedSection ? [selectedSection, `${selectedSection}_end`] : undefined
-    )
+    );
 
   const limit = 2;
   /* const rowIDs$ =
@@ -146,25 +147,31 @@ function model(actions) {
    *   items$.map(genCounts);*/
   // const items = genItems(searchedBooks, savedBooks);
   // const counts = genCounts(items);
-
   const state$ = Rx
     .Observable
     .combineLatest(
       /* searchedBooks$,
        * actions.savedBooksStatus$,*/
       items$,
-      //counts$,
+      sectionIDs$,
+      //actions.selectedSection$.do(i => LayoutAnimation.easeInEaseOut()),
+      actions.selectedSection$.do(i =>
+        LayoutAnimation.configureNext(
+          LayoutAnimation
+            .create(3000,
+                    LayoutAnimation.Types.easeInEaseOut,
+                    LayoutAnimation.Properties.opacity))),
+      // counts$,
       // actions.savedBooks$,
       booksLoadingState$.startWith(false).distinctUntilChanged(),
       navigationState$.distinctUntilChanged(),
       selectedBook$.startWith(null).distinctUntilChanged(),
       // LayoutAnimation treate listview as different
-      actions.selectedSection$,
-      //Rx.Observable.interval(1000).do(i=>console.log("int",i)),
-      //Rx.Observable.just(1000),
-      // actions.selectedSection$.startWith("検索"),
-      (items, booksLoadingState, navigationState, selectedBook, selectedSection, i) =>
-        ({ items, booksLoadingState, navigationState, selectedBook, selectedSection , i}));
+      // Rx.Observable.interval(1000).do(i=>console.log("int",i)),
+      // Rx.Observable.just(1000),
+      // actions.selectedSection$.startWith("search"),
+      (items, sectionIDs, selectedSection, booksLoadingState, navigationState, selectedBook, i) => ({ items, sectionIDs, selectedSection, booksLoadingState, navigationState, selectedBook, i }))
+    .debounce(10);// for delay of selectedSection and sectionIDs
   return state$;
 }
 

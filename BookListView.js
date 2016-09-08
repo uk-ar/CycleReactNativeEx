@@ -21,69 +21,28 @@ function withItems(ListViewComponent) {
       const { items, sectionIDs, rowIDs, ...other } = this.props;
       this.dataSource =
         this.dataSource.cloneWithRowsAndSections(items, sectionIDs, rowIDs);
-      console.log("dataSource:",
+      console.log('dataSource:',
                   this.dataSource.getRowCount(),
                   this.dataSource.getRowAndSectionCount(),
-                  this.dataSource.getSectionLengths())
+                  this.dataSource.getSectionLengths());
       return (
         <ListViewComponent
           dataSource={this.dataSource}
           {...other}
-        />)
+        />);
     }
-  }
-}
-
-// Smart compo
-class SmartListView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.dataSource = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2,
-      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
-    });
-  }
-  scrollTo(arg){
-    console.log("scrolledto")
-    this.refs.root.scrollTo(arg)//{x,y,animated}
-  }
-  render() {
-    // https://github.com/babel/babel-eslint/issues/95#issuecomment-102170872
-    const { items, sectionIDs, rowIDs, ...other } = this.props;
-    this.dataSource =
-      this.dataSource.cloneWithRowsAndSections(items, sectionIDs, rowIDs);
-    //this.refs.listview.scrollTo(10,20,true)
-    console.log("ref",this.props,{ items, sectionIDs, rowIDs })
-    return (
-      // onResponderMove is too premitive
-      // directionalLockEnabled disables horizontal scroll when scroll vertically
-      // https://github.com/facebook/react-native/issues/6764
-      <ListView
-        ref="root"
-        directionalLockEnabled
-        dataSource={this.dataSource}
-        {...other}
-      />
-    );
-  }
+  };
 }
 
 import util from 'util';
-function debugRenderRow(rowData,sectionID,columnID){
-  console.log("row:",rowData,sectionID,columnID)
-  return(<View style={{height:200,borderColor:columnID % 2 ? "yellow": "green",borderWidth:3}}><Text>row:{columnID}:{util.inspect(rowData)}</Text></View>)
+function debugRenderRow(rowData, sectionID, columnID) {
+  console.log('row:', rowData, sectionID, columnID);
+  return (<View style={{ height: 200, borderColor: columnID % 2 ? 'yellow' : 'green', borderWidth: 3 }}><Text>row:{columnID}:{util.inspect(rowData)}</Text></View>);
 }
 
+import { compose, mapProps, withState, toClass, withProps, withHandlers } from 'recompose';
 
-function BookListView(props){
-  const { sectionIDs, rowIDs, ...other } = props;
-  return <My
-           {...other}
-         />
-}
-import { compose, mapProps, withState,toClass,withProps,withHandlers } from 'recompose'
-
-//http://blog.koba04.com/post/2016/07/15/a-brief-note-of-reacteurope2016-sessions/
+// http://blog.koba04.com/post/2016/07/15/a-brief-note-of-reacteurope2016-sessions/
 /* const enhance = compose(
  *   //toClass,
  *   //withItems
@@ -94,152 +53,170 @@ import { compose, mapProps, withState,toClass,withProps,withHandlers } from 'rec
  *   withProps(({items})=>
  *     ({dataSource:dataSource.cloneWithRowsAndSections(items)}))
  * )*/
-const enhance = compose(
+const EnhancedListView = compose(
   withItems,
-  withHandlers({
-    onScroll: props => e => console.log("foo:",e.nativeEvent.contentOffset.y)
-  }),
+  /* withHandlers({
+   *   onScroll: props => e => console.log("foo:",e.nativeEvent.contentOffset.y)
+   * }),*/
   withHandlers({
     renderSectionHeader: props => (sectionData, sectionID) => {
       return sectionID.endsWith('_end') ?
              props.renderSectionFooter(sectionData, sectionID) :
              props.renderSectionHeader(sectionData, sectionID);
     }
-  })
-)
+  }),
+  //withState('sectionRefs','updateSectionRefs',{})
+)(ListView);
 
-const BookListView = enhance(({...other}) => {
-  return (
-    <View style={{flex:1}}>
-      <View style={{height:50}} />
-      <Text
-        style={{ color: 'white' }}
-        onPress={() => {
-            console.log("onpress",this)
-            this.scrollview.scrollTo({x:0,y:100,animated:true})
-          }}
-      >
-        {'toggle'}
-      </Text>
-      <ListView
-        {...other}
-        renderScrollComponent={(props) =>
-          <ScrollView ref={(c)=>{
-              console.log("c:",c)
-              this.scrollview = c
-            }} {...props} />}
-        renderRow={debugRenderRow}
-      />
-    </View>
-  )
-})
-
+class BookListView extends React.Component {
+  scrollTo(...args) {
+    return new Promise((resolve, reject) => {
+      this.scrollview.scrollTo(...args);
+      setTimeout(() => resolve(), 100); // TODO:onScrollEndAnimation
+    });
+  }
+  scrollToSectionHeader(sectionID) {
+    // console.log("liked3",this)//211
+    return new Promise((resolve, reject) => {
+      return resolve([sectionID, 0]);
+      console.log("sec:", this)
+      this.sections[sectionID]
+          .measureLayout(
+            findNodeHandle(this.scrollview),
+            (x, y) => {
+              // console.log("liked4",x,y)//211
+              this.scrollview.scrollTo({ x: 0, y, animated: true });
+              setTimeout(() => resolve([sectionID, y]), 100);
+              // TODO:onScrollEndAnimation
+            });
+    });
+  }
+  render() {
+    this.sections = this.sections || {};
+    return (<EnhancedListView
+      {...this.props}
+      renderScrollComponent={props =>
+        <ScrollView
+          ref={c => this.scrollview = c}
+          {...props}
+          />}
+      renderSectionHeader={(sectionData, sectionID) =>
+        <View
+          ref={c => {
+              this.sections[sectionID] = c;
+            }}
+          >
+               {this.props.renderSectionHeader(sectionData, sectionID)}
+        </View>}
+    />);
+  }
+}
+BookListView.propTypes = {
+  // ...ListView.DataSource.propTypes
+  items: React.PropTypes.object.isRequired,
+  ...ListView.propTypes,
+  dataSource: React.PropTypes.instanceOf(ListView.DataSource),
+  renderSectionFooter: React.PropTypes.func.isRequired
+};
+BookListView.defaultProps = { ...ListView.defaultProps };
+// BookListView.propTypes = { initialCount: React.PropTypes.number };
 
 // Dumb compo
 class ListViewWithFilter extends React.Component {
-  render(){
+  render() {
     const { limit, items, selectedSection, ...other } = this.props;
-    //function ListViewWithFilter({ limit, items, selectedSection, ...other }) {
-    console.log("ListViewWithFilter",this.props)
-  const sectionIDs =
+    // function ListViewWithFilter({ limit, items, selectedSection, ...other }) {
+    console.log('ListViewWithFilter', this.props);
+    const sectionIDs =
     selectedSection ?
     [selectedSection, `${selectedSection}_end`] :
     Object.keys(items);
   // Object.keys(items).filter(key => key !== "search_end")
-    console.log("sec:",sectionIDs);
+    console.log('sec:', sectionIDs);
 
-  const rowIDs =
+    const rowIDs =
     selectedSection ?
     undefined :
     sectionIDs.map(sectionID =>
       Object.keys(items[sectionID]).slice(0, limit || undefined));
-    console.log("row:",rowIDs);
+    console.log('row:', rowIDs);
 
     return (
-      //ListViewWithFooter
-      <SmartListView
-      ref="root"
-      items={items}
-      rowIDs={rowIDs}
-      sectionIDs={sectionIDs}
-      enableEmptySections
-      {...other}
-    />);
-}
+      // ListViewWithFooter
+      <ListView
+        ref="root"
+        items={items}
+        rowIDs={rowIDs}
+        sectionIDs={sectionIDs}
+        enableEmptySections
+        {...other}
+      />);
+  }
 }
 
 class BookListView0 extends React.Component {
   constructor(props) {
     super(props);
-    this.sec   = {}
+    this.sec = {};
     this.state = {
       selectedSection: this.props.selectedSection,
       items: this.props.items,
       limit: this.props.limit
-    }
+    };
   }
   // another component?
-  scrollToSectionHeader(sectionID,animated){
-    //console.log("scroll");
+  scrollToSectionHeader(sectionID, animated) {
+    // console.log("scroll");
     return new Promise((resolve, reject) => {
-      console.log("sec:",this.sec,sectionID)
+      console.log('sec:', this.sec, sectionID);
       this.sec[sectionID]
           .measureLayout(
             findNodeHandle(this.listview),
-            (x,y) => {
-              console.log("liked4",x,y)//211
-              this.listview.scrollTo({x:0, y:y, animated:true});
-              setTimeout(() => resolve(), 200) //TODO:onScrollEndAnimation
+            (x, y) => {
+              console.log('liked4', x, y);// 211
+              this.listview.scrollTo({ x: 0, y, animated: true });
+              setTimeout(() => resolve(), 200); // TODO:onScrollEndAnimation
             });
-    })
+    });
   }
-  componentWillReceiveProps(nextProps){
-    if(nextProps.selectedSection!==this.props.selectedSection){
-      if(this.props.selectedSection === null){
-      this.scrollToSectionHeader(nextProps.selectedSection)
-          .then(()=>this.setState(nextProps));
-      }else{
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.selectedSection !== this.props.selectedSection) {
+      if (this.props.selectedSection === null) {
+        this.scrollToSectionHeader(nextProps.selectedSection)
+          .then(() => this.setState(nextProps));
+      } else {
         current = this.props.selectedSection;
-        this.setState({...nextProps,contentOffset:{x:0,y:211}},()=>{
-          //scroll to previous scroll position
+        this.setState({ ...nextProps, contentOffset: { x: 0, y: 211 } }, () => {
+          // scroll to previous scroll position
           /* setTimeout(()=>
            *   this.scrollToSectionHeader(current))*/
-        })
+        });
       }
     }
   }
   render() {
-    const {renderSectionHeader, ...other} = this.props
+    const { renderSectionHeader, ...other } = this.props;
     return (
-      //TODO:move key to listview with filter
-      //SmartListView
+      // TODO:move key to listview with filter
+      // SmartListView
       <ListViewWithFilter
-        ref={(listview)=> this.listview = listview}
+        ref={(listview) => this.listview = listview}
         {...other}
-        key={ this.state.selectedSection }
-        selectedSection={ this.state.selectedSection }
-        items={ this.state.items }
-        limit={ this.state.limit }
-        contentOffset={this.state.contentOffset || {x:0,y:0}}
-        renderSectionHeader={(sectionData ,sectionID) => {
-            return (
+        key={this.state.selectedSection}
+        selectedSection={this.state.selectedSection}
+        items={this.state.items}
+        limit={this.state.limit}
+        contentOffset={this.state.contentOffset || { x: 0, y: 0 }}
+        renderSectionHeader={(sectionData, sectionID) => {
+          return (
               <View ref={(sec) => this.sec[sectionID] = sec}>
-                        {renderSectionHeader(sectionData ,sectionID)}
+                        {renderSectionHeader(sectionData, sectionID)}
               </View>
-            )
-          }}
+            );
+        }}
       />
     );
   }
 }
 
-BookListView.propTypes = {
-  selectedSection: React.PropTypes.string,
-  limit: React.PropTypes.number,
-  items: React.PropTypes.object.isRequired,
-  renderRow: React.PropTypes.func.isRequired,
-  renderSectionHeader: React.PropTypes.func.isRequired,
-  renderSectionFooter: React.PropTypes.func.isRequired
-};
-
-module.exports = { BookListView,SmartListView };
+module.exports = { BookListView };

@@ -138,13 +138,19 @@ import {
 } from 'react-native';
 
 import util from 'util';
-function debugRenderRow(rowData,sectionID,columnID){
-  console.log("row:",rowData,sectionID,columnID)
-  return(<View style={{height:400,borderColor:columnID % 2 ? "yellow": "green",borderWidth:3}}><Text>row:{util.inspect(rowData)}</Text></View>)
+function debugRenderRow(rowData, sectionID, columnID) {
+  console.log('row:', rowData, sectionID, columnID);
+  return (<View style={{ height: 400, borderColor: columnID % 2 ? 'yellow' : 'green', borderWidth: 3 }}><Text>row:{util.inspect(rowData)}</Text></View>);
 }
 
-//remove to index.js.android may overwrite by copy
+// remove to index.js.android may overwrite by copy
 UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+
+function log(str){
+  return function (params){
+    console.log(str + ":", params)
+  }
+}
 
 module.exports = {
   itemsInfo,
@@ -153,5 +159,6 @@ module.exports = {
   LIBRARY_ID,
   CALIL_STATUS_API,
   MOCKED_MOVIES_DATA,
+  log,
   //makeEventEmitterDriver,
 };

@@ -6,6 +6,7 @@ import {
   RAKUTEN_SEARCH_API,
   CALIL_STATUS_API,
   LIBRARY_ID,
+  log,
 } from './common';
 
 const mockbooks = [
@@ -47,7 +48,7 @@ const initialBooks = realm.objects('Book')
 
 function intent(RN, HTTP) {
   // Actions
-  //mojibake シンプ Q思考
+  // mojibake シンプ Q思考
   const release$ = RN.select('bookcell')
                      .events('release');
 
@@ -247,12 +248,12 @@ function intent(RN, HTTP) {
   }
 
   const mockSearcheBooks = [
-    { title: 'like:SOFT SKILLS', isbn: '9784822251550'},
-    { title: 'borrow:youji kyouiku keizai', isbn: '9784492314630'},
-    { title: 'done:simpsons', isbn: '9784105393069'},
-    { title: 'none:container', isbn: '9784822245641'},
-    { title: 'guri', isbn: '9784834032147'},
-    { title: 'ABC',  isbn: '9784828867472',},
+    { title: 'like:SOFT SKILLS', isbn: '9784822251550' },
+    { title: 'borrow:youji kyouiku keizai', isbn: '9784492314630' },
+    { title: 'done:simpsons', isbn: '9784105393069' },
+    { title: 'none:container', isbn: '9784822245641' },
+    { title: 'guri', isbn: '9784834032147' },
+    { title: 'ABC', isbn: '9784828867472' },
   ];
 
   const { booksStatus$: searchedBooksStatus$,
@@ -316,29 +317,53 @@ function intent(RN, HTTP) {
       .events('press')
       .merge(RN.select('close')
                .events('press').map(() => null))
-      .do(i => console.log('section selected0:%O', i,this))
+      // .do(i => console.log('section selected0:%O', i,this))
       .distinctUntilChanged()
+      .shareReplay();
+
+  const scrollListView$ =
+    RN.select('listview')
+      .events('scroll')
+      .do(e => console.log('scroll:', e.nativeEvent.contentOffset.y))
+      .subscribe();
+
+  const scrollToSection$ =
+    changeSection$
+      .filter(i => i !== null)// null->section
+      .withLatestFrom(
+        RN.select('listview')
+          .my()
+          .filter(i => i !== null)
+          .distinctUntilChanged()
+          .do(log("my"))
+      )
+      // .do(i => console.log('listview:my:', i))
+      .flatMap(([section, inst]) =>
+        // Rx.Observable.fromPromise(inst.scrollTo({x:0,y:100,animated:true})))
+        Rx.Observable.fromPromise(inst.scrollToSectionHeader(section)))
+      .do(log("sec?"))
+      // .do(i => console.log('prom result', i))
+      // .distinctUntilChanged()
 
   const selectedSection$ =
-    changeSection$
-      .do(i => console.log('section selected1:%O', i))
-      .shareReplay()
+    Rx.Observable.merge(
+      scrollToSection$.map(([section, y]) => section).do(log("toSec")),
+      changeSection$
+        .filter(i => i === null) // section->null
+        .do(log("toNull"))
+    )
+      .distinctUntilChanged()
       .startWith(null)
+  // .do(i => console.log('section selected1:%O', i))
+      .shareReplay();
 
-  /* const foo$ = console.log("self:",
-   *                          //RN.select('section').my().map(i),
-   *                          RN.select('section'))*/
-  RN.select('listview').my().do(i=>console.log("me:",i)).subscribe()
-  //selector has many instances
-
-  
   return {
     savedBooks$,
     savedBooksStatus$,
     request$,
     requestBooks$, // for loading status
     // request$,
-    //onpress -> triggers animation -> change selectedSection
+    // onpress -> triggers animation -> change selectedSection
     selectedSection$,
     // .do((books)=>LayoutAnimation.easeInEaseOut())//there is bug in iOS
     // Will be fixed in RN 0.28?

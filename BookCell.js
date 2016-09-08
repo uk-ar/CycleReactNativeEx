@@ -52,7 +52,7 @@ function LeftButton({ icon, text, style, backgroundColor, ...props }) {
 
 // http://mae.chab.in/archives/2854
 // stateless component validation
-//flexDirection=row-reverse
+// flexDirection=row-reverse
 function RightButton({ icon, text, style, backgroundColor, ...props }) {
   return (
     <View
@@ -74,7 +74,7 @@ function RightButton({ icon, text, style, backgroundColor, ...props }) {
   );
 }
 
-//const LibraryStatusWithLoading = withLoading(LibraryStatus)
+// const LibraryStatusWithLoading = withLoading(LibraryStatus)
 function LibraryStatus({ libraryStatus = {}, ...props }) {
   let text;
   let style;
@@ -259,13 +259,13 @@ function BookRow({ bucket, book, onRelease, style }) {
   return (
     // CloseableCompo
     // need ref & React.cloneElement?
-    //onSwipeStart responder move
-    //onSwipeEnd responder end
-    //onOpen responder end(not closed)
+    // onSwipeStart responder move
+    // onSwipeEnd responder end
+    // onOpen responder end(not closed)
     <SwipeableRow2
-      onSwipeStart={()=>console.log("start")}
-      onSwipeEnd={()=>console.log("end")}
-      onOpen={()=>console.log("open")}
+      onSwipeStart={() => console.log('start')}
+      onSwipeEnd={() => console.log('end')}
+      onOpen={() => console.log('open')}
       onRelease={() => onRelease(book, bucket)}
       leftButtons={leftButtons}
       rightButtons={rightButtons}
