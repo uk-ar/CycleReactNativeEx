@@ -97,17 +97,18 @@ function model(actions) {
       ...filterBooks(savedBooks, 'liked'),
       ...filterBooks(savedBooks, 'borrowed'),
       ...filterBooks(savedBooks, 'done'),
+      sections:{
+        search:1,
+        search_end:1,
+        liked:2,
+        liked_end:1,
+        borrowed:2,
+        borrowed_end:1,
+        done:2,
+        done_end:1
+      }
     };
   }
-
-  /* function genCounts(items) {
-   *   return {
-   *     search_end: Object.keys(items.search).length,
-   *     liked_end: Object.keys(items.liked).length,
-   *     borrowed_end: Object.keys(items.borrowed).length,
-   *     done_end: Object.keys(items.done).length
-   *   };
-   * }*/
 
   const searchedBooks$ =
     actions.searchedBooksStatus$
@@ -125,9 +126,13 @@ function model(actions) {
 
   // update with animation when selectedSection$ changed
   const sectionIDs$ =
-    actions.selectedSection$.map(selectedSection =>
-      selectedSection ? [selectedSection, `${selectedSection}_end`] : undefined
-    );
+    Rx.Observable
+      .combineLatest(actions.selectedSection$, items$,
+      (selectedSection, items) => {
+      return selectedSection ?
+             [selectedSection, `${selectedSection}_end`] :
+             Object.keys(items).filter(i => i !== "sections")
+      });
 
   const limit = 2;
   /* const rowIDs$ =

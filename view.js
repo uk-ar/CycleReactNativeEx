@@ -476,7 +476,7 @@ function MainView({ items, sectionIDs, booksLoadingState, selectedSection }) {
               />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {
-          //console.log('header', sectionData, sectionID, selectedSection);
+          console.log('header', sectionData, sectionID, selectedSection);
           return (sectionID === 'search') ? (
               <SearchHeader
                 selectedSection={selectedSection}

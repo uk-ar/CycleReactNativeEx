@@ -15,6 +15,8 @@ function withItems(ListViewComponent) {
       this.dataSource = new ListView.DataSource({
         rowHasChanged: (r1, r2) => r1 !== r2,
         sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+        getSectionHeaderData: (dataBlob, sectionID) =>
+          dataBlob.sections[sectionID]
       });
     }
     render() {
