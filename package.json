@@ -23,7 +23,7 @@
     "recompose": "^0.20.2",
     "rx": "^4.1.0",
     "util": "^0.10.3",
-    "xstream": "^5.3.2"
+    "xstream": "^6.3.0"
   },
   "devDependencies": {
     "babel-eslint": "^6.1.0",
