@@ -417,11 +417,11 @@ function ItemsHeader({ selectedSection, section, children, style }) {
 Touchable.BookListView = Touchable.createCycleComponent(
   BookListView);
 
-function MainView({ items, sectionIDs, booksLoadingState, selectedSection }) {
+function MainView({ items, sectionIDs, rowIDs, booksLoadingState, selectedSection }) {
   // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
   // TODO: transition to detail view
-  console.log('render main', { items, sectionIDs, booksLoadingState, selectedSection });
+  console.log('render main', { items, sectionIDs, rowIDs, booksLoadingState, selectedSection });
   /* LayoutAnimation.configureNext(
    *   LayoutAnimation.create(1000,
    *                          LayoutAnimation.Types.easeInEaseOut,
@@ -446,9 +446,13 @@ function MainView({ items, sectionIDs, booksLoadingState, selectedSection }) {
       { /* listView should have onRelease method? */ }
       { /* key is for rerender header */ }
       <Touchable.BookListView
+        removeClippedSubviews={false}
+        onContentSizeChange={(contentWidth, contentHeight) =>
+          console.log('change', contentWidth, contentHeight)}
         selector="listview"
         items={items}
         sectionIDs={sectionIDs}
+        rowIDs={rowIDs}
         ref={(c) => {
             // console.log("ref:",c);
             // this.listview=c
@@ -457,6 +461,7 @@ function MainView({ items, sectionIDs, booksLoadingState, selectedSection }) {
         directionalLockEnabled
         enableEmptySections
         renderRow={(rowData, sectionID, rowID) => {
+          console.log('row:', rowData, sectionID, rowID);
           return (
           <Touchable.BookRow
             key={rowID}
@@ -468,23 +473,26 @@ function MainView({ items, sectionIDs, booksLoadingState, selectedSection }) {
         }}
         renderSectionFooter={(sectionData, sectionID) => {
             // console.log('footer', sectionData, sectionID);
+          const [select, loading] = sectionData;
           const section = sectionID.slice(0, -1 * '-end'.length);
           return (
-              <ItemsFooter
-                payload={section}
-                count={Object.keys(items[section]).length}
-              />);
+            <ItemsFooter
+              key={select}
+              payload={section}
+              count={Object.keys(items[section]).length}
+            />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {
-          console.log('header', sectionData, sectionID, selectedSection);
+            // console.log('header', sectionData, sectionID, selectedSection);
+          const [select, loading] = sectionData;
           return (sectionID === 'search') ? (
               <SearchHeader
-                selectedSection={selectedSection}
-                loadingState={booksLoadingState}
+                selectedSection={select}
+                loadingState={loading}
               />) : (
                 <ItemsHeader
                   key={sectionID}
-                  selectedSection={selectedSection}
+                  selectedSection={select}
                   section={sectionID}
                 />);
         }}

@@ -6,7 +6,10 @@ import {
   ListView,
   ScrollView,
   findNodeHandle,
+  TouchableHighlight,
 } from 'react-native';
+
+const RCTUIManager = require('NativeModules').UIManager;
 
 function withItems(ListViewComponent) {
   return class extends React.Component {
@@ -24,6 +27,7 @@ function withItems(ListViewComponent) {
       this.dataSource =
         this.dataSource.cloneWithRowsAndSections(items, sectionIDs, rowIDs);
       console.log('dataSource:',
+                  items, sectionIDs, rowIDs,
                   this.dataSource.getRowCount(),
                   this.dataSource.getRowAndSectionCount(),
                   this.dataSource.getSectionLengths());
@@ -70,7 +74,68 @@ const EnhancedListView = compose(
   //withState('sectionRefs','updateSectionRefs',{})
 )(ListView);
 
+const Dimensions = require('Dimensions');
+const {
+  width,
+  height,
+} = Dimensions.get('window');
+
+
 class BookListView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { toggle: true };
+  }
+  render() {
+    return (
+      <ScrollView
+        ref={c => this.scrollview = c}
+        removeClippedSubview={false}
+        onContentSizeChange={
+          (contentWidth, contentHeight) => {
+            // this.scrollview.scrollTo({x:0,y:-1,animated:true});
+            // console.log(contentHeight,this.scrollview);
+            // this.scrollview.forceUpdate()
+          }}
+        contentContainerStyle={{
+          // flex:1,
+          justifyContent: 'center'
+        }}
+      >
+        <View style={{ height: this.state.toggle ? null : 0.1, overflow: 'hidden' }}>
+          <Text style={{ fontSize: 96 }}>Scroll me plz</Text>
+
+          <TouchableHighlight onPress={() => console.log('press:')}>
+            <Text style={{ fontSize: 96 }}>If you like</Text>
+          </TouchableHighlight>
+          <Text style={{ fontSize: 96 }}>Scrolling down</Text>
+          <Text style={{ fontSize: 96 }}>What's the best</Text>
+          <Text style={{ fontSize: 96 }}>Framework around?</Text>
+          <Text style={{ fontSize: 80 }}>React Native</Text>
+        </View>
+        <TouchableHighlight onPress={() => {
+          this.setState({ toggle: !this.state.toggle }, () => {
+            this.scrollview.scrollTo({ x: 0, y: 0, animated: true });
+          });
+            // console.log("press:",this.state.toggle)
+        }}>
+          <Text style={{ fontSize: 96, color: 'red' }}>If you like</Text>
+        </TouchableHighlight>
+        <Text style={{ fontSize: 96 }}>wn</Text>
+        <Text style={{ fontSize: 96 }}>est</Text>
+        <Text style={{ fontSize: 96 }}>ound?</Text>
+        <Text style={{ fontSize: 80 }}>2</Text>
+        <Text style={{ fontSize: 96 }}>wn</Text>
+        <Text style={{ fontSize: 96 }}>est</Text>
+        <Text style={{ fontSize: 96 }}>ound?</Text>
+        <Text style={{ fontSize: 80 }}>2</Text>
+
+      </ScrollView>
+    );
+  }
+}
+
+class BookListView1 extends React.Component {
   scrollTo(...args) {
     return new Promise((resolve, reject) => {
       this.scrollview.scrollTo(...args);
@@ -78,17 +143,26 @@ class BookListView extends React.Component {
     });
   }
   scrollToSectionHeader(sectionID) {
-    // console.log("liked3",this)//211
+    console.log('liked3', this);// 211
     return new Promise((resolve, reject) => {
-      return resolve([sectionID, 0]);
-      console.log("sec:", this)
+      // return resolve([sectionID, 0]);
+      console.log('scrosec:', height, this, this.scrollview.getInnerViewNode());
+      RCTUIManager.measure(this.scrollview.getInnerViewNode(), (...data) => { console.log('inn:', data); });
+      /* this.scrollview.getInnerViewNode().measure(
+       *   (x, y, width, height)=>console.log("in",(x, y, width, height))
+       * )*/
       this.sections[sectionID]
           .measureLayout(
             findNodeHandle(this.scrollview),
-            (x, y) => {
-              // console.log("liked4",x,y)//211
+            (x, y, width, height) => {
+              // support scroll max
+              // sec:687, max 256
+              // totalheight:916
+              // dim heigjt 683
+              console.log('liked4', x, y, width, height);// 232 691
               this.scrollview.scrollTo({ x: 0, y, animated: true });
-              setTimeout(() => resolve([sectionID, y]), 100);
+              // this.scrollview.scrollTo({ x: 0, y: 200, animated: true });
+              setTimeout(() => resolve([sectionID, y]), 1000);
               // TODO:onScrollEndAnimation
             });
     });
@@ -101,13 +175,13 @@ class BookListView extends React.Component {
         <ScrollView
           ref={c => this.scrollview = c}
           {...props}
-          />}
+        />}
       renderSectionHeader={(sectionData, sectionID) =>
         <View
           ref={c => {
-              this.sections[sectionID] = c;
-            }}
-          >
+            this.sections[sectionID] = c;
+          }}
+        >
                {this.props.renderSectionHeader(sectionData, sectionID)}
         </View>}
     />);

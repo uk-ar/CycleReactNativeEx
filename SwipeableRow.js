@@ -8,9 +8,10 @@ import {
   View,
   Animated,
   PanResponder,
+  Dimensions,
 } from 'react-native';
 
-const Dimensions = require('Dimensions');
+// const Dimensions = require('Dimensions');
 const {
   width,
   height,

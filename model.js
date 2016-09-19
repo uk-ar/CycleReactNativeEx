@@ -9,6 +9,7 @@ import {
   TextInput,
   LayoutAnimation,
   ActivityIndicator,
+  UIManager
 } from 'react-native';
 
 import {
@@ -20,12 +21,14 @@ import {
   log
 } from './common';
 
+UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+
 function model(actions) {
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
 
   const selectedBook$ = actions.goToBookView$;
   const booksLoadingState$ =
-    Rx.Observable.just([]);
+    Rx.Observable.just(true);
   /* actions.requestBooks$.map((_) => true)
    *        .merge(
    *          // response event
@@ -74,6 +77,7 @@ function model(actions) {
         }
       });
 
+  //  selectedSection, booksLoadingState
   function genItems(searchedBooks, savedBooks) {
     // move to model?
     function booksToObject(books) {
@@ -97,15 +101,15 @@ function model(actions) {
       ...filterBooks(savedBooks, 'liked'),
       ...filterBooks(savedBooks, 'borrowed'),
       ...filterBooks(savedBooks, 'done'),
-      sections:{
-        search:1,
-        search_end:1,
-        liked:2,
-        liked_end:1,
-        borrowed:2,
-        borrowed_end:1,
-        done:2,
-        done_end:1
+      sections: {
+        search: null,
+        search_end: null,
+        liked: null,
+        liked_end: null,
+        borrowed: null,
+        borrowed_end: null,
+        done: null,
+        done_end: null,
       }
     };
   }
@@ -119,29 +123,64 @@ function model(actions) {
 
   // selectedSection triggers scroll and update value when animation end
   // update with animation when selectedSection$ changed
+  const books$ =
+    Rx.Observable.combineLatest(
+      searchedBooks$.do(log('seb')),
+      actions.savedBooksStatus$.do(log('sab')),
+      genItems)
+  /* .do(i=>console.log("items:",JSON.stringify(i)))
+   * .distinctUntilChanged(x => JSON.stringify(x),(a,b)=>a!==b) */
+      .do(log('items'))
+      .shareReplay();
+
   const items$ =
     Rx.Observable.combineLatest(
-      searchedBooks$, actions.savedBooksStatus$,
-      genItems);
+      books$,
+      actions.selectedSection$,
+      booksLoadingState$,
+      (books, selectedSection, booksLoadingState) => {
+        const sections = {
+          search: [selectedSection, booksLoadingState],
+          search_end: [selectedSection, booksLoadingState],
+          liked: [selectedSection, booksLoadingState],
+          liked_end: [selectedSection, booksLoadingState],
+          borrowed: [selectedSection, booksLoadingState],
+          borrowed_end: [selectedSection, booksLoadingState],
+          done: [selectedSection, booksLoadingState],
+          done_end: [selectedSection, booksLoadingState]
+        };
+        return ({ ...books, sections });
+      });
 
   // update with animation when selectedSection$ changed
   const sectionIDs$ =
     Rx.Observable
-      .combineLatest(actions.selectedSection$, items$,
-      (selectedSection, items) => {
-      return selectedSection ?
-             [selectedSection, `${selectedSection}_end`] :
-             Object.keys(items).filter(i => i !== "sections")
-      });
+      .combineLatest(actions.selectedSection$,
+                     books$,
+                     (selectedSection, items) => {
+                       return selectedSection ?
+                              [selectedSection, `${selectedSection}_end`] :
+                              Object.keys(items).filter(i => i !== 'sections');
+                     })
+      .do(i => console.log('secIDs?:', i))
+      .shareReplay();
 
   const limit = 2;
-  /* const rowIDs$ =
-   *   actions.selectedSection$.map(selectedSection =>
-   *     selectedSection ?
-   *                   undefined :
-   *                   sectionIDs.map(sectionID =>
-   *                     Object.keys(items[sectionID]).slice(0, limit || undefined));*/
-    /* const rowIDs =
+  const rowIDs$ =
+    Rx.Observable
+      .combineLatest(
+        actions.selectedSection$.do(log('asc')), sectionIDs$.do(log('sci')), books$,
+        (selectedSection, sectionIDs, items) => {
+          return sectionIDs.map(sectionID => {
+            return selectedSection ?
+                   Object.keys(items[sectionID]) :
+                   Object.keys(items[sectionID]).slice(0, limit || undefined);
+          });
+        })
+      .do(i => console.log('rowIDs?:', i));
+  // FIXME:bug with select done
+  // Maybe scroll position keeped when transition
+      /* const rowIDs =
      * selectedSection ?
      * undefined :
      * sectionIDs.map(sectionID =>
@@ -159,13 +198,15 @@ function model(actions) {
        * actions.savedBooksStatus$,*/
       items$,
       sectionIDs$,
-      //actions.selectedSection$.do(i => LayoutAnimation.easeInEaseOut()),
-      actions.selectedSection$.do(i =>
-        LayoutAnimation.configureNext(
-          LayoutAnimation
-            .create(3000,
-                    LayoutAnimation.Types.easeInEaseOut,
-                    LayoutAnimation.Properties.opacity))),
+      rowIDs$,
+      actions.selectedSection$,
+      // actions.selectedSection$.do(i => LayoutAnimation.easeInEaseOut()),
+      /* actions.selectedSection$.do(i =>
+       *   LayoutAnimation.configureNext(
+       *     LayoutAnimation
+       *       .create(3000,
+       *               LayoutAnimation.Types.easeInEaseOut,
+       *               LayoutAnimation.Properties.opacity))),*/
       // counts$,
       // actions.savedBooks$,
       booksLoadingState$.startWith(false).distinctUntilChanged(),
@@ -175,7 +216,7 @@ function model(actions) {
       // Rx.Observable.interval(1000).do(i=>console.log("int",i)),
       // Rx.Observable.just(1000),
       // actions.selectedSection$.startWith("search"),
-      (items, sectionIDs, selectedSection, booksLoadingState, navigationState, selectedBook, i) => ({ items, sectionIDs, selectedSection, booksLoadingState, navigationState, selectedBook, i }))
+      (items, sectionIDs, rowIDs, selectedSection, booksLoadingState, navigationState, selectedBook, i) => ({ items, sectionIDs, rowIDs, selectedSection, booksLoadingState, navigationState, selectedBook, i }))
     .debounce(10);// for delay of selectedSection and sectionIDs
   return state$;
 }

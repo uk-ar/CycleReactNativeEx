@@ -335,26 +335,27 @@ function intent(RN, HTTP) {
           .my()
           .filter(i => i !== null)
           .distinctUntilChanged()
-          .do(log("my"))
+          .do(log('my'))
       )
       // .do(i => console.log('listview:my:', i))
       .flatMap(([section, inst]) =>
         // Rx.Observable.fromPromise(inst.scrollTo({x:0,y:100,animated:true})))
         Rx.Observable.fromPromise(inst.scrollToSectionHeader(section)))
-      .do(log("sec?"))
+      .do(log('sec?'));
       // .do(i => console.log('prom result', i))
       // .distinctUntilChanged()
 
   const selectedSection$ =
     Rx.Observable.merge(
-      scrollToSection$.map(([section, y]) => section).do(log("toSec")),
+      scrollToSection$.map(([section, y]) => section).do(log('toSec')),
       changeSection$
         .filter(i => i === null) // section->null
-        .do(log("toNull"))
+        .do(log('toNull'))
     )
+  // .distinctUntilChanged(x => x, (a,b) => a !== b )
       .distinctUntilChanged()
       .startWith(null)
-  // .do(i => console.log('section selected1:%O', i))
+      .do(i => console.log('section selected1:%O', i))
       .shareReplay();
 
   return {

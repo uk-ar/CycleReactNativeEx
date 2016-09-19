@@ -144,12 +144,12 @@ function debugRenderRow(rowData, sectionID, columnID) {
 }
 
 // remove to index.js.android may overwrite by copy
-UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+// UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
 
-function log(str){
-  return function (params){
-    console.log(str + ":", params)
-  }
+function log(str) {
+  return function (params) {
+    console.log(str + ':', params);
+  };
 }
 
 module.exports = {
