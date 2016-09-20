@@ -18,7 +18,10 @@ const {
   StyleSheet,
   PixelRatio,
 } = ReactNative;
-import Touchable from '@cycle/react-native/src/Touchable';
+//jest bug
+//import Touchable from '@cycle/react-native/src/Touchable';
+//const Touchable = require('@cycle/react-native/src/Touchable');
+const Touchable = require('@cycle/react-native/lib/Touchable');
 
 const Dimensions = require('Dimensions');
 const {
@@ -278,5 +281,5 @@ function BookRow({ bucket, book, onRelease, style }) {
   );
 }
 
-module.exports = { BookRow };
+module.exports = { BookRow, LibraryStatus,BookCell };
 // module.exports = { BookCell, SwipeableRow };

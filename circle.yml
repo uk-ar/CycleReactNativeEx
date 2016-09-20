@@ -1,0 +1,8 @@
+## Customize the test machine
+machine:
+  node:
+    version: 6.3.0
+  post:
+    - npm install -g npm@3
+  timezone:
+    Asia/Tokyo # Set the timezone

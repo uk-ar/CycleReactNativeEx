@@ -1,0 +1,5 @@
+exports[`Animated tests renders correctly 1`] = `
+<View
+  onLayout={[Function anonymous]}
+  style={Object {}} />
+`;
