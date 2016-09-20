@@ -1,8 +1,6 @@
 
 import React from 'react';
 
-const _ = require('lodash');
-
 import {
   StyleSheet,
   View,
@@ -10,6 +8,9 @@ import {
   PanResponder,
   Dimensions,
 } from 'react-native';
+
+const _ = require('lodash');
+import { AnimView } from './AnimView';
 
 // const Dimensions = require('Dimensions');
 const {
@@ -438,129 +439,6 @@ class MeasureableView extends React.Component {
  *           </MeasureableView>)))
  *   }
  * })*/
-
-const AnimView = React.createClass({
-  // Use LayoutAnimation if you want to use height or width null
-  getInitialState() {
-    return {
-      animatedStyle: StyleSheet.flatten(this.props.style),
-    };
-  },
-  // for ReactTransitionGroup
-  componentWillEnter(callback) {
-    console.log('component will enter');
-    callback();
-  },
-  componentWillLeave(callback) {
-    console.log('component will leave');
-    callback();
-  },
-  componentWillMount() {
-    this.prevStyle = StyleSheet.flatten(this.props.style);
-    // this.animating = false;
-  },
-  animate(fromValues, toValues) {
-    this.prevStyle = fromValues;
-    return this.animateTo(toValues);
-  },
-  // https://github.com/joshwcomeau/react-flip-move#enterleave-animations
-  animateTo(nextStyle) {
-      // duration,easing jquery
-    // console.log('animate');
-      // this.animating = true;
-    this.counter = new Animated.Value(0);
-    const current = StyleSheet.flatten(this.prevStyle);
-    const next = StyleSheet.flatten(nextStyle);
-    const animatedStyle = Object.assign({}, next);
-    // check for initial
-    // console.log("rec",current,this.prevStyle,next,animatedStyle);
-    /* if(current.height && next.height === null){
-     *   const orig = next.height;
-     *   this.refs.measure((x,y,width,height)=>{
-     *     next.height = height;
-     *     //replace
-     *     //anim.then(next.height=orig)
-     *   })
-     * }*/
-    // console.log("n:",next,nextStyle)
-    next &&
-    Object.keys(next).map((key) => {
-          // remove if with filter & merge
-          // console.log("k:",key,typeof next[key] === "number",key == "backgroundColor" || key == "color",current[key] != next[key],current[key],next[key])
-      if (((typeof current[key] === 'number' && typeof next[key] === 'number') |
-           key.endsWith('Color') ||
-           key == 'color')
-          && current[key] !== next[key]
-          ) {
-            // console.log("an",current[key],next[key]);
-        animatedStyle[key] = this.counter.interpolate({
-          inputRange: [0, 1],
-          outputRange: [current[key], next[key]],
-        });
-      } else if (key === 'transform' && current['transform']) {
-        // current next
-        // transform is ordered array!!
-        /* console.log("ab",current['transform'],next['transform']);
-         * animatedStyle['transform'] =
-         *   [Object.keys(next['transform'][0])
-         *         .map((transformKey)=>console.log("ke",transformKey))
-         *         .filter((transformKey)=>
-         *           next['transform'][0][transformKey]!==
-         *             current['transform'][0][transformKey])
-         *         .reduce((acc,transformKey)=>{
-         *           acc[transformKey] = this.counter.interpolate({
-         *             inputRange: [0, 1],
-         *             outputRange: [current[key], next[key]],
-         *           })
-         *           return acc;
-         *         },{...next['transform'][0]})] || next['transform']
-         * console.log("as",animatedStyle['transform']);*/
-      }
-    });
-
-    this.prevStyle = next;
-    return new Promise((resolve, reject) => {
-      this.setState({ animatedStyle }, () => {
-        Animated.timing(
-            this.counter,
-            { toValue: 1,
-              duration: (this.props.anim && this.props.anim.duration) || 360, //180,
-              //duration: 180,
-            }
-          ).start(() => {
-            resolve();
-          });
-      });
-    });
-  },
-
-  componentWillReceiveProps(nextProps) {
-    // console.log('willReceiveProps');
-    this.animateTo(nextProps.style);
-  },
-  measure(callback) {
-    // not needed?
-    callback(...Object.values(this.layout));
-  },
-  render() {
-    // console.log("rend anim,view1,view2",this.state.animatedStyle,this.props.style)
-    return (
-      // style={[this.state.style,]}
-      <Animated.View
-        ref="root"
-        {...this.props}
-        onLayout={
-          this.props.onLayout ? this.props.onLayout :
-          ({ nativeEvent: { layout: { x, y, width, height } } }) => {
-            // Animated.View cannot measure
-            this.layout = { x, y, width, height };
-          }}
-        style={[this.state.animatedStyle]}
-      >
-        {this.props.children}
-      </Animated.View>);
-  },
-});
 
 const SwipeableButtons2 = React.createClass({
   getInitialState() {
