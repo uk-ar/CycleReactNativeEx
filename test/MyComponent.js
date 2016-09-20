@@ -1,16 +1,31 @@
+const SavePromise = Promise;
+const saveSetTimeout = setTimeout;
+
 import React from 'react';
-import {
-  Animated,
+/* import {
+ *   View,
+ *   Text,
+ *   StyleSheet,
+ *   TouchableHighlight
+ * } from 'react-native';*/
+const {
   View,
+  TouchableHighlight,
   Text,
-  StyleSheet,
-  TouchableHighlight
-} from 'react-native';
-import { shallow,render } from 'enzyme';
+  Platform,
+  Animated
+} = require('react-native');
+
+
+import { shallow,render,mount } from 'enzyme';
 import { expect } from 'chai';
 import sinon from 'sinon';
+//"test":"mocha --require react-native-mock/mock.js --compilers js:babel-core/register --recursive -w test/MyComponent.js"
+import { AnimView } from '../AnimView';
 
-import { AnimView, MeasureableView } from '../SwipeableRow';
+
+Promise = SavePromise;
+setTimeout = saveSetTimeout;
 
 const Test = React.createClass({
   render() {
@@ -33,7 +48,7 @@ describe('<AnimView />', () => {
     const wrapper = shallow(<AnimView/>);
     expect(wrapper.find(Animated.View)).to.have.length(1);
   });
-  
+
   it('renders children when passed in', () => {
     const wrapper = shallow(
       <AnimView>
@@ -46,20 +61,35 @@ describe('<AnimView />', () => {
     const wrapper = shallow(<AnimView/>);
     expect(wrapper.state().animatedStyle).to.equal(undefined);
   });
-
-  it('has animatedStyle when passed in', () => {
+  const initialStyle = {
+    width:1,
+    height:2
+  }
+  const nextStyle = {
+    width:3,
+    height:4
+  }
+  it('has animatedStyle when passed in?', () => {
+    //const wrapper = shallow(
     const wrapper = shallow(
-      <AnimView style={{width:10,height:20}}/>
-    );
-    expect(wrapper.state().animatedStyle).to.deep.equal({width:10,height:20});
+      <AnimView style={initialStyle}/>
+    ).instance();
+    expect(wrapper.state.animatedStyle).to.deep.equal(initialStyle);
+    expect(wrapper.prevStyle).to.deep.equal(initialStyle);
   });
 
   //https://github.com/facebook/react-native/blob/master/Libraries/Experimental/WindowedListView.js
   //https://github.com/facebook/react-native/blob/master/Libraries/Experimental/IncrementalExample.js
-  it('has animatedStyle when changed style', () => {
+  it('has animatedStyle when changed style', (done) => {
     const wrapper = shallow(
-      <AnimView style={{width:10,height:20}}/>
-    );
+      <AnimView style={initialStyle}/>
+    ).instance();
+    wrapper.animateTo(nextStyle).then((foo)=>{
+      console.log(wrapper.state.animatedStyle.width.__getValue())
+      //expect(wrapper.state.animatedStyle.width.__getValue()).to.deep.equal(3);
+      //expect(wrapper.prevStyle).to.deep.equal(initialStyle);
+    }).then(done)
+    //wrapper.setProps({ style: nextStyle});
     //expect(wrapper.find(View)).to.have.length(1);//not to mock Animated.View
     /* wrapper.instance().animateTo({width:0,height:0}).then(()=>
      *   expect(wrapper.state().animatedStyle).to.deep.equal(null
@@ -71,7 +101,7 @@ describe('<AnimView />', () => {
     //wrapper.setProps({ style: });
   });
 
-  
+
   it('simulates press events', () => {
     const onPress = sinon.spy();
     const wrapper = shallow(

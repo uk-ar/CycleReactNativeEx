@@ -15,7 +15,7 @@ class AnimView extends React.Component {
     this.prevStyle = this.state.animatedStyle;
   }
   componentWillReceiveProps(nextProps) {
-    //console.log('willReceiveProps', nextProps);
+    console.log('willReceiveProps', nextProps);
     this.animateTo(nextProps.style);
   }
   animate(fromValues, toValues) {
