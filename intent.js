@@ -42,9 +42,11 @@ realm.write(() => {
    *                true)
    * })*/
 });
-const initialBooks = realm.objects('Book')
-                          .sorted('modifyDate', true)// reverse sort
-                          .map((i) => i);// convert result to array
+/* const initialBooks = realm.objects('Book')
+ *                           .sorted('modifyDate', true)// reverse sort
+ *                           .map((i) => i);// convert result to array
+ * */
+const initialBooks = mockbooks
 
 function intent(RN, HTTP) {
   // Actions
@@ -186,7 +188,7 @@ function intent(RN, HTTP) {
 
   const changeBucket$ =
     release$
-      .do(i => console.log('release:', i))
+      .do((i,j) => console.log('release:', i,j))
   // TODO:change to isbn
   /* .map(([book, bucket]) => (
    *   { type: 'replace',
@@ -198,7 +200,7 @@ function intent(RN, HTTP) {
    *     isbn,
    *     bucket,
    *   }))*/
-      .flatMap(([book, bucket]) =>
+      .flatMap((book, bucket) =>
         [{ type: 'remove', book },
          { type: 'add', book, bucket }])
   /* .map(([book, bucket]) => (

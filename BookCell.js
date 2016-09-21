@@ -19,9 +19,10 @@ const {
   PixelRatio,
 } = ReactNative;
 //jest bug
-//import Touchable from '@cycle/react-native/src/Touchable';
+import Touchable from '@cycle/react-native/src/Touchable';
 //const Touchable = require('@cycle/react-native/src/Touchable');
-const Touchable = require('@cycle/react-native/lib/Touchable');
+//const Touchable = require('@cycle/react-native/lib/Touchable');
+//import Touchable from '@cycle/react-native/lib/Touchable';
 
 const Dimensions = require('Dimensions');
 const {
@@ -193,6 +194,9 @@ function getButtons(bucket, isbn) {
  *   style*/
 // ToastAndroid.show('foo', ToastAndroid.SHORT)
 
+function BookCell2({ book, ...props }) {
+  return(<View/>)
+}
 function BookCell({ book, ...props }) {
   let TouchableElement = Touchable.TouchableHighlight;
   if (Platform.OS === 'android') {
@@ -269,7 +273,7 @@ function BookRow({ bucket, book, onRelease, style }) {
       onSwipeStart={() => console.log('start')}
       onSwipeEnd={() => console.log('end')}
       onOpen={() => console.log('open')}
-      onRelease={() => onRelease(book, bucket)}
+      onRelease={() => onRelease(book, "foo")}
       leftButtons={leftButtons}
       rightButtons={rightButtons}
     >

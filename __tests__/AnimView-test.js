@@ -6,19 +6,12 @@ const saveSetTimeout = setTimeout;
 
 var Animated = require('Animated');
 var { AnimView } = require('../AnimView');
-
-jest
-  .disableAutomock()
-  .setMock('Text', {})
-  .setMock('View', {})
-  .setMock('Image', {})
-  .setMock('ScrollView', {})
-
-import React from 'react';
 const {
-  Platform,
+  View,
   //Animated
 } = require('react-native');
+
+import React from 'react';
 
 // Note: test renderer must be required after react-native.
 import renderer from 'react-test-renderer';
@@ -30,7 +23,23 @@ describe('Animated tests', () => {
   beforeEach(() => {
     //jest.resetModules();
   });
-
+  
+  /* it("promises work?", () => {
+   *   return Promise.resolve().then(() => {
+   *     expect(true).toBe(true)
+   *   })
+   * })*/
+  it('renders 1 animated.view component', () => {
+    const tree = renderer.create(<AnimView/>);
+    expect(tree.toJSON()).toMatchSnapshot();
+  });
+  it('renders children when passed in', () => {
+    const tree = renderer.create(
+      <AnimView>
+        <View key="foo"/>
+      </AnimView>);
+    expect(tree.toJSON()).toMatchSnapshot();
+  });
   //https://github.com/facebook/react-native/blob/master/Libraries/Animated/src/__tests__/Animated-test.js#L27
   //https://github.com/facebook/react/blob/master/src/renderers/testing/__tests__/ReactTestRenderer-test.js
   const initialStyle = {
@@ -52,7 +61,7 @@ describe('Animated tests', () => {
       .toEqual(initialStyle);
 
     const callback = jest.fn();
-    const foo = inst.animateTo(nextStyle)//.then(callback);
+    const foo = inst.animateTo(nextStyle).then(callback);
     jest.runAllTimers();
     //expect(callback).toBeCalled();
     expect(inst.state.animatedStyle.width.__getValue())
@@ -78,30 +87,11 @@ describe('Animated tests', () => {
 
     expect(tree.toJSON()).toMatchSnapshot();
   });
-  it('renders correctly2', () => {
-    const initialStyle = {
-      width:1,
-      height:2
-    }
-    let c = new AnimView({style:initialStyle});
-    //c.props = {style:initialStyle}
-    expect(c.state).toEqual({
-      animatedStyle:initialStyle });
-    const nextStyle = {
-      width:3,
-      height:4
-    }
-    c.props = {style:nextStyle}
-    //c.componentWillReceiveProps({style:nextStyle})
-    //console.log(c)
-    /* const tree = renderer.create(
-     *   <AnimView style={{width:1,height:2}}/>
-     * )//.toJSON();
-     * console.log(tree)
-     * tree.componentWillReceiveProps(
-     *   {style:{width:1,height:2}})
-     * //tree.state.
-     * //expect(tree.props.style).toEqual({});
-     * expect(tree.toJSON()).toMatchSnapshot();*/
+  it('renders onPress to be called', () => {
+    const callback = jest.fn();
+    const tree = renderer.create(<AnimView onPress={callback}/>);
+    tree.getInstance().props.onPress()
+    expect(callback).toBeCalled();
+    expect(tree.toJSON()).toMatchSnapshot();
   });
 });

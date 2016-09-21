@@ -461,7 +461,7 @@ function MainView({ items, sectionIDs, rowIDs, booksLoadingState, selectedSectio
         directionalLockEnabled
         enableEmptySections
         renderRow={(rowData, sectionID, rowID) => {
-          console.log('row:', rowData, sectionID, rowID);
+          //console.log('row:', rowData, sectionID, rowID);
           return (
           <Touchable.BookRow
             key={rowID}

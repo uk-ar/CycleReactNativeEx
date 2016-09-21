@@ -81,7 +81,7 @@ const {
 } = Dimensions.get('window');
 
 
-class BookListView extends React.Component {
+class BookListView1 extends React.Component {
   constructor(props) {
     super(props);
     this.state = { toggle: true };
@@ -135,7 +135,7 @@ class BookListView extends React.Component {
   }
 }
 
-class BookListView1 extends React.Component {
+class BookListView extends React.Component {
   scrollTo(...args) {
     return new Promise((resolve, reject) => {
       this.scrollview.scrollTo(...args);

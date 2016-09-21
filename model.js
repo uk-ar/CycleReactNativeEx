@@ -125,12 +125,11 @@ function model(actions) {
   // update with animation when selectedSection$ changed
   const books$ =
     Rx.Observable.combineLatest(
-      searchedBooks$.do(log('seb')),
-      actions.savedBooksStatus$.do(log('sab')),
+      searchedBooks$,
+      actions.savedBooksStatus$,
       genItems)
   /* .do(i=>console.log("items:",JSON.stringify(i)))
    * .distinctUntilChanged(x => JSON.stringify(x),(a,b)=>a!==b) */
-      .do(log('items'))
       .shareReplay();
 
   const items$ =
@@ -162,14 +161,16 @@ function model(actions) {
                               [selectedSection, `${selectedSection}_end`] :
                               Object.keys(items).filter(i => i !== 'sections');
                      })
-      .do(i => console.log('secIDs?:', i))
+      //.do(i => console.log('secIDs?:', i))
       .shareReplay();
 
   const limit = 2;
   const rowIDs$ =
     Rx.Observable
       .combineLatest(
-        actions.selectedSection$.do(log('asc')), sectionIDs$.do(log('sci')), books$,
+        actions.selectedSection$,
+        sectionIDs$,
+        books$,
         (selectedSection, sectionIDs, items) => {
           return sectionIDs.map(sectionID => {
             return selectedSection ?
@@ -177,7 +178,7 @@ function model(actions) {
                    Object.keys(items[sectionID]).slice(0, limit || undefined);
           });
         })
-      .do(i => console.log('rowIDs?:', i));
+      //.do(i => console.log('rowIDs?:', i));
   // FIXME:bug with select done
   // Maybe scroll position keeped when transition
       /* const rowIDs =
