@@ -29,7 +29,7 @@ const {
   width,
 } = Dimensions.get('window');
 
-const { SwipeableRow, SwipeableRow2 } = require('./SwipeableRow');
+const { SwipeableRow2,SwipeableButtons2 } = require('./SwipeableRow');
 
 function LeftButton({ icon, text, style, backgroundColor, ...props }) {
   // console.log("props:",icon, text, style, backgroundColor, props)
@@ -194,9 +194,6 @@ function getButtons(bucket, isbn) {
  *   style*/
 // ToastAndroid.show('foo', ToastAndroid.SHORT)
 
-function BookCell2({ book, ...props }) {
-  return(<View/>)
-}
 function BookCell({ book, ...props }) {
   let TouchableElement = Touchable.TouchableHighlight;
   if (Platform.OS === 'android') {
@@ -263,6 +260,9 @@ function BookRow({ bucket, book, onRelease, style }) {
   // (book,bucket)=>closeanimate.start(onRelease)
   // onRelease is cycle:touchable element
   const { leftButtons, rightButtons } = getButtons(bucket, book);
+  function onRe(){
+    onRelease(book,"bar")
+  }
   return (
     // CloseableCompo
     // need ref & React.cloneElement?
@@ -273,8 +273,14 @@ function BookRow({ bucket, book, onRelease, style }) {
       onSwipeStart={() => console.log('start')}
       onSwipeEnd={() => console.log('end')}
       onOpen={() => console.log('open')}
-      onRelease={() => onRelease(book, "foo")}
-      leftButtons={leftButtons}
+      onRelease={onRe}
+      renderLeftActions={(width)=>
+        <SwipeableButtons2
+          ref="leftButtons"
+          direction="left"
+          width={width}
+          buttons={leftButtons}
+                />}
       rightButtons={rightButtons}
     >
       <BookCell

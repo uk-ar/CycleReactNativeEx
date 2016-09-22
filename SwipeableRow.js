@@ -613,6 +613,9 @@ const SwipeableRow2 = React.createClass({
 
   render() {
     // console.log('sr2:');
+    let leftActions = this.props.renderLeftActions(this._panX)
+    /* React.cloneElement(,
+     *                      {ref:})*/
     return (
       <View
         {...this._panResponder.panHandlers}
@@ -625,12 +628,7 @@ const SwipeableRow2 = React.createClass({
                   //alignItems:"stretch"
                 }}
       >
-         <SwipeableButtons2
-           ref="leftButtons"
-           direction="left"
-           width={this._panX}
-           buttons={this.props.leftButtons}
-         />
+        {this.props.renderLeftActions(this._panX)}
          <View
            style={[{ width, //expand to cell width
     }, this.props.style]}
@@ -765,4 +763,4 @@ const styles = StyleSheet.create({
   },
 });
 
-module.exports = { SwipeableRow, SwipeableRow2, AnimView, MeasureableView };
+module.exports = {SwipeableButtons2, SwipeableRow2, AnimView, MeasureableView };
