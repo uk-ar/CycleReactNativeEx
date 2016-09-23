@@ -234,7 +234,9 @@ function intent(RN, HTTP) {
           case 'replace':
             /* return [book].concat(
              *   books.filter((elem) => elem.isbn.toString() !== book.isbn.toString()));*/
-            return [{...book,bucket,modifyDate: new Date(Date.now())}].concat(books)
+            return [{...book,bucket,modifyDate: new Date(Date.now())}]
+              .concat(books.filter((elem) =>
+                elem.isbn.toString() !== book.isbn.toString()))
           default:
             return books;
         }

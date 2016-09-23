@@ -118,250 +118,8 @@ const AnimatedExpandable = Animated.createAnimatedComponent(Expandable);
    }}>foo</Text>
    </AnimatableBackGroundColor> */
 // TODO:migrate to AnimatableView
-const AnimatableBackGroundColor = React.createClass({
-  componentWillMount() {
-    this.colorIndex = new Animated.Value(this.props.colorIndex);
-  },
-
-  componentWillReceiveProps(nextProps) {
-    // animated
-    if (nextProps.colorIndex != this.props.colorIndex) {
-      Animated.timing(
-        this.colorIndex,
-        { toValue: nextProps.colorIndex, // interpolate?
-        duration: 360 } // TODO:add props
-      ).start();
-    }
-  },
-
-  render() {
-    return (
-      // AnimatableBackGroundColor and children can expose method?
-      <Animated.View {...this.props} style={[this.props.style, {
-        backgroundColor: this.colorIndex.interpolate({
-          inputRange: _.range(this.props.colors.length),
-          outputRange: this.props.colors,
-        }),
-      },
-        ]}>
-        {this.props.children}
-      </Animated.View>);
-  },
-});
-
 // Visible toggle hidden display
-const AnimatableView = React.createClass({
-  getInitialState() {
-    return {
-      style: this.props.style,
-    };
-  },
-
-  componentWillMount() {
-    this.animating = false;
-  },
-
-  _onLayout({ nativeEvent: { layout: { x, y, width, height } } }) {
-    this.props.onLayout && this.props.onLayout(
-      { nativeEvent: { layout: { x, y, width, height } } });
-    if (this.animating) { return; }
-
-    this.contentHeight = height;
-    this.contentWidth = width;
-  },
-
-  componentWillReceiveProps(nextProps) {
-    const current = StyleSheet.flatten(this.props.style);
-    const next = StyleSheet.flatten(nextProps.style);
-    const style = Object.assign({}, next);
-    const values = Object.keys(StyleSheet.flatten(nextProps.style))
-                       .filter((key) => current[key] !== next[key])
-                       .filter((key) =>
-                         ((typeof current[key] !== 'string') ||
-                          (key === 'backgroundColor')))
-                       .map((key) => {
-                         if (current[key]) {
-                           style[key] = new Animated.Value(current[key]);
-                         } else if (key === 'height' || key === 'width') {
-                           style[key] = new Animated.Value(this.contentHeight);
-                         }
-
-                         return key;
-                       }).map((key) =>
-                         Animated.timing(
-                           style[key],
-                           { toValue: next[key] }// TODO:add props duration
-                         ));// null
-    // console.log("style:%O,%O",current,next);
-    // console.log("a:%O,%O",values,style);
-    // TODO:may heavy?
-    this.setState({ style });
-
-    if (values.length !== 0) {
-      this.animating = true;
-      Animated.parallel(values).start((e) => {
-        this.animating = false;
-        // always animated...
-        this.props.onAnimationEnd &&
-                         this.props.onAnimationEnd();
-      });
-      // trac for re-render children
-    }
-  },
-
-  render() {
-    // drop own props
-    const { style, ...props } = this.props;
-    return (
-      <Animated.View
-        {...props}
-        style={this.state.style}
-        onLayout={this._onLayout}
-      >
-        {this.props.children}
-      </Animated.View>);
-  },
-});
-
-const SwipeableButtons = React.createClass({
-  getInitialState() {
-    return {
-      componentIndex: 0,
-      width: new Animated.Value(0.001),
-      releasing: false,
-    };
-  },
-
-  componentWillMount() {
-    this.colors = this.props.buttons.map(
-      (elem, i) => elem.props.backgroundColor);
-    this.styles = this.props.direction == 'left' ? [{
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: null,
-      justifyContent: 'flex-end',
-      //padding:10,//RN bug:clipped padding
-    }, {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: null,
-      width: SWIPEABLE_MAIN_WIDTH / 2,
-    }, {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: null,
-      width: SWIPEABLE_MAIN_WIDTH,
-    }] : [{
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: null,
-    }, {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: null,
-      alignSelf: 'flex-end',
-      justifyContent: 'flex-end',
-      width: SWIPEABLE_MAIN_WIDTH / 2,
-    }, {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: null,
-      alignSelf: 'flex-end',
-      justifyContent: 'flex-end',
-      width: SWIPEABLE_MAIN_WIDTH,
-    }];
-  },
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.width != this.props.width) {
-      this.setState({ width: new Animated.Value(nextProps.width) });
-    }
-  },
-  // shuld handle in parent?
-  release(callback) {
-    // need release listener?
-    // Execute button action
-    const currentButton = this.props.buttons[this.state.componentIndex];
-    const close = currentButton.props.close;
-    this.setState({ releasing: true });
-
-    return new Promise((resolve, reject) => {
-      Animated.timing(
-        this.state.width,
-        { toValue: close ? SWIPEABLE_MAIN_WIDTH : 0.001,
-        duration: 180 }
-      ).start((e) => {
-        // called when animation finished
-        resolve(close);
-        console.log('callReleasefunc');
-        if (!close) {
-          this.setState({
-            releasing: false,
-            componentIndex: 0,
-          }, () => {
-            // delete data
-            console.log('callReleasefunc0');
-            currentButton.props.onRelease && currentButton.props.onRelease();
-          }
-          );
-        } else {
-          this.setState({
-            releasing: false,
-          }, () => {
-            // delete data
-            console.log('callReleasefunc1');
-            currentButton.props.onRelease && currentButton.props.onRelease();
-          }
-          );
-        }
-      });
-    });
-  },
-
-  render() {
-    const styles = this.styles;
-    const { width, ...props } = this.props;
-    //               colors={this.props.colors}
-    // console.log("w:%O", width);
-    return (
-      <AnimatableBackGroundColor {...props}
-        colors={this.colors}
-        colorIndex={this.state.componentIndex}
-      >
-        <AnimatedExpandable
-          width={this.state.width.interpolate({
-            inputRange: [0, 0.01, 1],
-            outputRange: [0.01, 0.01, 1],
-          })}
-          lock={this.state.releasing}
-          style={{
-                // width={this.state.width}
-                // width={50}
-                // width cannot shrink under padding
-                // height:50,//TODO:support height centering
-            justifyContent: 'center',
-                //lock={this.releasing}
-          }}
-          onResize={(i) => {
-                // TODO:shuld call from first time?
-            this.setState({ componentIndex: i });
-          }}
-
-          components={this.props.buttons.map((elem, i) => {
-            return (React.cloneElement(
-                  elem,
-                  { style: [
-                    elem.props.style,
-                    styles[i],
-                  ] })); // for merge backgroundColor
-          })}
-        />
-      </AnimatableBackGroundColor>);
-  },
-});
-
 class MeasureableView extends React.Component {
-// const MeasureableView = React.createClass({
   // TODO:position absolute
   constructor(props) {
     super(props);
@@ -390,56 +148,6 @@ class MeasureableView extends React.Component {
   }
 }
 
-/* const SelectableView = React.createClass({
-   getInitialState:function(){
-   return({
-   containerStyle:{position:"absolute"}
-   })
-   },
-   render: function(){
-   return (
-   <View
-   {...this.props}
-   style={[this.props.style,this.state.containerStyle]}
-   onFirstLayout={()=> this.setState({containerStyle:null})}
-   >
-   {this.props.components.map((elem,i)=>{
-   return (
-   <View
-   key={i}
-   onFirstLayout={({nativeEvent:{layout:{width, height}}})=>{
-   //this.props.onChildrenMount()
-   }}>
-   {elem}
-   </View>
-   )
-   })}
-   </View>
-   )
-   }
-}); */
-
-/* const MeasureableViews = React.createClass({
- *   //TODO:remove this.widths
- *   render: function(){
- *     return (React.Children.toArray(this.props.children))
- *     return (
- *       React.Children.map(
- *         this.props.children,
- *         ((button, i, array)=>
- *           <MeasureableView
- *               onFirstLayout={({nativeEvent:{layout:{x, y, width, height}}})=>{
- *                   this.widths[i] = width;
- *                   if(Object.keys(this.widths).length == array.length){
- *                     this.props.onFirstLayoutAll &&
- *                     this.props.onFirstLayoutAll(widths)
- *                   }
- *                 }}>
- *             {button}
- *           </MeasureableView>)))
- *   }
- * })*/
-
 const SwipeableButtons2 = React.createClass({
   getInitialState() {
     return {
@@ -456,16 +164,19 @@ const SwipeableButtons2 = React.createClass({
     const close = this.currentButton.props.close;
     this.releasing = true;
 
-    Animated.timing(this.props.width,
+    return new Promise((resolve, reject) => {
+      Animated.timing(this.props.width,
                     { toValue: !close ? 0.001 :
                      this.props.direction == 'left' ? SWIPEABLE_MAIN_WIDTH
                    : -SWIPEABLE_MAIN_WIDTH,
                     duration: 180 }
     ).start(() => {
-      this.currentButton.props.onRelease &&
-      this.currentButton.props.onRelease();
+      /* this.currentButton.props.onRelease &&
+       * this.currentButton.props.onRelease();*/
       this.releasing = false;
-    });
+      resolve()
+    })
+    })
   },
   getTarget(){
     //console.log("buttons",this.props.buttons[this.state.index].props.target)
@@ -495,36 +206,34 @@ const SwipeableButtons2 = React.createClass({
                     overflow: 'hidden' }}
         >
           {this.props.buttons.map((button, i, array) =>
+            <MeasureableView
+              ref={i}
+              key={i}
+              onFirstLayout={
+                ({ nativeEvent: { layout: { x, y, width, height } } }) => {
+                  this.thresholds[i] = width;
+                  if (Object.keys(this.thresholds).length == array.length) {
+                    // console.log(this.thresholds)
+                    this.props.width.addListener(({ value }) => {
+                      if (this.releasing) { return; }
 
+                      let index = calcIndex(value, this.thresholds);
+                      if (this.props.direction == 'right') {
+                        index = calcIndex(-value, this.thresholds);
+                      }
 
-<MeasureableView
-  ref={i}
-  key={i}
-  onFirstLayout={
-               ({ nativeEvent: { layout: { x, y, width, height } } }) => {
-                 this.thresholds[i] = width;
-                 if (Object.keys(this.thresholds).length == array.length) {
-                  // console.log(this.thresholds)
-                   this.props.width.addListener(({ value }) => {
-                     if (this.releasing) { return; }
-
-                     let index = calcIndex(value, this.thresholds);
-                     if (this.props.direction == 'right') {
-                       index = calcIndex(-value, this.thresholds);
-                     }
-
-                     if (index != -1 && this.state.index != index) {
-                       this.setState({ index });
-                     }
-                   });
-                   this.setState({ index: 0 });// for re-render
-                 }
-               }}
->
-           {button}
-             </MeasureableView>
-            )}
-         </View>);
+                      if (index != -1 && this.state.index != index) {
+                        this.setState({ index });
+                      }
+                    });
+                    this.setState({ index: 0 });// for re-render
+                  }
+                }}
+            >
+              {button}
+            </MeasureableView>
+           )}
+        </View>);
     } else {
       // console.log('rend buttons');
       return (
@@ -595,11 +304,11 @@ const SwipeableRow2 = React.createClass({
       onPanResponderTerminationRequest: (evt, gestureState) => false,
       onPanResponderRelease: (evt, gestureState) => {
         if (this.state.positiveSwipe) {
-          this.props.onRelease()
+          this.props.onRelease(this.state.positiveSwipe)
           /* this.refs.leftButtons.release().then(()=>
            *   this.props.onRelease());*/
         } else {
-          this.props.onRelease()
+          this.props.onRelease(this.state.positiveSwipe)
           /* this.refs.rightButtons.release().then(()=>
            *   this.props.onRelease());*/
         }
@@ -647,109 +356,6 @@ const SwipeableRow2 = React.createClass({
            buttons={this.props.rightButtons}
          />
        </View>
-    );
-  },
-});
-
-const SwipeableRow = React.createClass({
-  componentWillMount() {
-    this._panX = new Animated.Value(0);
-
-    this._panResponder = PanResponder.create({
-      // Ask to be the responder:
-      onStartShouldSetPanResponder: (evt, gestureState) => false,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-
-      onPanResponderGrant: (evt, gestureState) => {},
-
-      onPanResponderMove: Animated.event([
-        null,
-        { dx: this._panX },
-      ]),
-      onPanResponderTerminationRequest: (evt, gestureState) => false,
-      onPanResponderRelease: (evt, gestureState) => {
-        if (0 < this.state.left) {
-          console.log('this.refs.leftButtons.refs.node:%O',
-                      this.refs.leftButtons.refs.node);
-          this.refs.leftButtons.release().then((close) => {
-            // if(close){this.setState({hidden:true})}
-          });
-        } else {
-          this.refs.rightButtons.release().then((close) => {
-            // if(close){this.setState({hidden:true})}
-          });
-        }
-      },
-
-      onShouldBlockNativeResponder: (evt, gestureState) => true,
-    });
-    this._panX.addListener(({ value }) => {
-      // if(0 < value){
-      // }
-      // TODO:heavy
-      this.setState({ left: value });
-    });
-  },
-
-  getInitialState() {
-    return {
-      left: 0.01, // changed when move & release
-      positiveSwipe: true,
-      width: null,
-    };
-  },
-
-  render() {
-    const leftButtons = (
-      // cannot convert animatedvalue because of release function
-      // <SwipeableButtons
-      <SwipeableButtons
-        ref="leftButtons"
-        direction="left"
-        width={this.state.left}
-        buttons={this.props.leftButtons}
-        style={{ justifyContent: 'center', //vertical center
-    }}
-      />);
-    // button input color, component, release action
-    // close flag is parent props
-    const rightButtons = (
-      <SwipeableButtons
-        ref="rightButtons"
-        direction="right"
-        width={-this.state.left}
-        buttons={this.props.rightButtons}
-        style={{ justifyContent: 'center',
-                  overflow: 'hidden' }}
-      />
-    );
-
-    return (
-      // onFirstLayout
-      <MeasureableView
-        onFirstLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
-          this.setState({ width });
-        }}
-
-        style={{
-          flexDirection: 'row',
-            // TODO:vertical stretch will fixed in RN 0.28?
-            // https://github.com/facebook/react-native/commit/d95757037aef3fbd8bb9064e667ea4fea9e5abc1
-          alignItems: 'stretch',
-          justifyContent: 0 < this.state.left ? 'flex-start' : 'flex-end',
-          overflow: 'hidden',
-        }}
-        {...this._panResponder.panHandlers}
-      >
-        {leftButtons}
-        <View style={[{ width: this.state.width }, // fixed width
-                      this.props.style]}>
-          {this.props.children}
-        </View>
-        {rightButtons}
-      </MeasureableView>
     );
   },
 });

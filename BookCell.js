@@ -291,7 +291,7 @@ class BookRow extends React.Component {
       onSwipeStart={() => console.log('start')}
       onSwipeEnd={() => console.log('end')}
       onOpen={() => console.log('open')}
-      onRelease={()=> {
+      onRelease={(positiveSwipe)=> {
           //this.refs.leftButtons.state
           console.log("zzz",
                       this.leftActions.state.index,
@@ -300,7 +300,11 @@ class BookRow extends React.Component {
           this.props.onRelease())
           */
           //console.log("zzz",this.leftActions.state.index)
-          onRelease(book,this.leftActions.getTarget(),this)
+          if (positiveSwipe){
+            this.leftActions.release().then(()=>
+              onRelease(book,this.leftActions.getTarget(),this)
+            );
+          }
         }}
       renderLeftActions={(width)=>
         <SwipeableButtons2
