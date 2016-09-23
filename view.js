@@ -348,12 +348,12 @@ class Header extends React.Component {
   }
 }
 
-function SearchHeader({ selectedSection, children, loadingState }) {
-  console.log('search', selectedSection, children, loadingState);
-  return ((selectedSection !== null) ? (
-     <ItemsHeader
-       selectedSection={selectedSection}
-       section="search"
+function SearchHeader({ loadingState, ...props}) {
+  //console.log('search',   loadingState);
+  return (!close ? (
+    <ItemsHeader
+      {...props}
+      section="search"
      >
        <TextInput
          autoCapitalize="none"
@@ -371,17 +371,19 @@ function SearchHeader({ selectedSection, children, loadingState }) {
      </ItemsHeader>
    ) : (
      <ItemsHeader
-       style={[styles.sectionFooter, styles.sectionHeader]}
-       selectedSection={selectedSection}
+       {...props}
+       style={[styles.sectionHeader]}
        section="search"
      />)
+    //       style={[styles.sectionFooter, styles.sectionHeader]}
    );
 }
 
 import { itemsInfo } from './common';
-function ItemsHeader({ selectedSection, section, children, style }) {
+function ItemsHeader({ section, children, style, close }) {
   if (!itemsInfo[section]) { return null; }
-  const icon = (selectedSection === null) ? (
+  //const icon = (selectedSection === null) ? (
+  const icon = !close ? (
     <FAIcon
       name={itemsInfo[section].icon}
       color={itemsInfo[section].backgroundColor}
@@ -417,7 +419,7 @@ function ItemsHeader({ selectedSection, section, children, style }) {
 Touchable.BookListView = Touchable.createCycleComponent(
   BookListView);
 
-function MainView({ items, sectionIDs, rowIDs, booksLoadingState, selectedSection }) {
+function MainView({ items, sectionIDs, rowIDs,dataSource, booksLoadingState, selectedSection }) {
   // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
   // TODO: transition to detail view
@@ -450,9 +452,7 @@ function MainView({ items, sectionIDs, rowIDs, booksLoadingState, selectedSectio
         onContentSizeChange={(contentWidth, contentHeight) =>
           console.log('change', contentWidth, contentHeight)}
         selector="listview"
-        items={items}
-        sectionIDs={sectionIDs}
-        rowIDs={rowIDs}
+        dataSource={dataSource}
         ref={(c) => {
             // console.log("ref:",c);
             // this.listview=c
@@ -472,27 +472,24 @@ function MainView({ items, sectionIDs, rowIDs, booksLoadingState, selectedSectio
           />);
         }}
         renderSectionFooter={(sectionData, sectionID) => {
-            // console.log('footer', sectionData, sectionID);
-          const [select, loading] = sectionData;
-          const section = sectionID.slice(0, -1 * '-end'.length);
+            console.log('footer', sectionData, sectionID);
+            const {section}=sectionData
           return (
             <ItemsFooter
-              key={select}
+              {...sectionData}
+              key={selectedSection}
               payload={section}
-              count={Object.keys(items[section]).length}
             />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {
-            // console.log('header', sectionData, sectionID, selectedSection);
-          const [select, loading] = sectionData;
-          return (sectionID === 'search') ? (
+            console.log('header', sectionData, sectionID);//,
+            //const {selectedSection, booksLoadingState} = sectionData;
+            return (sectionID === 'search') ? (
               <SearchHeader
-                selectedSection={select}
-                loadingState={loading}
+                {...sectionData}
               />) : (
                 <ItemsHeader
-                  key={sectionID}
-                  selectedSection={select}
+                {...sectionData}
                   section={sectionID}
                 />);
         }}

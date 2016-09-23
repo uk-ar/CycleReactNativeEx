@@ -2,14 +2,8 @@ import Rx from 'rx';
 import _ from 'lodash';
 import NavigationStateUtils from 'NavigationStateUtils';
 import {
-  Platform,
-  Text,
-  View,
-  NavigationExperimental,
-  TextInput,
-  LayoutAnimation,
-  ActivityIndicator,
-  UIManager
+  UIManager,
+  ListView,
 } from 'react-native';
 
 import {
@@ -178,6 +172,54 @@ function model(actions) {
                    Object.keys(items[sectionID]).slice(0, limit || undefined);
           });
         })
+  const dataSource$ =
+    Rx.Observable.combineLatest(
+      books$,
+      actions.selectedSection$,
+      booksLoadingState$,
+      (books,selectedSection,booksLoadingState) => {
+        const sections = {
+          search:      {close:selectedSection,loadingState:booksLoadingState},
+          search_end:  {count:Object.keys(books.search).length,
+                        section:"search"},
+          liked:       {close:selectedSection,loadingState:booksLoadingState},
+          liked_end:   {count:Object.keys(books.liked).length,section:"like"},
+          borrowed:    {close:selectedSection,loadingState:booksLoadingState},
+          borrowed_end:{count:Object.keys(books.borrowed).length,
+                        section:"borrowed"},
+          done:        {close:selectedSection,loadingState:booksLoadingState},
+          done_end:    {count:Object.keys(books.done).length,section:"done"}
+        };
+        const sectionIdentities =
+          selectedSection ?
+          [selectedSection, `${selectedSection}_end`] :
+          Object.keys(books);
+        const rowIdentities =
+          sectionIdentities.map((sectionID) =>{
+            return selectedSection ?
+                   Object.keys(books[sectionID]) :
+                   Object.keys(books[sectionID]).slice(0, limit || undefined)
+          })
+        //Object.keys(items).filter(i => i !== 'sections');
+        return ({
+          dataBlob: { ...books, sections },
+          sectionIdentities,
+          rowIdentities
+        });
+      })
+      .scan(
+        (datasource, {dataBlob, sectionIdentities, rowIdentities}) => {
+          return datasource.cloneWithRowsAndSections(
+            dataBlob, sectionIdentities, rowIdentities)
+        },new ListView.DataSource({
+          rowHasChanged: (r1, r2) => r1 !== r2,
+          sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+          getSectionHeaderData: (dataBlob, sectionID) =>
+            dataBlob.sections[sectionID]
+        }))
+      .do(i=>console.log("datasource:",i))
+      //.subscribe()
+
       //.do(i => console.log('rowIDs?:', i));
   // FIXME:bug with select done
   // Maybe scroll position keeped when transition
@@ -197,9 +239,10 @@ function model(actions) {
     .combineLatest(
       /* searchedBooks$,
        * actions.savedBooksStatus$,*/
-      items$,
-      sectionIDs$,
-      rowIDs$,
+      /* items$,
+       * sectionIDs$,
+       * rowIDs$,*/
+      dataSource$,
       actions.selectedSection$,
       // actions.selectedSection$.do(i => LayoutAnimation.easeInEaseOut()),
       /* actions.selectedSection$.do(i =>
@@ -217,7 +260,9 @@ function model(actions) {
       // Rx.Observable.interval(1000).do(i=>console.log("int",i)),
       // Rx.Observable.just(1000),
       // actions.selectedSection$.startWith("search"),
-      (items, sectionIDs, rowIDs, selectedSection, booksLoadingState, navigationState, selectedBook, i) => ({ items, sectionIDs, rowIDs, selectedSection, booksLoadingState, navigationState, selectedBook, i }))
+      (/* items, sectionIDs, rowIDs,*/
+       dataSource, selectedSection, booksLoadingState, navigationState, selectedBook, i) => ({ /* items, sectionIDs, rowIDs,*/
+         dataSource, selectedSection, booksLoadingState, navigationState, selectedBook, i }))
     .debounce(10);// for delay of selectedSection and sectionIDs
   return state$;
 }

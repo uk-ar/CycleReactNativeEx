@@ -60,7 +60,7 @@ import { compose, mapProps, withState, toClass, withProps, withHandlers } from '
  *     ({dataSource:dataSource.cloneWithRowsAndSections(items)}))
  * )*/
 const EnhancedListView = compose(
-  withItems,
+  //withItems,
   /* withHandlers({
    *   onScroll: props => e => console.log("foo:",e.nativeEvent.contentOffset.y)
    * }),*/
@@ -168,7 +168,8 @@ class BookListView extends React.Component {
     });
   }
   render() {
-    this.sections = this.sections || {};
+    this.sections = this.sections || {};//refs
+    console.log("this.props",this.props)
     return (<EnhancedListView
       {...this.props}
       renderScrollComponent={props =>
@@ -189,9 +190,7 @@ class BookListView extends React.Component {
 }
 BookListView.propTypes = {
   // ...ListView.DataSource.propTypes
-  items: React.PropTypes.object.isRequired,
   ...ListView.propTypes,
-  dataSource: React.PropTypes.instanceOf(ListView.DataSource),
   renderSectionFooter: React.PropTypes.func.isRequired
 };
 BookListView.defaultProps = { ...ListView.defaultProps };

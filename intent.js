@@ -52,7 +52,8 @@ function intent(RN, HTTP) {
   // Actions
   // mojibake シンプ Q思考
   const release$ = RN.select('bookcell')
-                     .events('release');
+                     .events('release')
+                     .do((...args)=>console.log("foo:",...args));
 
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')
@@ -188,7 +189,8 @@ function intent(RN, HTTP) {
 
   const changeBucket$ =
     release$
-      .do((i,j) => console.log('release:', i,j))
+      .do((i) => console.log('release:', i))
+      .filter(([book, bucket, bookRow])=> bucket !== null)
   // TODO:change to isbn
   /* .map(([book, bucket]) => (
    *   { type: 'replace',
@@ -200,42 +202,52 @@ function intent(RN, HTTP) {
    *     isbn,
    *     bucket,
    *   }))*/
-      .flatMap((book, bucket) =>
-        [{ type: 'remove', book },
-         { type: 'add', book, bucket }])
+  /* .flatMap(([book, bucket, bookRow]) =>
+   *   bookRow.close().then(()=>[book, bucket, bookRow])
+   *   )*/
+      .map(([book, bucket, bookRow]) =>{
+        return ({ type: 'replace', book, bucket, bookRow})
+      })
+  /* .flatMap(([book, bucket, bookRow]) =>
+   *   [{ type: 'remove', book, bookRow},
+   *    //bookRow.close(),
+   *    { type: 'add', book, bucket }])*/
   /* .map(([book, bucket]) => (
    *   { type: 'replace',
    *     book: Object.assign(
    *       {}, book, { bucket, modifyDate: new Date(Date.now()) }) }))*/
-      .do(i => console.log('rel:%O', i));
+      .do(i => console.log('rel:%O', i))
+      .shareReplay();
 
   // [{isbn:,mod},{isbn:,mod}]
   const savedBooks$ =
     changeBucket$
       .startWith(initialBooks)
-      .scan((books, { type, book, bucket }) => {
-        console.log('type:', type);
+      .scan((books, { type, book, bucket, bookRow}) => {
+        console.log('type:', type, book, bucket, bookRow);
         switch (type) {
-          case 'remove':
-            return books.filter((elem) =>
-              elem.isbn.toString() !== book.isbn.toString());
-          case 'add':
-            return [book].concat(books);
-            /* case 'replace':
-             *    return [book].concat(
-             *     books.filter((elem) => elem.isbn.toString() !== book.isbn.toString()));
-             *   return [{...book,bucket,modifyDate: new Date(Date.now())}].concat(books)*/
+            /* case 'remove':
+             *   return books.filter((elem) =>
+             *     elem.isbn.toString() !== book.isbn.toString());
+             * case 'add':
+             *   return [{...book,bucket}].concat(books);*/
+          case 'replace':
+            /* return [book].concat(
+             *   books.filter((elem) => elem.isbn.toString() !== book.isbn.toString()));*/
+            return [{...book,bucket,modifyDate: new Date(Date.now())}].concat(books)
           default:
             return books;
         }
       } // ).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
-      ).do((books) => {
-        realm.write(() => {
-          books.forEach((book) => {
-            realm.create('Book', book, true);
-          });
-        });
-      }).shareReplay();
+      ).shareReplay();
+
+  savedBooks$.do((books) => {
+    realm.write(() => {
+      books.forEach((book) => {
+        realm.create('Book', book, true);
+      });
+    });
+  }).subscribe();
 
   const { booksStatus$: savedBooksStatus$,
           requestStatus$: requestSavedBooksStatus$ } =
@@ -326,7 +338,7 @@ function intent(RN, HTTP) {
   const scrollListView$ =
     RN.select('listview')
       .events('scroll')
-      .do(e => console.log('scroll:', e.nativeEvent.contentOffset.y))
+      .do(([e]) => console.log('scroll:', e.nativeEvent.contentOffset.y))
       .subscribe();
 
   const scrollToSection$ =
@@ -338,6 +350,7 @@ function intent(RN, HTTP) {
           .filter(i => i !== null)
           .distinctUntilChanged()
           .do(log('my'))
+        //my() to payload or func param
       )
       // .do(i => console.log('listview:my:', i))
       .flatMap(([section, inst]) =>

@@ -467,7 +467,10 @@ const SwipeableButtons2 = React.createClass({
       this.releasing = false;
     });
   },
-
+  getTarget(){
+    //console.log("buttons",this.props.buttons[this.state.index].props.target)
+    return this.props.buttons[this.state.index].props.target || null
+  },
   render() {
     /* width={Animated.multiply(this._panX,-1)}*/
     // console.log("mul",Animated.multiply(this._panX,-1))
@@ -592,11 +595,13 @@ const SwipeableRow2 = React.createClass({
       onPanResponderTerminationRequest: (evt, gestureState) => false,
       onPanResponderRelease: (evt, gestureState) => {
         if (this.state.positiveSwipe) {
-          // this.refs.leftButtons.release();
-          this.props.onRelease();
+          this.props.onRelease()
+          /* this.refs.leftButtons.release().then(()=>
+           *   this.props.onRelease());*/
         } else {
-          this.props.onRelease();
-          // this.refs.rightButtons.release();
+          this.props.onRelease()
+          /* this.refs.rightButtons.release().then(()=>
+           *   this.props.onRelease());*/
         }
       },
 

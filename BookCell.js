@@ -97,6 +97,7 @@ function LibraryStatus({ libraryStatus = {}, ...props }) {
   }
   // http://www.google.com/design/spec/style/color.html#color-color-palette
   if (!text) {
+    //{!text && ActivityIndicator}
     return (
       <View style={[styles.row]}>
         <Text>
@@ -148,6 +149,7 @@ function getButtons(bucket, isbn) {
     />, // grey 300
     <LeftButton
       close
+      target="liked"
       onRelease={() => {
         console.log('like'); func(isbn, 'liked');
       }}
@@ -159,6 +161,7 @@ function getButtons(bucket, isbn) {
     <LeftButton
       onRelease={() => func(isbn, 'borrowed')}
       close
+      target="borrowed"
       {...itemsInfo['borrowed']}
       {...borrowedButton}
       style={{ width }}
@@ -176,6 +179,7 @@ function getButtons(bucket, isbn) {
     <RightButton
       onRelease={() => func(isbn, 'done')}
       close
+      target="done"
       {...itemsInfo['done']}
       {...doneButton}
       style={{ justifyContent: 'flex-end' }}
@@ -196,6 +200,7 @@ function getButtons(bucket, isbn) {
 
 function BookCell({ book, ...props }) {
   let TouchableElement = Touchable.TouchableHighlight;
+  //(Platform.OS === 'android') &&
   if (Platform.OS === 'android') {
     TouchableElement = Touchable.TouchableNativeFeedback;
      // BUG:TouchableNativeFeedback TouchableOpacity TouchableWithoutFeedback not support style
@@ -249,7 +254,23 @@ function BookCell({ book, ...props }) {
     </View>);
 }
 
-function BookRow({ bucket, book, onRelease, style }) {
+//function BookRow({ bucket, book, onRelease, style }) {
+class BookRow extends React.Component {
+  componentWillMount(){
+    console.log("willmount",this,this.props.book)
+  }
+  //class style because of ref to leftActions
+  close(){
+    console.log("close")
+    return new Promise((resolve)=>
+      setTimeout(()=> {
+        console.log("promise done")
+        resolve("resolve");
+      }, 5000)
+    )
+  }
+  render(){
+    const { bucket, book, onRelease, style } = this.props
   // There is 3 type of close behavior
   // animated left only
   // animated right and vertical close permanently
@@ -260,9 +281,6 @@ function BookRow({ bucket, book, onRelease, style }) {
   // (book,bucket)=>closeanimate.start(onRelease)
   // onRelease is cycle:touchable element
   const { leftButtons, rightButtons } = getButtons(bucket, book);
-  function onRe(){
-    onRelease(book,"bar")
-  }
   return (
     // CloseableCompo
     // need ref & React.cloneElement?
@@ -273,10 +291,20 @@ function BookRow({ bucket, book, onRelease, style }) {
       onSwipeStart={() => console.log('start')}
       onSwipeEnd={() => console.log('end')}
       onOpen={() => console.log('open')}
-      onRelease={onRe}
+      onRelease={()=> {
+          //this.refs.leftButtons.state
+          console.log("zzz",
+                      this.leftActions.state.index,
+                      this.leftActions.getTarget())
+          /* this.refs.leftButtons.release().then(()=>
+          this.props.onRelease())
+          */
+          //console.log("zzz",this.leftActions.state.index)
+          onRelease(book,this.leftActions.getTarget(),this)
+        }}
       renderLeftActions={(width)=>
         <SwipeableButtons2
-          ref="leftButtons"
+          ref={(c)=> this.leftActions = c}
           direction="left"
           width={width}
           buttons={leftButtons}
@@ -289,6 +317,7 @@ function BookRow({ bucket, book, onRelease, style }) {
       />
     </SwipeableRow2>
   );
+  }
 }
 
 module.exports = { BookRow, LibraryStatus,BookCell };
