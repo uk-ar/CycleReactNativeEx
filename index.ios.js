@@ -33,7 +33,7 @@ function main({ RN, HTTP, EE }) {
   // const request$ = Rx.Observable.merge(actions.requestBooks$, actions.requestStatus$);
   // 0192521722
   // qwerty
-  actions.request$.map((r) => console.log('request:', r))
+  actions.request$.map(r => console.log('request:', r))
           .subscribe();
   return {
     RN: state$.map(view),

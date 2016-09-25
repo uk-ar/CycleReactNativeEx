@@ -61,8 +61,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   sectionFooter: {
-    // backgroundColor:materialColor.grey["200"],
-    backgroundColor: materialColor.grey['50'],
+    backgroundColor:materialColor.grey["200"],
+    //backgroundColor: materialColor.grey['50'],
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
     borderRadius: 5,

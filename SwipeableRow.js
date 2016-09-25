@@ -174,13 +174,13 @@ const SwipeableButtons2 = React.createClass({
       /* this.currentButton.props.onRelease &&
        * this.currentButton.props.onRelease();*/
       this.releasing = false;
-      resolve()
-    })
-    })
+      resolve();
+    });
+    });
   },
-  getTarget(){
-    //console.log("buttons",this.props.buttons[this.state.index].props.target)
-    return this.props.buttons[this.state.index].props.target || null
+  getTarget() {
+    // console.log("buttons",this.props.buttons[this.state.index].props.target)
+    return this.props.buttons[this.state.index].props.target || null;
   },
   render() {
     /* width={Animated.multiply(this._panX,-1)}*/
@@ -304,11 +304,11 @@ const SwipeableRow2 = React.createClass({
       onPanResponderTerminationRequest: (evt, gestureState) => false,
       onPanResponderRelease: (evt, gestureState) => {
         if (this.state.positiveSwipe) {
-          this.props.onRelease(this.state.positiveSwipe)
+          this.props.onRelease(this.state.positiveSwipe);
           /* this.refs.leftButtons.release().then(()=>
            *   this.props.onRelease());*/
         } else {
-          this.props.onRelease(this.state.positiveSwipe)
+          this.props.onRelease(this.state.positiveSwipe);
           /* this.refs.rightButtons.release().then(()=>
            *   this.props.onRelease());*/
         }
@@ -327,7 +327,7 @@ const SwipeableRow2 = React.createClass({
 
   render() {
     // console.log('sr2:');
-    let leftActions = this.props.renderLeftActions(this._panX)
+    const leftActions = this.props.renderLeftActions(this._panX);
     /* React.cloneElement(,
      *                      {ref:})*/
     return (
@@ -374,4 +374,4 @@ const styles = StyleSheet.create({
   },
 });
 
-module.exports = {SwipeableButtons2, SwipeableRow2, AnimView, MeasureableView };
+module.exports = { SwipeableButtons2, SwipeableRow2, AnimView, MeasureableView };

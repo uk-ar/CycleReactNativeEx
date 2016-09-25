@@ -60,7 +60,7 @@ import { compose, mapProps, withState, toClass, withProps, withHandlers } from '
  *     ({dataSource:dataSource.cloneWithRowsAndSections(items)}))
  * )*/
 const EnhancedListView = compose(
-  //withItems,
+  // withItems,
   /* withHandlers({
    *   onScroll: props => e => console.log("foo:",e.nativeEvent.contentOffset.y)
    * }),*/
@@ -168,8 +168,8 @@ class BookListView extends React.Component {
     });
   }
   render() {
-    this.sections = this.sections || {};//refs
-    console.log("this.props",this.props)
+    this.sections = this.sections || {};// refs
+    console.log('this.props', this.props);
     return (<EnhancedListView
       {...this.props}
       renderScrollComponent={props =>
@@ -179,7 +179,7 @@ class BookListView extends React.Component {
         />}
       renderSectionHeader={(sectionData, sectionID) =>
         <View
-          ref={c => {
+          ref={(c) => {
             this.sections[sectionID] = c;
           }}
         >
@@ -275,7 +275,7 @@ class BookListView0 extends React.Component {
       // TODO:move key to listview with filter
       // SmartListView
       <ListViewWithFilter
-        ref={(listview) => this.listview = listview}
+        ref={listview => this.listview = listview}
         {...other}
         key={this.state.selectedSection}
         selectedSection={this.state.selectedSection}
@@ -284,7 +284,7 @@ class BookListView0 extends React.Component {
         contentOffset={this.state.contentOffset || { x: 0, y: 0 }}
         renderSectionHeader={(sectionData, sectionID) => {
           return (
-              <View ref={(sec) => this.sec[sectionID] = sec}>
+              <View ref={sec => this.sec[sectionID] = sec}>
                         {renderSectionHeader(sectionData, sectionID)}
               </View>
             );

@@ -44,7 +44,7 @@ function model(actions) {
   const navigationState$ =
     Rx.Observable
       .merge(
-        actions.goToBookView$.map((e) =>
+        actions.goToBookView$.map(e =>
           ({ type: 'push', key: 'Book Detail', data: e })),
         actions.back$,
       )
@@ -84,7 +84,7 @@ function model(actions) {
     }
     function filterBooks(books, bucket) {
       let ret = {};
-      let booksInBucket = books.filter((book) => book.bucket === bucket);
+      let booksInBucket = books.filter(book => book.bucket === bucket);
       ret[bucket] = booksToObject(booksInBucket);
       ret[`${bucket}_end`] = {};
       return ret;
@@ -155,7 +155,7 @@ function model(actions) {
                               [selectedSection, `${selectedSection}_end`] :
                               Object.keys(items).filter(i => i !== 'sections');
                      })
-      //.do(i => console.log('secIDs?:', i))
+      // .do(i => console.log('secIDs?:', i))
       .shareReplay();
 
   const limit = 2;
@@ -166,41 +166,41 @@ function model(actions) {
         sectionIDs$,
         books$,
         (selectedSection, sectionIDs, items) => {
-          return sectionIDs.map(sectionID => {
+          return sectionIDs.map((sectionID) => {
             return selectedSection ?
                    Object.keys(items[sectionID]) :
                    Object.keys(items[sectionID]).slice(0, limit || undefined);
           });
-        })
+        });
   const dataSource$ =
     Rx.Observable.combineLatest(
       books$,
       actions.selectedSection$,
       booksLoadingState$,
-      (books,selectedSection,booksLoadingState) => {
+      (books, selectedSection, booksLoadingState) => {
         const sections = {
-          search:      {close:selectedSection,loadingState:booksLoadingState},
-          search_end:  {count:Object.keys(books.search).length,
-                        section:"search"},
-          liked:       {close:selectedSection,loadingState:booksLoadingState},
-          liked_end:   {count:Object.keys(books.liked).length,section:"like"},
-          borrowed:    {close:selectedSection,loadingState:booksLoadingState},
-          borrowed_end:{count:Object.keys(books.borrowed).length,
-                        section:"borrowed"},
-          done:        {close:selectedSection,loadingState:booksLoadingState},
-          done_end:    {count:Object.keys(books.done).length,section:"done"}
+          search: { close: selectedSection, loadingState: booksLoadingState },
+          search_end: { count: Object.keys(books.search).length,
+                        section: 'search' },
+          liked: { close: selectedSection, loadingState: booksLoadingState },
+          liked_end: { count: Object.keys(books.liked).length, section: 'like' },
+          borrowed: { close: selectedSection, loadingState: booksLoadingState },
+          borrowed_end: { count: Object.keys(books.borrowed).length,
+                        section: 'borrowed' },
+          done: { close: selectedSection, loadingState: booksLoadingState },
+          done_end: { count: Object.keys(books.done).length, section: 'done' }
         };
         const sectionIdentities =
           selectedSection ?
           [selectedSection, `${selectedSection}_end`] :
           Object.keys(books);
         const rowIdentities =
-          sectionIdentities.map((sectionID) =>{
+          sectionIdentities.map((sectionID) => {
             return selectedSection ?
                    Object.keys(books[sectionID]) :
-                   Object.keys(books[sectionID]).slice(0, limit || undefined)
-          })
-        //Object.keys(items).filter(i => i !== 'sections');
+                   Object.keys(books[sectionID]).slice(0, limit || undefined);
+          });
+        // Object.keys(items).filter(i => i !== 'sections');
         return ({
           dataBlob: { ...books, sections },
           sectionIdentities,
@@ -208,19 +208,19 @@ function model(actions) {
         });
       })
       .scan(
-        (datasource, {dataBlob, sectionIdentities, rowIdentities}) => {
+        (datasource, { dataBlob, sectionIdentities, rowIdentities }) => {
           return datasource.cloneWithRowsAndSections(
-            dataBlob, sectionIdentities, rowIdentities)
-        },new ListView.DataSource({
+            dataBlob, sectionIdentities, rowIdentities);
+        }, new ListView.DataSource({
           rowHasChanged: (r1, r2) => r1 !== r2,
           sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
           getSectionHeaderData: (dataBlob, sectionID) =>
             dataBlob.sections[sectionID]
         }))
-      .do(i=>console.log("datasource:",i))
-      //.subscribe()
+      .do(i => console.log('datasource:', i));
+      // .subscribe()
 
-      //.do(i => console.log('rowIDs?:', i));
+      // .do(i => console.log('rowIDs?:', i));
   // FIXME:bug with select done
   // Maybe scroll position keeped when transition
       /* const rowIDs =

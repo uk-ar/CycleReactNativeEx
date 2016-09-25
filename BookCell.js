@@ -14,22 +14,24 @@ const {
   Text,
   View,
   Image,
+  Animated,
   Platform,
   StyleSheet,
   PixelRatio,
+  TouchableHighlight,
 } = ReactNative;
-//jest bug
+// jest bug
 import Touchable from '@cycle/react-native/src/Touchable';
-//const Touchable = require('@cycle/react-native/src/Touchable');
-//const Touchable = require('@cycle/react-native/lib/Touchable');
-//import Touchable from '@cycle/react-native/lib/Touchable';
+// const Touchable = require('@cycle/react-native/src/Touchable');
+// const Touchable = require('@cycle/react-native/lib/Touchable');
+// import Touchable from '@cycle/react-native/lib/Touchable';
 
 const Dimensions = require('Dimensions');
 const {
   width,
 } = Dimensions.get('window');
 
-const { SwipeableRow2,SwipeableButtons2 } = require('./SwipeableRow');
+const { SwipeableRow2, SwipeableButtons2 } = require('./SwipeableRow');
 
 function LeftButton({ icon, text, style, backgroundColor, ...props }) {
   // console.log("props:",icon, text, style, backgroundColor, props)
@@ -97,7 +99,7 @@ function LibraryStatus({ libraryStatus = {}, ...props }) {
   }
   // http://www.google.com/design/spec/style/color.html#color-color-palette
   if (!text) {
-    //{!text && ActivityIndicator}
+    // {!text && ActivityIndicator}
     return (
       <View style={[styles.row]}>
         <Text>
@@ -141,7 +143,7 @@ function getButtons(bucket, isbn) {
   const leftButtons = [
     <LeftButton
       close={false}
-      {...itemsInfo['liked']}
+      {...itemsInfo.liked}
       {...likedButton}
       text={null}
       backgroundColor={materialColor.grey[300]}
@@ -153,7 +155,7 @@ function getButtons(bucket, isbn) {
       onRelease={() => {
         console.log('like'); func(isbn, 'liked');
       }}
-      {...itemsInfo['liked']}
+      {...itemsInfo.liked}
       {...likedButton}
       style={{ width: width / 2 }}
     />, // light blue "#03A9F4"
@@ -162,7 +164,7 @@ function getButtons(bucket, isbn) {
       onRelease={() => func(isbn, 'borrowed')}
       close
       target="borrowed"
-      {...itemsInfo['borrowed']}
+      {...itemsInfo.borrowed}
       {...borrowedButton}
       style={{ width }}
     />, //green
@@ -171,7 +173,7 @@ function getButtons(bucket, isbn) {
   const rightButtons = [
     <RightButton
       close={false}
-      {...itemsInfo['done']}
+      {...itemsInfo.done}
       {...doneButton}
       backgroundColor={materialColor.grey[300]}
       text={null}
@@ -180,7 +182,7 @@ function getButtons(bucket, isbn) {
       onRelease={() => func(isbn, 'done')}
       close
       target="done"
-      {...itemsInfo['done']}
+      {...itemsInfo.done}
       {...doneButton}
       style={{ justifyContent: 'flex-end' }}
     />, //amber
@@ -200,7 +202,7 @@ function getButtons(bucket, isbn) {
 
 function BookCell({ book, ...props }) {
   let TouchableElement = Touchable.TouchableHighlight;
-  //(Platform.OS === 'android') &&
+  // (Platform.OS === 'android') &&
   if (Platform.OS === 'android') {
     TouchableElement = Touchable.TouchableNativeFeedback;
      // BUG:TouchableNativeFeedback TouchableOpacity TouchableWithoutFeedback not support style
@@ -208,10 +210,10 @@ function BookCell({ book, ...props }) {
 
   return (
      <View {...props}>
-    <TouchableElement
-      selector="cell"
-      payload={book}
-    >
+       {/* <TouchableElement
+       selector="cell"
+       payload={book}
+       > */}
     <View style={styles.row}>
           <Image
             source={{ uri: book.thumbnail || undefined
@@ -250,27 +252,56 @@ function BookCell({ book, ...props }) {
             }} />
           </View>
         </View>
-      </TouchableElement>
+        {/* </TouchableElement> */}
     </View>);
 }
-
-//function BookRow({ bucket, book, onRelease, style }) {
-class BookRow extends React.Component {
-  componentWillMount(){
-    console.log("willmount",this,this.props.book)
+import { Closeable, Closeable2 } from './Closeable';
+import { AnimView } from './AnimView';
+// function BookRow({ bucket, book, onRelease, style }) {
+class BookRow0 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      close: true,
+      bounceValue: new Animated.Value(0),
+      props:{style:{height:0.1},
+             anim: {delay:5000}}
+    };
   }
-  //class style because of ref to leftActions
-  close(){
-    console.log("close")
-    return new Promise((resolve)=>
-      setTimeout(()=> {
-        console.log("promise done")
-        resolve("resolve");
+  componentDidMount() {
+    //console.log('didmount', this, this.props.book);
+        //this.state.bounceValue.setValue(1.5);     // Start large
+    Animated.timing(                          // Base: spring, decay, timing
+      this.state.bounceValue,                 // Animate `bounceValue`
+      {
+        toValue: 1,                         // Animate to smaller size
+        duration: 5000,                          // Bouncier spring
+                                              }
+    ).start();
+    /* this.refs.outer.open().then(
+     *   this.setState({close:false})
+     * )*/
+    console.log("th:",this)
+    //this.onMount(()=>console.log("onMount"))
+    /* this.setState(
+     *   {props:{style:{height:80},
+     *           anim: {delay:2000}}})*/
+    //this.anim.animateTo({height:80})
+    //console.log("ta:",this.anim)
+    //this.setState({close:!this.state.close})
+  }
+  // class style because of ref to leftActions
+  close() {
+    console.log('close');
+    return new Promise(resolve =>
+      setTimeout(() => {
+        console.log('promise done');
+        resolve('resolve');
       }, 5000)
-    )
+    );
   }
-  render(){
-    const { bucket, book, onRelease, style } = this.props
+  render() {
+    const { bucket, book, onRelease, style } = this.props;
   // There is 3 type of close behavior
   // animated left only
   // animated right and vertical close permanently
@@ -280,39 +311,77 @@ class BookRow extends React.Component {
   // skip close behavior
   // (book,bucket)=>closeanimate.start(onRelease)
   // onRelease is cycle:touchable element
-  const { leftButtons, rightButtons } = getButtons(bucket, book);
-  return (
+    const { leftButtons, rightButtons } = getButtons(bucket, book);
+    return (
     // CloseableCompo
     // need ref & React.cloneElement?
     // onSwipeStart responder move
     // onSwipeEnd responder end
-    // onOpen responder end(not closed)
-    <SwipeableRow2
+      // onOpen responder end(not closed)
+      /* style={{
+         opacity:this.state.bounceValue,
+         height: this.state.close ? 50 : 80
+         }}
+         onLayout={c=>console.log('lay', this, this.props.book)}
+         {...this.state.props}
+         {c => {
+         this.anim = c;
+         console.log("this.anim:",this.anim)
+         //this.anim.animateTo({height:80})
+         }}
+         <Closeable2
+         direction="vertical"
+         style={{ overflow: 'hidden'}}
+         close={false}
+         ref="outer"
+         >
+      */
+      <TouchableHighlight
+        onPress={()=>{
+            console.log(this)
+            this.refs.anim.animateTo({height:80})
+            //this.setState({close:!this.state.close})
+            console.log("mypress")}}
+      >
+        <AnimView
+          ref={c => {
+              console.log('ref:', this, this.props.book);
+              this.anim = c}}
+          style={{
+            opacity:this.state.bounceValue,
+            height: this.state.close ? 50 : 80
+          }}
+      >
+        <SwipeableRow2
+          ref={
+            //c=>console.log('ref:', this, this.props.book)
+            null
+              }
       onSwipeStart={() => console.log('start')}
       onSwipeEnd={() => console.log('end')}
       onOpen={() => console.log('open')}
-      onRelease={(positiveSwipe)=> {
-          //this.refs.leftButtons.state
-          console.log("zzz",
+      onRelease={(positiveSwipe) => {
+          // this.refs.leftButtons.state
+        console.log('zzz',
                       this.leftActions.state.index,
-                      this.leftActions.getTarget())
+                      this.leftActions.getTarget());
           /* this.refs.leftButtons.release().then(()=>
           this.props.onRelease())
           */
-          //console.log("zzz",this.leftActions.state.index)
-          if (positiveSwipe){
-            this.leftActions.release().then(()=>
-              onRelease(book,this.leftActions.getTarget(),this)
+          // console.log("zzz",this.leftActions.state.index)
+        if (positiveSwipe) {
+          this.leftActions.release().then(() =>
+              onRelease(book, this.leftActions.getTarget(), this)
             );
-          }
-        }}
-      renderLeftActions={(width)=>
+        }
+      }}
+      renderLeftActions={width =>
         <SwipeableButtons2
-          ref={(c)=> this.leftActions = c}
+          ref={c => this.leftActions = c}
           direction="left"
           width={width}
           buttons={leftButtons}
-                />}
+        />}
       rightButtons={rightButtons}
     >
       <BookCell
@@ -320,9 +389,57 @@ class BookRow extends React.Component {
         style={style}
       />
     </SwipeableRow2>
-  );
+      </AnimView>
+      </TouchableHighlight>
+    );//
   }
 }
 
-module.exports = { BookRow, LibraryStatus,BookCell };
+class BookRow extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      close: true,
+    };
+  }
+  componentDidMount() {
+    console.log("th:",this)
+    //this.anim.animate({height:0.1},{height:80})
+  }
+  render() {
+    const { bucket, book, onRelease, style } = this.props;
+    const { leftButtons, rightButtons } = getButtons(bucket, book);
+    return (
+      <AnimView
+        ref={c => {
+            console.log('ref:', this, this.props.book);
+            this.anim = c;
+            //this.anim.animateTo({height:80})
+          }}
+        style={{
+          opacity:this.state.bounceValue,
+          //height: this.state.close ? 50 : 80
+          height: 0.1
+        }}
+      >
+        <TouchableHighlight
+        onPress={()=>{
+            console.log(this)
+            //this.anim.animateTo({height:80})
+            //this.setState({close:!this.state.close})
+            console.log("mypress")}}
+      >
+          <View>
+          <BookCell
+            book={book}
+            style={style}
+          />
+          </View>
+                </TouchableHighlight>
+      </AnimView>
+    );//
+  }
+}
+
+module.exports = { BookRow, LibraryStatus, BookCell };
 // module.exports = { BookCell, SwipeableRow };

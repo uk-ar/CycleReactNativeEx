@@ -15,7 +15,7 @@ class AnimView extends React.Component {
     this.prevStyle = this.state.animatedStyle;
   }
   componentWillReceiveProps(nextProps) {
-    //console.log('willReceiveProps', nextProps);
+    // console.log('willReceiveProps', nextProps);
     this.animateTo(nextProps.style);
   }
   animate(fromValues, toValues) {
@@ -42,12 +42,12 @@ class AnimView extends React.Component {
              key == 'color')
             && current[key] !== next[key]
         ) {
-          //console.log("an",current[key],next[key]);
+          // console.log("an",current[key],next[key]);
           animatedStyle[key] = this.counter.interpolate({
             inputRange: [0, 1],
             outputRange: [current[key], next[key]],
           });
-        } else if (key === 'transform' && current['transform']) {
+        } else if (key === 'transform' && current.transform) {
           // current next
           // transform is ordered array!!
           /* console.log("ab",current['transform'],next['transform']);
@@ -70,13 +70,14 @@ class AnimView extends React.Component {
 
     this.prevStyle = next;
     return new Promise((resolve, reject) => {
-      //resolve("done");
+      // resolve("done");
       this.setState({ animatedStyle }, () => {
         Animated.timing(
           this.counter,
           { toValue: 1,
             duration: (this.props.anim && this.props.anim.duration)
-                   || 360, //180,
+                   || 500, //180,
+            delay: (this.props.anim && this.props.anim.delay) || 0
             //duration: 180,
           }
         ).start(() => {
@@ -84,6 +85,10 @@ class AnimView extends React.Component {
         });
       });
     });
+  }
+  setNativeProps(props){
+    //for Touchable
+    this.refs.root.setNativeProps(props)
   }
   render() {
     // console.log("rend anim,view1,view2",this.state.animatedStyle,this.props.style)

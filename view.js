@@ -80,7 +80,7 @@ function ItemsFooter({ payload, count }) {
   );
 }
 
-import { Closeable,Closeable2 } from './Closeable';
+import { Closeable, Closeable2 } from './Closeable';
 import { AnimView } from './AnimView';
 class Header extends React.Component {
   constructor(props) {
@@ -96,6 +96,7 @@ class Header extends React.Component {
     //            close={this.state.toggle}
     //            close={true}
     //            close={!this.state.toggle}
+    //          close={!this.state.toggle}
     return (
       <AnimView
         style={{ padding: 10, opacity: this.state.opacity }}
@@ -105,7 +106,7 @@ class Header extends React.Component {
           style={{ justifyContent: 'center',
                    backgroundColor: 'red' }}
           direction="vertical"
-          close={!this.state.toggle}
+          close
           ref="close"
         >
           <AnimView
@@ -148,16 +149,16 @@ class Header extends React.Component {
         <Text
           style={{ color: 'white' }}
           onPress={() => {
-              this.refs.view2.animate(
-                {
-                  height: 10,
-                  backgroundColor: 'black',
-                },
-                {
-                  height: 10,
-                  backgroundColor: 'orange',
-                },);
-            }}
+            this.refs.view2.animate(
+              {
+                height: 10,
+                backgroundColor: 'black',
+              },
+              {
+                height: 10,
+                backgroundColor: 'orange',
+              },);
+          }}
         >
           {'animate'}
         </Text>
@@ -166,19 +167,19 @@ class Header extends React.Component {
           <Text
             style={{ color: 'white' }}
             onPress={() => {
-                console.log("refs",this.refs)
-                this.refs.view4.measure((x,y,width,height)=>
-                  console.log("view4:",width,height))
-                this.refs.view5.measure((x,y,width,height)=>
-                  console.log("view5:",width,height))
-                this.setState((prev, current) => ({ toggle: !prev.toggle }));
-                this.refs.close.toggle()
-                    .then(()=>
-                      console.log("toggled")
-                      //ToastAndroid.show('Toggled', ToastAndroid.SHORT)
+              console.log('refs', this.refs);
+              this.refs.view4.measure((x, y, width, height) =>
+                  console.log('view4:', width, height));
+              this.refs.view5.measure((x, y, width, height) =>
+                  console.log('view5:', width, height));
+              this.setState((prev, current) => ({ toggle: !prev.toggle }));
+              this.refs.close.toggle()
+                    .then(() =>
+                      console.log('toggled')
+                      // ToastAndroid.show('Toggled', ToastAndroid.SHORT)
                     );
                 // FIXME:why width is shurinked?
-              }}
+            }}
           >
             {'toggle'}
           </Text>
@@ -187,13 +188,13 @@ class Header extends React.Component {
   }
 }
 
-function SearchHeader({ loadingState, ...props}) {
-  //console.log('search',   loadingState);
+function SearchHeader({ loadingState, close, ...props }) {
+  // console.log('search',   loadingState);
   return (!close ? (
     <ItemsHeader
       {...props}
       section="search"
-     >
+    >
        <TextInput
          autoCapitalize="none"
          autoCorrect={false}
@@ -221,7 +222,7 @@ function SearchHeader({ loadingState, ...props}) {
 import { itemsInfo } from './common';
 function ItemsHeader({ section, children, style, close }) {
   if (!itemsInfo[section]) { return null; }
-  //const icon = (selectedSection === null) ? (
+  // const icon = (selectedSection === null) ? (
   const icon = !close ? (
     <FAIcon
       name={itemsInfo[section].icon}
@@ -258,7 +259,7 @@ function ItemsHeader({ section, children, style, close }) {
 Touchable.BookListView = Touchable.createCycleComponent(
   BookListView);
 
-function MainView({ items, sectionIDs, rowIDs,dataSource, booksLoadingState, selectedSection }) {
+function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, selectedSection }) {
   // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
   // TODO: transition to detail view
@@ -290,7 +291,9 @@ function MainView({ items, sectionIDs, rowIDs,dataSource, booksLoadingState, sel
       <Touchable.BookListView
         removeClippedSubviews={false}
         onContentSizeChange={(contentWidth, contentHeight) =>
-          console.log('change', contentWidth, contentHeight)}
+          //console.log('change', contentWidth, contentHeight)
+          null
+                            }
         selector="listview"
         dataSource={dataSource}
         ref={(c) => {
@@ -301,7 +304,7 @@ function MainView({ items, sectionIDs, rowIDs,dataSource, booksLoadingState, sel
         directionalLockEnabled
         enableEmptySections
         renderRow={(rowData, sectionID, rowID) => {
-          //console.log('row:', rowData, sectionID, rowID);
+          // console.log('row:', rowData, sectionID, rowID);
           return (
           <Touchable.BookRow
             key={rowID}
@@ -312,8 +315,8 @@ function MainView({ items, sectionIDs, rowIDs,dataSource, booksLoadingState, sel
           />);
         }}
         renderSectionFooter={(sectionData, sectionID) => {
-            console.log('footer', sectionData, sectionID);
-            const {section}=sectionData
+            //console.log('footer', sectionData, sectionID);
+          const { section } = sectionData;
           return (
             <ItemsFooter
               {...sectionData}
@@ -322,14 +325,14 @@ function MainView({ items, sectionIDs, rowIDs,dataSource, booksLoadingState, sel
             />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {
-            console.log('header', sectionData, sectionID);//,
-            //const {selectedSection, booksLoadingState} = sectionData;
-            return (sectionID === 'search') ? (
+            //console.log('header', sectionData, sectionID);// ,
+            // const {selectedSection, booksLoadingState} = sectionData;
+          return (sectionID === 'search') ? (
               <SearchHeader
                 {...sectionData}
               />) : (
                 <ItemsHeader
-                {...sectionData}
+                  {...sectionData}
                   section={sectionID}
                 />);
         }}

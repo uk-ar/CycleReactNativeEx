@@ -30,7 +30,7 @@ import {
 } from 'react-native';
 
 import Touchable from '@cycle/react-native/src/Touchable';
-Touchable['FAIcon'] = Touchable.createCycleComponent(
+Touchable.FAIcon = Touchable.createCycleComponent(
   FAIcon, Touchable.PRESS_ACTION_TYPES);
 
 const GiftedNavigator = React.createClass({

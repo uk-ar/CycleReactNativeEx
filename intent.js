@@ -46,14 +46,14 @@ realm.write(() => {
  *                           .sorted('modifyDate', true)// reverse sort
  *                           .map((i) => i);// convert result to array
  * */
-const initialBooks = mockbooks
+const initialBooks = mockbooks;
 
 function intent(RN, HTTP) {
   // Actions
   // mojibake シンプ Q思考
   const release$ = RN.select('bookcell')
                      .events('release')
-                     .do((...args)=>console.log("foo:",...args));
+                     .do((...args) => console.log('foo:', ...args));
 
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')
@@ -105,7 +105,7 @@ function intent(RN, HTTP) {
 
   function createBooksStatusStream(books$, category) {
     function mergeBooksStatus(books, booksStatus) {
-      return books.map(book => {
+      return books.map((book) => {
         // console.log("book:",book,booksStatus)
         let libraryStatus;
         if ((booksStatus[book.isbn] !== undefined) && // not yet retrieve
@@ -154,13 +154,13 @@ function intent(RN, HTTP) {
     // .flatMap(result => result.continue === 1 ?
     //                 [result, Observable.throw(error)] : [result])
         .flatMap(result => [{ ...result, continue: 0 }, result])
-        .map(result => {
+        .map((result) => {
           if (result.continue === 1) {
             throw result;
           }
           return result;
         })
-        .retryWhen((errors) =>
+        .retryWhen(errors =>
           errors.delay(2000)
         )
         .distinctUntilChanged(i => JSON.stringify(i))
@@ -189,8 +189,8 @@ function intent(RN, HTTP) {
 
   const changeBucket$ =
     release$
-      .do((i) => console.log('release:', i))
-      .filter(([book, bucket, bookRow])=> bucket !== null)
+      .do(i => console.log('release:', i))
+      .filter(([book, bucket, bookRow]) => bucket !== null)
   // TODO:change to isbn
   /* .map(([book, bucket]) => (
    *   { type: 'replace',
@@ -205,8 +205,8 @@ function intent(RN, HTTP) {
   /* .flatMap(([book, bucket, bookRow]) =>
    *   bookRow.close().then(()=>[book, bucket, bookRow])
    *   )*/
-      .map(([book, bucket, bookRow]) =>{
-        return ({ type: 'replace', book, bucket, bookRow})
+      .map(([book, bucket, bookRow]) => {
+        return ({ type: 'replace', book, bucket, bookRow });
       })
   /* .flatMap(([book, bucket, bookRow]) =>
    *   [{ type: 'remove', book, bookRow},
@@ -223,7 +223,7 @@ function intent(RN, HTTP) {
   const savedBooks$ =
     changeBucket$
       .startWith(initialBooks)
-      .scan((books, { type, book, bucket, bookRow}) => {
+      .scan((books, { type, book, bucket, bookRow }) => {
         console.log('type:', type, book, bucket, bookRow);
         switch (type) {
             /* case 'remove':
@@ -234,9 +234,9 @@ function intent(RN, HTTP) {
           case 'replace':
             /* return [book].concat(
              *   books.filter((elem) => elem.isbn.toString() !== book.isbn.toString()));*/
-            return [{...book,bucket,modifyDate: new Date(Date.now())}]
-              .concat(books.filter((elem) =>
-                elem.isbn.toString() !== book.isbn.toString()))
+            return [{ ...book, bucket, modifyDate: new Date(Date.now()) }]
+              .concat(books.filter(elem =>
+                elem.isbn.toString() !== book.isbn.toString()));
           default:
             return books;
         }
@@ -281,7 +281,7 @@ function intent(RN, HTTP) {
                 .combineLatest(
                   savedBooks$.map(arrayToObject),
                   (searchedBooks, savedBooks) =>
-                    searchedBooks.map((book) =>
+                    searchedBooks.map(book =>
                       savedBooks[book.isbn] || book))
               // booksResponse$
                 .do(i => console.log('in:', i))
@@ -352,7 +352,7 @@ function intent(RN, HTTP) {
           .filter(i => i !== null)
           .distinctUntilChanged()
           .do(log('my'))
-        //my() to payload or func param
+        // my() to payload or func param
       )
       // .do(i => console.log('listview:my:', i))
       .flatMap(([section, inst]) =>
@@ -396,16 +396,14 @@ function intent(RN, HTTP) {
                     .events('press')
                     .startWith(false)
                     .scan((current, event) => !current)
-                    .do(i => console.log('filter change:%O', i))
-    ,
+                    .do(i => console.log('filter change:%O', i)),
     sortState$: RN.select('sort')
                   .events('press')
                   .do(i => console.log('sort change:%O', i))
       // actions.sortState$
                   .startWith(false)
                   .scan((current, event) => !current)
-                  .do(i => console.log('sort:%O', i))
-    ,
+                  .do(i => console.log('sort:%O', i)),
     // booksResponse$,
     // booksStatusResponse$,
     searchedBooksStatus$,
