@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "./node_modules/react-native/packager/packager.sh start --reset-cache",
-    "postinstall": "cd node_modules/@cycle/react-native && npm run compile-lib",
+    "postinstall": "cd node_modules/@cycle/react-native && npm run compile-lib && cd - && find ./node_modules/@cycle -type f| grep /.babelrc | xargs rm",
     "test":"jest --verbose",
     "watch":"jest --verbose --watch"
   },

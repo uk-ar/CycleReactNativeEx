@@ -235,6 +235,7 @@ function intent(RN, HTTP) {
             /* return [book].concat(
              *   books.filter((elem) => elem.isbn.toString() !== book.isbn.toString()));*/
             return [{ ...book, bucket, modifyDate: new Date(Date.now()) }]
+            //return []
               .concat(books.filter(elem =>
                 elem.isbn.toString() !== book.isbn.toString()));
           default:
@@ -246,7 +247,7 @@ function intent(RN, HTTP) {
   savedBooks$.do((books) => {
     realm.write(() => {
       books.forEach((book) => {
-        realm.create('Book', book, true);
+        //realm.create('Book', book, true);
       });
     });
   }).subscribe();
@@ -283,6 +284,7 @@ function intent(RN, HTTP) {
                   (searchedBooks, savedBooks) =>
                     searchedBooks.map(book =>
                       savedBooks[book.isbn] || book))
+              // reuse books status
               // booksResponse$
                 .do(i => console.log('in:', i))
                 .do(i => console.log('booksres0:', i))
@@ -351,13 +353,13 @@ function intent(RN, HTTP) {
           .my()
           .filter(i => i !== null)
           .distinctUntilChanged()
-          .do(log('my'))
+          //.do(log('my'))
         // my() to payload or func param
       )
       // .do(i => console.log('listview:my:', i))
-      .flatMap(([section, inst]) =>
-        // Rx.Observable.fromPromise(inst.scrollTo({x:0,y:100,animated:true})))
-        Rx.Observable.fromPromise(inst.scrollToSectionHeader(section)))
+  /* .flatMap(([section, inst]) =>
+   *   // Rx.Observable.fromPromise(inst.scrollTo({x:0,y:100,animated:true})))
+   *   Rx.Observable.fromPromise(inst.scrollToSectionHeader(section)))*/
       .do(log('sec?'));
       // .do(i => console.log('prom result', i))
       // .distinctUntilChanged()

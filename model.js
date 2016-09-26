@@ -4,6 +4,7 @@ import NavigationStateUtils from 'NavigationStateUtils';
 import {
   UIManager,
   ListView,
+  LayoutAnimation
 } from 'react-native';
 
 import {
@@ -95,16 +96,6 @@ function model(actions) {
       ...filterBooks(savedBooks, 'liked'),
       ...filterBooks(savedBooks, 'borrowed'),
       ...filterBooks(savedBooks, 'done'),
-      sections: {
-        search: null,
-        search_end: null,
-        liked: null,
-        liked_end: null,
-        borrowed: null,
-        borrowed_end: null,
-        done: null,
-        done_end: null,
-      }
     };
   }
 
@@ -119,59 +110,15 @@ function model(actions) {
   // update with animation when selectedSection$ changed
   const books$ =
     Rx.Observable.combineLatest(
-      searchedBooks$,
-      actions.savedBooksStatus$,
+      searchedBooks$.do(i=>console.log("searched books")),
+      actions.savedBooksStatus$.do(i=>console.log("saved books")),
       genItems)
   /* .do(i=>console.log("items:",JSON.stringify(i)))
    * .distinctUntilChanged(x => JSON.stringify(x),(a,b)=>a!==b) */
       .shareReplay();
 
-  const items$ =
-    Rx.Observable.combineLatest(
-      books$,
-      actions.selectedSection$,
-      booksLoadingState$,
-      (books, selectedSection, booksLoadingState) => {
-        const sections = {
-          search: [selectedSection, booksLoadingState],
-          search_end: [selectedSection, booksLoadingState],
-          liked: [selectedSection, booksLoadingState],
-          liked_end: [selectedSection, booksLoadingState],
-          borrowed: [selectedSection, booksLoadingState],
-          borrowed_end: [selectedSection, booksLoadingState],
-          done: [selectedSection, booksLoadingState],
-          done_end: [selectedSection, booksLoadingState]
-        };
-        return ({ ...books, sections });
-      });
-
-  // update with animation when selectedSection$ changed
-  const sectionIDs$ =
-    Rx.Observable
-      .combineLatest(actions.selectedSection$,
-                     books$,
-                     (selectedSection, items) => {
-                       return selectedSection ?
-                              [selectedSection, `${selectedSection}_end`] :
-                              Object.keys(items).filter(i => i !== 'sections');
-                     })
-      // .do(i => console.log('secIDs?:', i))
-      .shareReplay();
-
   const limit = 2;
-  const rowIDs$ =
-    Rx.Observable
-      .combineLatest(
-        actions.selectedSection$,
-        sectionIDs$,
-        books$,
-        (selectedSection, sectionIDs, items) => {
-          return sectionIDs.map((sectionID) => {
-            return selectedSection ?
-                   Object.keys(items[sectionID]) :
-                   Object.keys(items[sectionID]).slice(0, limit || undefined);
-          });
-        });
+
   const dataSource$ =
     Rx.Observable.combineLatest(
       books$,
@@ -243,8 +190,14 @@ function model(actions) {
        * sectionIDs$,
        * rowIDs$,*/
       dataSource$,
-      actions.selectedSection$,
-      // actions.selectedSection$.do(i => LayoutAnimation.easeInEaseOut()),
+      /* dataSource$.do(i =>
+       *   LayoutAnimation.configureNext(
+       *     LayoutAnimation
+       *       .create(3000,
+       *               LayoutAnimation.Types.easeInEaseOut,
+       *               LayoutAnimation.Properties.opacity))),*/
+      //actions.selectedSection$,
+      actions.selectedSection$.do(i => LayoutAnimation.easeInEaseOut()),
       /* actions.selectedSection$.do(i =>
        *   LayoutAnimation.configureNext(
        *     LayoutAnimation

@@ -76,7 +76,7 @@ class AnimView extends React.Component {
           this.counter,
           { toValue: 1,
             duration: (this.props.anim && this.props.anim.duration)
-                   || 500, //180,
+                   || 180,//500, //180,
             delay: (this.props.anim && this.props.anim.delay) || 0
             //duration: 180,
           }
