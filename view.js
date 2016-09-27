@@ -124,7 +124,7 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
         dataSource={dataSource}
         ref={(c) => {
             // console.log("ref:",c);
-            // this.listview=c
+            this.listview = c
             // c.scrollTo({x:0,y:100,animated:false})
         }}
         directionalLockEnabled
@@ -142,25 +142,35 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
         }}
         renderSectionFooter={(sectionData, sectionID) => {
             //console.log('footer', sectionData, sectionID);
-          const { section } = sectionData;
-          return (
-            <ItemsFooter
+            const { section,count } = sectionData;
+            return (
+              <ItemsFooter
               {...sectionData}
               key={selectedSection}
-              payload={section}
+              payload={[section,this.listview]}
             />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {
-            //console.log('header', sectionData, sectionID);// ,
-            // const {selectedSection, booksLoadingState} = sectionData;
+            console.log('header', sectionData, sectionID,this.listview,this);// ,
+            const {close, loadingState} = sectionData;
+            //close or not
           return (sectionID === 'search') ? (
               <SearchHeader
                 {...sectionData}
-              />) : (
-                <ItemsHeader
-                  {...sectionData}
-                  section={sectionID}
-                />);
+                payload={[sectionID,this.listview]}
+                        />) : (
+                          <Text
+                            onPress={() => {
+                                console.log('listview', this.listview);
+                              }}>
+                            bar
+                          </Text>
+                );
+            /* <ItemsHeader
+            {...sectionData}
+            section={sectionID}
+            payload={[sectionID,this.listview]}
+            /> */
         }}
         style={{
           paddingHorizontal: 3,

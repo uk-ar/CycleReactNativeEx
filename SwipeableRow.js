@@ -2,16 +2,16 @@
 import React from 'react';
 
 import {
-  StyleSheet,
   View,
   Animated,
   PanResponder,
   Dimensions,
+  Text,
 } from 'react-native';
 
 const _ = require('lodash');
 import { AnimView } from './AnimView';
-
+import { styles } from './styles';
 // const Dimensions = require('Dimensions');
 const {
   width,
@@ -148,6 +148,8 @@ class MeasureableView extends React.Component {
   }
 }
 
+
+
 const SwipeableButtons2 = React.createClass({
   getInitialState() {
     return {
@@ -260,7 +262,93 @@ function calcIndex(value, thresholds) {
   });
 }
 
-// scroll view base
+//const horizontalPanResponder =
+
+
+//https://github.com/facebook/react-native/blob/master/Libraries/Experimental/SwipeableRow/SwipeableListView.js
+class SwipeableRow3 extends React.Component {
+  /* onSwipeEnd={() => this._setListViewScrollable(true)}
+   * onSwipeStart={() => this._setListViewScrollable(false)}*/
+  constructor(props) {
+    super(props);
+    this.state = {
+      positiveSwipe: true,
+    };
+
+    function isSwipeHorizontal(evt, gestureState) {
+      return Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
+          && Math.abs(gestureState.dx) > 10;
+    }
+    this._panX = new Animated.Value(0.01);
+    this._panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => false,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
+      onMoveShouldSetPanResponder: isSwipeHorizontal,
+      onMoveShouldSetPanResponderCapture: isSwipeHorizontal,
+
+      onPanResponderGrant:(evt, gestureState) =>{
+        this.props.onSwipeStart && this.props.onSwipeStart(evt, gestureState)},
+      onPanResponderMove: (evt, gestureState) =>{
+        this._panX.setValue(gestureState.dx);
+        this.props.onSwipe && this.props.onSwipe(evt, gestureState)},
+      onPanResponderRelease: (evt, gestureState) =>{
+        this.props.onSwipeEnd && this.props.onSwipeEnd(evt, gestureState)}
+    });
+    this._panX.addListener(({ value }) => {
+      if (0 < value && this.state.positiveSwipe != true) {
+        this.setState({ positiveSwipe: true });
+      } else if (value <= 0 && this.state.positiveSwipe != false) {
+        this.setState({ positiveSwipe: false });
+      }
+    });
+  }
+  render(){
+    const { onSwipeStart, onSwipe, onSwipeEnd,
+            children, style, ...props } = this.props
+    return (
+      <View
+        {...this._panResponder.panHandlers}
+        {...props}
+        style={[style,{
+            flexDirection: 'row',
+            justifyContent: this.state.positiveSwipe ?
+                            'flex-start' : 'flex-end',
+            overflow: 'hidden',
+            //TODO:vertical stretch will fixed in RN 0.28?
+            //https://github.com/facebook/react-native/commit/d95757037aef3fbd8bb9064e667ea4fea9e5abc1
+            //alignItems:"stretch"
+          }]}
+      >
+        {this.props.renderLeftActions(this._panX)}
+        {children}
+        {this.props.renderRightActions(Animated.multiply(this._panX, -1))}
+      </View>
+    )
+  }
+}
+class SwipeableActions extends React.Component {
+  /* onSwipeEnd={() => this._setListViewScrollable(true)}
+   * onSwipeStart={() => this._setListViewScrollable(false)}*/
+  constructor(props) {
+    super(props);
+    /* this.state = {
+     *   positiveSwipe: true,
+     * };*/
+  }
+  render(){
+    const { actions, ...props } = this.props
+    return (
+      <Animated.View
+        {...props}
+      >
+        {actions.map(action =>
+          React.isValidElement(action) ?
+                            action : <Text>{action}</Text>)}
+      </Animated.View>
+    )
+  }
+}
+//scroll view base
 // ref: http://browniefed.com/blog/react-native-animated-listview-row-swipe/
 const SwipeableRow2 = React.createClass({
   getInitialState() {
@@ -327,7 +415,6 @@ const SwipeableRow2 = React.createClass({
 
   render() {
     // console.log('sr2:');
-    const leftActions = this.props.renderLeftActions(this._panX);
     /* React.cloneElement(,
      *                      {ref:})*/
     return (
@@ -360,18 +447,4 @@ const SwipeableRow2 = React.createClass({
   },
 });
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-  },
-  outerScroll: {
-    flex: 1,
-    flexDirection: 'column',
-  },
-  row: {
-    flex: 1,
-  },
-});
-
-module.exports = { SwipeableButtons2, SwipeableRow2, AnimView, MeasureableView };
+module.exports = { SwipeableButtons2, SwipeableRow2,SwipeableRow3, AnimView, MeasureableView,SwipeableActions };

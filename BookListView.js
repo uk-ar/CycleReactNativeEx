@@ -136,6 +136,7 @@ class BookListView1 extends React.Component {
 }
 
 class BookListView extends React.Component {
+  //class because refs & methods
   scrollTo(...args) {
     return new Promise((resolve, reject) => {
       this.scrollview.scrollTo(...args);

@@ -331,20 +331,37 @@ function intent(RN, HTTP) {
 
   // release$.do((i)=>console.log("rel$")).subscribe()
   const changeSection$ =
-    RN.select('section')
-      .events('press')
-      .merge(RN.select('close')
-               .events('press').map(() => null))
-      // .do(i => console.log('section selected0:%O', i,this))
-      .distinctUntilChanged()
-      .shareReplay();
-
+    Rx.Observable
+      .merge(
+        RN.select('section')
+          .events('press')//section,this.listview
+        // .do(i => console.log('section selected0:%O', i,this))
+          .shareReplay(),
+        RN.select('close')
+          .events('press').map(([_, listview]) => [null,listview])
+          .shareReplay()
+      )
+      .do(i=>console.log("bar",i))
+      .distinctUntilChanged(([section,listview])=>section)
+      .do(i=>console.log("foo",i))
+      .shareReplay()
+  
   const scrollListView$ =
     RN.select('listview')
       .events('scroll')
       .do(([e]) => console.log('scroll:', e.nativeEvent.contentOffset.y))
       .subscribe();
 
+  const openSection$ =
+    changeSection$
+      .filter(i => i !== null)// null->section
+      .shareReplay()
+
+  const closeSection$ =
+    changeSection$
+      .filter(i => i === null)// null->section
+      .shareReplay()
+  
   const scrollToSection$ =
     changeSection$
       .filter(i => i !== null)// null->section
@@ -367,12 +384,14 @@ function intent(RN, HTTP) {
   const selectedSection$ =
     Rx.Observable.merge(
       scrollToSection$.map(([section, y]) => section).do(log('toSec')),
-      changeSection$
-        .filter(i => i === null) // section->null
-        .do(log('toNull'))
+      RN.select('close')
+          .events('press').map(() => null)
+          .filter(i => i === null) // section->null
+          .do(log('toNull'))
     )
   // .distinctUntilChanged(x => x, (a,b) => a !== b )
       .distinctUntilChanged()
+
       .startWith(null)
       .do(i => console.log('section selected1:%O', i))
       .shareReplay();

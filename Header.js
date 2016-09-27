@@ -168,7 +168,7 @@ function SearchHeader({ loadingState, close, ...props }) {
 }
 
 import { itemsInfo } from './common';
-function ItemsHeader({ section, children, style, close }) {
+function ItemsHeader({payload, section, children, style, close }) {
   if (!itemsInfo[section]) { return null; }
   // const icon = (selectedSection === null) ? (
   const icon = !close ? (
@@ -194,7 +194,7 @@ function ItemsHeader({ section, children, style, close }) {
     <Touchable.TouchableElement
       selector="section"
       key={section}
-      payload={section}
+      payload={payload}
     >
       <View style={style || styles.sectionHeader}>
         {icon}

@@ -5,11 +5,12 @@
   "scripts": {
     "start": "./node_modules/react-native/packager/packager.sh start --reset-cache",
     "postinstall": "cd node_modules/@cycle/react-native && npm run compile-lib && cd - && find ./node_modules/@cycle -type f| grep /.babelrc | xargs rm",
-    "test":"jest --verbose",
-    "watch":"jest --verbose --watch"
+    "test": "jest --verbose",
+    "watch": "jest --verbose --watch",
+    "storybook": "storybook start -p 7007"
   },
   "jest": {
-    "timers":"fake",
+    "timers": "fake",
     "preset": "jest-react-native"
   },
   "dependencies": {
@@ -58,6 +59,7 @@
     "react-dom": "^15.3.2",
     "react-native-mock": "^0.2.6",
     "react-test-renderer": "^15.3.2",
-    "sinon": "^1.17.5"
+    "sinon": "^1.17.5",
+    "@kadira/react-native-storybook": "^2.0.0"
   }
 }
