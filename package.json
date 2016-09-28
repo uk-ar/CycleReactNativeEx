@@ -20,7 +20,7 @@
     "@cycle/rx-adapter": "^3.0.0",
     "@cycle/rx-run": "^7.0.1",
     "isbn": "^0.4.0",
-    "lodash": "^4.16.0",
+    "lodash": "^4.16.1",
     "material-colors": "^1.1.1",
     "react": "^15.3.2",
     "react-addons-transition-group": "^15.3.2",
