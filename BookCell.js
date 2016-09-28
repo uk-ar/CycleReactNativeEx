@@ -193,7 +193,7 @@ function getButtons(bucket, isbn) {
 //bucket,target->icon,text,backgroundColor,close,target
 function Action({ icon,text,backgroundColor,close,target, style,...props }) {
   //console.log("props:",icon, text, style, backgroundColor, props)
-  // backgroundColor,close,target are used from SwipeableButtons
+  // backgroundColor,close,target are used from SwipeableActions
   return (
     <View
       {...props}
@@ -201,7 +201,7 @@ function Action({ icon,text,backgroundColor,close,target, style,...props }) {
           flexDirection: 'row',
           alignItems: 'center',
           flex: 1, //vertical center
-          backgroundColor:backgroundColor,//for debug
+          //backgroundColor:backgroundColor,//for debug
         },style]}
     >
       <FAIcon

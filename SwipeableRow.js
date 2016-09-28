@@ -125,55 +125,27 @@ class MeasureableView extends React.Component {
     this.state = { layouted: false };
   }
   render() {
-    return this.state.layouted ? (
+    return (
+      this.state.layouted ?
       <View
         {...this.props}
       >
         {this.props.children}
-      </View>) : (
-        <View
-          {...this.props}
-          style={[this.props.style, { position: 'absolute' }]}
-          onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
-              if(!this.state.layouted){
-                this.props.onFirstLayout &&
-                this.props.onFirstLayout(
-                  { nativeEvent: { layout: { x, y, width, height } } });
-                this.setState({ layouted: true });
-              }
-            }}
-        >
-          {this.props.children}
-        </View>
-      );
-  }
-}
-
-class MeasureableView2 extends React.Component {
-  // TODO:position absolute
-  constructor(props) {
-    super(props);
-    this.state = { measured:false }
-    setTimeout(()=>
-      this.refs.root.measure((x,y,width,height)=>{
-        this.props.onFirstLayout(x,y,width,height)
-        this.setState({measured:true})
-      })
-    )
-    //this.props.onFirstLayout
-  }
-  render() {
-    const {style,props} = this.props
-    return (
+      </View> :
       <View
-        ref="root"
-        {...props}
-        style={this.state.measured ?
-               style :
-               [style,{position:"absolute"}]}
+        {...this.props}
+        style={[this.props.style, { position: 'absolute', opacity: 0 }]}
+        onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
+            if(!this.state.layouted){
+              this.props.onFirstLayout &&
+              this.props.onFirstLayout(
+                { nativeEvent: { layout: { x, y, width, height } } });
+              this.setState({ layouted: true });
+            }
+          }}
       >
-      {this.props.children}
-    </View>)
+        {this.props.children}
+      </View>)
   }
 }
 
@@ -264,7 +236,7 @@ const SwipeableButtons2 = React.createClass({
            )}
         </View>);
     } else {
-      // console.log('rend buttons');
+      console.log('rend buttons',this.thresholds);
       return (
         <AnimView
           {...props}
@@ -284,11 +256,13 @@ const SwipeableButtons2 = React.createClass({
 });
 
 function calcIndex(value, thresholds) {
-  return thresholds.findIndex((elem, index) => {
+  let index = thresholds.findIndex((elem, index) => {
     return value < elem;
   });
+  if(index == -1){index = thresholds.length-1}
+  return index
 }
-
+//console.log("c",calcIndex(0,[30,50,80]))
 //const horizontalPanResponder =
 
 
@@ -347,7 +321,9 @@ class SwipeableRow3 extends React.Component {
           }]}
       >
         {this.props.renderLeftActions(this._panX)}
-        {children}
+        <View style={{width:width}}>
+          {children}
+        </View>
         {this.props.renderRightActions(Animated.multiply(this._panX, -1))}
       </View>
     )
@@ -356,6 +332,10 @@ class SwipeableRow3 extends React.Component {
 class SwipeableActions extends React.Component {
   /* onSwipeEnd={() => this._setListViewScrollable(true)}
    * onSwipeStart={() => this._setListViewScrollable(false)}*/
+  setNativeProps(nativeProps) {
+    //for Touchable
+    this._root.setNativeProps(nativeProps);
+  }
   constructor(props) {
     super(props);
     this.state = { index:null };
@@ -363,39 +343,76 @@ class SwipeableActions extends React.Component {
     //this.releasing = false;
   }
   render(){
-    console.log("rend")
-    const { actions, ...props } = this.props
-    //return(<View />)
+    const { actions,style, ...props } = this.props
+    if(this.state.index == null){
+      /* style={{ flexDirection: 'row',
+       *          opacity: 0,
+       *          width: 0.01,
+       *          overflow: 'hidden' }}
+       */
     return (
-      this.state.index == null ?
       <View
+        ref={c => this._root = c}
         {...props}
+        style={{
+          flexDirection: 'row',
+          opacity: 0,
+        }}
       >
-        {actions.map((action, i, array) =>{
-           console.log("l:",i)
-          return (<MeasureableView
-          key={i}
-            onFirstLayout={
-              ({ nativeEvent: { layout: { x, y, width, height } } }) => {
-                //(x, y, width, height) => {
-                this.thresholds[i] = width;
-                console.log("m:",i,this.thresholds,x, y, width, height)
-                /* if (Object.keys(this.thresholds).length == array.length) {
-                 *   //this.setState({ index: 0 });// for re-render
-                 *   console.log("comp")
-                 * }*/
-              }}
-          >
-          {React.isValidElement(action) ? action : <Text>{action}</Text>}
-          </MeasureableView>)
+        {actions.map((action, i, array) => {
+           return (
+             <MeasureableView
+               key={i}
+               onFirstLayout={
+                 ({ nativeEvent: { layout: { x, y, width, height } } }) => {
+                   this.thresholds[i] = width;
+                   if (Object.keys(this.thresholds).length == array.length) {
+                     this.setState({ index: 0 });// for re-render
+                     //console.log("comp",this.thresholds)
+                   }
+                 }}
+             >
+               {React.isValidElement(action) ? action : <Text>{action}</Text>}
+             </MeasureableView>)
          })}
-      </View> :
-      <View
-        onLayout={({ nativeEvent: { layout: { x, y, width, height }}}) =>
-          console.log(width)} >
-        {actions[this.state.index]}
-      </View>
+      </View>)
+    }
+    //console.log("in",this.state.index)
+    const currentAction = actions[this.state.index];
+    return(
+      <AnimView
+        ref={c => this._root = c}
+        {...props}
+        style={[style,{
+            backgroundColor:currentAction.props.backgroundColor,
+            overflow: 'hidden'
+          }]}
+        onLayout={({ nativeEvent: { layout: { x, y, width, height }}}) =>{
+            let index = calcIndex(width, this.thresholds);
+            if(this.state.index !== index){
+              this.setState({ index });
+            }
+            /* console.log("onlay:",width,this.thresholds,
+            index,actions[this.state.index]) */
+          }} >
+        {currentAction}
+      </AnimView>
     )
+    /* this.props.width.addListener(({ value }) => {
+     *   if (this.releasing) { return; }
+
+     *   let index = calcIndex(value, this.thresholds);
+     *   if (this.props.direction == 'right') {
+     *     index = calcIndex(-value, this.thresholds);
+     *   }
+
+     *   if (index != -1 && this.state.index != index) {
+     *     this.setState({ index });
+     *   }
+     * });*/
+    /* {actions.map(action =>
+        React.isValidElement(action) ?
+        action : <Text>{action}</Text>)} */
     /* this.props.width.addListener(({ value }) => {
      *   if (this.releasing) { return; }
 

@@ -4,7 +4,8 @@ import {
   TouchableHighlight,
   PanResponder,
   Animated,
-  View
+  View,
+  ScrollView
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 
@@ -12,27 +13,9 @@ import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
 import {genActions,Action,BookCell} from '../../BookCell';
-import {SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
-
-storiesOf('Welcome', module)
-  .add('to Storybook', () => (
-    <Welcome showApp={linkTo('Button')}/>
-  ));
-
-storiesOf('Button', module)
-  .addDecorator(getStory => (
-    <CenterView>{getStory()}</CenterView>
-  ))
-  .add('with text', () => (
-    <Button onPress={action('clicked-text')}>
-      <Text>Hello Button</Text>
-    </Button>
-  ))
-  .add('with some emoji', () => (
-    <Button onPress={action('clicked-emoji')}>
-      <Text>😀 😎 👍 💯</Text>
-    </Button>
-  ));
+import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
+require("./native")
+require("./default")
 
 storiesOf('BookCell', module)
   .add('with book', () => (
@@ -77,12 +60,34 @@ storiesOf('Action', module)
     />
   ))
 
+class Actions extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { index:0 };
+  }
+  render(){
+    const { leftActions, rightActions } = genActions('search');
+    const widths=[10,150,300]
+    return (
+      <TouchableHighlight
+        onPress={()=>{
+            this.setState(
+              {index:(this.state.index+1)%3})
+          }}>
+        <SwipeableActions
+          style={{width:widths[this.state.index]}}
+          actions={leftActions}/>
+      </TouchableHighlight>
+    )
+  }
+}
+
 storiesOf('SwipeableActions', module)
   .add('with book', () => (
     //style={{width:100,flexDirection:"row"}}
     <SwipeableActions
       style={{margin:50,height:10,backgroundColor:"red"}}
-      actions={["foo","bar","baz",<Text>boon</Text>]}
+      actions={[<Text>foo</Text>,<Text>bar</Text>]}
     />
   )).add('with search', () => {
     const { leftActions, rightActions } = genActions('search');
@@ -90,8 +95,8 @@ storiesOf('SwipeableActions', module)
       <View>
         <SwipeableActions
           actions={leftActions}/>
-        {/* <SwipeableActions
-        actions={rightActions}/> */}
+        <SwipeableActions
+          actions={rightActions}/>
       </View>
     )
   }).add('with liked', () => {
@@ -122,14 +127,32 @@ storiesOf('SwipeableActions', module)
           actions={leftActions}/>
         <SwipeableActions
           actions={rightActions}/>
+        <SwipeableBu
+          actions={rightActions}/>
       </View>
     )
-  })
+  }).add('with Toggle', () => {
+    const { leftActions, rightActions } = genActions('search');
+    return (
+      <Actions />
+    )}).add('with sw b', () => {
+      const { leftActions, rightActions } = genActions('done');
+      return (
+          <SwipeableButtons2
+            ref="rightButtons"
+            direction="right"
+            width={new Animated.Value(100)}
+            buttons={leftActions}
+          />
+      )
+    })
 
 
 storiesOf('SwipeableRow3', module)
   .add('with book', () => (
-    <SwipeableRow3>
+    <SwipeableRow3
+      renderLeftActions={()=><Text>foo1</Text>}
+      renderRightActions={()=><Text>foo2</Text>}>
       <Text>foo</Text>
     </SwipeableRow3>
   )).add('with callback', () => (
@@ -160,4 +183,26 @@ storiesOf('SwipeableRow3', module)
       style={{marginTop:20}}>
         <Text>bar</Text>
     </SwipeableRow3>
-  ))
+  )).add('with actions', () => {
+    const { leftActions, rightActions } = genActions('liked');
+    return(
+      <SwipeableRow3
+        renderLeftActions={(width)=>
+          <SwipeableActions
+            style={{width:width}}
+            actions={leftActions}/>
+                          }
+        renderRightActions={(width)=>
+          <SwipeableActions
+             style={{width:width}}
+             actions={rightActions}/>
+                           }
+      onSwipeEnd={(evt, gestureState)=>{
+          0 < gestureState.dx ?
+          action('left action')(evt, gestureState) :
+          action('right action')(evt, gestureState)
+        }}
+      style={{marginTop:20}}>
+        <Text>bar</Text>
+    </SwipeableRow3>
+  )})
