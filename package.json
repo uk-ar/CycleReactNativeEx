@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "./node_modules/react-native/packager/packager.sh start --reset-cache",
-    "postinstall": "cd node_modules/@cycle/react-native && npm run compile-lib && cd - && find ./node_modules/@cycle -type f| grep /.babelrc | xargs rm",
+    "postinstall": "cd node_modules/@cycle/react-native && rm -rf lib ./-p && npm run compile-lib && cd ../../../ && find ./node_modules/@cycle -type f| grep /.babelrc | xargs rm -f",
     "test": "jest --verbose",
     "watch": "jest --verbose --watch",
     "storybook": "storybook start -p 7007"
@@ -34,6 +34,8 @@
     "xstream": "^6.3.0"
   },
   "devDependencies": {
+    "@kadira/react-native-storybook": "^2.0.0",
+    "@kadira/storybook": "^2.20.0",
     "babel-cli": "^6.14.0",
     "babel-core": "^6.14.0",
     "babel-eslint": "^6.1.0",
@@ -59,7 +61,6 @@
     "react-dom": "^15.3.2",
     "react-native-mock": "^0.2.6",
     "react-test-renderer": "^15.3.2",
-    "sinon": "^1.17.5",
-    "@kadira/react-native-storybook": "^2.0.0"
+    "sinon": "^1.17.5"
   }
 }

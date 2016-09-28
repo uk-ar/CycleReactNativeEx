@@ -120,7 +120,6 @@ const AnimatedExpandable = Animated.createAnimatedComponent(Expandable);
 // TODO:migrate to AnimatableView
 // Visible toggle hidden display
 class MeasureableView extends React.Component {
-  // TODO:position absolute
   constructor(props) {
     super(props);
     this.state = { layouted: false };
@@ -132,23 +131,51 @@ class MeasureableView extends React.Component {
       >
         {this.props.children}
       </View>) : (
-<View
-  {...this.props}
-  style={[this.props.style, { position: 'absolute' }]}
-  onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
-    this.props.onFirstLayout &&
+        <View
+          {...this.props}
+          style={[this.props.style, { position: 'absolute' }]}
+          onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
+              if(!this.state.layouted){
+                this.props.onFirstLayout &&
                 this.props.onFirstLayout(
                   { nativeEvent: { layout: { x, y, width, height } } });
-    this.setState({ layouted: true });
-  }}
->
+                this.setState({ layouted: true });
+              }
+            }}
+        >
           {this.props.children}
         </View>
       );
   }
 }
 
-
+class MeasureableView2 extends React.Component {
+  // TODO:position absolute
+  constructor(props) {
+    super(props);
+    this.state = { measured:false }
+    setTimeout(()=>
+      this.refs.root.measure((x,y,width,height)=>{
+        this.props.onFirstLayout(x,y,width,height)
+        this.setState({measured:true})
+      })
+    )
+    //this.props.onFirstLayout
+  }
+  render() {
+    const {style,props} = this.props
+    return (
+      <View
+        ref="root"
+        {...props}
+        style={this.state.measured ?
+               style :
+               [style,{position:"absolute"}]}
+      >
+      {this.props.children}
+    </View>)
+  }
+}
 
 const SwipeableButtons2 = React.createClass({
   getInitialState() {
@@ -331,21 +358,59 @@ class SwipeableActions extends React.Component {
    * onSwipeStart={() => this._setListViewScrollable(false)}*/
   constructor(props) {
     super(props);
-    /* this.state = {
-     *   positiveSwipe: true,
-     * };*/
+    this.state = { index:null };
+    this.thresholds = [];
+    //this.releasing = false;
   }
   render(){
+    console.log("rend")
     const { actions, ...props } = this.props
+    //return(<View />)
     return (
-      <Animated.View
+      this.state.index == null ?
+      <View
         {...props}
       >
-        {actions.map(action =>
-          React.isValidElement(action) ?
-                            action : <Text>{action}</Text>)}
-      </Animated.View>
+        {actions.map((action, i, array) =>{
+           console.log("l:",i)
+          return (<MeasureableView
+          key={i}
+            onFirstLayout={
+              ({ nativeEvent: { layout: { x, y, width, height } } }) => {
+                //(x, y, width, height) => {
+                this.thresholds[i] = width;
+                console.log("m:",i,this.thresholds,x, y, width, height)
+                /* if (Object.keys(this.thresholds).length == array.length) {
+                 *   //this.setState({ index: 0 });// for re-render
+                 *   console.log("comp")
+                 * }*/
+              }}
+          >
+          {React.isValidElement(action) ? action : <Text>{action}</Text>}
+          </MeasureableView>)
+         })}
+      </View> :
+      <View
+        onLayout={({ nativeEvent: { layout: { x, y, width, height }}}) =>
+          console.log(width)} >
+        {actions[this.state.index]}
+      </View>
     )
+    /* this.props.width.addListener(({ value }) => {
+     *   if (this.releasing) { return; }
+
+     *   let index = calcIndex(value, this.thresholds);
+     *   if (this.props.direction == 'right') {
+     *     index = calcIndex(-value, this.thresholds);
+     *   }
+
+     *   if (index != -1 && this.state.index != index) {
+     *     this.setState({ index });
+     *   }
+     * });*/
+    /* {actions.map(action =>
+        React.isValidElement(action) ?
+        action : <Text>{action}</Text>)} */
   }
 }
 //scroll view base

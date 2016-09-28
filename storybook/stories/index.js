@@ -71,22 +71,30 @@ storiesOf('BookCell', module)
 storiesOf('Action', module)
   .add('with liked', () => (
     <Action
-      bucket="liked"
-    />
-  )).add('with liked', () => (
-    <Action
-      bucket="liked"
-      target="liked"
+      icon="heart-o"
+      text="読みたい"
+      backgroundColor="#03a9f4"
     />
   ))
 
 storiesOf('SwipeableActions', module)
   .add('with book', () => (
+    //style={{width:100,flexDirection:"row"}}
     <SwipeableActions
-      style={{width:100}}
+      style={{margin:50,height:10,backgroundColor:"red"}}
       actions={["foo","bar","baz",<Text>boon</Text>]}
     />
-  )).add('with liked', () => {
+  )).add('with search', () => {
+    const { leftActions, rightActions } = genActions('search');
+    return (
+      <View>
+        <SwipeableActions
+          actions={leftActions}/>
+        {/* <SwipeableActions
+        actions={rightActions}/> */}
+      </View>
+    )
+  }).add('with liked', () => {
     const { leftActions, rightActions } = genActions('liked');
     return (
       <View>
@@ -96,7 +104,28 @@ storiesOf('SwipeableActions', module)
           actions={rightActions}/>
       </View>
     )
+  }).add('with borrowed', () => {
+    const { leftActions, rightActions } = genActions('borrowed');
+    return (
+      <View>
+        <SwipeableActions
+          actions={leftActions}/>
+        <SwipeableActions
+          actions={rightActions}/>
+      </View>
+    )
+  }).add('with done', () => {
+    const { leftActions, rightActions } = genActions('done');
+    return (
+      <View>
+        <SwipeableActions
+          actions={leftActions}/>
+        <SwipeableActions
+          actions={rightActions}/>
+      </View>
+    )
   })
+
 
 storiesOf('SwipeableRow3', module)
   .add('with book', () => (

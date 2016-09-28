@@ -6,5 +6,5 @@ configure(() => {
   require('./stories');
 }, module);
 
-const StorybookUI = getStorybookUI({port: 7007, host: 'localhost'});
+const StorybookUI = getStorybookUI({port: 7007, host: '10.0.3.2'});
 AppRegistry.registerComponent('CycleReactNativeEx', () => StorybookUI);

@@ -192,22 +192,23 @@ function getButtons(bucket, isbn) {
 }
 //bucket,target->icon,text,backgroundColor,close,target
 function Action({ icon,text,backgroundColor,close,target, style,...props }) {
-  // console.log("props:",icon, text, style, backgroundColor, props)
+  //console.log("props:",icon, text, style, backgroundColor, props)
   // backgroundColor,close,target are used from SwipeableButtons
   return (
     <View
       {...props}
-      style={[style, {
+      style={[{
           flexDirection: 'row',
           alignItems: 'center',
           flex: 1, //vertical center
           backgroundColor:backgroundColor,//for debug
-        }]}
+        },style]}
     >
       <FAIcon
         name={icon} size={20}
-        style={{ margin: 10, marginRight: 5 }}
+        style={{ margin: 10 }}
       />
+      <View style={{margin: -2.5 }} />
       <Text>
         {text}
       </Text>
@@ -216,66 +217,46 @@ function Action({ icon,text,backgroundColor,close,target, style,...props }) {
 }
 
 //bucket,target->icon,text,backgroundColor,close,target
-function genActions(bucket) {
-  function getProps(bucket,target){
-    let icon, text
-    let close = true;
-    let backgroundColor = materialColor.grey[300]
-    switch(target){
-      case undefined:
-      case null:
-        ({icon} = itemsInfo[bucket])
-        close=false;
-        //console.log("null")
-        break;
-      case bucket:
-        ({icon,text} = { text: '先頭に移動', icon: 'level-up'})
-        ({backgroundColor} = itemsInfo[bucket])
-        // MIcon publish,vertical align top,low priority
-        //console.log("bucket")
-        break;
-      default:
-        ({icon,text,backgroundColor} = itemsInfo[bucket])
-        //console.log("default")
-        break;
-    }
-    return {icon,text,backgroundColor,close,target}
-  }
-  console.log("l:",getProps("liked",null))
-  //      {...getProps("liked","liked")}
-  //      {...getProps("liked","borrowed")}
-  const leftActions = [
-    <Action
-      {...itemsInfo.liked}
-      {...getProps("liked",null)}
-      style={{ justifyContent: 'flex-end' }}
-    />,
-    <Action
-      {...itemsInfo.liked}
-      style={{ width: width / 2 }}
-    />,
-    <Action
-      {...itemsInfo.borrowed}
-      style={{ width }}
-    />, //green
-  ];
-  //console.log("lb:",leftActions)
-  const rightActions = [
-    <RightButton
-      close={false}
-      {...itemsInfo.done}
-      backgroundColor={materialColor.grey[300]}
-      text={null}
-    />, // grey 300
-    <RightButton
-      close
-      target="done"
-      {...itemsInfo.done}
-      style={{ justifyContent: 'flex-end' }}
-    />, //amber
-  ];// Touchable
-  return { leftActions, rightActions };
-}
+ function genActions(self) {
+   function getProps(self,target){
+     ({icon,text,backgroundColor} = itemsInfo[target])
+     if(target === self){
+       ({icon,text} = { text: '先頭に移動', icon: 'level-up'})
+     }
+     return {icon,text,backgroundColor,close:true,target}
+   }
+   const nop = {
+     text:null,backgroundColor:materialColor.grey[300],close:false,target:null}
+   const leftActions = [
+     <Action
+       {...getProps(self,"liked")}
+       {...nop}
+       style={{ justifyContent: 'flex-end' }}
+     />,
+     <Action
+       {...getProps(self,"liked")}
+       style={{ width: width / 2 }}
+     />,
+     <Action
+       {...getProps(self,"borrowed")}
+       style={{ width }}
+     />,
+   ];
+   const rightActions = [
+     <Action
+       {...getProps(self,"done")}
+       {...nop}
+       style={{ flexDirection: 'row-reverse',
+                justifyContent: 'flex-end'}}
+     />,
+     <Action
+       {...getProps(self,"done")}
+       style={{ flexDirection: 'row-reverse'}}
+     />,
+   ];// Touchable
+   return { leftActions, rightActions };
+ }
+
 /* SwipeableRow2
  *   onPanResponderMove, onPanResponderEnd,
  *   onRelease,
