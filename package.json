@@ -31,7 +31,7 @@
     "recompose": "^0.20.2",
     "rx": "^4.1.0",
     "util": "^0.10.3",
-    "xstream": "^6.3.0"
+    "xstream": "^6.3.2"
   },
   "devDependencies": {
     "@kadira/react-native-storybook": "^2.0.0",
