@@ -314,10 +314,10 @@ class SwipeableRow3 extends React.Component {
     this._panX.setValue(0.01)
   }
   swipeToMax(){
-    this._panX.setValue(width)
+    this._panX.setValue(width/2)
   }
   swipeToMin(){
-    this._panX.setValue(-width)
+    this._panX.setValue(-width/2)
   }
   close(){
     console.log("close??")
