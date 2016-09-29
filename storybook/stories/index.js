@@ -16,6 +16,7 @@ import {genActions,Action,BookCell} from '../../BookCell';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 require("./native")
 require("./default")
+require("./SwipeableRowExample")
 
 storiesOf('BookCell', module)
   .add('with book', () => (
@@ -127,8 +128,6 @@ storiesOf('SwipeableActions', module)
           actions={leftActions}/>
         <SwipeableActions
           actions={rightActions}/>
-        <SwipeableBu
-          actions={rightActions}/>
       </View>
     )
   }).add('with Toggle', () => {
@@ -146,63 +145,3 @@ storiesOf('SwipeableActions', module)
           />
       )
     })
-
-
-storiesOf('SwipeableRow3', module)
-  .add('with book', () => (
-    <SwipeableRow3
-      renderLeftActions={()=><Text>foo1</Text>}
-      renderRightActions={()=><Text>foo2</Text>}>
-      <Text>foo</Text>
-    </SwipeableRow3>
-  )).add('with callback', () => (
-    <SwipeableRow3
-      onSwipe={action('move')}
-      onSwipeStart={action('start')}
-      onSwipeEnd={action('end')}
-      renderLeftActions={()=><Text>foo1</Text>}
-      renderRightActions={()=><Text>foo2</Text>}
-      style={{marginTop:20}}>
-      <Text>bar</Text>
-    </SwipeableRow3>
-  )).add('with release', () => (
-    <SwipeableRow3
-      renderLeftActions={(width)=>
-        <Animated.View style={{width:width}}>
-          <Text numberOfLines={1}>foo1</Text>
-        </Animated.View>}
-      renderRightActions={(width)=>
-        <Animated.View style={{width:width}}>
-          <Text numberOfLines={1}>foo2</Text>
-        </Animated.View>}
-      onSwipeEnd={(evt, gestureState)=>{
-          0 < gestureState.dx ?
-          action('left action')(evt, gestureState) :
-          action('right action')(evt, gestureState)
-        }}
-      style={{marginTop:20}}>
-        <Text>bar</Text>
-    </SwipeableRow3>
-  )).add('with actions', () => {
-    const { leftActions, rightActions } = genActions('liked');
-    return(
-      <SwipeableRow3
-        renderLeftActions={(width)=>
-          <SwipeableActions
-            style={{width:width}}
-            actions={leftActions}/>
-                          }
-        renderRightActions={(width)=>
-          <SwipeableActions
-             style={{width:width}}
-             actions={rightActions}/>
-                           }
-      onSwipeEnd={(evt, gestureState)=>{
-          0 < gestureState.dx ?
-          action('left action')(evt, gestureState) :
-          action('right action')(evt, gestureState)
-        }}
-      style={{marginTop:20}}>
-        <Text>bar</Text>
-    </SwipeableRow3>
-  )})
