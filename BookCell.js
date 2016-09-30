@@ -190,25 +190,25 @@ function getButtons(bucket, isbn) {
   ];// Touchable
   return { leftButtons, rightButtons };
 }
-//bucket,target->icon,text,backgroundColor,close,target
-function Action({ icon,text,backgroundColor,close,target, style,...props }) {
-  //console.log("props:",icon, text, style, backgroundColor, props)
+// bucket,target->icon,text,backgroundColor,close,target
+function Action({ icon, text, backgroundColor, close, target, style, ...props }) {
+  // console.log("props:",icon, text, style, backgroundColor, props)
   // backgroundColor,close,target are used from SwipeableActions
   return (
     <View
       {...props}
       style={[{
-          flexDirection: 'row',
-          alignItems: 'center',
-          flex: 1, //vertical center
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1, //vertical center
           //backgroundColor:backgroundColor,//for debug
-        },style]}
+      }, style]}
     >
       <FAIcon
         name={icon} size={20}
         style={{ margin: 10 }}
       />
-      <View style={{margin: -2.5 }} />
+      <View style={{ margin: -2.5 }} />
       <Text>
         {text}
       </Text>
@@ -216,46 +216,46 @@ function Action({ icon,text,backgroundColor,close,target, style,...props }) {
   );
 }
 
-//bucket,target->icon,text,backgroundColor,close,target
- function genActions(self) {
-   function getProps(self,target){
-     ({icon,text,backgroundColor} = itemsInfo[target])
-     if(target === self){
-       ({icon,text} = { text: '先頭に移動', icon: 'level-up'})
-     }
-     return {icon,text,backgroundColor,close:true,target}
-   }
-   const nop = {
-     text:null,backgroundColor:materialColor.grey[300],close:false,target:null}
-   const leftActions = [
-     <Action
-       {...getProps(self,"liked")}
-       {...nop}
-       style={{ justifyContent: 'flex-end' }}
-     />,
-     <Action
-       {...getProps(self,"liked")}
-       style={{ width: width / 2 }}
-     />,
-     <Action
-       {...getProps(self,"borrowed")}
-       style={{ width }}
-     />,
-   ];
-   const rightActions = [
-     <Action
-       {...getProps(self,"done")}
-       {...nop}
-       style={{ flexDirection: 'row-reverse',
-                justifyContent: 'flex-end'}}
-     />,
-     <Action
-       {...getProps(self,"done")}
-       style={{ flexDirection: 'row-reverse'}}
-     />,
-   ];// Touchable
-   return { leftActions, rightActions };
- }
+// bucket,target->icon,text,backgroundColor,close,target
+function genActions(self) {
+  function getProps(self, target) {
+    ({ icon, text, backgroundColor } = itemsInfo[target]);
+    if (target === self) {
+      ({ icon, text } = { text: '先頭に移動', icon: 'level-up' });
+    }
+    return { icon, text, backgroundColor, close: true, target };
+  }
+  const nop = {
+    text: null, backgroundColor: materialColor.grey[300], close: false, target: null };
+  const leftActions = [
+    <Action
+      {...getProps(self, 'liked')}
+      {...nop}
+      style={{ justifyContent: 'flex-end' }}
+    />,
+    <Action
+      {...getProps(self, 'liked')}
+      style={{ width: width / 2 }}
+    />,
+    <Action
+      {...getProps(self, 'borrowed')}
+      style={{ width }}
+    />,
+  ];
+  const rightActions = [
+    <Action
+      {...getProps(self, 'done')}
+      {...nop}
+      style={{ flexDirection: 'row-reverse',
+                justifyContent: 'flex-end' }}
+    />,
+    <Action
+      {...getProps(self, 'done')}
+      style={{ flexDirection: 'row-reverse' }}
+    />,
+  ];// Touchable
+  return { leftActions, rightActions };
+}
 
 /* SwipeableRow2
  *   onPanResponderMove, onPanResponderEnd,
@@ -267,7 +267,7 @@ function Action({ icon,text,backgroundColor,close,target, style,...props }) {
  *   style*/
 // ToastAndroid.show('foo', ToastAndroid.SHORT)
 
-function BookCell({ book,style,onPress, ...props }) {
+function BookCell({ book, style, onPress, ...props }) {
   let TouchableElement = TouchableHighlight;
   // (Platform.OS === 'android') &&
   if (Platform.OS === 'android') {
@@ -281,7 +281,8 @@ function BookCell({ book,style,onPress, ...props }) {
     >
       <View
         {...props}
-        style={[style,styles.row]}>
+        style={[style, styles.row]}
+      >
         <Image
           source={{ uri: book.thumbnail || undefined
             /* Image source cannot accpet null */ }}
@@ -322,7 +323,7 @@ function BookCell({ book,style,onPress, ...props }) {
     </TouchableElement>
   );
 }
-import { Closeable, Closeable2 } from './Closeable';
+import { Closeable, CloseableView } from './Closeable';
 import { AnimView } from './AnimView';
 // function BookRow({ bucket, book, onRelease, style }) {
 class BookRow0 extends React.Component {
@@ -331,31 +332,31 @@ class BookRow0 extends React.Component {
     this.state = {
       close: true,
       bounceValue: new Animated.Value(0),
-      props:{style:{height:0.1},
-             anim: {delay:5000}}
+      props: { style: { height: 0.1 },
+             anim: { delay: 5000 } }
     };
   }
   componentDidMount() {
-    //console.log('didmount', this, this.props.book);
-        //this.state.bounceValue.setValue(1.5);     // Start large
+    // console.log('didmount', this, this.props.book);
+        // this.state.bounceValue.setValue(1.5);     // Start large
     Animated.timing(                          // Base: spring, decay, timing
       this.state.bounceValue,                 // Animate `bounceValue`
       {
         toValue: 1,                         // Animate to smaller size
         duration: 5000,                          // Bouncier spring
-                                              }
+      }
     ).start();
     /* this.refs.outer.open().then(
      *   this.setState({close:false})
      * )*/
-    console.log("th:",this)
-    //this.onMount(()=>console.log("onMount"))
+    console.log('th:', this);
+    // this.onMount(()=>console.log("onMount"))
     /* this.setState(
      *   {props:{style:{height:80},
      *           anim: {delay:2000}}})*/
-    //this.anim.animateTo({height:80})
-    //console.log("ta:",this.anim)
-    //this.setState({close:!this.state.close})
+    // this.anim.animateTo({height:80})
+    // console.log("ta:",this.anim)
+    // this.setState({close:!this.state.close})
   }
   // class style because of ref to leftActions
   close() {
@@ -396,7 +397,7 @@ class BookRow0 extends React.Component {
          console.log("this.anim:",this.anim)
          //this.anim.animateTo({height:80})
          }}
-         <Closeable2
+         <CloseableView
          direction="vertical"
          style={{ overflow: 'hidden'}}
          close={false}
@@ -404,53 +405,53 @@ class BookRow0 extends React.Component {
          >
       */
       <TouchableHighlight
-        onPress={()=>{
-            console.log(this)
-            this.refs.anim.animateTo({height:80})
-            //this.setState({close:!this.state.close})
-            console.log("mypress")}}
+        onPress={() => {
+          console.log(this);
+          this.refs.anim.animateTo({ height: 80 });
+            // this.setState({close:!this.state.close})
+          console.log('mypress'); }}
       >
         <AnimView
-          ref={c => {
-              console.log('ref:', this, this.props.book);
-              this.anim = c}}
+          ref={(c) => {
+            console.log('ref:', this, this.props.book);
+            this.anim = c; }}
           style={{
-            opacity:this.state.bounceValue,
+            opacity: this.state.bounceValue,
             height: this.state.close ? 50 : 80
           }}
-      >
+        >
         <SwipeableRow2
           ref={
-            //c=>console.log('ref:', this, this.props.book)
+            // c=>console.log('ref:', this, this.props.book)
             null
               }
-      onSwipeStart={() => console.log('start')}
-      onSwipeEnd={() => console.log('end')}
-      onOpen={() => console.log('open')}
-      onRelease={(positiveSwipe) => {
+          onSwipeStart={() => console.log('start')}
+          onSwipeEnd={() => console.log('end')}
+          onOpen={() => console.log('open')}
+          onRelease={(positiveSwipe) => {
           // this.refs.leftButtons.state
-        console.log('zzz',
+            console.log('zzz',
                       this.leftActions.state.index,
                       this.leftActions.getTarget());
           /* this.refs.leftButtons.release().then(()=>
           this.props.onRelease())
           */
           // console.log("zzz",this.leftActions.state.index)
-        if (positiveSwipe) {
-          this.leftActions.release().then(() =>
+            if (positiveSwipe) {
+              this.leftActions.release().then(() =>
               onRelease(book, this.leftActions.getTarget(), this)
             );
-        }
-      }}
-      renderLeftActions={width =>
+            }
+          }}
+          renderLeftActions={width =>
         <SwipeableButtons2
           ref={c => this.leftActions = c}
           direction="left"
           width={width}
           buttons={leftButtons}
         />}
-      rightButtons={rightButtons}
-    >
+          rightButtons={rightButtons}
+        >
       <BookCell
         book={book}
         style={style}
@@ -470,9 +471,9 @@ class BookRow extends React.Component {
     };
   }
   componentDidMount() {
-    console.log("th:",this)
-    //this.anim.animate({height:0.1},{height:80})
-    //this.state.height.setValue(0.1)
+    console.log('th:', this);
+    // this.anim.animate({height:0.1},{height:80})
+    // this.state.height.setValue(0.1)
     /* Animated.timing(this.state.height,{
      *   ToValue:100,
      *   duration:5000,
@@ -481,13 +482,12 @@ class BookRow extends React.Component {
      * ).start(() => console.log("fin:"));*/
   }
   render() {
-    console.log("rend?")
+    console.log('rend?');
     const { bucket, book, onRelease, style } = this.props;
     const { leftButtons, rightButtons } = getButtons(bucket, book);
     return (
       //        style={{height:this.state.height}}
-      <Animated.View
-      >
+      <Animated.View >
         {/* <AnimView
         ref={c => {
         //console.log('ref:', this, this.props.book);
@@ -502,7 +502,7 @@ class BookRow extends React.Component {
         > */}
         <SwipeableRow2
           ref={
-            //c=>console.log('ref:', this, this.props.book)
+            // c=>console.log('ref:', this, this.props.book)
             null
               }
           onSwipeStart={() => console.log('start')}
@@ -510,26 +510,26 @@ class BookRow extends React.Component {
           onOpen={() => console.log('open')}
           onRelease={(positiveSwipe) => {
               // this.refs.leftButtons.state
-              console.log('zzz',
+            console.log('zzz',
                           this.leftActions.state.index,
                           this.leftActions.getTarget());
               /* this.refs.leftButtons.release().then(()=>
                  this.props.onRelease())
                */
               // console.log("zzz",this.leftActions.state.index)
-              if (positiveSwipe) {
-                this.leftActions.release().then(() =>
+            if (positiveSwipe) {
+              this.leftActions.release().then(() =>
                   onRelease(book, this.leftActions.getTarget(), this)
                 );
-              }
-            }}
+            }
+          }}
           renderLeftActions={width =>
             <SwipeableButtons2
-          ref={c => this.leftActions = c}
-          direction="left"
-          width={width}
-          buttons={leftButtons}
-                  />}
+              ref={c => this.leftActions = c}
+              direction="left"
+              width={width}
+              buttons={leftButtons}
+            />}
           rightButtons={rightButtons}
         >
           <BookCell
@@ -543,5 +543,5 @@ class BookRow extends React.Component {
   }
 }
 
-module.exports = { BookRow, LibraryStatus, BookCell,Action, genActions};
+module.exports = { BookRow, LibraryStatus, BookCell, Action, genActions };
 // module.exports = { BookCell, SwipeableRow };

@@ -15,9 +15,10 @@ import Welcome from './Welcome';
 import {genActions,Action,BookCell} from '../../BookCell';
 import {AnimView} from '../../AnimView';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
-require("./native")
+require("./nativeExample")
 require("./default")
 require("./SwipeableRowExample")
+require("./CloseableExample")
 
 storiesOf('BookCell', module)
   .add('with book', () => (

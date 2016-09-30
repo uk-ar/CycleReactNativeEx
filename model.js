@@ -110,8 +110,8 @@ function model(actions) {
   // update with animation when selectedSection$ changed
   const books$ =
     Rx.Observable.combineLatest(
-      searchedBooks$.do(i=>console.log("searched books")),
-      actions.savedBooksStatus$.do(i=>console.log("saved books")),
+      searchedBooks$.do(i => console.log('searched books')),
+      actions.savedBooksStatus$.do(i => console.log('saved books')),
       genItems)
   /* .do(i=>console.log("items:",JSON.stringify(i)))
    * .distinctUntilChanged(x => JSON.stringify(x),(a,b)=>a!==b) */
@@ -196,7 +196,7 @@ function model(actions) {
        *       .create(3000,
        *               LayoutAnimation.Types.easeInEaseOut,
        *               LayoutAnimation.Properties.opacity))),*/
-      //actions.selectedSection$,
+      // actions.selectedSection$,
       actions.selectedSection$.do(i => LayoutAnimation.easeInEaseOut()),
       /* actions.selectedSection$.do(i =>
        *   LayoutAnimation.configureNext(

@@ -11,19 +11,20 @@ import { MeasureableView } from './SwipeableRow';
 const ReactTransitionGroup = require('react-addons-transition-group');
 
 // https://gist.github.com/sebmarkbage/ef0bf1f338a7182b6775#gistcomment-1574787
-class Closeable2 extends React.Component {
+//rename to closeableview
+class CloseableView extends React.Component {
   // TODO:High Order Component can remove inner view
   constructor(props) {
     super(props);
     this.state = { close: this.props.close };
-    this.style = this.props.close ? { height: 10 } : { height: null };
+    this.style = this.props.close ? { height: 0.01 } : { height: null };
   }
   open() {
     return new Promise((resolve, reject) => {
-      this.refs.inner.measure((x, y, width, height) => {
+      this.inner.measure((x, y, width, height) => {
         this.style = { height };
         this.setState({ close: false }, () => { // widen
-          this.refs.outer.animate({ height: 0.01 }, this.style)
+          this.outer.animate({ height: 0.01 }, this.style)
               .then(() => {
                 resolve();
               });
@@ -33,9 +34,9 @@ class Closeable2 extends React.Component {
   }
   close() {
     return new Promise((resolve, reject) => {
-      this.refs.inner.measure((x, y, width, height) => {
+      this.inner.measure((x, y, width, height) => {
         this.style = { height: 0.01 };
-        this.refs.outer.animate({ height }, this.style)
+        this.outer.animate({ height }, this.style)
             .then(() => {
               this.setState({ close: true });// shrink
               resolve();
@@ -54,14 +55,16 @@ class Closeable2 extends React.Component {
   render() {
     return (
       <AnimView
-        style={this.style}
-        ref="outer"
+        style={[this.style,
+                { overflow: 'hidden' }]}
+        ref={c => this.outer = c}
       >
         <View
-          ref="inner"
+          ref={c => this.inner = c}
           {...this.props}
           style={[this.props.style,
-                  this.state.close ? { position: 'absolute' } : null]}
+                  this.state.close ?
+                  { position: 'absolute' } : null]}
         >
           {this.props.children}
         </View>
@@ -93,7 +96,7 @@ function willRecieveProps(key, fn) {
   };
 }
 // this.toggle
-// const Closeable3 = willRecieveProps(key, (inst) => inst.toggle())(Closeable2)
+// const Closeable3 = willRecieveProps(key, (inst) => inst.toggle())(CloseableView)
 
 // TODO:refactor
 class Closeable extends React.Component {
@@ -173,23 +176,4 @@ class Closeable extends React.Component {
   }
 }
 
-/* <View
- * ref={c=>this.out=c}
- * style={{
- *   width:50,height:50,
- *   backgroundColor:"red",
- *   
- *   overflow:"hidden",
- * }}>
- * <View
- * ref={c=>this.in=c}
- * style={{
- *   width:100,height:100,
- *   backgroundColor:"green",
- *   
- *   position:"absolute"
- * }}>
- * </View>
- * </View>
- * */
-module.exports = { Closeable, Closeable2 };
+module.exports = { Closeable, CloseableView };

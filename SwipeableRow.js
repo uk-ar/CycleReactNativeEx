@@ -136,16 +136,16 @@ class MeasureableView extends React.Component {
         {...this.props}
         style={[this.props.style, { position: 'absolute', opacity: 0 }]}
         onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
-            if(!this.state.layouted){
-              this.props.onFirstLayout &&
+          if (!this.state.layouted) {
+            this.props.onFirstLayout &&
               this.props.onFirstLayout(
                 { nativeEvent: { layout: { x, y, width, height } } });
-              this.setState({ layouted: true });
-            }
-          }}
+            this.setState({ layouted: true });
+          }
+        }}
       >
         {this.props.children}
-      </View>)
+      </View>);
   }
 }
 
@@ -236,7 +236,7 @@ const SwipeableButtons2 = React.createClass({
            )}
         </View>);
     } else {
-      console.log('rend buttons',this.thresholds);
+      console.log('rend buttons', this.thresholds);
       return (
         <AnimView
           {...props}
@@ -259,14 +259,13 @@ function calcIndex(value, thresholds) {
   let index = thresholds.findIndex((elem, index) => {
     return value < elem;
   });
-  if(index == -1){index = thresholds.length-1}
-  return index
+  if (index == -1) { index = thresholds.length - 1; }
+  return index;
 }
-//console.log("c",calcIndex(0,[30,50,80]))
-//const horizontalPanResponder =
-
-
-//https://github.com/facebook/react-native/blob/master/Libraries/Experimental/SwipeableRow/SwipeableListView.js
+// console.log("c",calcIndex(0,[30,50,80]))
+// const horizontalPanResponder =
+import { CloseableView } from './Closeable';
+// https://github.com/facebook/react-native/blob/master/Libraries/Experimental/SwipeableRow/SwipeableListView.js
 class SwipeableRow3 extends React.Component {
   /* onSwipeEnd={() => this._setListViewScrollable(true)}
    * onSwipeStart={() => this._setListViewScrollable(false)}*/
@@ -287,22 +286,22 @@ class SwipeableRow3 extends React.Component {
       onMoveShouldSetPanResponder: isSwipeHorizontal,
       onMoveShouldSetPanResponderCapture: isSwipeHorizontal,
 
-      onPanResponderGrant:(evt, gestureState) =>{
-        this.props.onSwipeStart && this.props.onSwipeStart(evt, gestureState)},
+      onPanResponderGrant: (evt, gestureState) => {
+        this.props.onSwipeStart && this.props.onSwipeStart(evt, gestureState); },
       /* onPanResponderMove: (evt, gestureState) =>{
        *   this._panX.setValue(gestureState.dx);
        *   //this.props.onSwipe && this.props.onSwipe(evt, gestureState)
        * },*/
       onPanResponderMove: Animated.event([
         null,                // raw event arg ignored
-        {dx: this._panX},    // gestureState arg
-      ]),//for performance
-      onPanResponderRelease: (evt, gestureState) =>{
-        console.log("aa",gestureState.vx)
-        this.props.onSwipeEnd && this.props.onSwipeEnd(evt, gestureState)
+        { dx: this._panX },    // gestureState arg
+      ]), // for performance
+      onPanResponderRelease: (evt, gestureState) => {
+        console.log('aa', gestureState.vx);
+        this.props.onSwipeEnd && this.props.onSwipeEnd(evt, gestureState);
       }
     });
-    //console.log("pan",this._panResponder,this._panResponder.getInteractionHandle())
+    // console.log("pan",this._panResponder,this._panResponder.getInteractionHandle())
     this._panX.addListener(({ value }) => {
       if (0 < value && this.state.positiveSwipe != true) {
         this.setState({ positiveSwipe: true });
@@ -311,110 +310,109 @@ class SwipeableRow3 extends React.Component {
       }
     });
   }
-  swipeTo(anim){
-    return new Promise((resolve, reject)=>{
-      anim.start(()=>resolve());
-    })
+  swipeTo(anim) {
+    return new Promise((resolve, reject) => {
+      anim.start(() => resolve());
+    });
   }
-  swipeToFlat(velocity){
+  swipeToFlat(velocity) {
     return this.swipeTo(
-      Animated.spring(this._panX,{
-        toValue:0.01,
-        tension:400,//default 40
-        velocity}))
+      Animated.spring(this._panX, {
+        toValue: 0.01,
+        tension: 400, // default 40
+        velocity }));
   }
-  swipeToMax(velocity){
-    //console.log("v1:",velocity)//bug?
-    return this.swipeTo(
-      Animated.parallel([
-        Animated.decay(this._panX,{
-          deceleration: 0.1,//default 0.997,
-          velocity
-        }),
-        Animated.spring(this._panX,{
-          toValue:width})
-      ]))
-  }
-  swipeToMin(velocity){
+  swipeToMax(velocity) {
+    // console.log("v1:",velocity)//bug?
     return this.swipeTo(
       Animated.parallel([
-        Animated.decay(this._panX,{
-          deceleration: 0.1,//default 0.997,
+        Animated.decay(this._panX, {
+          deceleration: 0.1, // default 0.997,
           velocity
         }),
-        Animated.spring(this._panX,{
-          toValue:-width})
-      ]))
+        Animated.spring(this._panX, {
+          toValue: width })
+      ]));
   }
-  close(){
-    return this._root.animateTo({height:0.1})
+  swipeToMin(velocity) {
+    return this.swipeTo(
+      Animated.parallel([
+        Animated.decay(this._panX, {
+          deceleration: 0.1, // default 0.997,
+          velocity
+        }),
+        Animated.spring(this._panX, {
+          toValue: -width })
+      ]));
   }
-  render(){
+  close() {
+    return this._root.close;
+  }
+  render() {
     const { onSwipeStart, onSwipe, onSwipeEnd,
-            children, style, ...props } = this.props
+            children, style, ...props } = this.props;
     return (
       //      style={{backgroundColor:"red"}}
-      <AnimView
-      ref={c=>this._root=c}
-        style={{height:50,
-                backgroundColor:"red",
-                overflow: 'hidden'}}
+      <CloseableView
+        ref={c => this._root = c}
+        style={{backgroundColor: 'red',
+                overflow: 'hidden' }}
       >
       <View
         {...this._panResponder.panHandlers}
         {...props}
-        style={[style,{
+        style={[style, {
           flexDirection: 'row',
           justifyContent: this.state.positiveSwipe ?
                           'flex-start' : 'flex-end',
           overflow: 'hidden',
-          alignItems:"stretch"
-            //TODO:vertical stretch will fixed in RN 0.28?
-            //https://github.com/facebook/react-native/commit/d95757037aef3fbd8bb9064e667ea4fea9e5abc1
+          alignItems: 'stretch'
+            // TODO:vertical stretch will fixed in RN 0.28?
+            // https://github.com/facebook/react-native/commit/d95757037aef3fbd8bb9064e667ea4fea9e5abc1
 
-          }]}
+        }]}
       >
-        <Animated.View style={{width:this._panX}}>
+        <Animated.View style={{ width: this._panX }}>
           {this.props.renderLeftActions()}
         </Animated.View>
-        <View style={{width:width}}>
+        <View style={{ width }}>
           {children}
         </View>
-        <Animated.View style={{width:Animated.multiply(this._panX, -1)}}>
+        <Animated.View style={{ width: Animated.multiply(this._panX, -1) }}>
           {this.props.renderRightActions()}
         </Animated.View>
         </View>
-      </AnimView>
-    )
+      </CloseableView>
+    );
   }
 }
 class SwipeableActions extends React.Component {
   /* onSwipeEnd={() => this._setListViewScrollable(true)}
    * onSwipeStart={() => this._setListViewScrollable(false)}*/
   setNativeProps(nativeProps) {
-    //for Touchable
+    // for Touchable
     this._root.setNativeProps(nativeProps);
   }
   constructor(props) {
     super(props);
-    this.state = { index:null };
+    this.state = { index: null };
     this.thresholds = [];
-    //this.width = new Animated.Value(0.1);
-    //cannot trac value
-    //this.width
+    // this.width = new Animated.Value(0.1);
+    // cannot trac value
+    // this.width
   }
   /* componentWillReceiveProps(nextProps){
    *   console.log(nextProps)
    * }*/
-  render(){
-    const { actions, style, ...props } = this.props
-    if(this.state.index == null){
+  render() {
+    const { actions, style, ...props } = this.props;
+    if (this.state.index == null) {
       /* style={{ flexDirection: 'row',
        *          opacity: 0,
        *          width: 0.01,
        *          overflow: 'hidden' }}
        */
-    return (
+      return (
       <View
         ref={c => this._root = c}
         {...props}
@@ -424,7 +422,7 @@ class SwipeableActions extends React.Component {
         }}
       >
         {actions.map((action, i, array) => {
-           return (
+          return (
              <MeasureableView
                key={i}
                onFirstLayout={
@@ -432,53 +430,55 @@ class SwipeableActions extends React.Component {
                    this.thresholds[i] = width;
                    if (Object.keys(this.thresholds).length == array.length) {
                      this.setState({ index: 0 });// for re-render
-                     //console.log("comp",this.thresholds)
+                     // console.log("comp",this.thresholds)
                    }
                  }}
              >
                {React.isValidElement(action) ? action : <Text>{action}</Text>}
-             </MeasureableView>)
-         })}
-      </View>)
+             </MeasureableView>);
+        })}
+      </View>);
     }
-    //console.log("in",this.state.index)
-    //currentAction = this.getCurrentAction();
+    // console.log("in",this.state.index)
+    // currentAction = this.getCurrentAction();
     currentAction = actions[this.state.index];
-    //onLayout has paformance problems?
-    //onLayout may cause over position
-    //cannot addListener to multiply animatedValue...
-    //console.log("ty wi:",typeof style.width,style.width.addListener)
-    //const {width,...otherStyle} = style
-    //console.log("s:",style)
-    //console.log("w:",width,otherStyle)
-    //this.width = new Animated.Value(width);
-    //this.width = width;
+    // onLayout has paformance problems?
+    // onLayout may cause over position
+    // cannot addListener to multiply animatedValue...
+    // console.log("ty wi:",typeof style.width,style.width.addListener)
+    // const {width,...otherStyle} = style
+    // console.log("s:",style)
+    // console.log("w:",width,otherStyle)
+    // this.width = new Animated.Value(width);
+    // this.width = width;
     //        style={[{width:width},otherStyle]}
-    //console.log("lock",this.props.lock)
-    return(
+    // console.log("lock",this.props.lock)
+    return (
       <Animated.View
         ref={c => this._root = c}
         {...props}
         style={style}
-        onLayout={({ nativeEvent: { layout: { x, y, width, height }}}) =>{
-            let index = calcIndex(width, this.thresholds);
-            //this.width = width;
-            if(this.state.index !== index && !this.props.lock){
-              this.setState({ index });
-            }
+        onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
+          const index = calcIndex(width, this.thresholds);
+            // this.width = width;
+          if (this.state.index !== index && !this.props.lock) {
+            this.setState({ index });
+          }
             /* console.log("onlay:",width,this.thresholds,
                index,actions[this.state.index]) */
-          }} >
+        }}
+      >
         <AnimView
           ref={c => this._container = c}
           style={{
-            backgroundColor:currentAction.props.backgroundColor,
+            backgroundColor: currentAction.props.backgroundColor,
             overflow: 'hidden',
-          }}>
+          }}
+        >
         {currentAction}
         </AnimView>
       </Animated.View>
-    )
+    );
     /* this.props.width.addListener(({ value }) => {
      *   if (this.releasing) { return; }
 
@@ -511,7 +511,7 @@ class SwipeableActions extends React.Component {
         action : <Text>{action}</Text>)} */
   }
 }
-//scroll view base
+// scroll view base
 // ref: http://browniefed.com/blog/react-native-animated-listview-row-swipe/
 const SwipeableRow2 = React.createClass({
   getInitialState() {
@@ -610,4 +610,4 @@ const SwipeableRow2 = React.createClass({
   },
 });
 
-module.exports = { SwipeableButtons2, SwipeableRow2,SwipeableRow3, AnimView, MeasureableView,SwipeableActions };
+module.exports = { SwipeableButtons2, SwipeableRow2, SwipeableRow3, AnimView, MeasureableView, SwipeableActions };

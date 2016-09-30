@@ -10,13 +10,13 @@
   },
   "plugins": [
     "react",
-    "react-native",
+    "react-native"
   ],
   "rules": {
     "comma-dangle" : ["error","only-multiline"],
     "no-unused-vars" : ["error", { "varsIgnorePattern": "_",
                                    "args":"none",
-                                   "argsIgnorePattern": "_",}],
+                                   "argsIgnorePattern": "_"}],
     "no-shadow": ["error", { "allow": ["_"] }],
     "no-console" : "warn",
     "react/prop-types": "warn",
@@ -25,5 +25,5 @@
     "import/no-unresolved":"off",
     "react-native/no-unused-styles": "warn",
     "react-native/no-inline-styles": "warn"
-  },
+  }
 }

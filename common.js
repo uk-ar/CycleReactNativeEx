@@ -148,7 +148,7 @@ function debugRenderRow(rowData, sectionID, columnID) {
 
 function log(str) {
   return function (params) {
-    console.log(str + ':', params);
+    console.log(`${str}:`, params);
   };
 }
 

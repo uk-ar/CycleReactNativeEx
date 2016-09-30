@@ -30,20 +30,20 @@ class AnimView extends React.Component {
     this.counter = new Animated.Value(0);
     const current = StyleSheet.flatten(this.prevStyle);
     const next = StyleSheet.flatten(nextStyle);
-    const animatedStyle = 
+    const animatedStyle =
       Object.keys(next)
-            .filter((key) =>
+            .filter(key =>
               (typeof next[key] === 'number' || key.toLowerCase().endsWith('color'))
             )
-            .reduce((acc,key)=>{
-              console.log("key",key,acc)
+            .reduce((acc, key) => {
+              console.log('key', key, acc);
               acc[key] = this.counter.interpolate({
                 inputRange: [0, 1],
                 outputRange: [current[key], next[key]],
-              })
-              return acc
-            },{})
-    //console.log("as",animatedStyle)
+              });
+              return acc;
+            }, {});
+    // console.log("as",animatedStyle)
           // transform is ordered array!!
           /* console.log("ab",current['transform'],next['transform']);
            * animatedStyle['transform'] =
@@ -71,7 +71,7 @@ class AnimView extends React.Component {
             duration: (this.props.anim && this.props.anim.duration)
                    || 180,
             delay: (this.props.anim && this.props.anim.delay) || 0
-            //duration: 180,
+            // duration: 180,
           }
         ).start(() => {
           resolve();
@@ -79,18 +79,18 @@ class AnimView extends React.Component {
       });
     });
   }
-  setNativeProps(props){
-    //for Touchable
-    this.refs.root.setNativeProps(props)
+  setNativeProps(props) {
+    // for Touchable
+    this.refs.root.setNativeProps(props);
   }
   render() {
-    const {style,...props} = this.props;
+    const { style, ...props } = this.props;
     return (
       // style={[this.state.style,]}
       <Animated.View
         ref="root"
         {...props}
-        style={[style,this.state.animatedStyle]}
+        style={[style, this.state.animatedStyle]}
       />
     );
   }

@@ -26,23 +26,24 @@ function withDebug(MyComponent){
     render(){
       //this.props.data.length
       return (
-        <TouchableHighlight
-          onPress={()=>{
-              if(1<this.props.data.length){
+        <View>
+          <Text onPress={()=>{
+              if(1 < this.props.data.length){
                 this.setState(
                   {index:(this.state.index+1) % this.props.data.length })
               }
               this.props.onPress &&
               this.props.onPress(this.props.data[this.state.index],this.root)
             }}>
-          <View>
-            <MyComponent
-              ref={c=>this.root =c}
-              {...this.props.data[this.state.index]}
-              children={this.props.children}
-            />
-          </View>
-        </TouchableHighlight>)
+            pressMe
+          </Text>
+          <MyComponent
+            ref={c => this.root = c}
+            {...this.props.data[this.state.index]}
+            children={this.props.children}
+          />
+        </View>
+        )
       //              {...this.props.data[this.state.index]}
     }
   }

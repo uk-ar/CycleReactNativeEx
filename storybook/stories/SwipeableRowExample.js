@@ -41,7 +41,6 @@ class Row extends React.Component {
                   />
                              }
           onSwipeEnd={(evt, gestureState)=>{
-              console.log("st:",gestureState.vx,gestureState.vy)
               if(0 < gestureState.dx){
                 this.setState({lock:true},()=>{
                   if(this.leftActions.state.index == 0){

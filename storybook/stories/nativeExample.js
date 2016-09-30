@@ -38,7 +38,7 @@ class NestedView extends React.Component {
         style={{
           width:50,height:50,
           backgroundColor:"red",
-          
+
           overflow:"hidden",
         }}>
         <View
@@ -46,7 +46,7 @@ class NestedView extends React.Component {
           style={{
             width:100,height:100,
             backgroundColor:"green",
-            
+
             position:"absolute"
           }}>
         </View>

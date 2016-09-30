@@ -15,7 +15,7 @@ const FAIcon = require('react-native-vector-icons/FontAwesome');
 
 import { styles } from './styles';
 import { AnimView } from './AnimView';
-import { Closeable, Closeable2 } from './Closeable';
+import { Closeable, CloseableView } from './Closeable';
 import Touchable from '@cycle/react-native/src/Touchable';
 
 Touchable.TouchableElement = Touchable.TouchableHighlight;
@@ -50,7 +50,7 @@ class Header extends React.Component {
         style={{ padding: 10, opacity: this.state.opacity }}
         anim={{ duration: 500 }}
       >
-        <Closeable2
+        <CloseableView
           style={{ justifyContent: 'center',
                    backgroundColor: 'red' }}
           direction="vertical"
@@ -67,7 +67,7 @@ class Header extends React.Component {
           >
             <Text>foo</Text>
           </AnimView>
-        </Closeable2>
+        </CloseableView>
 
         <AnimView
           ref="view2"
@@ -97,16 +97,16 @@ class Header extends React.Component {
         <Text
           style={{ color: 'white' }}
           onPress={() => {
-              this.refs.view2.animate(
-                {
-                  height: 10,
-                  backgroundColor: 'black',
-                },
-                {
-                  height: 10,
-                  backgroundColor: 'orange',
-                },);
-            }}
+            this.refs.view2.animate(
+              {
+                height: 10,
+                backgroundColor: 'black',
+              },
+              {
+                height: 10,
+                backgroundColor: 'orange',
+              },);
+          }}
         >
           {'animate'}
         </Text>
@@ -115,19 +115,19 @@ class Header extends React.Component {
           <Text
             style={{ color: 'white' }}
             onPress={() => {
-                console.log('refs', this.refs);
-                this.refs.view4.measure((x, y, width, height) =>
+              console.log('refs', this.refs);
+              this.refs.view4.measure((x, y, width, height) =>
                   console.log('view4:', width, height));
-                this.refs.view5.measure((x, y, width, height) =>
+              this.refs.view5.measure((x, y, width, height) =>
                   console.log('view5:', width, height));
-                this.setState((prev, current) => ({ toggle: !prev.toggle }));
-                this.refs.close.toggle()
+              this.setState((prev, current) => ({ toggle: !prev.toggle }));
+              this.refs.close.toggle()
                     .then(() =>
                       console.log('toggled')
                       // ToastAndroid.show('Toggled', ToastAndroid.SHORT)
                     );
                 // FIXME:why width is shurinked?
-              }}
+            }}
           >
             {'toggle'}
           </Text>
@@ -168,7 +168,7 @@ function SearchHeader({ loadingState, close, ...props }) {
 }
 
 import { itemsInfo } from './common';
-function ItemsHeader({payload, section, children, style, close }) {
+function ItemsHeader({ payload, section, children, style, close }) {
   if (!itemsInfo[section]) { return null; }
   // const icon = (selectedSection === null) ? (
   const icon = !close ? (
@@ -204,4 +204,4 @@ function ItemsHeader({payload, section, children, style, close }) {
   );
 }
 
-module.exports = { Header,ItemsHeader,SearchHeader};
+module.exports = { Header, ItemsHeader, SearchHeader };

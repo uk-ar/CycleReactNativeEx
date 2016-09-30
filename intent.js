@@ -235,7 +235,7 @@ function intent(RN, HTTP) {
             /* return [book].concat(
              *   books.filter((elem) => elem.isbn.toString() !== book.isbn.toString()));*/
             return [{ ...book, bucket, modifyDate: new Date(Date.now()) }]
-            //return []
+            // return []
               .concat(books.filter(elem =>
                 elem.isbn.toString() !== book.isbn.toString()));
           default:
@@ -247,7 +247,7 @@ function intent(RN, HTTP) {
   savedBooks$.do((books) => {
     realm.write(() => {
       books.forEach((book) => {
-        //realm.create('Book', book, true);
+        // realm.create('Book', book, true);
       });
     });
   }).subscribe();
@@ -334,18 +334,18 @@ function intent(RN, HTTP) {
     Rx.Observable
       .merge(
         RN.select('section')
-          .events('press')//section,this.listview
+          .events('press')// section,this.listview
         // .do(i => console.log('section selected0:%O', i,this))
           .shareReplay(),
         RN.select('close')
-          .events('press').map(([_, listview]) => [null,listview])
+          .events('press').map(([_, listview]) => [null, listview])
           .shareReplay()
       )
-      .do(i=>console.log("bar",i))
-      .distinctUntilChanged(([section,listview])=>section)
-      .do(i=>console.log("foo",i))
-      .shareReplay()
-  
+      .do(i => console.log('bar', i))
+      .distinctUntilChanged(([section, listview]) => section)
+      .do(i => console.log('foo', i))
+      .shareReplay();
+
   const scrollListView$ =
     RN.select('listview')
       .events('scroll')
@@ -355,13 +355,13 @@ function intent(RN, HTTP) {
   const openSection$ =
     changeSection$
       .filter(i => i !== null)// null->section
-      .shareReplay()
+      .shareReplay();
 
   const closeSection$ =
     changeSection$
       .filter(i => i === null)// null->section
-      .shareReplay()
-  
+      .shareReplay();
+
   const scrollToSection$ =
     changeSection$
       .filter(i => i !== null)// null->section
@@ -370,7 +370,7 @@ function intent(RN, HTTP) {
           .my()
           .filter(i => i !== null)
           .distinctUntilChanged()
-          //.do(log('my'))
+          // .do(log('my'))
         // my() to payload or func param
       )
       // .do(i => console.log('listview:my:', i))

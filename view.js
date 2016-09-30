@@ -64,7 +64,7 @@ Touchable.BookRow = Touchable.createCycleComponent(
   });
 
 import { BookListView } from './BookListView';
-import { Header,ItemsHeader,SearchHeader} from './Header';
+import { Header, ItemsHeader, SearchHeader } from './Header';
 function ItemsFooter({ payload, count }) {
   return (
     <Touchable.TouchableElement
@@ -117,14 +117,14 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
       <Touchable.BookListView
         removeClippedSubviews={false}
         onContentSizeChange={(contentWidth, contentHeight) =>
-          //console.log('change', contentWidth, contentHeight)
+          // console.log('change', contentWidth, contentHeight)
           null
                             }
         selector="listview"
         dataSource={dataSource}
         ref={(c) => {
             // console.log("ref:",c);
-            this.listview = c
+          this.listview = c;
             // c.scrollTo({x:0,y:100,animated:false})
         }}
         directionalLockEnabled
@@ -141,28 +141,29 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
           />);
         }}
         renderSectionFooter={(sectionData, sectionID) => {
-            //console.log('footer', sectionData, sectionID);
-            const { section,count } = sectionData;
-            return (
+            // console.log('footer', sectionData, sectionID);
+          const { section, count } = sectionData;
+          return (
               <ItemsFooter
-              {...sectionData}
-              key={selectedSection}
-              payload={[section,this.listview]}
-            />);
+                {...sectionData}
+                key={selectedSection}
+                payload={[section, this.listview]}
+              />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {
-            console.log('header', sectionData, sectionID,this.listview,this);// ,
-            const {close, loadingState} = sectionData;
-            //close or not
+          console.log('header', sectionData, sectionID, this.listview, this);// ,
+          const { close, loadingState } = sectionData;
+            // close or not
           return (sectionID === 'search') ? (
               <SearchHeader
                 {...sectionData}
-                payload={[sectionID,this.listview]}
-                        />) : (
+                payload={[sectionID, this.listview]}
+              />) : (
                           <Text
                             onPress={() => {
-                                console.log('listview', this.listview);
-                              }}>
+                              console.log('listview', this.listview);
+                            }}
+                          >
                             bar
                           </Text>
                 );
