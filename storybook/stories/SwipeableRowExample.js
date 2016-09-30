@@ -64,7 +64,9 @@ class Row extends React.Component {
             }
           }}
       >
-          <Text>bar</Text>
+          <View style={{backgroundColor:"blue",flex:1,justifyContent:"center"}}>
+            <Text>bar</Text>
+          </View>
       </SwipeableRow3>
     )
   }
@@ -111,18 +113,18 @@ storiesOf('SwipeableRow3', module)
         <Text>bar</Text>
     </SwipeableRow3>
   ))
-  .add('with actions', () => {
+  .add('with actions && tall height', () => {
     const { leftActions, rightActions } = genActions('liked');
     return(
       <SwipeableRow3
         renderLeftActions={(width)=>
           <SwipeableActions
-            style={{width:width}}
+            style={{width:width,flex:1}}
             actions={leftActions}/>
                           }
         renderRightActions={(width)=>
           <SwipeableActions
-             style={{width:width}}
+             style={{width:width,flex:1}}
              actions={rightActions}/>
                            }
         onSwipeEnd={(evt, gestureState)=>{
@@ -131,9 +133,9 @@ storiesOf('SwipeableRow3', module)
             action('right action')(evt, gestureState)
           }}
         style={{marginTop:20}}>
-          <Text>bar</Text>
+      <Text style={{backgroundColor:"red",height:100}}>bar</Text>
       </SwipeableRow3>
     )})
-  .add('with row', () =>(
+  .add('with row && small height', () =>(
     <Row />
   ))

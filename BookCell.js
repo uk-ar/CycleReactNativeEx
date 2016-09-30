@@ -468,7 +468,7 @@ class BookRow1 extends React.Component {
     this.state={lock:false}
   }
   render() {
-    const { bucket, onRelease,...props } = this.props;
+    const { bucket, onSwipeEnd, ...props } = this.props;
     //TODO:parameterize
     const { leftActions, rightActions } = genActions(bucket);
     return (
@@ -494,24 +494,25 @@ class BookRow1 extends React.Component {
               this.setState({lock:true},()=>{
                 if(this.leftActions.state.index == 0){
                   this.row.swipeToFlat(gestureState.vx)
-                  this.setState({lock:false})
+                      .then(()=>this.setState({lock:false}))
+                      .then(()=> onSwipeEnd && onSwipeEnd())
                 } else {
                   this.row.swipeToMax(gestureState.vx)
                       .then(()=> this.row.close())
-                      .then(()=> onRelease && onRelease())
+                      .then(()=> onSwipeEnd && onSwipeEnd())
                 }
               })
             }else{
               this.setState({lock:true},()=>{
                 if(this.rightActions.state.index == 0){
                   this.row.swipeToFlat(gestureState.vx)
-                  this.setState({lock:false})
+                      .then(()=>this.setState({lock:false}))
+                      .then(()=> onSwipeEnd && onSwipeEnd())
                 } else {
                   this.row.swipeToMin(gestureState.vx)
                       .then(()=> this.row.close())
-                      .then(()=> onRelease && onRelease())
+                      .then(()=> onSwipeEnd && onSwipeEnd())
                 }
-                //onRelease
               })
               //this.rightActions.props.onSwipeEnd(this.row)
             }

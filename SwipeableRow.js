@@ -353,22 +353,17 @@ class SwipeableRow3 extends React.Component {
     return (
       <Closeable3
         ref={c => this._root = c}
-      >
-      <View
         {...this._panResponder.panHandlers}
         {...props}
         style={[style, {
-          flexDirection: 'row',
-          justifyContent: this.state.positiveSwipe ?
-                          'flex-start' : 'flex-end',
-          overflow: 'hidden',
-          alignItems: 'stretch'
-            // TODO:vertical stretch will fixed in RN 0.28?
-            // https://github.com/facebook/react-native/commit/d95757037aef3fbd8bb9064e667ea4fea9e5abc1
-
-        }]}
+            flexDirection: 'row',
+            justifyContent: this.state.positiveSwipe ?
+                            'flex-start' : 'flex-end',
+            overflow: 'hidden',
+            alignItems: 'stretch'
+          }]}
       >
-        <Animated.View style={{ width: this._panX }}>
+        <Animated.View style={{ width: this._panX}}>
           {this.props.renderLeftActions()}
         </Animated.View>
         <View style={{ width }}>
@@ -377,7 +372,6 @@ class SwipeableRow3 extends React.Component {
         <Animated.View style={{ width: Animated.multiply(this._panX, -1) }}>
           {this.props.renderRightActions()}
         </Animated.View>
-        </View>
       </Closeable3>
     );
   }
@@ -441,19 +435,15 @@ class SwipeableActions extends React.Component {
     // onLayout has paformance problems?
     // onLayout may cause over position
     // cannot addListener to multiply animatedValue...
-    // console.log("ty wi:",typeof style.width,style.width.addListener)
-    // const {width,...otherStyle} = style
-    // console.log("s:",style)
-    // console.log("w:",width,otherStyle)
-    // this.width = new Animated.Value(width);
-    // this.width = width;
     //        style={[{width:width},otherStyle]}
-    // console.log("lock",this.props.lock)
     return (
-      <Animated.View
+      <AnimView
         ref={c => this._root = c}
         {...props}
-        style={style}
+        style={[style,
+                { backgroundColor: currentAction.props.backgroundColor,
+                  overflow: 'hidden'}
+          ]}
         onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
           const index = calcIndex(width, this.thresholds);
             // this.width = width;
@@ -464,16 +454,8 @@ class SwipeableActions extends React.Component {
                index,actions[this.state.index]) */
         }}
       >
-        <AnimView
-          ref={c => this._container = c}
-          style={{
-            backgroundColor: currentAction.props.backgroundColor,
-            overflow: 'hidden',
-          }}
-        >
         {currentAction}
-        </AnimView>
-      </Animated.View>
+      </AnimView>
     );
     /* this.props.width.addListener(({ value }) => {
      *   if (this.releasing) { return; }
