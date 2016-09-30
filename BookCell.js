@@ -32,7 +32,7 @@ const {
   width,
 } = Dimensions.get('window');
 
-const { SwipeableRow2, SwipeableButtons2 } = require('./SwipeableRow');
+const { SwipeableRow2,SwipeableRow3,SwipeableActions, SwipeableButtons2 } = require('./SwipeableRow');
 
 function LeftButton({ icon, text, style, backgroundColor, ...props }) {
   // console.log("props:",icon, text, style, backgroundColor, props)
@@ -323,7 +323,7 @@ function BookCell({ book, style, onPress, ...props }) {
     </TouchableElement>
   );
 }
-import { Closeable, CloseableView } from './Closeable';
+
 import { AnimView } from './AnimView';
 // function BookRow({ bucket, book, onRelease, style }) {
 class BookRow0 extends React.Component {
@@ -397,7 +397,7 @@ class BookRow0 extends React.Component {
          console.log("this.anim:",this.anim)
          //this.anim.animateTo({height:80})
          }}
-         <CloseableView
+         <Closeable3
          direction="vertical"
          style={{ overflow: 'hidden'}}
          close={false}
@@ -460,6 +460,64 @@ class BookRow0 extends React.Component {
       </AnimView>
       </TouchableHighlight>
     );//
+  }
+}
+class BookRow1 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state={lock:false}
+  }
+  render() {
+    const { bucket, onRelease,...props } = this.props;
+    //TODO:parameterize
+    const { leftActions, rightActions } = genActions(bucket);
+    return (
+      <SwipeableRow3
+        {...props}
+        ref={c => this.row = c}
+        renderLeftActions={(width)=>
+          <SwipeableActions
+          ref={c => this.leftActions = c}
+          actions={leftActions}
+          lock={this.state.lock}
+               />
+                          }
+        renderRightActions={(width)=>
+          <SwipeableActions
+          ref={c => this.rightActions = c}
+          actions={rightActions}
+          lock={this.state.lock}
+               />
+                           }
+        onSwipeEnd={(evt, gestureState)=>{
+            if(0 < gestureState.dx){
+              this.setState({lock:true},()=>{
+                if(this.leftActions.state.index == 0){
+                  this.row.swipeToFlat(gestureState.vx)
+                  this.setState({lock:false})
+                } else {
+                  this.row.swipeToMax(gestureState.vx)
+                      .then(()=> this.row.close())
+                      .then(()=> onRelease && onRelease())
+                }
+              })
+            }else{
+              this.setState({lock:true},()=>{
+                if(this.rightActions.state.index == 0){
+                  this.row.swipeToFlat(gestureState.vx)
+                  this.setState({lock:false})
+                } else {
+                  this.row.swipeToMin(gestureState.vx)
+                      .then(()=> this.row.close())
+                      .then(()=> onRelease && onRelease())
+                }
+                //onRelease
+              })
+              //this.rightActions.props.onSwipeEnd(this.row)
+            }
+          }}
+      />
+    );
   }
 }
 
@@ -531,8 +589,8 @@ class BookRow extends React.Component {
               buttons={leftButtons}
             />}
           rightButtons={rightButtons}
-        >
-          <BookCell
+      >
+      <BookCell
             book={book}
             style={style}
           />
@@ -543,5 +601,5 @@ class BookRow extends React.Component {
   }
 }
 
-module.exports = { BookRow, LibraryStatus, BookCell, Action, genActions };
+module.exports = { BookRow,BookRow1, LibraryStatus, BookCell, Action, genActions };
 // module.exports = { BookCell, SwipeableRow };

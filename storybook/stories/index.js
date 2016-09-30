@@ -19,6 +19,7 @@ require("./nativeExample")
 require("./default")
 require("./SwipeableRowExample")
 require("./CloseableExample")
+require("./BookCellExample")
 
 storiesOf('BookCell', module)
   .add('with book', () => (

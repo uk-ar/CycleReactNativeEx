@@ -95,6 +95,7 @@ function willRecieveProps(key, fn) {
   };
 }
 // this.toggle
+// const Closeable3 = willRecieveProps(key, (inst) => inst.toggle())(Closeable3)
 
 // TODO:refactor
 class Closeable extends React.Component {

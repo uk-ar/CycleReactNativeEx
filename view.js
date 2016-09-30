@@ -57,9 +57,9 @@ function MyCard({ children, navigationProps }) {
     );
 }
 
-import { BookRow } from './BookCell';
-Touchable.BookRow = Touchable.createCycleComponent(
-  BookRow, {
+import { BookRow1,BookCell } from './BookCell';
+Touchable.BookRow1 = Touchable.createCycleComponent(
+  BookRow1, {
     onRelease: 'release',
   });
 
@@ -80,7 +80,7 @@ function ItemsFooter({ payload, count }) {
   );
 }
 
-import { Closeable, Closeable2 } from './Closeable';
+//import { Closeable, Closeable2 } from './Closeable';
 import { AnimView } from './AnimView';
 Touchable.BookListView = Touchable.createCycleComponent(
   BookListView);
@@ -131,15 +131,24 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
         enableEmptySections
         renderRow={(rowData, sectionID, rowID) => {
           // console.log('row:', rowData, sectionID, rowID);
-          return (
-          <Touchable.BookRow
+            return (
+              <BookRow1
+                key={rowID}
+                selector="bookcell"
+                bucket={sectionID}>
+                <BookCell
+                  book={rowData}
+                  style={{ backgroundColor: materialColor.grey['50'] }}/>
+              </BookRow1>
+            )
+            /* <Touchable.BookRow
             key={rowID}
             selector="bookcell"
             bucket={sectionID}
             book={rowData}
             style={{ backgroundColor: materialColor.grey['50'] }}
-          />);
-        }}
+            />); */
+          }}
         renderSectionFooter={(sectionData, sectionID) => {
             // console.log('footer', sectionData, sectionID);
           const { section, count } = sectionData;

@@ -12,25 +12,25 @@ import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
-import {CloseableView} from '../../Closeable';
+import {Closeable3} from '../../Closeable';
 
 import {withDebug} from './common';
-const CloseableViewDebug = withDebug(CloseableView)
+const Closeable3Debug = withDebug(Closeable3)
 
-storiesOf('CloseableView', module)
+storiesOf('Closeable3', module)
   .addDecorator(getStory => (
     <CenterView>{getStory()}</CenterView>
   ))
   .add('with close props', () => (
-    <CloseableViewDebug
+    <Closeable3Debug
       data={[{close:"true"},
              {close:"false"}]}
     >
       <Text>foo</Text>
-    </CloseableViewDebug>
+    </Closeable3Debug>
   ))
   .add('with toggle', () => (
-    <CloseableViewDebug
+    <Closeable3Debug
       data={[{style:{height:10,backgroundColor:"red"}}]}
       onPress={(props,self)=>{
           self.toggle();

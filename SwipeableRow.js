@@ -11,7 +11,7 @@ import {
 
 const _ = require('lodash');
 import { AnimView } from './AnimView';
-import { styles } from './styles';
+import { Closeable3 } from './Closeable';
 // const Dimensions = require('Dimensions');
 const {
   width,
@@ -236,7 +236,6 @@ const SwipeableButtons2 = React.createClass({
            )}
         </View>);
     } else {
-      console.log('rend buttons', this.thresholds);
       return (
         <AnimView
           {...props}
@@ -264,7 +263,7 @@ function calcIndex(value, thresholds) {
 }
 // console.log("c",calcIndex(0,[30,50,80]))
 // const horizontalPanResponder =
-import { CloseableView } from './Closeable';
+//console.log("cl:",Closeable,View)
 // https://github.com/facebook/react-native/blob/master/Libraries/Experimental/SwipeableRow/SwipeableListView.js
 class SwipeableRow3 extends React.Component {
   /* onSwipeEnd={() => this._setListViewScrollable(true)}
@@ -346,17 +345,14 @@ class SwipeableRow3 extends React.Component {
       ]));
   }
   close() {
-    return this._root.close;
+    return this._root.close();
   }
   render() {
     const { onSwipeStart, onSwipe, onSwipeEnd,
             children, style, ...props } = this.props;
     return (
-      //      style={{backgroundColor:"red"}}
-      <CloseableView
+      <Closeable3
         ref={c => this._root = c}
-        style={{backgroundColor: 'red',
-                overflow: 'hidden' }}
       >
       <View
         {...this._panResponder.panHandlers}
@@ -382,7 +378,7 @@ class SwipeableRow3 extends React.Component {
           {this.props.renderRightActions()}
         </Animated.View>
         </View>
-      </CloseableView>
+      </Closeable3>
     );
   }
 }

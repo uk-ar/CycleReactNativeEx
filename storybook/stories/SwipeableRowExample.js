@@ -23,47 +23,57 @@ class Row extends React.Component {
   render(){
     const { leftActions, rightActions } = genActions('search');
     return(
-      <View style={{paddingTop:20}}>
-        <SwipeableRow3
-          ref={c => this.row = c}
-          renderLeftActions={(width)=>
-            <SwipeableActions
+      <SwipeableRow3
+        ref={c => this.row = c}
+        renderLeftActions={(width)=>
+          <SwipeableActions
             ref={c => this.leftActions = c}
             actions={leftActions}
             lock={this.state.lock}
                  />
-                            }
-          renderRightActions={(width)=>
-            <SwipeableActions
+                          }
+        renderRightActions={(width)=>
+          <SwipeableActions
              ref={c => this.rightActions = c}
              actions={rightActions}
              lock={this.state.lock}
                   />
-                             }
-          onSwipeEnd={(evt, gestureState)=>{
-              if(0 < gestureState.dx){
-                this.setState({lock:true},()=>{
-                  if(this.leftActions.state.index == 0){
-                    this.row.swipeToFlat(gestureState.vx)
-                    this.setState({lock:false})
-                  } else {
-                    this.row.swipeToMax(gestureState.vx)
-                        .then(()=> this.row.close())
-                  }
-                })
-              }else{
-                //this.rightActions.props.onSwipeEnd(this.row)
-              }
-            }}
-        >
-            <Text>bar</Text>
-        </SwipeableRow3>
-      </View>
+                           }
+        onSwipeEnd={(evt, gestureState)=>{
+            if(0 < gestureState.dx){
+              this.setState({lock:true},()=>{
+                if(this.leftActions.state.index == 0){
+                  this.row.swipeToFlat(gestureState.vx)
+                  this.setState({lock:false})
+                } else {
+                  this.row.swipeToMax(gestureState.vx)
+                      .then(()=> this.row.close())
+                }
+              })
+            }else{
+              this.setState({lock:true},()=>{
+                if(this.rightActions.state.index == 0){
+                  this.row.swipeToFlat(gestureState.vx)
+                  this.setState({lock:false})
+                } else {
+                  this.row.swipeToMin(gestureState.vx)
+                      .then(()=> this.row.close())
+                }
+              })
+              //this.rightActions.props.onSwipeEnd(this.row)
+            }
+          }}
+      >
+          <Text>bar</Text>
+      </SwipeableRow3>
     )
   }
 }
 
 storiesOf('SwipeableRow3', module)
+  .addDecorator(getStory => (
+    <CenterView>{getStory()}</CenterView>
+  ))
   .add('with book', () => (
     <SwipeableRow3
       renderLeftActions={()=><Text>foo1</Text>}
@@ -125,5 +135,5 @@ storiesOf('SwipeableRow3', module)
       </SwipeableRow3>
     )})
   .add('with row', () =>(
-      <Row />
+    <Row />
   ))
