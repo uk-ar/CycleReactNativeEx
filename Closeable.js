@@ -173,4 +173,23 @@ class Closeable extends React.Component {
   }
 }
 
+/* <View
+ * ref={c=>this.out=c}
+ * style={{
+ *   width:50,height:50,
+ *   backgroundColor:"red",
+ *   
+ *   overflow:"hidden",
+ * }}>
+ * <View
+ * ref={c=>this.in=c}
+ * style={{
+ *   width:100,height:100,
+ *   backgroundColor:"green",
+ *   
+ *   position:"absolute"
+ * }}>
+ * </View>
+ * </View>
+ * */
 module.exports = { Closeable, Closeable2 };

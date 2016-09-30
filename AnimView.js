@@ -9,7 +9,7 @@ class AnimView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      animatedStyle: props && props.style &&
+      animatedStyle: props.style &&
                      StyleSheet.flatten(props.style)
     };
     this.prevStyle = this.state.animatedStyle;
@@ -30,25 +30,20 @@ class AnimView extends React.Component {
     this.counter = new Animated.Value(0);
     const current = StyleSheet.flatten(this.prevStyle);
     const next = StyleSheet.flatten(nextStyle);
-    const animatedStyle =
-      Object.assign({}, next);
-    // check for initial
-    next &&
-      Object.keys(next).map((key) => {
-        // remove if with filter & merge
-        // console.log("k:",key,typeof next[key] === "number",key == "backgroundColor" || key == "color",current[key] != next[key],current[key],next[key])
-        if (((typeof current[key] === 'number' && typeof next[key] === 'number') |
-             key.endsWith('Color') ||
-             key == 'color')
-            && current[key] !== next[key]
-        ) {
-          // console.log("an",current[key],next[key]);
-          animatedStyle[key] = this.counter.interpolate({
-            inputRange: [0, 1],
-            outputRange: [current[key], next[key]],
-          });
-        } else if (key === 'transform' && current.transform) {
-          // current next
+    const animatedStyle = 
+      Object.keys(next)
+            .filter((key) =>
+              (typeof next[key] === 'number' || key.toLowerCase().endsWith('color'))
+            )
+            .reduce((acc,key)=>{
+              console.log("key",key,acc)
+              acc[key] = this.counter.interpolate({
+                inputRange: [0, 1],
+                outputRange: [current[key], next[key]],
+              })
+              return acc
+            },{})
+    //console.log("as",animatedStyle)
           // transform is ordered array!!
           /* console.log("ab",current['transform'],next['transform']);
            * animatedStyle['transform'] =
@@ -65,8 +60,6 @@ class AnimView extends React.Component {
            *           return acc;
            *         },{...next['transform'][0]})] || next['transform']
            * console.log("as",animatedStyle['transform']);*/
-        }
-      });
 
     this.prevStyle = next;
     return new Promise((resolve, reject) => {
@@ -76,7 +69,7 @@ class AnimView extends React.Component {
           this.counter,
           { toValue: 1,
             duration: (this.props.anim && this.props.anim.duration)
-                   || 180,//500, //180,
+                   || 180,
             delay: (this.props.anim && this.props.anim.delay) || 0
             //duration: 180,
           }
@@ -91,16 +84,15 @@ class AnimView extends React.Component {
     this.refs.root.setNativeProps(props)
   }
   render() {
-    // console.log("rend anim,view1,view2",this.state.animatedStyle,this.props.style)
+    const {style,...props} = this.props;
     return (
       // style={[this.state.style,]}
       <Animated.View
         ref="root"
-        {...this.props}
-        style={[this.state.animatedStyle]}
-      >
-        {this.props.children}
-      </Animated.View>);
+        {...props}
+        style={[style,this.state.animatedStyle]}
+      />
+    );
   }
 }
 

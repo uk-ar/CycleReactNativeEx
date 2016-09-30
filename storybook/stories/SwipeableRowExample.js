@@ -41,14 +41,15 @@ class Row extends React.Component {
                   />
                              }
           onSwipeEnd={(evt, gestureState)=>{
+              console.log("st:",gestureState.vx,gestureState.vy)
               if(0 < gestureState.dx){
                 this.setState({lock:true},()=>{
                   if(this.leftActions.state.index == 0){
-                    this.row.swipeToFlat()
+                    this.row.swipeToFlat(gestureState.vx)
                     this.setState({lock:false})
                   } else {
-                    this.row.swipeToMax()
-                    this.row.close()
+                    this.row.swipeToMax(gestureState.vx)
+                        .then(()=> this.row.close())
                   }
                 })
               }else{
@@ -70,7 +71,8 @@ storiesOf('SwipeableRow3', module)
       renderRightActions={()=><Text>foo2</Text>}>
       <Text>foo</Text>
     </SwipeableRow3>
-  )).add('with callback', () => (
+  ))
+  .add('with callback', () => (
     <SwipeableRow3
       onSwipe={action('move')}
       onSwipeStart={action('start')}
@@ -80,7 +82,8 @@ storiesOf('SwipeableRow3', module)
       style={{marginTop:20}}>
       <Text>bar</Text>
     </SwipeableRow3>
-  )).add('with release', () => (
+  ))
+  .add('with release', () => (
     <SwipeableRow3
       renderLeftActions={(width)=>
         <Animated.View style={{width:width}}>
@@ -98,7 +101,8 @@ storiesOf('SwipeableRow3', module)
       style={{marginTop:20}}>
         <Text>bar</Text>
     </SwipeableRow3>
-  )).add('with actions', () => {
+  ))
+  .add('with actions', () => {
     const { leftActions, rightActions } = genActions('liked');
     return(
       <SwipeableRow3
@@ -120,6 +124,7 @@ storiesOf('SwipeableRow3', module)
         style={{marginTop:20}}>
           <Text>bar</Text>
       </SwipeableRow3>
-    )}).add('with row', () =>(
+    )})
+  .add('with row', () =>(
       <Row />
-    ))
+  ))

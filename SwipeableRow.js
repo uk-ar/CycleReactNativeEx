@@ -298,6 +298,7 @@ class SwipeableRow3 extends React.Component {
         {dx: this._panX},    // gestureState arg
       ]),//for performance
       onPanResponderRelease: (evt, gestureState) =>{
+        console.log("aa",gestureState.vx)
         this.props.onSwipeEnd && this.props.onSwipeEnd(evt, gestureState)
       }
     });
@@ -310,20 +311,43 @@ class SwipeableRow3 extends React.Component {
       }
     });
   }
-  swipeToFlat(){
-    this._panX.setValue(0.01)
+  swipeTo(anim){
+    return new Promise((resolve, reject)=>{
+      anim.start(()=>resolve());
+    })
   }
-  swipeToMax(){
-    this._panX.setValue(width/2)
+  swipeToFlat(velocity){
+    return this.swipeTo(
+      Animated.spring(this._panX,{
+        toValue:0.01,
+        tension:400,//default 40
+        velocity}))
   }
-  swipeToMin(){
-    this._panX.setValue(-width/2)
+  swipeToMax(velocity){
+    //console.log("v1:",velocity)//bug?
+    return this.swipeTo(
+      Animated.parallel([
+        Animated.decay(this._panX,{
+          deceleration: 0.1,//default 0.997,
+          velocity
+        }),
+        Animated.spring(this._panX,{
+          toValue:width})
+      ]))
+  }
+  swipeToMin(velocity){
+    return this.swipeTo(
+      Animated.parallel([
+        Animated.decay(this._panX,{
+          deceleration: 0.1,//default 0.997,
+          velocity
+        }),
+        Animated.spring(this._panX,{
+          toValue:-width})
+      ]))
   }
   close(){
-    console.log("close??")
-    this._root.animateTo({height:10},{height:0.1})
-    //when non style
-    //this._root.animateTo({height:0.1})
+    return this._root.animateTo({height:0.1})
   }
   render(){
     const { onSwipeStart, onSwipe, onSwipeEnd,
@@ -332,8 +356,9 @@ class SwipeableRow3 extends React.Component {
       //      style={{backgroundColor:"red"}}
       <AnimView
       ref={c=>this._root=c}
-      style={{height:10,backgroundColor:"red",
-        overflow: 'hidden'}}
+        style={{height:50,
+                backgroundColor:"red",
+                overflow: 'hidden'}}
       >
       <View
         {...this._panResponder.panHandlers}
