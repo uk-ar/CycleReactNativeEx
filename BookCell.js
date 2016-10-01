@@ -468,7 +468,7 @@ class BookRow1 extends React.Component {
     this.state={lock:false}
   }
   render() {
-    const { bucket, onSwipeEnd, ...props } = this.props;
+    const { bucket, onSwipeEnd,onSwipeStart, ...props } = this.props;
     //TODO:parameterize
     const { leftActions, rightActions } = genActions(bucket);
     return (
@@ -489,17 +489,20 @@ class BookRow1 extends React.Component {
           lock={this.state.lock}
                />
                            }
+        onSwipeStart={(evt, gestureState)=> onSwipeStart(gestureState)}
         onSwipeEnd={(evt, gestureState)=>{
             if(0 < gestureState.dx){
               this.setState({lock:true},()=>{
                 if(this.leftActions.state.index == 0){
                   this.row.swipeToFlat(gestureState.vx)
                       .then(()=>this.setState({lock:false}))
-                      .then(()=> onSwipeEnd && onSwipeEnd())
+                      .then(()=> onSwipeEnd &&
+                               onSwipeEnd(gestureState))
                 } else {
                   this.row.swipeToMax(gestureState.vx)
                       .then(()=> this.row.close())
-                      .then(()=> onSwipeEnd && onSwipeEnd())
+                      .then(()=> onSwipeEnd &&
+                               onSwipeEnd(gestureState))
                 }
               })
             }else{
@@ -507,11 +510,13 @@ class BookRow1 extends React.Component {
                 if(this.rightActions.state.index == 0){
                   this.row.swipeToFlat(gestureState.vx)
                       .then(()=>this.setState({lock:false}))
-                      .then(()=> onSwipeEnd && onSwipeEnd())
+                      .then(()=> onSwipeEnd &&
+                               onSwipeEnd(gestureState))
                 } else {
                   this.row.swipeToMin(gestureState.vx)
                       .then(()=> this.row.close())
-                      .then(()=> onSwipeEnd && onSwipeEnd())
+                      .then(()=> onSwipeEnd &&
+                               onSwipeEnd(gestureState))
                 }
               })
               //this.rightActions.props.onSwipeEnd(this.row)

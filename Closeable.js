@@ -21,9 +21,11 @@ class Closeable3 extends React.Component {
   open() {
     return new Promise((resolve, reject) => {
       this.inner.measure((x, y, width, height) => {
-        this.style = { height };
+        //TODO:filter Props
+        this.style = { height, opacity:1,transform:[{scale:1}]};
         this.setState({ close: false }, () => { // widen
-          this.outer.animate({ height: 0.01 }, this.style)
+          this.outer.animate(
+            {opacity:0.1, transform:[{scale:0.1}], height: 0.01 }, this.style)
               .then(() => {
                 resolve();
               });
@@ -34,8 +36,9 @@ class Closeable3 extends React.Component {
   close() {
     return new Promise((resolve, reject) => {
       this.inner.measure((x, y, width, height) => {
-        this.style = { height: 0.01 };
-        this.outer.animate({ height }, this.style)
+        this.style = { height: 0.01, opacity:0.1, transform:[{scale:0.1}]};
+        this.outer.animate(
+          { height, opacity:1,transform:[{scale:1}] }, this.style)
             .then(() => {
               this.setState({ close: true });// shrink
               resolve();

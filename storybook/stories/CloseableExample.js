@@ -34,7 +34,7 @@ storiesOf('Closeable3', module)
       data={[{style:{height:10,backgroundColor:"red"}}]}
       onPress={(props,self)=>{
           self.toggle();
-          console.log(self);
+          //console.log(self);
           //self.animateTo({height:20,backgroundColor:"red"})
         }}/>
   ))
