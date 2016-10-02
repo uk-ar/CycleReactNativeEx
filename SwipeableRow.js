@@ -263,7 +263,7 @@ function calcIndex(value, thresholds) {
 }
 // console.log("c",calcIndex(0,[30,50,80]))
 // const horizontalPanResponder =
-//console.log("cl:",Closeable,View)
+// console.log("cl:",Closeable,View)
 // https://github.com/facebook/react-native/blob/master/Libraries/Experimental/SwipeableRow/SwipeableListView.js
 class SwipeableRow3 extends React.Component {
   /* onSwipeEnd={() => this._setListViewScrollable(true)}
@@ -296,7 +296,7 @@ class SwipeableRow3 extends React.Component {
         { dx: this._panX },    // gestureState arg
       ]), // for performance
       onPanResponderRelease: (evt, gestureState) => {
-        //console.log('aa', gestureState.vx);
+        // console.log('aa', gestureState.vx);
         this.props.onSwipeEnd && this.props.onSwipeEnd(evt, gestureState);
       }
     });
@@ -328,7 +328,7 @@ class SwipeableRow3 extends React.Component {
           velocity
         }),
         Animated.timing(this._panX, {
-          toValue: width*2 })
+          toValue: width * 2 })
         /* ,
          * Animated.spring(this._panX, {
          *   toValue: width })*/
@@ -342,7 +342,7 @@ class SwipeableRow3 extends React.Component {
           velocity
         }),
         Animated.timing(this._panX, {
-          toValue: -width*2 })
+          toValue: -width * 2 })
         /* Animated.spring(this._panX, {
          *   toValue: -width })*/
       ]));
@@ -359,14 +359,14 @@ class SwipeableRow3 extends React.Component {
         {...this._panResponder.panHandlers}
         {...props}
         style={[style, {
-            flexDirection: 'row',
-            justifyContent: this.state.positiveSwipe ?
+          flexDirection: 'row',
+          justifyContent: this.state.positiveSwipe ?
                             'flex-start' : 'flex-end',
-            overflow: 'hidden',
-            alignItems: 'stretch'
-          }]}
+          overflow: 'hidden',
+          alignItems: 'stretch'
+        }]}
       >
-        <Animated.View style={{ width: this._panX}}>
+        <Animated.View style={{ width: this._panX }}>
           {this.props.renderLeftActions()}
         </Animated.View>
         <View style={{ width }}>
@@ -445,7 +445,7 @@ class SwipeableActions extends React.Component {
         {...props}
         style={[style,
                 { backgroundColor: currentAction.props.backgroundColor,
-                  overflow: 'hidden'}
+                  overflow: 'hidden' }
           ]}
         onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
           const index = calcIndex(width, this.thresholds);

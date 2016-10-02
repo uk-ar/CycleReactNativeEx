@@ -32,7 +32,7 @@ const {
   width,
 } = Dimensions.get('window');
 
-const { SwipeableRow2,SwipeableRow3,SwipeableActions, SwipeableButtons2 } = require('./SwipeableRow');
+const { SwipeableRow2, SwipeableRow3, SwipeableActions, SwipeableButtons2 } = require('./SwipeableRow');
 
 function LeftButton({ icon, text, style, backgroundColor, ...props }) {
   // console.log("props:",icon, text, style, backgroundColor, props)

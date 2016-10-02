@@ -31,7 +31,7 @@ const {
   width,
 } = Dimensions.get('window');
 
-const { SwipeableRow2,SwipeableRow3,SwipeableActions, SwipeableButtons2 } = require('./SwipeableRow');
+const { SwipeableRow2, SwipeableRow3, SwipeableActions, SwipeableButtons2 } = require('./SwipeableRow');
 
 import { AnimView } from './AnimView';
 // function BookRow({ bucket, book, onRelease, style }) {
@@ -50,10 +50,10 @@ class BookRow0 extends React.Component {
     // this.state.bounceValue.setValue(1.5);     // Start large
     Animated.timing(                          // Base: spring, decay, timing
                                               this.state.bounceValue,                 // Animate `bounceValue`
-                                              {
-                                                toValue: 1,                         // Animate to smaller size
-                                                duration: 5000,                          // Bouncier spring
-                                              }
+      {
+        toValue: 1,                         // Animate to smaller size
+        duration: 5000,                          // Bouncier spring
+      }
     ).start();
     /* this.refs.outer.open().then(
      *   this.setState({close:false})
@@ -115,15 +115,15 @@ class BookRow0 extends React.Component {
        */
       <TouchableHighlight
         onPress={() => {
-            console.log(this);
-            this.refs.anim.animateTo({ height: 80 });
+          console.log(this);
+          this.refs.anim.animateTo({ height: 80 });
             // this.setState({close:!this.state.close})
-            console.log('mypress'); }}
+          console.log('mypress'); }}
       >
         <AnimView
           ref={(c) => {
-              console.log('ref:', this, this.props.book);
-              this.anim = c; }}
+            console.log('ref:', this, this.props.book);
+            this.anim = c; }}
           style={{
             opacity: this.state.bounceValue,
             height: this.state.close ? 50 : 80
@@ -139,26 +139,26 @@ class BookRow0 extends React.Component {
             onOpen={() => console.log('open')}
             onRelease={(positiveSwipe) => {
                 // this.refs.leftButtons.state
-                console.log('zzz',
+              console.log('zzz',
                             this.leftActions.state.index,
                             this.leftActions.getTarget());
                 /* this.refs.leftButtons.release().then(()=>
                    this.props.onRelease())
                  */
                 // console.log("zzz",this.leftActions.state.index)
-                if (positiveSwipe) {
-                  this.leftActions.release().then(() =>
+              if (positiveSwipe) {
+                this.leftActions.release().then(() =>
                     onRelease(book, this.leftActions.getTarget(), this)
                   );
-                }
-              }}
+              }
+            }}
             renderLeftActions={width =>
               <SwipeableButtons2
-          ref={c => this.leftActions = c}
-          direction="left"
-          width={width}
-          buttons={leftButtons}
-                  />}
+                ref={c => this.leftActions = c}
+                direction="left"
+                width={width}
+                buttons={leftButtons}
+              />}
             rightButtons={rightButtons}
           >
               <BookCell
@@ -180,11 +180,11 @@ function Action({ icon, text, backgroundColor, close, target, style, ...props })
     <View
       {...props}
       style={[{
-          flexDirection: 'row',
-          alignItems: 'center',
-          flex: 1, //vertical center
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1, //vertical center
           //backgroundColor:backgroundColor,//for debug
-        }, style]}
+      }, style]}
     >
       <FAIcon
         name={icon} size={20}
@@ -242,64 +242,64 @@ function genActions(self) {
 class BookRow1 extends React.Component {
   constructor(props) {
     super(props);
-    this.state={lock:false}
+    this.state = { lock: false };
   }
   render() {
-    const { bucket, onSwipeEnd,onSwipeStart, ...props } = this.props;
-    //TODO:parameterize
+    const { bucket, onSwipeEnd, onSwipeStart, ...props } = this.props;
+    // TODO:parameterize
     const { leftActions, rightActions } = genActions(bucket);
     return (
       <SwipeableRow3
         {...props}
         ref={c => this.row = c}
-        renderLeftActions={(width)=>
+        renderLeftActions={width =>
           <SwipeableActions
-          ref={c => this.leftActions = c}
-          actions={leftActions}
-          lock={this.state.lock}
-               />
+            ref={c => this.leftActions = c}
+            actions={leftActions}
+            lock={this.state.lock}
+          />
                           }
-        renderRightActions={(width)=>
+        renderRightActions={width =>
           <SwipeableActions
-          ref={c => this.rightActions = c}
-          actions={rightActions}
-          lock={this.state.lock}
-               />
+            ref={c => this.rightActions = c}
+            actions={rightActions}
+            lock={this.state.lock}
+          />
                            }
-        onSwipeStart={(evt, gestureState)=> onSwipeStart(gestureState)}
-        onSwipeEnd={(evt, gestureState)=>{
-            const velocity = gestureState.vx //save value for async
-            if(0 < gestureState.dx){
-              this.setState({lock:true},()=>{
-                if(this.leftActions.state.index == 0){
-                  this.row.swipeToFlat(velocity)
-                      .then(()=>this.setState({lock:false}))
-                      .then(()=> onSwipeEnd &&
-                               onSwipeEnd(gestureState))
-                } else {
-                  this.row.swipeToMax(velocity)
-                      .then(()=> this.row.close())
-                      .then(()=> onSwipeEnd &&
-                               onSwipeEnd(gestureState))
-                }
-              })
-            }else{
-              this.setState({lock:true},()=>{
-                if(this.rightActions.state.index == 0){
-                  this.row.swipeToFlat(velocity)
-                      .then(()=>this.setState({lock:false}))
-                      .then(()=> onSwipeEnd &&
-                               onSwipeEnd(gestureState))
-                } else {
-                  this.row.swipeToMin(velocity)
-                      .then(()=> this.row.close())
-                      .then(()=> onSwipeEnd &&
-                               onSwipeEnd(gestureState))
-                }
-              })
-              //this.rightActions.props.onSwipeEnd(this.row)
-            }
-          }}
+        onSwipeStart={(evt, gestureState) => onSwipeStart(gestureState)}
+        onSwipeEnd={(evt, gestureState) => {
+          const velocity = gestureState.vx; // save value for async
+          if (0 < gestureState.dx) {
+            this.setState({ lock: true }, () => {
+              if (this.leftActions.state.index == 0) {
+                this.row.swipeToFlat(velocity)
+                      .then(() => this.setState({ lock: false }))
+                      .then(() => onSwipeEnd &&
+                               onSwipeEnd(gestureState));
+              } else {
+                this.row.swipeToMax(velocity)
+                      .then(() => this.row.close())
+                      .then(() => onSwipeEnd &&
+                               onSwipeEnd(gestureState));
+              }
+            });
+          } else {
+            this.setState({ lock: true }, () => {
+              if (this.rightActions.state.index == 0) {
+                this.row.swipeToFlat(velocity)
+                      .then(() => this.setState({ lock: false }))
+                      .then(() => onSwipeEnd &&
+                               onSwipeEnd(gestureState));
+              } else {
+                this.row.swipeToMin(velocity)
+                      .then(() => this.row.close())
+                      .then(() => onSwipeEnd &&
+                               onSwipeEnd(gestureState));
+              }
+            });
+              // this.rightActions.props.onSwipeEnd(this.row)
+          }
+        }}
       />
     );
   }
@@ -352,26 +352,26 @@ class BookRow extends React.Component {
           onOpen={() => console.log('open')}
           onRelease={(positiveSwipe) => {
               // this.refs.leftButtons.state
-              console.log('zzz',
+            console.log('zzz',
                           this.leftActions.state.index,
                           this.leftActions.getTarget());
               /* this.refs.leftButtons.release().then(()=>
                  this.props.onRelease())
                */
               // console.log("zzz",this.leftActions.state.index)
-              if (positiveSwipe) {
-                this.leftActions.release().then(() =>
+            if (positiveSwipe) {
+              this.leftActions.release().then(() =>
                   onRelease(book, this.leftActions.getTarget(), this)
                 );
-              }
-            }}
+            }
+          }}
           renderLeftActions={width =>
             <SwipeableButtons2
               ref={c => this.leftActions = c}
               direction="left"
               width={width}
               buttons={leftButtons}
-                      />}
+            />}
           rightButtons={rightButtons}
         >
             <BookCell
@@ -384,4 +384,4 @@ class BookRow extends React.Component {
     );//
   }
 }
-module.exports = { BookRow, BookRow1, Action, genActions};
+module.exports = { BookRow, BookRow1, Action, genActions };

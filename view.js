@@ -81,7 +81,7 @@ function ItemsFooter({ payload, count }) {
   );
 }
 
-//import { Closeable, Closeable2 } from './Closeable';
+// import { Closeable, Closeable2 } from './Closeable';
 import { AnimView } from './AnimView';
 Touchable.BookListView = Touchable.createCycleComponent(
   BookListView);
@@ -132,16 +132,18 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
         enableEmptySections
         renderRow={(rowData, sectionID, rowID) => {
           // console.log('row:', rowData, sectionID, rowID);
-            return (
+          return (
               <BookRow1
                 key={rowID}
                 selector="bookcell"
-                bucket={sectionID}>
+                bucket={sectionID}
+              >
                 <BookCell
                   book={rowData}
-                  style={{ backgroundColor: materialColor.grey['50'] }}/>
+                  style={{ backgroundColor: materialColor.grey['50'] }}
+                />
               </BookRow1>
-            )
+            );
             /* <Touchable.BookRow
             key={rowID}
             selector="bookcell"
@@ -149,7 +151,7 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
             book={rowData}
             style={{ backgroundColor: materialColor.grey['50'] }}
             />); */
-          }}
+        }}
         renderSectionFooter={(sectionData, sectionID) => {
             // console.log('footer', sectionData, sectionID);
           const { section, count } = sectionData;
