@@ -57,7 +57,8 @@ function MyCard({ children, navigationProps }) {
     );
 }
 
-import { BookRow1,BookCell } from './BookCell';
+import { BookCell } from './BookCell';
+import { BookRow1 } from './BookRow';
 Touchable.BookRow1 = Touchable.createCycleComponent(
   BookRow1, {
     onRelease: 'release',

@@ -18,18 +18,18 @@ import {BookRow1} from '../../BookRow';
 import {withDebug} from './common';
 const BookRow1Debug = withDebug(BookRow1)
 
-/* storiesOf('BookRow1', module)
- *   .addDecorator(getStory => (
- *     <CenterView>{getStory()}</CenterView>
- *   ))
- *   .add('with close props', () => (
- *     <BookRow1
- *       bucket="liked"
- *       onSwipeEnd={action('swipeEnd')}
- *       onSwipeStart={action('swipeStart')}>
- *       <Text>foo</Text>
- *     </BookRow1>
- *   ))*/
+storiesOf('BookRow1', module)
+  .addDecorator(getStory => (
+    <CenterView>{getStory()}</CenterView>
+  ))
+  .add('with close props', () => (
+    <BookRow1
+      bucket="liked"
+      onSwipeEnd={action('swipeEnd')}
+      onSwipeStart={action('swipeStart')}>
+      <Text>foo</Text>
+    </BookRow1>
+  ))
 /* .add('with close props', () => (
  *   <BookRow1Debug
  *     data={[{close:"true"},

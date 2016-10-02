@@ -12,7 +12,8 @@ import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
-import {genActions,Action,BookCell} from '../../BookCell';
+import {BookCell} from '../../BookCell';
+import {genActions,Action} from '../../BookRow';
 import {AnimView} from '../../AnimView';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 require("./nativeExample")
@@ -21,6 +22,7 @@ require("./SwipeableRowExample")
 require("./CloseableExample")
 require("./BookCellExample")
 require("./AnimViewExample")
+require("./BookRowExample")
 
 storiesOf('BookCell', module)
   .add('with book', () => (

@@ -296,7 +296,7 @@ class SwipeableRow3 extends React.Component {
         { dx: this._panX },    // gestureState arg
       ]), // for performance
       onPanResponderRelease: (evt, gestureState) => {
-        console.log('aa', gestureState.vx);
+        //console.log('aa', gestureState.vx);
         this.props.onSwipeEnd && this.props.onSwipeEnd(evt, gestureState);
       }
     });
