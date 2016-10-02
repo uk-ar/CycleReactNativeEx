@@ -268,15 +268,16 @@ class BookRow1 extends React.Component {
                            }
         onSwipeStart={(evt, gestureState)=> onSwipeStart(gestureState)}
         onSwipeEnd={(evt, gestureState)=>{
+            const velocity = gestureState.vx //save value for async
             if(0 < gestureState.dx){
               this.setState({lock:true},()=>{
                 if(this.leftActions.state.index == 0){
-                  this.row.swipeToFlat(gestureState.vx)
+                  this.row.swipeToFlat(velocity)
                       .then(()=>this.setState({lock:false}))
                       .then(()=> onSwipeEnd &&
                                onSwipeEnd(gestureState))
                 } else {
-                  this.row.swipeToMax(gestureState.vx)
+                  this.row.swipeToMax(velocity)
                       .then(()=> this.row.close())
                       .then(()=> onSwipeEnd &&
                                onSwipeEnd(gestureState))
@@ -285,12 +286,12 @@ class BookRow1 extends React.Component {
             }else{
               this.setState({lock:true},()=>{
                 if(this.rightActions.state.index == 0){
-                  this.row.swipeToFlat(gestureState.vx)
+                  this.row.swipeToFlat(velocity)
                       .then(()=>this.setState({lock:false}))
                       .then(()=> onSwipeEnd &&
                                onSwipeEnd(gestureState))
                 } else {
-                  this.row.swipeToMin(gestureState.vx)
+                  this.row.swipeToMin(velocity)
                       .then(()=> this.row.close())
                       .then(()=> onSwipeEnd &&
                                onSwipeEnd(gestureState))

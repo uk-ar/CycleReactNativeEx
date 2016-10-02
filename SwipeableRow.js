@@ -322,15 +322,16 @@ class SwipeableRow3 extends React.Component {
         velocity }));
   }
   swipeToMax(velocity) {
-    // console.log("v1:",velocity)//bug?
     return this.swipeTo(
       Animated.parallel([
         Animated.decay(this._panX, {
-          deceleration: 0.1, // default 0.997,
           velocity
         }),
-        Animated.spring(this._panX, {
-          toValue: width })
+        Animated.timing(this._panX, {
+          toValue: width*2 })
+        /* ,
+         * Animated.spring(this._panX, {
+         *   toValue: width })*/
       ]));
   }
   swipeToMin(velocity) {
@@ -340,8 +341,10 @@ class SwipeableRow3 extends React.Component {
           deceleration: 0.1, // default 0.997,
           velocity
         }),
-        Animated.spring(this._panX, {
-          toValue: -width })
+        Animated.timing(this._panX, {
+          toValue: -width*2 })
+        /* Animated.spring(this._panX, {
+         *   toValue: -width })*/
       ]));
   }
   close() {

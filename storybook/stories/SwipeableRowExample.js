@@ -42,23 +42,24 @@ class Row extends React.Component {
                   />
                            }
         onSwipeEnd={(evt, gestureState)=>{
+            const velocity = gestureState.vx //save value for async
             if(0 < gestureState.dx){
               this.setState({lock:true},()=>{
                 if(this.leftActions.state.index == 0){
-                  this.row.swipeToFlat(gestureState.vx)
+                  this.row.swipeToFlat(velocity)
                   this.setState({lock:false})
                 } else {
-                  this.row.swipeToMax(gestureState.vx)
+                  this.row.swipeToMax(velocity)
                       .then(()=> this.row.close())
                 }
               })
             }else{
               this.setState({lock:true},()=>{
                 if(this.rightActions.state.index == 0){
-                  this.row.swipeToFlat(gestureState.vx)
+                  this.row.swipeToFlat(velocity)
                   this.setState({lock:false})
                 } else {
-                  this.row.swipeToMin(gestureState.vx)
+                  this.row.swipeToMin(velocity)
                       .then(()=> this.row.close())
                 }
               })

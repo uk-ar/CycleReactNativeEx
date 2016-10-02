@@ -64,19 +64,15 @@ class AnimView extends React.Component {
       })
       animatedStyle.transform = transforms;
     }
-
+    //TimingAnimationConfigSingle
     this.prevStyle = next;
+    const animationConfig = this.props.animationConfig;
     return new Promise((resolve, reject) => {
       // resolve("done");
       this.setState({ animatedStyle }, () => {
         Animated.timing(
           this.counter,
-          { toValue: 1,
-            duration: (this.props.anim && this.props.anim.duration)
-                   || 180,
-            delay: (this.props.anim && this.props.anim.delay) || 0
-            // duration: 180,
-          }
+          { ...animationConfig, toValue: 1}
         ).start(() => {
           resolve();
         });
@@ -88,7 +84,7 @@ class AnimView extends React.Component {
     this.refs.root.setNativeProps(props);
   }
   render() {
-    const { style, ...props } = this.props;
+    const { style, animationConfig, ...props } = this.props;
     //console.log("foo",style,props,this.state.animatedStyle)
     //return null
     return (
