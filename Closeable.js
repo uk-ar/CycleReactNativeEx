@@ -54,6 +54,9 @@ class Closeable3 extends React.Component {
       this.toggle();
     }
   }
+  componentDidMount(){
+    console.log("didmount")
+  }
   render() {
     return (
       <AnimView
@@ -78,6 +81,7 @@ class Closeable3 extends React.Component {
 // withPropsWillChange("key",(old,new)=>)
 // {key1:,key2:}
 // [key1,key2],func
+// props to state
 function willRecieveProps(key, fn) {
   // console.log("p:",key,Object.keys(key))
   return (WrappedComponent) => {
