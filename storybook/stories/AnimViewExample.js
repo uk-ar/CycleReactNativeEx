@@ -12,7 +12,7 @@ import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
-import {genActions,Action,BookCell} from '../../BookCell';
+import {BookCell} from '../../BookCell';
 import {AnimView} from '../../AnimView';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 
@@ -72,4 +72,13 @@ storiesOf('AnimView', module)
     >
       <Text style={{backgroundColor:"red"}}>foo</Text>
     </AnimViewDebug>
+  ))
+  .add('with animationConfig', () => (
+    //opacity:0 or scale 0 cause problems
+    <AnimViewDebug
+      data={[{style:{height:10, backgroundColor:"red" },
+              animationConfig:{duration:1000}},
+             {style:{height:10, backgroundColor:"green"},
+              animationConfig:{duration:1000}}]}
+    />
   ))
