@@ -5,6 +5,7 @@ import {
   PanResponder,
   Animated,
   View,
+  ListView,
   ScrollView
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
@@ -23,21 +24,23 @@ storiesOf('SwipeableListView', module)
   .addDecorator(getStory => (
     <CenterView>{getStory()}</CenterView>
   ))
-  .add('with book', () => (
-    <SwipeableListView
-      renderLeftActions={()=><Text>foo1</Text>}
-      renderRightActions={()=><Text>foo2</Text>}>
-      <Text>foo</Text>
-    </SwipeableListView>
-  ))
-  .add('with callback', () => (
-    <SwipeableListView
-      onSwipe={action('move')}
-      onSwipeStart={action('start')}
-      onSwipeEnd={action('end')}
-      renderLeftActions={()=><Text>foo1</Text>}
-      renderRightActions={()=><Text>foo2</Text>}
-      style={{marginTop:20}}>
-      <Text>bar</Text>
-    </SwipeableListView>
-  ))
+  .add('with book', () => {
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    return(
+      <ListView
+        style={{paddingTop:20}}
+        dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
+        renderRow={(rowData) => <Text>{rowData}</Text>}
+      />
+    )
+  })
+  .add('with book', () => {
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    return(
+      <SwipeableListView
+        style={{paddingTop:20}}
+        dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
+        renderRow={(rowData) => <Text>{rowData}</Text>}
+      />
+    )
+  })
