@@ -19,10 +19,14 @@ import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableR
 require("./nativeExample")
 require("./default")
 require("./SwipeableRowExample")
+require("./SwipeableListViewExample")
+
+require("./AnimViewExample")
 require("./CloseableExample")
 require("./BookCellExample")
-require("./AnimViewExample")
 require("./BookRowExample")
+
+
 
 storiesOf('BookCell', module)
   .add('with book', () => (
