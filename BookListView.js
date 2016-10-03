@@ -80,22 +80,23 @@ class BookListView extends React.Component {
   render() {
     this.sections = this.sections || {};// refs
     console.log('this.props', this.props);
-    return (<EnhancedListView
-      {...this.props}
-      renderScrollComponent={props =>
-        <ScrollView
-          ref={c => this.scrollview = c}
-          {...props}
-        />}
-      renderSectionHeader={(sectionData, sectionID) =>
-        <View
-          ref={(c) => {
-            this.sections[sectionID] = c;
-          }}
-        >
-               {this.props.renderSectionHeader(sectionData, sectionID)}
-        </View>}
-    />);
+    return (
+      <EnhancedListView
+        {...this.props}
+        renderScrollComponent={props =>
+          <ScrollView
+            ref={c => this.scrollview = c}
+            {...props}
+          />}
+        renderSectionHeader={(sectionData, sectionID) =>
+          <View
+            ref={(c) => {
+              this.sections[sectionID] = c;
+            }}
+          >
+            {this.props.renderSectionHeader(sectionData, sectionID)}
+          </View>}
+      />);
   }
 }
 

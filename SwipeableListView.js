@@ -9,6 +9,7 @@ import { SwipeableRow3 } from './SwipeableRow';
 class SwipeableListView extends React.Component {
   render() {
     const { renderRow, generateActions, ...props } = this.props;
+    //console.log("pr:",this.props)
     return (
       <ListView
         ref={c => (this.listview = c)}

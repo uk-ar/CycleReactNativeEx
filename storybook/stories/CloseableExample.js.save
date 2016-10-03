@@ -1,0 +1,35 @@
+import React from 'react'; import {
+  Text,
+  TouchableHighlight,
+  PanResponder,
+  Animated,
+  View,
+  ScrollView
+} from 'react-native';
+import { storiesOf, action, linkTo } from 
+'@kadira/react-native-storybook';
+
+import Button from './Button'; import CenterView from './CenterView'; 
+import Welcome from './Welcome'; import {Closeable2} from 
+'../../Closeable';
+
+import {withDebug} from './common'; const Closeable2Debug = 
+withDebug(Closeable2)
+
+storiesOf('Closeable2', module)
+  .add('with close props', () => (
+    <Closaeble2Debug
+      data={[{close:"true"},
+             {close:"false"}]}
+    >
+      <Text>foo</Text>
+    </Closaeble2Debug>
+  ))
+  .add('with book', () => (
+    <Closaeble2Debug
+      data={[{style:{height:10,backgroundColor:"red"}}]}
+      onPress={(props,self)=>{
+          //console.log(self)
+          self.animateTo({height:20,backgroundColor:"red"})
+        }}/>
+  ))

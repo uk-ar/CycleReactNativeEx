@@ -63,35 +63,37 @@ function withState2(DecoratedComponent) {
             <SwipeableActions
               actions={actions}
               lock={this.state.lock}
+              style={{flex:1}}
             />
           }
           onSwipeEnd={(gestureState) => {
             const fn = onSwipeEnd || function () {};
-            const velocity = gestureState.vx; // save value for async
+              //console.log("fn",fn,this.props)
+              const gestureStateSave = {...gestureState}; // save value for async
             if (0 < gestureState.dx) {
               this.setState({ lock: true }, () => {
                 if (this.row.getCurrentActions().state.index === 0) {
-                  this.row.swipeToFlat(velocity)
+                  this.row.swipeToFlat(gestureStateSave.vx)
                         .then(() => this.setState({ lock: false }, () =>
                                                 Promise.resolve()))
-                        .then(() => fn(gestureState));
+                        .then(() => fn(gestureStateSave));
                 } else {
-                  this.row.swipeToMax(velocity)
+                  this.row.swipeToMax(gestureStateSave.vx)
                         .then(() => this.row.close())
-                        .then(() => fn(gestureState));
+                        .then(() => fn(gestureStateSave));
                 }
               });
             } else {
               this.setState({ lock: true }, () => {
                 if (this.row.getCurrentActions().state.index === 0) {
-                  this.row.swipeToFlat(velocity)
+                  this.row.swipeToFlat(gestureStateSave.vx)
                         .then(() => this.setState({ lock: false }, () =>
                                                 Promise.resolve()))
-                        .then(() => fn(gestureState));
+                        .then(() => fn(gestureStateSave));
                 } else {
-                  this.row.swipeToMin(velocity)
+                  this.row.swipeToMin(gestureStateSave.vx)
                         .then(() => this.row.close())
-                        .then(() => fn(gestureState));
+                        .then(() => fn(gestureStateSave));
                 }
               });
                 // this.rightActions.props.onSwipeEnd(this.row)

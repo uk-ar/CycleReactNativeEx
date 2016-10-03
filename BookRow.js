@@ -9,8 +9,10 @@ class BookRow1 extends React.Component {
     this.state = { lock: false };
   }
   render() {
-    const { bucket, onSwipeEnd, onSwipeStart, ...props } = this.props;
+    const { bucket, ...props } = this.props;
+    //onSwipeEnd
     // TODO:parameterize leftActions & rightActions
+    console.log("br1 rend",this.props)
     return (
       <SwipeableRow3
         {...props}

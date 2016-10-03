@@ -105,10 +105,10 @@ storiesOf('SwipeableRow3', module)
     <SwipeableRow3
       leftActions={[{text:"foo"}]}
       rightActions={[{text:"bar"}]}
-      onSwipeEnd={(evt, gestureState)=>{
+      onSwipeEnd={(gestureState)=>{
           0 < gestureState.dx ?
-          action('left action')(evt, gestureState) :
-          action('right action')(evt, gestureState)
+          action('left action')(gestureState) :
+          action('right action')(gestureState)
         }}
       >
         <Text>bar</Text>
@@ -120,10 +120,11 @@ storiesOf('SwipeableRow3', module)
       <SwipeableRow3
         leftActions={[{text:"foo"}]}
         rightActions={[{text:"bar"}]}
-        onSwipeEnd={(evt, gestureState)=>{
+        onSwipeEnd={(gestureState)=>{
+            console.log("gs:",gestureState)
             0 < gestureState.dx ?
-            action('left action')(evt, gestureState) :
-            action('right action')(evt, gestureState)
+            action('left action')(gestureState) :
+            action('right action')(gestureState)
           }}
         >
         <Text style={{backgroundColor:"red",height:100}}>bar</Text>
@@ -131,4 +132,19 @@ storiesOf('SwipeableRow3', module)
     )})
   .add('with row && small height', () =>(
     <Row />
+  ))
+  .add('with default', () =>(
+    <SwipeableRow3
+      {...genActions2('search')}
+      onSwipeEnd={(gestureState)=>{
+          console.log("gs:",gestureState)
+          0 < gestureState.dx ?
+          action('left action')(gestureState) :
+          action('right action')(gestureState)
+        }}
+    >
+            <View style={{backgroundColor:"blue",flex:1,justifyContent:"center"}}>
+              <Text>bar</Text>
+            </View>
+    </SwipeableRow3>
   ))
