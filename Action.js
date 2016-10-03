@@ -41,11 +41,11 @@ function Action({ icon, text, backgroundColor, close, target, style, ...props })
     <View
       {...props}
       style={[{
-          flexDirection: 'row',
-          alignItems: 'center',
-          flex: 1, //vertical center
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1, //vertical center
           //backgroundColor:backgroundColor,//for debug
-        }, style]}
+      }, style]}
     >
       <FAIcon
         name={icon} size={20}
@@ -111,25 +111,25 @@ function genActions2(self) {
   const nop = {
     text: null, backgroundColor: materialColor.grey[300], close: false, target: null };
   const leftActions = [
-    {...getProps(self, 'liked'),
+    { ...getProps(self, 'liked'),
      ...nop,
-     style:{ justifyContent: 'flex-end' }},
-    {...getProps(self, 'liked'),
-     style:{ width: width / 2 }},
-    {...getProps(self, 'borrowed'),
-     style:{ width: width }}
+     style: { justifyContent: 'flex-end' } },
+    { ...getProps(self, 'liked'),
+     style: { width: width / 2 } },
+    { ...getProps(self, 'borrowed'),
+     style: { width } }
   ];
   const rightActions = [
-    {...getProps(self, 'done'),
+    { ...getProps(self, 'done'),
      ...nop,
-     style:{flexDirection: 'row-reverse',
-            justifyContent: 'flex-end' }},
-    {...getProps(self, 'done'),
-     style:{ flexDirection: 'row-reverse' }}
+     style: { flexDirection: 'row-reverse',
+            justifyContent: 'flex-end' } },
+    { ...getProps(self, 'done'),
+     style: { flexDirection: 'row-reverse' } }
   ];
   return { leftActions, rightActions };
 }
 
-//console.log("sw:?",{ SwipeableRow2, SwipeableRow3, SwipeableActions, SwipeableButtons2,AnimView })
+// console.log("sw:?",{ SwipeableRow2, SwipeableRow3, SwipeableActions, SwipeableButtons2,AnimView })
 
 module.exports = { Action, genActions, genActions2 };

@@ -15,7 +15,7 @@ import CenterView from './CenterView';
 import Welcome from './Welcome';
 
 import {BookCell} from '../../BookCell';
-import {genActions,Action} from '../../BookRow';
+import {genActions,Action} from '../../Action';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 
 import {SwipeableListView} from '../../SwipeableListView';

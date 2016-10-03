@@ -15,7 +15,7 @@ const cloneReferencedElement = require('react-clone-referenced-element');
 import { AnimView } from './AnimView';
 import { Closeable3 } from './Closeable';
 // const Dimensions = require('Dimensions');
-//import { BookRow, BookRow1, Action, genActions, genActions2 } from './BookRow';
+// import { BookRow, BookRow1, Action, genActions, genActions2 } from './BookRow';
 import { Action, genActions, genActions2 } from './Action';
 
 const {
@@ -272,63 +272,63 @@ function calcIndex(value, thresholds) {
 // https://github.com/facebook/react-native/blob/master/Libraries/Experimental/SwipeableRow/SwipeableListView.js
 
 function withState2(DecoratedComponent) {
-  console.log("withState2 deco")
+  console.log('withState2 deco');
   return class extends DecoratedComponent {
     constructor(props) {
       super(props);
-      console.log("withState2");
-      this.state = {...this.state, lock:false };
+      console.log('withState2');
+      this.state = { ...this.state, lock: false };
     }
-    render(){
-      const {onSwipeEnd,...props}={...this.props}
-      return(
+    render() {
+      const { onSwipeEnd, ...props } = { ...this.props };
+      return (
         <DecoratedComponent
           ref={c => this.row = c}
-          renderActions={ actions => {
-              return (
+          renderActions={(actions) => {
+            return (
                 <SwipeableActions
-                actions={actions}
-                lock={this.state.lock}
-                     />
-              )//need state index
-            }}
-          onSwipeEnd={(gestureState)=>{
-              const fn = onSwipeEnd || function() {}
-              const velocity = gestureState.vx //save value for async
-              if(0 < gestureState.dx){
-                this.setState({lock:true},()=>{
-                  if(this.row.getCurrentActions().state.index == 0){
-                    this.row.swipeToFlat(velocity)
-                        .then(()=>this.setState({lock:false},()=>
+                  actions={actions}
+                  lock={this.state.lock}
+                />
+              );// need state index
+          }}
+          onSwipeEnd={(gestureState) => {
+            const fn = onSwipeEnd || function () {};
+            const velocity = gestureState.vx; // save value for async
+            if (0 < gestureState.dx) {
+              this.setState({ lock: true }, () => {
+                if (this.row.getCurrentActions().state.index == 0) {
+                  this.row.swipeToFlat(velocity)
+                        .then(() => this.setState({ lock: false }, () =>
                                                 Promise.resolve()))
-                        .then(()=>fn(gestureState))
-                  } else {
-                    this.row.swipeToMax(velocity)
-                        .then(()=> this.row.close())
-                        .then(()=>fn(gestureState))
-                  }
-                })
-              }else{
-                this.setState({lock:true},()=>{
-                  if(this.row.getCurrentActions().state.index == 0){
-                    this.row.swipeToFlat(velocity)
-                        .then(()=>this.setState({lock:false},()=>
+                        .then(() => fn(gestureState));
+                } else {
+                  this.row.swipeToMax(velocity)
+                        .then(() => this.row.close())
+                        .then(() => fn(gestureState));
+                }
+              });
+            } else {
+              this.setState({ lock: true }, () => {
+                if (this.row.getCurrentActions().state.index == 0) {
+                  this.row.swipeToFlat(velocity)
+                        .then(() => this.setState({ lock: false }, () =>
                                                 Promise.resolve()))
-                        .then(()=>fn(gestureState))
-                  } else {
-                    this.row.swipeToMin(velocity)
-                        .then(()=> this.row.close())
-                        .then(()=>fn(gestureState))
-                  }
-                })
-                //this.rightActions.props.onSwipeEnd(this.row)
-              }
-            }}
+                        .then(() => fn(gestureState));
+                } else {
+                  this.row.swipeToMin(velocity)
+                        .then(() => this.row.close())
+                        .then(() => fn(gestureState));
+                }
+              });
+                // this.rightActions.props.onSwipeEnd(this.row)
+            }
+          }}
           {...props}
         />
-      )
+      );
     }
-  }
+  };
 }
 
 
@@ -339,7 +339,7 @@ class _SwipeableRow3 extends React.Component {
    * onSwipeStart={() => this._setListViewScrollable(false)}*/
   constructor(props) {
     super(props);
-    console.log("SwipeableRow3");
+    console.log('SwipeableRow3');
     this.state = {
       positiveSwipe: true,
     };
@@ -420,26 +420,26 @@ class _SwipeableRow3 extends React.Component {
   close() {
     return this._root.close();
   }
-  getCurrentActions(){
+  getCurrentActions() {
     return this.state.positiveSwipe ? this.leftActions : this.rightActions;
   }
   render() {
     const { onSwipeStart, onSwipeEnd,
             leftActions, rightActions, renderActions,
             children, style, ...props } = this.props;
-    //console.log("th:",this.props)
-    //cloneReferencedElement
-    console.log("tp:",this.props)
+    // console.log("th:",this.props)
+    // cloneReferencedElement
+    console.log('tp:', this.props);
     /* let leftActionsElement = null;
      * let rightActionsElement = null;*/
-    let leftActionsElement = cloneReferencedElement(
-      renderActions(leftActions),{
-        ref:c => this.leftActions = c
-      })
-    let rightActionsElement = cloneReferencedElement(
-      renderActions(rightActions),{
-        ref:c => this.rightActions = c
-      })
+    const leftActionsElement = cloneReferencedElement(
+      renderActions(leftActions), {
+        ref: c => this.leftActions = c
+      });
+    const rightActionsElement = cloneReferencedElement(
+      renderActions(rightActions), {
+        ref: c => this.rightActions = c
+      });
 
     return (
       <Closeable3
@@ -467,8 +467,8 @@ class _SwipeableRow3 extends React.Component {
     );
   }
 }
-const SwipeableRow3 = withState2(_SwipeableRow3)
-//const SwipeableRowW = null//withState2(SwipeableRow3)
+const SwipeableRow3 = withState2(_SwipeableRow3);
+// const SwipeableRowW = null//withState2(SwipeableRow3)
 
 class SwipeableActions extends React.Component {
   /* onSwipeEnd={() => this._setListViewScrollable(true)}
@@ -518,7 +518,7 @@ class SwipeableActions extends React.Component {
                    }
                  }}
              >
-               <Action {...action}/>
+               <Action {...action} />
              </MeasureableView>
           );
         })}
@@ -549,7 +549,7 @@ class SwipeableActions extends React.Component {
                index,actions[this.state.index]) */
         }}
       >
-        <Action {...currentAction}/>
+        <Action {...currentAction} />
       </AnimView>
     );
     /* this.props.width.addListener(({ value }) => {
@@ -683,6 +683,6 @@ const SwipeableRow2 = React.createClass({
   },
 });
 
-//module.exports = { SwipeableButtons2, SwipeableRow2, SwipeableRow3, AnimView, MeasureableView, SwipeableActions,SwipeableRowW ,withState2};
+// module.exports = { SwipeableButtons2, SwipeableRow2, SwipeableRow3, AnimView, MeasureableView, SwipeableActions,SwipeableRowW ,withState2};
 
-module.exports = { SwipeableButtons2, SwipeableRow2, SwipeableRow3, AnimView, MeasureableView, SwipeableActions, withState2};
+module.exports = { SwipeableButtons2, SwipeableRow2, SwipeableRow3, AnimView, MeasureableView, SwipeableActions, withState2 };

@@ -81,25 +81,25 @@ const {
   height,
 } = Dimensions.get('window');
 
-import {SwipeableActions,SwipeableRow3,SwipeableRowW} from './SwipeableRow';
+import { SwipeableActions, SwipeableRow3, SwipeableRowW } from './SwipeableRow';
 import { BookRow, BookRow1 } from './BookRow';
 import { Action, genActions, genActions2 } from './Action';
 
 class SwipeableListView extends React.Component {
   render() {
-    const {renderRow, renderActions, actions, ...props} = this.props;
+    const { renderRow, renderActions, actions, ...props } = this.props;
 
     return (
       <ListView
         ref={c => this.listview = c}
         renderRow={(rowData, sectionID, rowID, highlightRow) =>
           <SwipeableRow3
-             onSwipeStart={()=>
-               this.listview.setNativeProps({scrollEnabled:false})}
-             onSwipeEnd={()=>
-               this.listview.setNativeProps({scrollEnabled:true})}
-             {...genActions2('search')}
-                  >
+            onSwipeStart={() =>
+               this.listview.setNativeProps({ scrollEnabled: false })}
+            onSwipeEnd={() =>
+               this.listview.setNativeProps({ scrollEnabled: true })}
+            {...genActions2('search')}
+          >
             {renderRow(rowData, sectionID, rowID, highlightRow)}
           </SwipeableRow3>
                   }
