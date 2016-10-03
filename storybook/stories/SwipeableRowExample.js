@@ -24,6 +24,7 @@ class Row extends React.Component {
     this.state = { lock:false };
   }
   render(){
+    const { onSwipeEnd, ...props } = { ...this.props };
     return(
       <SwipeableRow3
         ref={c => this.row = c}
@@ -36,29 +37,36 @@ class Row extends React.Component {
                      />
             )//need state index
           }}
-        onSwipeEnd={(evt, gestureState)=>{
-            const velocity = gestureState.vx //save value for async
-            if(0 < gestureState.dx){
-              this.setState({lock:true},()=>{
-                if(this.row.getCurrentActions().state.index == 0){
+        onSwipeEnd={(gestureState) => {
+            const fn = onSwipeEnd || function () {};
+            const velocity = gestureState.vx; // save value for async
+            if (0 < gestureState.dx) {
+              this.setState({ lock: true }, () => {
+                if (this.row.getCurrentActions().state.index === 0) {
                   this.row.swipeToFlat(velocity)
-                  this.setState({lock:false})
+                      .then(() => this.setState({ lock: false }, () =>
+                        Promise.resolve()))
+                      .then(() => fn(gestureState));
                 } else {
                   this.row.swipeToMax(velocity)
-                      .then(()=> this.row.close())
+                      .then(() => this.row.close())
+                      .then(() => fn(gestureState));
                 }
-              })
-            }else{
-              this.setState({lock:true},()=>{
-                if(this.row.getCurrentActions().state.index == 0){
+              });
+            } else {
+              this.setState({ lock: true }, () => {
+                if (this.row.getCurrentActions().state.index === 0) {
                   this.row.swipeToFlat(velocity)
-                  this.setState({lock:false})
+                      .then(() => this.setState({ lock: false }, () =>
+                        Promise.resolve()))
+                      .then(() => fn(gestureState));
                 } else {
                   this.row.swipeToMin(velocity)
-                      .then(()=> this.row.close())
+                      .then(() => this.row.close())
+                      .then(() => fn(gestureState));
                 }
-              })
-              //this.rightActions.props.onSwipeEnd(this.row)
+              });
+              // this.rightActions.props.onSwipeEnd(this.row)
             }
           }}
       >
@@ -76,9 +84,10 @@ storiesOf('SwipeableRow3', module)
   ))
   .add('with book', () => (
     <SwipeableRow3
-      renderLeftActions={()=><Text>foo1</Text>}
-      renderRightActions={()=><Text>foo2</Text>}>
-      <Text>foo</Text>
+      leftActions={[{text:"foo"}]}
+      rightActions={[{text:"bar"}]}
+    >
+      <Text>baz</Text>
     </SwipeableRow3>
   ))
   .add('with callback', () => (
@@ -86,52 +95,38 @@ storiesOf('SwipeableRow3', module)
       onSwipe={action('move')}
       onSwipeStart={action('start')}
       onSwipeEnd={action('end')}
-      renderLeftActions={()=><Text>foo1</Text>}
-      renderRightActions={()=><Text>foo2</Text>}
-      style={{marginTop:20}}>
-      <Text>bar</Text>
+      leftActions={[{text:"foo"}]}
+      rightActions={[{text:"bar"}]}
+      >
+      <Text>baz</Text>
     </SwipeableRow3>
   ))
   .add('with release', () => (
     <SwipeableRow3
-      renderLeftActions={(width)=>
-        <Animated.View style={{width:width}}>
-          <Text numberOfLines={1}>foo1</Text>
-        </Animated.View>}
-      renderRightActions={(width)=>
-        <Animated.View style={{width:width}}>
-          <Text numberOfLines={1}>foo2</Text>
-        </Animated.View>}
+      leftActions={[{text:"foo"}]}
+      rightActions={[{text:"bar"}]}
       onSwipeEnd={(evt, gestureState)=>{
           0 < gestureState.dx ?
           action('left action')(evt, gestureState) :
           action('right action')(evt, gestureState)
         }}
-      style={{marginTop:20}}>
+      >
         <Text>bar</Text>
     </SwipeableRow3>
   ))
   .add('with actions && tall height', () => {
-    const { leftActions, rightActions } = genActions('liked');
+    const { leftActions, rightActions } = genActions2('liked');
     return(
       <SwipeableRow3
-        renderLeftActions={(width)=>
-          <SwipeableActions
-            style={{width:width,flex:1}}
-            actions={leftActions}/>
-                          }
-        renderRightActions={(width)=>
-          <SwipeableActions
-             style={{width:width,flex:1}}
-             actions={rightActions}/>
-                           }
+        leftActions={[{text:"foo"}]}
+        rightActions={[{text:"bar"}]}
         onSwipeEnd={(evt, gestureState)=>{
             0 < gestureState.dx ?
             action('left action')(evt, gestureState) :
             action('right action')(evt, gestureState)
           }}
-        style={{marginTop:20}}>
-      <Text style={{backgroundColor:"red",height:100}}>bar</Text>
+        >
+        <Text style={{backgroundColor:"red",height:100}}>bar</Text>
       </SwipeableRow3>
     )})
   .add('with row && small height', () =>(

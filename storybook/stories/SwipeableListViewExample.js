@@ -15,7 +15,7 @@ import CenterView from './CenterView';
 import Welcome from './Welcome';
 
 import {BookCell} from '../../BookCell';
-import {genActions,Action} from '../../Action';
+import {genActions2,Action} from '../../Action';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 
 import {SwipeableListView} from '../../SwipeableListView';
@@ -39,6 +39,7 @@ storiesOf('SwipeableListView', module)
     return(
       <SwipeableListView
         style={{paddingTop:20}}
+        generateActions={()=>genActions2('search')}
         dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
         renderRow={(rowData) => <Text>{rowData}</Text>}
       />

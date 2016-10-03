@@ -14,7 +14,7 @@ class BookRow1 extends React.Component {
     return (
       <SwipeableRow3
         {...props}
-        ref={c => this.row = c}
+        ref={c => (this.row = c)}
         {...genActions2(bucket)}
       />
     );

@@ -13,7 +13,7 @@ import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
-import {genActions,Action} from '../../Action';
+import {genActions2,Action} from '../../Action';
 import {AnimView} from '../../AnimView';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 require("./nativeExample")
@@ -25,8 +25,7 @@ require("./AnimViewExample")
 require("./CloseableExample")
 require("./BookCellExample")
 require("./BookRowExample")
-
-
+require("./BookListViewExample")
 
 storiesOf('BookCell', module)
   .add('with book', () => (
@@ -77,7 +76,7 @@ class Actions extends React.Component {
     this.state = { index:0 };
   }
   render(){
-    const { leftActions, rightActions } = genActions('search');
+    const { leftActions, rightActions } = genActions2('search');
     const widths=[10,150,300]
     return (
       <TouchableHighlight
@@ -101,7 +100,7 @@ storiesOf('SwipeableActions', module)
       actions={[<Text>foo</Text>,<Text>bar</Text>]}
     />
   )).add('with search', () => {
-    const { leftActions, rightActions } = genActions('search');
+    const { leftActions, rightActions } = genActions2('search');
     return (
       <View>
         <SwipeableActions
@@ -111,7 +110,7 @@ storiesOf('SwipeableActions', module)
       </View>
     )
   }).add('with liked', () => {
-    const { leftActions, rightActions } = genActions('liked');
+    const { leftActions, rightActions } = genActions2('liked');
     return (
       <View>
         <SwipeableActions
@@ -121,7 +120,7 @@ storiesOf('SwipeableActions', module)
       </View>
     )
   }).add('with borrowed', () => {
-    const { leftActions, rightActions } = genActions('borrowed');
+    const { leftActions, rightActions } = genActions2('borrowed');
     return (
       <View>
         <SwipeableActions
@@ -131,7 +130,7 @@ storiesOf('SwipeableActions', module)
       </View>
     )
   }).add('with done', () => {
-    const { leftActions, rightActions } = genActions('done');
+    const { leftActions, rightActions } = genActions2('done');
     return (
       <View>
         <SwipeableActions
@@ -141,11 +140,11 @@ storiesOf('SwipeableActions', module)
       </View>
     )
   }).add('with Toggle', () => {
-    const { leftActions, rightActions } = genActions('search');
+    const { leftActions, rightActions } = genActions2('search');
     return (
       <Actions />
     )}).add('with sw b', () => {
-      const { leftActions, rightActions } = genActions('done');
+      const { leftActions, rightActions } = genActions2('done');
       return (
           <SwipeableButtons2
             ref="rightButtons"

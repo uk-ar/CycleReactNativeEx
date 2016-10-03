@@ -1,85 +1,20 @@
 
 import React from 'react';
-const ReactNative = require('react-native');
-const FAIcon = require('react-native-vector-icons/FontAwesome');
-
-import materialColor from 'material-colors';
-import { styles } from './styles';
-import { itemsInfo } from './common';
-
-const _ = require('lodash');
-
-const {
+import FAIcon from 'react-native-vector-icons/FontAwesome';
+import {
   ActivityIndicator,
   Text,
   View,
   Image,
-  Animated,
   Platform,
   StyleSheet,
   PixelRatio,
   TouchableHighlight,
   TouchableNativeFeedback,
-} = ReactNative;
-// jest bug
-import Touchable from '@cycle/react-native/src/Touchable';
-// const Touchable = require('@cycle/react-native/src/Touchable');
-// const Touchable = require('@cycle/react-native/lib/Touchable');
-// import Touchable from '@cycle/react-native/lib/Touchable';
+} from 'react-native';
 
-const Dimensions = require('Dimensions');
-const {
-  width,
-} = Dimensions.get('window');
-
-const { SwipeableRow2, SwipeableRow3, SwipeableActions, SwipeableButtons2 } = require('./SwipeableRow');
-
-function LeftButton({ icon, text, style, backgroundColor, ...props }) {
-  // console.log("props:",icon, text, style, backgroundColor, props)
-  // backgroundColor are used from SwipeableButtons
-  return (
-    <View
-      {...props}
-      style={[style, {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1, //vertical center
-      }]}
-    >
-      <FAIcon
-        name={icon} size={20}
-        style={{ margin: 10, marginRight: 5 }}
-      />
-      <Text>
-        {text}
-      </Text>
-    </View>
-  );
-}
-
-// http://mae.chab.in/archives/2854
-// stateless component validation
-// flexDirection=row-reverse
-function RightButton({ icon, text, style, backgroundColor, ...props }) {
-  return (
-    <View
-      {...props}
-      style={[style, {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1, //vertical center
-      }]}
-    >
-      <Text>
-        {text}
-      </Text>
-      <FAIcon
-        name={icon} size={20}
-        style={{ margin: 10, marginLeft: 5 }}
-      />
-    </View>
-  );
-}
+import { styles } from './styles';
+import { itemsInfo } from './common';
 
 // const LibraryStatusWithLoading = withLoading(LibraryStatus)
 function LibraryStatus({ libraryStatus = {}, ...props }) {
@@ -121,93 +56,8 @@ function LibraryStatus({ libraryStatus = {}, ...props }) {
   );
 }
 
-function getButtons(bucket, isbn) {
-  let likedButton;
-  let borrowedButton;
-  let doneButton;
-  const selfProps = { text: '先頭に移動', icon: 'level-up', close: false };
-  // MIcon publish,vertical align top,low priority
-  switch (bucket) {
-    case 'liked':
-      likedButton = selfProps;
-      break;
-    case 'borrowed':
-      borrowedButton = selfProps;
-      break;
-    case 'done':
-      doneButton = selfProps;
-      break;
-    default:
-      break;
-  }
-
-  const leftButtons = [
-    <LeftButton
-      close={false}
-      {...itemsInfo.liked}
-      {...likedButton}
-      text={null}
-      backgroundColor={materialColor.grey[300]}
-      style={{ justifyContent: 'flex-end' }}
-    />, // grey 300
-    <LeftButton
-      close
-      target="liked"
-      onRelease={() => {
-        console.log('like'); func(isbn, 'liked');
-      }}
-      {...itemsInfo.liked}
-      {...likedButton}
-      style={{ width: width / 2 }}
-    />, // light blue "#03A9F4"
-    // blue "#2196F3"
-    <LeftButton
-      onRelease={() => func(isbn, 'borrowed')}
-      close
-      target="borrowed"
-      {...itemsInfo.borrowed}
-      {...borrowedButton}
-      style={{ width }}
-    />, //green
-  ];
-
-  const rightButtons = [
-    <RightButton
-      close={false}
-      {...itemsInfo.done}
-      {...doneButton}
-      backgroundColor={materialColor.grey[300]}
-      text={null}
-    />, // grey 300
-    <RightButton
-      onRelease={() => func(isbn, 'done')}
-      close
-      target="done"
-      {...itemsInfo.done}
-      {...doneButton}
-      style={{ justifyContent: 'flex-end' }}
-    />, //amber
-  ];// Touchable
-  return { leftButtons, rightButtons };
-}
-
-/* SwipeableRow2
- *   onPanResponderMove, onPanResponderEnd,
- *   onRelease,
- *   bucket,
- * children
- *   book
- *   ...props
- *   style*/
-// ToastAndroid.show('foo', ToastAndroid.SHORT)
-
 function BookCell({ book, style, onPress, ...props }) {
-  let TouchableElement = TouchableHighlight;
-  // (Platform.OS === 'android') &&
-  if (Platform.OS === 'android') {
-    TouchableElement = TouchableNativeFeedback;
-     // BUG:TouchableNativeFeedback TouchableOpacity TouchableWithoutFeedback not support style
-  }
+  const TouchableElement = (Platform.OS === 'android') ? TouchableNativeFeedback : TouchableHighlight;
 
   return (
     <TouchableElement
@@ -259,4 +109,3 @@ function BookCell({ book, style, onPress, ...props }) {
 }
 
 module.exports = { LibraryStatus, BookCell };
-// module.exports = { BookCell, SwipeableRow };
