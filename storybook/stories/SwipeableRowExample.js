@@ -14,38 +14,33 @@ import CenterView from './CenterView';
 import Welcome from './Welcome';
 
 import {BookCell} from '../../BookCell';
-import {genActions,Action} from '../../BookRow';
+import {genActions2,Action} from '../../BookRow';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 
+//with row && small height
 class Row extends React.Component {
   constructor(props) {
     super(props);
     this.state = { lock:false };
   }
   render(){
-    const { leftActions, rightActions } = genActions('search');
     return(
       <SwipeableRow3
         ref={c => this.row = c}
-        renderLeftActions={(width)=>
-          <SwipeableActions
-            ref={c => this.leftActions = c}
-            actions={leftActions}
-            lock={this.state.lock}
-                 />
-                          }
-        renderRightActions={(width)=>
-          <SwipeableActions
-             ref={c => this.rightActions = c}
-             actions={rightActions}
-             lock={this.state.lock}
-                  />
-                           }
+        {...genActions2('search')}
+        renderActions={ actions => {
+            return (
+              <SwipeableActions
+                actions={actions}
+                lock={this.state.lock}
+                     />
+            )//need state index
+          }}
         onSwipeEnd={(evt, gestureState)=>{
             const velocity = gestureState.vx //save value for async
             if(0 < gestureState.dx){
               this.setState({lock:true},()=>{
-                if(this.leftActions.state.index == 0){
+                if(this.row.getCurrentActions().state.index == 0){
                   this.row.swipeToFlat(velocity)
                   this.setState({lock:false})
                 } else {
@@ -55,7 +50,7 @@ class Row extends React.Component {
               })
             }else{
               this.setState({lock:true},()=>{
-                if(this.rightActions.state.index == 0){
+                if(this.row.getCurrentActions().state.index == 0){
                   this.row.swipeToFlat(velocity)
                   this.setState({lock:false})
                 } else {

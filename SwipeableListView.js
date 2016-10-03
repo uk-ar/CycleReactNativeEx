@@ -81,37 +81,39 @@ const {
   height,
 } = Dimensions.get('window');
 
-//SwipeableListView
+import {SwipeableActions,SwipeableRow3,SwipeableRowW} from './SwipeableRow';
+import { BookRow, BookRow1 } from './BookRow';
+import { Action, genActions, genActions2 } from './Action';
+
 class SwipeableListView extends React.Component {
   render() {
-    this.sections = this.sections || {};// refs
-    console.log('this.props', this.props);
-    const {renderSectionHeader,...props} = this.props;
+    const {renderRow, renderActions, actions, ...props} = this.props;
+
     return (
-      <EnhancedListView
+      <ListView
+        ref={c => this.listview = c}
+        renderRow={(rowData, sectionID, rowID, highlightRow) =>
+          <SwipeableRow3
+             onSwipeStart={()=>
+               this.listview.setNativeProps({scrollEnabled:false})}
+             onSwipeEnd={()=>
+               this.listview.setNativeProps({scrollEnabled:true})}
+             {...genActions2('search')}
+                  >
+            {renderRow(rowData, sectionID, rowID, highlightRow)}
+          </SwipeableRow3>
+                  }
         {...props}
-        renderScrollComponent={p =>
-          <ScrollView
-          ref={c => this.scrollview = c}
-          {...p}
-          />}
-        renderSectionHeader={renderSectionHeader ? (sectionData, sectionID) =>
-          <View
-          ref={(c) => {
-              this.sections[sectionID] = c;
-            }}
-              >
-              {renderSectionHeader(sectionData, sectionID)}
-          </View> : undefined}
       />);
   }
 }
 SwipeableListView.propTypes = {
   // ...ListView.DataSource.propTypes
-  ...ListView.propTypes,
-  renderSectionFooter: React.PropTypes.func.isRequired
+  ...ListView.propTypes
 };
-SwipeableListView.defaultProps = { ...ListView.defaultProps };
+SwipeableListView.defaultProps = {
+  ...ListView.defaultProps
+};
 // SwipeableListView.propTypes = { initialCount: React.PropTypes.number };
 
 // Dumb compo

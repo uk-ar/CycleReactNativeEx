@@ -31,9 +31,10 @@ const {
   width,
 } = Dimensions.get('window');
 
-const { SwipeableRow2, SwipeableRow3, SwipeableActions, SwipeableButtons2 } = require('./SwipeableRow');
+import { SwipeableRow2, SwipeableRow3, SwipeableActions, SwipeableButtons2 } from './SwipeableRow';
 
 import { AnimView } from './AnimView';
+import { Action, genActions, genActions2 } from './Action';
 // function BookRow({ bucket, book, onRelease, style }) {
 class BookRow0 extends React.Component {
   constructor(props) {
@@ -172,73 +173,6 @@ class BookRow0 extends React.Component {
   }
 }
 
-// bucket,target->icon,text,backgroundColor,close,target
-function Action({ icon, text, backgroundColor, close, target, style, ...props }) {
-  // console.log("props:",icon, text, style, backgroundColor, props)
-  // backgroundColor,close,target are used from SwipeableActions
-  return (
-    <View
-      {...props}
-      style={[{
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1, //vertical center
-          //backgroundColor:backgroundColor,//for debug
-      }, style]}
-    >
-      <FAIcon
-        name={icon} size={20}
-        style={{ margin: 10 }}
-      />
-      <View style={{ margin: -2.5 }} />
-      <Text>
-        {text}
-      </Text>
-    </View>
-  );
-}
-
-// bucket,target->icon,text,backgroundColor,close,target
-function genActions(self) {
-  function getProps(self, target) {
-    ({ icon, text, backgroundColor } = itemsInfo[target]);
-    if (target === self) {
-      ({ icon, text } = { text: '先頭に移動', icon: 'level-up' });
-    }
-    return { icon, text, backgroundColor, close: true, target };
-  }
-  const nop = {
-    text: null, backgroundColor: materialColor.grey[300], close: false, target: null };
-  const leftActions = [
-    <Action
-      {...getProps(self, 'liked')}
-      {...nop}
-      style={{ justifyContent: 'flex-end' }}
-    />,
-    <Action
-      {...getProps(self, 'liked')}
-      style={{ width: width / 2 }}
-    />,
-    <Action
-      {...getProps(self, 'borrowed')}
-      style={{ width }}
-    />,
-  ];
-  const rightActions = [
-    <Action
-      {...getProps(self, 'done')}
-      {...nop}
-      style={{ flexDirection: 'row-reverse',
-               justifyContent: 'flex-end' }}
-    />,
-    <Action
-      {...getProps(self, 'done')}
-      style={{ flexDirection: 'row-reverse' }}
-    />,
-  ];// Touchable
-  return { leftActions, rightActions };
-}
-
 class BookRow1 extends React.Component {
   constructor(props) {
     super(props);
@@ -246,60 +180,46 @@ class BookRow1 extends React.Component {
   }
   render() {
     const { bucket, onSwipeEnd, onSwipeStart, ...props } = this.props;
-    // TODO:parameterize
-    const { leftActions, rightActions } = genActions(bucket);
+    // TODO:parameterize leftActions & rightActions
     return (
       <SwipeableRow3
         {...props}
         ref={c => this.row = c}
-        renderLeftActions={width =>
-          <SwipeableActions
-            ref={c => this.leftActions = c}
-            actions={leftActions}
-            lock={this.state.lock}
-          />
-                          }
-        renderRightActions={width =>
-          <SwipeableActions
-            ref={c => this.rightActions = c}
-            actions={rightActions}
-            lock={this.state.lock}
-          />
-                           }
+        {...genActions2(bucket)}
+        renderActions={ actions => {
+            return (
+              <SwipeableActions
+                actions={actions}
+                lock={this.state.lock}
+                     />
+            )//need state index
+          }}
         onSwipeStart={(evt, gestureState) => onSwipeStart(gestureState)}
-        onSwipeEnd={(evt, gestureState) => {
-          const velocity = gestureState.vx; // save value for async
-          if (0 < gestureState.dx) {
-            this.setState({ lock: true }, () => {
-              if (this.leftActions.state.index == 0) {
-                this.row.swipeToFlat(velocity)
-                      .then(() => this.setState({ lock: false }))
-                      .then(() => onSwipeEnd &&
-                               onSwipeEnd(gestureState));
-              } else {
-                this.row.swipeToMax(velocity)
-                      .then(() => this.row.close())
-                      .then(() => onSwipeEnd &&
-                               onSwipeEnd(gestureState));
-              }
-            });
-          } else {
-            this.setState({ lock: true }, () => {
-              if (this.rightActions.state.index == 0) {
-                this.row.swipeToFlat(velocity)
-                      .then(() => this.setState({ lock: false }))
-                      .then(() => onSwipeEnd &&
-                               onSwipeEnd(gestureState));
-              } else {
-                this.row.swipeToMin(velocity)
-                      .then(() => this.row.close())
-                      .then(() => onSwipeEnd &&
-                               onSwipeEnd(gestureState));
-              }
-            });
-              // this.rightActions.props.onSwipeEnd(this.row)
-          }
-        }}
+        onSwipeEnd={(evt, gestureState)=>{
+            const velocity = gestureState.vx //save value for async
+            if(0 < gestureState.dx){
+              this.setState({lock:true},()=>{
+                if(this.row.getCurrentActions().state.index == 0){
+                  this.row.swipeToFlat(velocity)
+                  this.setState({lock:false})
+                } else {
+                  this.row.swipeToMax(velocity)
+                      .then(()=> this.row.close())
+                }
+              })
+            }else{
+              this.setState({lock:true},()=>{
+                if(this.row.getCurrentActions().state.index == 0){
+                  this.row.swipeToFlat(velocity)
+                  this.setState({lock:false})
+                } else {
+                  this.row.swipeToMin(velocity)
+                      .then(()=> this.row.close())
+                }
+              })
+              //this.rightActions.props.onSwipeEnd(this.row)
+            }
+          }}
       />
     );
   }
@@ -384,4 +304,4 @@ class BookRow extends React.Component {
     );//
   }
 }
-module.exports = { BookRow, BookRow1, Action, genActions };
+module.exports = { BookRow, BookRow1 };

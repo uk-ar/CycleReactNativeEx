@@ -10,9 +10,14 @@ import {
 } from 'react-native';
 
 const _ = require('lodash');
+const cloneReferencedElement = require('react-clone-referenced-element');
+
 import { AnimView } from './AnimView';
 import { Closeable3 } from './Closeable';
 // const Dimensions = require('Dimensions');
+//import { BookRow, BookRow1, Action, genActions, genActions2 } from './BookRow';
+import { Action, genActions, genActions2 } from './Action';
+
 const {
   width,
   height,
@@ -265,11 +270,76 @@ function calcIndex(value, thresholds) {
 // const horizontalPanResponder =
 // console.log("cl:",Closeable,View)
 // https://github.com/facebook/react-native/blob/master/Libraries/Experimental/SwipeableRow/SwipeableListView.js
-class SwipeableRow3 extends React.Component {
+
+function withState2(DecoratedComponent) {
+  console.log("withState2 deco")
+  return class extends DecoratedComponent {
+    constructor(props) {
+      super(props);
+      console.log("withState2");
+      this.state = {...this.state, lock:false };
+    }
+    render(){
+      const {onSwipeEnd,...props}={...this.props}
+      return(
+        <DecoratedComponent
+          ref={c => this.row = c}
+          renderActions={ actions => {
+              return (
+                <SwipeableActions
+                actions={actions}
+                lock={this.state.lock}
+                     />
+              )//need state index
+            }}
+          onSwipeEnd={(gestureState)=>{
+              const fn = onSwipeEnd || function() {}
+              const velocity = gestureState.vx //save value for async
+              if(0 < gestureState.dx){
+                this.setState({lock:true},()=>{
+                  if(this.row.getCurrentActions().state.index == 0){
+                    this.row.swipeToFlat(velocity)
+                        .then(()=>this.setState({lock:false},()=>
+                                                Promise.resolve()))
+                        .then(()=>fn(gestureState))
+                  } else {
+                    this.row.swipeToMax(velocity)
+                        .then(()=> this.row.close())
+                        .then(()=>fn(gestureState))
+                  }
+                })
+              }else{
+                this.setState({lock:true},()=>{
+                  if(this.row.getCurrentActions().state.index == 0){
+                    this.row.swipeToFlat(velocity)
+                        .then(()=>this.setState({lock:false},()=>
+                                                Promise.resolve()))
+                        .then(()=>fn(gestureState))
+                  } else {
+                    this.row.swipeToMin(velocity)
+                        .then(()=> this.row.close())
+                        .then(()=>fn(gestureState))
+                  }
+                })
+                //this.rightActions.props.onSwipeEnd(this.row)
+              }
+            }}
+          {...props}
+        />
+      )
+    }
+  }
+}
+
+
+// decorator cannot works with storybook
+// @withState2//
+class _SwipeableRow3 extends React.Component {
   /* onSwipeEnd={() => this._setListViewScrollable(true)}
    * onSwipeStart={() => this._setListViewScrollable(false)}*/
   constructor(props) {
     super(props);
+    console.log("SwipeableRow3");
     this.state = {
       positiveSwipe: true,
     };
@@ -286,7 +356,7 @@ class SwipeableRow3 extends React.Component {
       onMoveShouldSetPanResponderCapture: isSwipeHorizontal,
 
       onPanResponderGrant: (evt, gestureState) => {
-        this.props.onSwipeStart && this.props.onSwipeStart(evt, gestureState); },
+        this.props.onSwipeStart && this.props.onSwipeStart(gestureState); },
       /* onPanResponderMove: (evt, gestureState) =>{
        *   this._panX.setValue(gestureState.dx);
        *   //this.props.onSwipe && this.props.onSwipe(evt, gestureState)
@@ -297,7 +367,7 @@ class SwipeableRow3 extends React.Component {
       ]), // for performance
       onPanResponderRelease: (evt, gestureState) => {
         // console.log('aa', gestureState.vx);
-        this.props.onSwipeEnd && this.props.onSwipeEnd(evt, gestureState);
+        this.props.onSwipeEnd && this.props.onSwipeEnd(gestureState);
       }
     });
     // console.log("pan",this._panResponder,this._panResponder.getInteractionHandle())
@@ -350,9 +420,27 @@ class SwipeableRow3 extends React.Component {
   close() {
     return this._root.close();
   }
+  getCurrentActions(){
+    return this.state.positiveSwipe ? this.leftActions : this.rightActions;
+  }
   render() {
-    const { onSwipeStart, onSwipe, onSwipeEnd,
+    const { onSwipeStart, onSwipeEnd,
+            leftActions, rightActions, renderActions,
             children, style, ...props } = this.props;
+    //console.log("th:",this.props)
+    //cloneReferencedElement
+    console.log("tp:",this.props)
+    /* let leftActionsElement = null;
+     * let rightActionsElement = null;*/
+    let leftActionsElement = cloneReferencedElement(
+      renderActions(leftActions),{
+        ref:c => this.leftActions = c
+      })
+    let rightActionsElement = cloneReferencedElement(
+      renderActions(rightActions),{
+        ref:c => this.rightActions = c
+      })
+
     return (
       <Closeable3
         ref={c => this._root = c}
@@ -367,18 +455,21 @@ class SwipeableRow3 extends React.Component {
         }]}
       >
         <Animated.View style={{ width: this._panX }}>
-          {this.props.renderLeftActions()}
+          {leftActionsElement}
         </Animated.View>
         <View style={{ width }}>
           {children}
         </View>
         <Animated.View style={{ width: Animated.multiply(this._panX, -1) }}>
-          {this.props.renderRightActions()}
+          {rightActionsElement}
         </Animated.View>
       </Closeable3>
     );
   }
 }
+const SwipeableRow3 = withState2(_SwipeableRow3)
+//const SwipeableRowW = null//withState2(SwipeableRow3)
+
 class SwipeableActions extends React.Component {
   /* onSwipeEnd={() => this._setListViewScrollable(true)}
    * onSwipeStart={() => this._setListViewScrollable(false)}*/
@@ -427,8 +518,9 @@ class SwipeableActions extends React.Component {
                    }
                  }}
              >
-               {React.isValidElement(action) ? action : <Text>{action}</Text>}
-             </MeasureableView>);
+               <Action {...action}/>
+             </MeasureableView>
+          );
         })}
       </View>);
     }
@@ -444,7 +536,7 @@ class SwipeableActions extends React.Component {
         ref={c => this._root = c}
         {...props}
         style={[style,
-                { backgroundColor: currentAction.props.backgroundColor,
+                { backgroundColor: currentAction.backgroundColor,
                   overflow: 'hidden' }
           ]}
         onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
@@ -457,7 +549,7 @@ class SwipeableActions extends React.Component {
                index,actions[this.state.index]) */
         }}
       >
-        {currentAction}
+        <Action {...currentAction}/>
       </AnimView>
     );
     /* this.props.width.addListener(({ value }) => {
@@ -591,4 +683,6 @@ const SwipeableRow2 = React.createClass({
   },
 });
 
-module.exports = { SwipeableButtons2, SwipeableRow2, SwipeableRow3, AnimView, MeasureableView, SwipeableActions };
+//module.exports = { SwipeableButtons2, SwipeableRow2, SwipeableRow3, AnimView, MeasureableView, SwipeableActions,SwipeableRowW ,withState2};
+
+module.exports = { SwipeableButtons2, SwipeableRow2, SwipeableRow3, AnimView, MeasureableView, SwipeableActions, withState2};
