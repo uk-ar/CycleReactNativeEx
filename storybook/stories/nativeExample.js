@@ -119,15 +119,11 @@ class LifeCycleView extends React.Component {
     super(props);
     action("constructor1")()
     this.state = {
-      fadeAnim: new Animated.Value(0),
-      heightAnim: new Animated.Value(0),
       layouted: false,
-      //{style:{height:0.1,opacity:0.1,transform:[{scale:0.1}]}}
       style:{
         opacity: 0,
         height: 0.1,
         transform:[{scale: 0.1}],//BUG:when scale 0
-        //backgroundColor:"red",
       }
     };
   }
@@ -138,25 +134,6 @@ class LifeCycleView extends React.Component {
     console.log("ro",this.root)
     this.root.measure(
       (x, y, width, height) => {
-        //console.log("ro:",height)
-        /* this.setState({
-         *   style: {
-         *     opacity: this.state.fadeAnim,
-         *     transform:[{
-         *       scale: this.state.fadeAnim
-         *     }],
-         *     height: this.state.fadeAnim.interpolate({
-         *       inputRange:[0,1],
-         *       outputRange:[0.1,height]
-         *     }),
-         *     //backgroundColor:"red",
-         *   }})
-         * Animated.timing(
-         *   this.state.fadeAnim, {
-         *     toValue: 1,
-         *     duration: 3000
-         *   }
-         * ).start();*/
         this.setState({
           style: {
             opacity: 1,

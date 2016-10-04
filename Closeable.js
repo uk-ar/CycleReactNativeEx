@@ -4,6 +4,7 @@ import {
   View,
   // TouchableHighlight,
   // TouchableNativeFeedback
+  StyleSheet
 } from 'react-native';
 
 import { AnimView } from './AnimView';
@@ -124,7 +125,58 @@ function makeLayoutableComponent(BaseComponent){
     }
   }
 }
-const LayoutableView = makeLayoutableComponent(AnimView);
+
+class LayoutableView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      layouted: false,
+      style:{
+        opacity: 0,
+        height: 0.1,
+        transform:[{scale: 0.1}],//BUG:when scale 0
+      }
+    };
+  }
+  animate(){
+    this.root.measure(
+      (x, y, width, height) => {
+        this.setState({
+          style: {
+            opacity: 1,
+            transform:[{
+              scale: 1
+            }],
+            height: height
+          }})
+      }
+    )
+  }
+  render(){
+    //this.props.data.length
+    const {style,children,...props} = this.props
+    return (
+      <AnimView
+        onLayout={()=>{
+            if(!this.state.layouted){
+              this.animate()
+              this.setState({layouted:true})
+            }
+          }}
+        style={[style,this.state.style]}
+      >
+        <View
+          ref={c => this.root = c}
+          style={{position:this.state.layouted ? "relative" : "absolute"}}>
+          {children}
+        </View>
+      </AnimView>
+    )
+  }
+}
+
+//const LayoutableView = makeLayoutableComponent(AnimView);
+
 LayoutableView.propTypes = {
   ...View.propTypes,//  ...Closable.propTypes,
   onFirstLayout:React.PropTypes.func,
