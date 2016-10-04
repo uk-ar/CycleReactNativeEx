@@ -11,6 +11,7 @@ import {
 
 import util from 'util';
 import { compose, withHandlers } from 'recompose';
+import { emptyFunction } from 'fbjs/lib/emptyFunction';
 
 import Dimensions from 'Dimensions';
 const {
@@ -80,9 +81,14 @@ class BookListView extends React.Component {
   render() {
     this.sections = this.sections || {};// refs
     console.log('this.props', this.props);
+    const {onRelease, ...props} = this.props;
     return (
       <EnhancedListView
         {...this.props}
+        onSwipeEnd={
+          ({gestureState, rowData, sectionID, rowID, highlightRow, action}) =>
+            onRelease(rowData,action)//book,to bucket
+                   }
         renderScrollComponent={props =>
           <ScrollView
             ref={c => this.scrollview = c}
@@ -102,8 +108,13 @@ class BookListView extends React.Component {
 
 BookListView.propTypes = {
   ...ListView.propTypes,
-  renderSectionFooter: React.PropTypes.func
+  renderSectionFooter: React.PropTypes.func,
+  onRelease:React.PropTypes.func,
 };
-BookListView.defaultProps = { ...ListView.defaultProps };
+BookListView.defaultProps = {
+  ...ListView.defaultProps,
+  //onRelease:emptyFunction,
+  onRelease:function(){},
+};
 
 module.exports = { BookListView };

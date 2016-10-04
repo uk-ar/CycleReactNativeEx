@@ -51,9 +51,13 @@ const initialBooks = mockbooks;
 function intent(RN, HTTP) {
   // Actions
   // mojibake シンプ Q思考
-  const release$ = RN.select('bookcell')
+  const release$ = RN.select('listview')
                      .events('release')
-                     .do((...args) => console.log('foo:', ...args));
+                     .do((...args) => console.log('foo0:', ...args))
+                     .map(([book,action]) => [book,action.target])
+                     .do((...args) => console.log('foo1:', ...args))
+                     .filter(([_,target]) => target !== null)
+                     .do((...args) => console.log('foo2:', ...args));
 
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')

@@ -45,3 +45,17 @@ storiesOf('SwipeableListView', module)
       />
     )
   })
+  .add('with callback', () => {
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    return(
+      <SwipeableListView
+        style={{paddingTop:20}}
+        generateActions={()=>genActions2('search')}
+        dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
+        onSwipeEnd={action('swipeEnd')}
+        onSwipeStart={action('swipeStart')}
+        renderRow={(rowData) => <Text>{rowData}</Text>}
+      />
+    )
+  })
+

@@ -27,40 +27,6 @@ require("./BookCellExample")
 require("./BookRowExample")
 require("./BookListViewExample")
 
-storiesOf('BookCell', module)
-  .add('with book', () => (
-    <BookCell
-      onPress={action('clicked-bookcell')}
-      book={{
-        title: 'ぐりとぐらの絵本7冊セット', author: '',
-        thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/2147/9784834032147.jpg?_ex=200x200',
-        libraryStatus: {
-          exist: false,
-          rentable: false,
-          reserveUrl: '',
-        },
-        isbn: '9784834032147',
-        active: true,
-      }}
-    />
-  ))
-  .add('with panresponder', () => {
-    const panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: ()=>true,
-      onMoveShouldSetPanResponder:  ()=>true,
-      onPanResponderMove: action('move'),
-      onPanResponderRelease: action('release')
-    })
-    return (
-      <BookCell
-        {...panResponder.panHandlers}
-        book={{
-        title: 'foo', author: 'bar',
-        thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/2147/9784834032147.jpg?_ex=200x200',
-      }}
-    />)
-  })
-
 storiesOf('Action', module)
   .add('with liked', () => (
     <Action

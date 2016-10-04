@@ -5,21 +5,32 @@ import {
 } from 'react-native';
 
 import { SwipeableRow3 } from './SwipeableRow';
+import { emptyFunction } from 'fbjs/lib/emptyFunction';
 
 class SwipeableListView extends React.Component {
   render() {
-    const { renderRow, generateActions, ...props } = this.props;
-    //console.log("pr:",this.props)
+    const { renderRow, generateActions,
+            onSwipeStart, onSwipeEnd, ...props } = this.props;
+    console.log("pr:",this.props)
     return (
       <ListView
         ref={c => (this.listview = c)}
         renderRow={(rowData, sectionID, rowID, highlightRow) =>
           <SwipeableRow3
+            ref={ c => (this.row1 = c)}
             {...generateActions(rowData, sectionID, rowID, highlightRow)}
-            onSwipeStart={() =>
-               this.listview.setNativeProps({ scrollEnabled: false })}
-            onSwipeEnd={() =>
-               this.listview.setNativeProps({ scrollEnabled: true })}
+            onSwipeStart={(gestureState) =>{
+                console.log("start",this.row1,this.row1.getCurrentAction())
+                this.listview.setNativeProps({ scrollEnabled: false })
+                onSwipeStart && onSwipeStart({gestureState, rowData, sectionID, rowID, highlightRow,
+                              action:this.row1.getCurrentAction()})
+              }}
+            onSwipeEnd={(gestureState) =>{
+                console.log("end",this.row1.getCurrentAction())
+                this.listview.setNativeProps({ scrollEnabled: true })
+                onSwipeEnd && onSwipeEnd({gestureState, rowData, sectionID, rowID, highlightRow,
+                            action:this.row1.getCurrentAction()})
+              }}
           >
             {renderRow(rowData, sectionID, rowID, highlightRow)}
           </SwipeableRow3>
@@ -29,10 +40,15 @@ class SwipeableListView extends React.Component {
   }
 }
 SwipeableListView.propTypes = {
-  ...ListView.propTypes
+  ...ListView.propTypes,
+  generateActions:React.PropTypes.func.isRequired,
+  onSwipeStart:React.PropTypes.func,
+  onSwipeEnd:React.PropTypes.func,
 };
 SwipeableListView.defaultProps = {
-  ...ListView.defaultProps
+  ...ListView.defaultProps,
+  onSwipeStart:emptyFunction,
+  onSwipeEnd:emptyFunction,
 };
 
 module.exports = { SwipeableListView };

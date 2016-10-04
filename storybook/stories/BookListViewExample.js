@@ -9,16 +9,28 @@ import {
   ScrollView
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
+import util from 'util'
 
 import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
 
 import {BookCell} from '../../BookCell';
+import {BookRow1} from '../../BookRow';
 import {genActions2,Action} from '../../Action';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 
 import {BookListView} from '../../BookListView';
+
+function debugView(string) {
+  return function (props){
+    return (
+      <View style={{ height: 200, borderColor: 'green', borderWidth: 3 }}>
+        <Text>{string}:{util.inspect(props)}</Text>
+      </View>);
+  }
+}
+
 
 storiesOf('BookListView', module)
   .addDecorator(getStory => (
@@ -42,21 +54,15 @@ storiesOf('BookListView', module)
       <BookListView
         style={{paddingTop:20}}
         generateActions={()=>genActions2('search')}
-        dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
-        renderRow={(rowData) =>
-          <BookRow1
-            key={rowID}
-            selector="bookcell"
-            bucket={sectionID}
-            onSwipeEnd={()=>console.log(sectionID,rowData)}
-           >
-              <BookCell
-                book={rowData}
-                style={{ backgroundColor: materialColor.grey['50'] }}
-            />
-            </BookRow1>
+        dataSource={ds.cloneWithRows(
+            {a:{title:'row 1',isbn:'123'},
+             b:{title:'row 2',isbn:'456'}
+            })}
+        onRelease={action('onRelease')}
+      renderRow={(rowData,rowID,sectionID) =>
+        <Text>foo</Text>
           }
-        renderSectionHeader={(rowData) => <Text>sec:{rowData}</Text>}
+        renderSectionHeader={debugView("head")}
       />
     )
   })
