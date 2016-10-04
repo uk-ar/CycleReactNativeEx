@@ -6,13 +6,11 @@ import { genActions2 } from './Action';
 class BookRow1 extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { lock: false };
+    console.log("const",props)
   }
   render() {
     const { bucket, ...props } = this.props;
-    //onSwipeEnd
-    // TODO:parameterize leftActions & rightActions
-    console.log("br1 rend",this.props)
+    //console.log("br1 rend",this.props)
     return (
       <SwipeableRow3
         {...props}

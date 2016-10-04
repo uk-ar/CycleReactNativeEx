@@ -53,67 +53,31 @@ function withState2(DecoratedComponent) {
   return class extends DecoratedComponent {
     constructor(props) {
       super(props);
-      //console.log("this.state",this.state)
       this.state = { ...this.state, lock: false };
-      //console.log("this.state2",this.state)
       this.onSwipeEnd = this.onSwipeEnd.bind(this)
-      /* this.getCurrentAction = this.getCurrentAction.bind(this)*/
     }
-    /* getCurrentActions() {
-     *   return this.row.getCurrentActions()
-     *   //return super.getCurrentActions()
-     * }*/
-    /* getCurrentAction() {
-     *   //return this.row.getCurrentAction()
-     *   return super.getCurrentAction()
-     * }*/
     onSwipeEnd(gestureState){
-      //.then(() => console.log("swipeableRow4",this.row.getCurrentActions().state.index))
       const fn = this.props.onSwipeEnd || function () {};
-      //console.log("fn",fn,this.props)
       const gestureStateSave = {...gestureState}; // save value for async
-      if (0 < gestureStateSave.dx) {
-        this.setState({ lock: true }, () => {
-          if (this.row.getCurrentActions().state.index === 0) {
-            this.row.swipeToFlat(gestureStateSave.vx)
-                .then(() => this.setState({ lock: false }, () =>
-                  Promise.resolve()))
-                .then(() => fn(gestureStateSave));
-          } else {
-            this.row.swipeToMax(gestureStateSave.vx)
-                .then(() => this.row.close())
-                .then(() => fn(gestureStateSave));
-          }
-        });
-      } else {
-        this.setState({ lock: true }, () => {
-          if (this.row.getCurrentActions().state.index === 0) {
-            this.row.swipeToFlat(gestureStateSave.vx)
-                .then(() => this.setState({ lock: false }, () =>
-                  Promise.resolve()))
-                .then(() => fn(gestureStateSave));
-          } else {
-            this.row.swipeToMin(gestureStateSave.vx)
-                .then(() => this.row.close())
-                .then(() => fn(gestureStateSave));
-          }
-        });
-        // this.rightActions.props.onSwipeEnd(this.row)
-      }
+      this.setState({ lock: true }, () => {
+        let promise;
+        if (this.row.getCurrentActions().state.index === 0) {
+          promise = this.row.swipeToFlat(gestureStateSave.vx)
+                        .then(() => this.setState({ lock: false }, () =>
+                          Promise.resolve()))
+        } else if (0 < gestureStateSave.dx) {
+          promise = this.row.swipeToMax(gestureStateSave.vx)
+                        .then(() => this.row.close())
+        } else {
+          promise = this.row.swipeToMin(gestureStateSave.vx)
+                        .then(() => this.row.close())
+        }
+        promise
+          .then(() => fn({gestureStateSave,action:this.row.getCurrentAction()}));
+      });
     }
     render() {
-      const { onSwipeEnd, ...props } = { ...this.props };
-      //console.log("this",this,this.super)
-      /* return React.cloneElement(super.render(),{
-       *   ref: c => this.row = c,
-       *   renderActions: actions =>
-       *     <SwipeableActions
-       *       actions={actions}
-       *       lock={this.state.lock}
-       *       style={{flex:1}}
-       *     />,
-       *   onSwipeEnd:this.onSwipeEnd
-       * })*/
+      const { onSwipeEnd, onSwipeStart, ...props } = { ...this.props };
       return (
         <DecoratedComponent
           {...props}
@@ -126,6 +90,8 @@ function withState2(DecoratedComponent) {
             />
           }
           onSwipeEnd={this.onSwipeEnd}
+          onSwipeStart={(gestureState)=>
+            onSwipeStart({gestureState,action:this.row.getCurrentAction()})}
         />
       );
     }
@@ -177,8 +143,8 @@ class _SwipeableRow3 extends React.Component {
         this.setState({ positiveSwipe: false });
       }
     });
-    /* this.getCurrentActions = this.getCurrentActions.bind(this)
-     * this.getCurrentAction = this.getCurrentAction.bind(this)*/
+    this.getCurrentActions = this.getCurrentActions.bind(this)
+    this.getCurrentAction = this.getCurrentAction.bind(this)
   }
   swipeTo(anim) {
     return new Promise((resolve, reject) => {
@@ -223,14 +189,10 @@ class _SwipeableRow3 extends React.Component {
     //console.log("actions",this.row,this.state.positiveSwipe, this.leftActions ,this.rightActions)
     return this.state.positiveSwipe ? this.leftActions : this.rightActions;
   }
-  /* getCurrentAction() {
-   *   console.log("getcurr", this, this.row, this.row.getCurrentActions().state.index);
-   *   //return this.row.getCurrentActions().state.index//getCurrentAction();
-   *   return this.state.positiveSwipe ?
-   *          this.row.leftActions.getCurrentAction() :
-   *          this.row.rightActions.getCurrentAction();
-   *   //this.state.index
-   * }*/
+  getCurrentAction() {
+    const actions = this.getCurrentActions()
+    return actions.props.actions[actions.state.index]
+  }
   render() {
     const { onSwipeStart, onSwipeEnd,
             leftActions, rightActions, renderActions,
@@ -244,7 +206,6 @@ class _SwipeableRow3 extends React.Component {
       renderActions(rightActions), {
         ref: c => (this.rightActions = c)
       });
-    //console.log("base",this)
     return (
       <Closeable3
         ref={c => (this.root = c)}

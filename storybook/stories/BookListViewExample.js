@@ -40,7 +40,7 @@ storiesOf('BookListView', module)
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     return(
       <BookListView
-        style={{paddingTop:20}}
+        style={{paddingTop:20,backgroundColor:"blue"}}
         generateActions={()=>genActions2('search')}
         dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
         renderRow={(rowData) => <Text>row:{rowData}</Text>}

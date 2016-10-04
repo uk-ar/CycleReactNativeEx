@@ -11,7 +11,6 @@ class SwipeableListView extends React.Component {
   render() {
     const { renderRow, generateActions,
             onSwipeStart, onSwipeEnd, ...props } = this.props;
-    console.log("pr:",this.props)
     return (
       <ListView
         ref={c => (this.listview = c)}
@@ -19,17 +18,16 @@ class SwipeableListView extends React.Component {
           <SwipeableRow3
             ref={ c => (this.row1 = c)}
             {...generateActions(rowData, sectionID, rowID, highlightRow)}
-            onSwipeStart={(gestureState) =>{
-                console.log("start",this.row1,this.row1.getCurrentAction())
-                this.listview.setNativeProps({ scrollEnabled: false })
-                onSwipeStart && onSwipeStart({gestureState, rowData, sectionID, rowID, highlightRow,
-                              action:this.row1.getCurrentAction()})
+            onSwipeStart={({gestureState,action}) =>{
+              this.listview.setNativeProps({ scrollEnabled: false })
+              onSwipeStart && onSwipeStart(
+                {gestureState, rowData, sectionID, rowID, highlightRow, action})
+              //this.row1.getCurrentAction() not working
               }}
-            onSwipeEnd={(gestureState) =>{
-                console.log("end",this.row1.getCurrentAction())
+            onSwipeEnd={({gestureState,action}) =>{
                 this.listview.setNativeProps({ scrollEnabled: true })
-                onSwipeEnd && onSwipeEnd({gestureState, rowData, sectionID, rowID, highlightRow,
-                            action:this.row1.getCurrentAction()})
+                onSwipeEnd && onSwipeEnd(
+                  {gestureState, rowData, sectionID, rowID, highlightRow, action})
               }}
           >
             {renderRow(rowData, sectionID, rowID, highlightRow)}
