@@ -30,7 +30,7 @@ class AnimView extends React.Component {
     // this.animating = true;
     this.counter = new Animated.Value(0);
     const current = StyleSheet.flatten(this.prevStyle);
-    const next = StyleSheet.flatten(nextStyle);
+    const next = StyleSheet.flatten(nextStyle) || {};
     // console.log("next?",next)
     const animatedStyle =
       Object.keys(next)

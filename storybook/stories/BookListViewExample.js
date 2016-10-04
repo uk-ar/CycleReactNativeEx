@@ -31,7 +31,6 @@ function debugView(string) {
   }
 }
 
-
 storiesOf('BookListView', module)
   .addDecorator(getStory => (
     <CenterView>{getStory()}</CenterView>

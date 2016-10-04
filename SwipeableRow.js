@@ -12,7 +12,7 @@ import cloneReferencedElement from 'react-clone-referenced-element';
 import { emptyFunction } from 'fbjs/lib/emptyFunction';
 
 import { AnimView } from './AnimView';
-import { Closeable3 } from './Closeable';
+import { CloseableView } from './Closeable';
 import { Action } from './Action';
 
 const {
@@ -207,7 +207,7 @@ class _SwipeableRow3 extends React.Component {
         ref: c => (this.rightActions = c)
       });
     return (
-      <Closeable3
+      <CloseableView
         ref={c => (this.root = c)}
         {...this.panResponder.panHandlers}
         {...props}
@@ -228,7 +228,7 @@ class _SwipeableRow3 extends React.Component {
         <Animated.View style={{ width: Animated.multiply(this.panX, -1) }}>
           {rightActionsElement}
         </Animated.View>
-      </Closeable3>
+      </CloseableView>
     );
   }
 }

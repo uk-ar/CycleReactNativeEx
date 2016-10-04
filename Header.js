@@ -15,7 +15,7 @@ const FAIcon = require('react-native-vector-icons/FontAwesome');
 
 import { styles } from './styles';
 import { AnimView } from './AnimView';
-import { Closeable, Closeable3 } from './Closeable';
+import { CloseableView } from './Closeable';
 import Touchable from '@cycle/react-native/src/Touchable';
 
 Touchable.TouchableElement = Touchable.TouchableHighlight;
@@ -50,7 +50,7 @@ class Header extends React.Component {
         style={{ padding: 10, opacity: this.state.opacity }}
         anim={{ duration: 500 }}
       >
-        <Closeable3
+        <CloseableView
           style={{ justifyContent: 'center',
                    backgroundColor: 'red' }}
           direction="vertical"
@@ -67,7 +67,7 @@ class Header extends React.Component {
           >
             <Text>foo</Text>
           </AnimView>
-        </Closeable3>
+        </CloseableView>
 
         <AnimView
           ref="view2"

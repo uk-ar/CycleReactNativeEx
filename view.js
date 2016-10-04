@@ -82,7 +82,7 @@ function ItemsFooter({ payload, count }) {
   );
 }
 
-// import { Closeable, Closeable2 } from './Closeable';
+// import { Closeable2 } from './Closeable';
 import { AnimView } from './AnimView';
 Touchable.BookListView = Touchable.createCycleComponent(
   BookListView);

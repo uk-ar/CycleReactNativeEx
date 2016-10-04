@@ -11,7 +11,7 @@ import { MeasureableView } from './SwipeableRow';
 const ReactTransitionGroup = require('react-addons-transition-group');
 
 // https://gist.github.com/sebmarkbage/ef0bf1f338a7182b6775#gistcomment-1574787
-class Closeable3 extends React.Component {
+class CloseableView extends React.Component {
   // TODO:High Order Component can remove inner view
   constructor(props) {
     super(props);
@@ -101,84 +101,38 @@ function willRecieveProps(key, fn) {
     };
   };
 }
-// this.toggle
 
-// TODO:refactor
-class Closeable extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { layouted: false };
-    /* this.initialStyle = { height: null };
-     * this.closedStyle = { height: 0.01 };
-     * this.state = { style: this.initialStyle };*/
-  }
-  close() {
-    this.style = this.calcStyle(true);
-    return this.refs.root.animateTo(this.style);
-  }
-  open() {
-    this.style = this.calcStyle(false);
-    return this.refs.root.animateTo(this.style);
-  }
-  toggle() {
-    const closedStyle = this.calcStyle(true);
-    if ((this.style.width === closedStyle.width) &&
-        (this.style.height === closedStyle.height)) {
-      this.style = this.calcStyle(false);
-    } else {
-      this.style = this.calcStyle(true);
+function makeLayoutableComponent(BaseComponent){
+  return class extends BaseComponent {
+    constructor(props) {
+      super(props);
+      this.state = { layouted: false };
     }
-    console.log('st:', this.style);
-    return this.refs.root.animateTo(this.style);
-  }
-  calcStyle(close) {
-    const style = !this.state.layouted ?
-                  { width: null, height: null } : close ?
-                  { width: 0.01, height: 0.01 } :
-                  { width: this.contentWidth, height: this.contentHeight };
-    if (this.props.direction == 'horizontal') {
-      // style.height = null;
-      return { width: style.width };
-    } else if (this.props.direction == 'vertical') {
-      // style.width  = null;
-      return { height: style.height };
-    } else {
-      return style;
+    render(){
+      const { onFirstLayout, ...props } = this.props;
+      //Add firstLayoutProps?
+      return (
+        this.state.layouted ?
+        <BaseComponent {...this.props}/> :
+        <BaseComponent
+          {...props}
+          onLayout={(...args) => {
+              onFirstLayout(...args);
+              this.setState({ layouted: true });
+            }}
+        />)
     }
-  }
-  // horizontal
-  // promise
-  render() {
-    // on the fly measureing cannot working when closed -> open
-    this.style = this.calcStyle(this.props.close);
-    console.log('st:', this.style);
-    return (
-      // not to optimize
-      // add absolute from parent when measureing
-      // first:  close -> absolute, open -> null
-      // second: close -> absolute, open -> null
-      <AnimView
-        style={[{// .vertical closable
-          overflow: 'hidden',
-                 //flexDirection:"row",//not to resize text when horizontal
-        }, this.style]}
-        ref="root"
-      >
-        { /* open ? tracking view : non tracking */ }
-        <MeasureableView
-          onFirstLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
-            console.log('h:', height);
-            this.contentWidth = width;
-            this.contentHeight = height;
-            this.setState({ layouted: true });
-          }}
-          style={[this.props.style, { overflow: 'hidden' }]}
-        >
-          {this.props.children}
-        </MeasureableView>
-      </AnimView>
-    );
   }
 }
+const LayoutableView = makeLayoutableComponent(AnimView);
+LayoutableView.propTypes = {
+  ...View.propTypes,//  ...Closable.propTypes,
+  onFirstLayout:React.PropTypes.func,
+};
 
-module.exports = { Closeable, Closeable3 };
+LayoutableView.defaultProps = {
+  ...View.defaultProps,
+  onFirstLayout:function(){},
+};
+
+module.exports = { CloseableView, LayoutableView };

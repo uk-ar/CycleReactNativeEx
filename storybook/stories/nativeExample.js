@@ -14,6 +14,7 @@ import CenterView from './CenterView';
 import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
+import {AnimView} from '../../AnimView';
 
 class ScrollPositionView extends React.Component {
   constructor(props) {
@@ -112,6 +113,98 @@ class NestedView extends React.Component {
     )
   }
 }
+
+class LifeCycleView extends React.Component {
+  constructor(props) {
+    super(props);
+    action("constructor1")()
+    this.state = {
+      fadeAnim: new Animated.Value(0),
+      heightAnim: new Animated.Value(0),
+      layouted: false,
+      //{style:{height:0.1,opacity:0.1,transform:[{scale:0.1}]}}
+      style:{
+        opacity: 0,
+        height: 0.1,
+        transform:[{scale: 0.1}],//BUG:when scale 0
+        //backgroundColor:"red",
+      }
+    };
+  }
+  componentWillMount() {
+    action("componentWillMount2")()
+  }
+  animate(){
+    console.log("ro",this.root)
+    this.root.measure(
+      (x, y, width, height) => {
+        //console.log("ro:",height)
+        /* this.setState({
+         *   style: {
+         *     opacity: this.state.fadeAnim,
+         *     transform:[{
+         *       scale: this.state.fadeAnim
+         *     }],
+         *     height: this.state.fadeAnim.interpolate({
+         *       inputRange:[0,1],
+         *       outputRange:[0.1,height]
+         *     }),
+         *     //backgroundColor:"red",
+         *   }})
+         * Animated.timing(
+         *   this.state.fadeAnim, {
+         *     toValue: 1,
+         *     duration: 3000
+         *   }
+         * ).start();*/
+        this.setState({
+          style: {
+            opacity: 1,
+            transform:[{
+              scale: 1
+            }],
+            height: height
+          }})
+      }
+    )
+  }
+  componentDidMount() {
+    action("componentDidMount4")()
+  }
+  render(){
+    //this.props.data.length
+    return (
+      <View>
+        <AnimView
+          ref={()=>action("ref3")()}
+          onLayout={()=>{
+              if(!this.state.layouted){
+                action("onFirstLayout5")()
+                this.animate()
+                this.setState({layouted:true})
+              }
+            }}
+          style={this.state.style}
+        >
+          <View
+            ref={c => this.root = c}
+            style={{
+              position:"absolute",//to measure
+              }}>
+            {this.props.children}
+          </View>
+        </AnimView>
+        <View
+          style={{
+            alignSelf:"center",
+            height:50,
+            width:200,
+            backgroundColor:"yellow"}} />
+      </View>
+    )
+  }
+}
+
 import {withDebug} from './common';
 const NestedViewDebug = withDebug(NestedView)
 
@@ -128,4 +221,12 @@ storiesOf('View', module)
           //console.log("baz",self)
         }}
     />
+  ))
+  .add('lifecycle ', () => (
+    <LifeCycleView>
+      <View
+        style={{
+          width:100,height:100,
+          backgroundColor:"green"}}/>
+    </LifeCycleView>
   ))
