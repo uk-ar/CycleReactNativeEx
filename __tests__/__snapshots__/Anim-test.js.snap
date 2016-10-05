@@ -3,7 +3,7 @@ exports[`Animated tests animate correctly by animateTo 1`] = `
   style={
     Object {
       "height": 2,
-      "width": 1
+      "width": 1,
     }
   } />
 `;
@@ -13,7 +13,7 @@ exports[`Animated tests animate correctly by props change 1`] = `
   style={
     Object {
       "height": 2,
-      "width": 1
+      "width": 1,
     }
   } />
 `;

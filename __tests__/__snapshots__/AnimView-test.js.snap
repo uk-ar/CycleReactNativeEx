@@ -3,7 +3,7 @@ exports[`Animated tests animate correctly by animateTo 1`] = `
   style={
     Object {
       "height": 2,
-      "width": 1
+      "width": 1,
     }
   } />
 `;
@@ -13,7 +13,7 @@ exports[`Animated tests animate correctly by props change 1`] = `
   style={
     Object {
       "height": 2,
-      "width": 1
+      "width": 1,
     }
   } />
 `;
@@ -32,6 +32,6 @@ exports[`Animated tests renders children when passed in 1`] = `
 
 exports[`Animated tests renders onPress to be called 1`] = `
 <View
-  onPress={[Function anonymous]}
+  onPress={[Function]}
   style={Object {}} />
 `;
