@@ -18,20 +18,13 @@ import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {BookRow1} from '../../BookRow';
 import {genActions2,Action} from '../../Action';
+import {BookListView} from '../../BookListView';
+import {LayoutableView} from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 
-import {BookListView} from '../../BookListView';
+import {withDebug,VerticalCenterView,TestListView,debugView} from './common'
 
-function debugView(string) {
-  return function (props){
-    return (
-      <View style={{ height: 200, borderColor: 'green', borderWidth: 3 }}>
-        <Text>{string}:{util.inspect(props)}</Text>
-      </View>);
-  }
-}
-
-class TestListView extends React.Component {
+class TestListView3 extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -52,7 +45,7 @@ class TestListView extends React.Component {
         generateActions={()=>genActions2('search')}
         dataSource={this.state.ds}
         onRelease={(rowData,rowID,action)=>{
-            
+
             const {[rowID]:foo,...rest} = this.state.ds._dataBlob.s1
             console.log("foo",foo,rest)
             this.setState({ds:this.state.ds.cloneWithRows(
@@ -62,6 +55,44 @@ class TestListView extends React.Component {
         renderRow={(rowData,rowID,sectionID) =>
           debugView("row")(rowData,rowID,sectionID)
                   }
+        renderSectionHeader={debugView("head")}
+      />
+    )
+  }
+}
+
+class TestListView2 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
+    };
+    this.data = [{title:'row 1',isbn:123},{title:'row 2',isbn:456}]
+  }
+  componentWillMount(){
+    this.setState({ds:this.state.ds.cloneWithRows(this.data)})
+  }
+  render(){
+    console.log(this.state.ds._dataBlob.s1)
+    return(
+      <BookListView
+        style={{paddingTop:20}}
+        generateActions={()=>genActions2('search')}
+        dataSource={this.state.ds}
+        onRelease={(rowData,rowID,action)=>{
+          console.log("foo",rowData,rowID,action,this.state.ds._dataBlob.s1)
+          //const array = [...this.state.ds._dataBlob.s1,rowData]
+          this.data = this.data.filter((elem,i)=> rowData.isbn !== elem.isbn)
+          //const {[rowID]:foo,...rest} = this.state.ds._dataBlob.s1
+          //console.log("foo",foo,rest)
+          console.log("foo",this.data)
+          this.setState({ds:this.state.ds.cloneWithRows(this.data)})
+          }}
+      renderRow={(rowData,rowID,sectionID) =>
+        <View key={rowID}>
+                  {debugView("row")(rowData,rowID,sectionID)}
+        </View>
+      }
         renderSectionHeader={debugView("head")}
       />
     )
@@ -102,6 +133,26 @@ storiesOf('BookListView', module)
       />
     )
   })
+  .add('with add row', () => {
+    return(
+      <TestListView>
+        {(dataSource)=>
+          <BookListView
+            style={{paddingTop:20}}
+            generateActions={()=>genActions2('search')}
+            dataSource={dataSource}
+            onRelease={action('onRelease')}
+            renderRow={(rowData,rowID,sectionID) =>
+                <LayoutableView>
+                          {debugView("row")(rowData,rowID,sectionID)}
+                </LayoutableView>
+                      }
+            renderSectionHeader={debugView("head")}
+          />
+        }
+      </TestListView>
+    )
+  })
   .add('with class', () => {
-    return(<TestListView />)
+    return(<TestListView2 />)
   })

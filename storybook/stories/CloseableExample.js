@@ -84,12 +84,12 @@ storiesOf('LayoutableView', module)
         justifyContent:"center",
         flex:1,
       }}>
-    <View>
+      <View>
       <LayoutableView>
         <View
           style={{
             //alignItems:"center",
-            justifyContent:"center",
+            //justifyContent:"center",
             height:50,
             flex:1,
             backgroundColor:"red"}}>

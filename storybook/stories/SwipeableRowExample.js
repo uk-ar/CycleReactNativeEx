@@ -16,6 +16,7 @@ import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {genActions2,Action} from '../../Action';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
+import {withDebug,VerticalCenterView} from './common';
 
 //with row && small height
 class Row extends React.Component {

@@ -62,7 +62,7 @@ class CloseableView extends React.Component {
     return (
       <AnimView
         style={[this.style,
-                { overflow: 'hidden' }]}
+                { overflow: 'hidden'}]}
         ref={c => this.outer = c}
       >
         <View

@@ -21,45 +21,7 @@ import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableR
 import {SwipeableListView} from '../../SwipeableListView';
 import {LayoutableView} from '../../Closeable';
 
-import util from 'util';
-
-function debugView(string) {
-  return function (props){
-    return (
-      <View style={{ height: 200, backgroundColor:"green" }}>
-        <Text>{string}:{util.inspect(props)}</Text>
-      </View>);
-  }
-}
-
-class TestListView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
-    };
-    this.data = ['row 0', 'row 1'];
-  }
-  componentWillMount(){
-    this.setState({ds:this.state.ds.cloneWithRows(this.data)})
-  }
-  render(){
-    //console.log(this.state.ds._dataBlob.s1)
-    return(
-      <View
-        style={{flex:1}}>
-        <Text
-          onPress={()=>{
-              this.data.push(`row ${this.data.length}`)
-              this.setState({ds:this.state.ds.cloneWithRows(this.data)})
-            }}>
-          pressMe
-        </Text>
-        { this.props.children(this.state.ds) }
-      </View>
-    )
-  }
-}
+import {withDebug,VerticalCenterView,TestListView,debugView} from './common'
 
 storiesOf('SwipeableListView', module)
 /* .addDecorator(getStory => (
@@ -100,7 +62,26 @@ storiesOf('SwipeableListView', module)
     )
   })
   .add('with add row', () => {
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    return(
+      <TestListView>
+        {(dataSource)=>
+          <SwipeableListView
+            style={{paddingTop:20,flex:1}}
+            generateActions={()=>genActions2('search')}
+            dataSource={dataSource}
+            renderRow={(rowData,rowID,sectionID) =>
+              <LayoutableView>
+                <View>
+                      {debugView("row")(rowData,rowID,sectionID)}
+                </View>
+              </LayoutableView>
+                      }
+          />
+        }
+      </TestListView>
+    )
+  })
+  .add('with lv add row', () => {
     return(
       <TestListView>
         {(dataSource)=>
@@ -110,7 +91,7 @@ storiesOf('SwipeableListView', module)
             renderRow={(rowData,rowID,sectionID) =>
               <LayoutableView>
                 <View>
-                      {debugView("row")(rowData,rowID,sectionID)}    
+                      {debugView("row")(rowData,rowID,sectionID)}
                 </View>
               </LayoutableView>
                       }
@@ -119,5 +100,3 @@ storiesOf('SwipeableListView', module)
       </TestListView>
     )
   })
-
-
