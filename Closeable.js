@@ -66,6 +66,7 @@ class CloseableView extends React.Component {
         ref={c => this.outer = c}
       >
         <View
+          collapsable={false}
           ref={c => this.inner = c}
           {...this.props}
           style={[this.props.style,
@@ -130,47 +131,25 @@ class LayoutableView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      layouted: false,
-      style:{
-        opacity: 0,
-        height: 0.1,
-        transform:[{scale: 0.1}],//BUG:when scale 0
-      }
+      layouted: props.disable ? true : false
     };
-  }
-  animate(){
-    this.root.measure(
-      (x, y, width, height) => {
-        this.setState({
-          style: {
-            opacity: 1,
-            transform:[{
-              scale: 1
-            }],
-            height: height
-          }})
-      }
-    )
   }
   render(){
     //this.props.data.length
-    const {style,children,...props} = this.props
+    const { disable, onLayout, ...props } = this.props
+    //const {transform,...otherStyle} = this.state.style
     return (
-      <AnimView
-        onLayout={()=>{
+      <CloseableView
+        ref={ c => this.closable = c }
+        close={this.state.layouted ? false : true}
+        onLayout={(...args)=>{
             if(!this.state.layouted){
-              this.animate()
               this.setState({layouted:true})
             }
+            onLayout(...args)
           }}
-        style={[style,this.state.style]}
-      >
-        <View
-          ref={c => this.root = c}
-          style={{position:this.state.layouted ? "relative" : "absolute"}}>
-          {children}
-        </View>
-      </AnimView>
+        {...props}
+      />
     )
   }
 }
@@ -179,12 +158,12 @@ class LayoutableView extends React.Component {
 
 LayoutableView.propTypes = {
   ...View.propTypes,//  ...Closable.propTypes,
-  onFirstLayout:React.PropTypes.func,
+  onLayout:React.PropTypes.func,
 };
 
 LayoutableView.defaultProps = {
   ...View.defaultProps,
-  onFirstLayout:function(){},
+  onLayout:function(){},
 };
 
 module.exports = { CloseableView, LayoutableView };

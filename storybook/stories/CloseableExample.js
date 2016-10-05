@@ -39,12 +39,33 @@ storiesOf('CloseableView', module)
           //self.animateTo({height:20,backgroundColor:"red"})
         }}/>
   ))
-
+  .add('with toggle 2', () => (
+    <View>
+      <CloseableViewDebug
+        data={[{style:{height:10,backgroundColor:"red"}}]}
+        onPress={(props,self)=>{
+            self.toggle();
+            //console.log(self);
+            //self.animateTo({height:20,backgroundColor:"red"})
+          }}/>
+      <View
+        style={{
+          height:50,
+          backgroundColor:"yellow"}} />
+    </View>
+  ))
+/* style={[style, {
+ *   flexDirection: 'row',
+ *   justifyContent: this.state.positiveSwipe ?
+ *                   'flex-start' : 'flex-end',
+ *   overflow: 'hidden',
+ *   alignItems: 'stretch'
+ * }]}*/
 storiesOf('LayoutableView', module)
 /* .addDecorator(getStory => (
  *   <CenterView>{getStory()}</CenterView>
  * ))*/
-  .add('with close props', () => (
+  .add('with top', () => (
     <View>
       <LayoutableView>
         <Text style={{height:50,backgroundColor:"red"}}>
@@ -54,12 +75,15 @@ storiesOf('LayoutableView', module)
       <View
         style={{
           height:50,
-          width:200,
-          flex:1,
           backgroundColor:"yellow"}} />
     </View>
   ))
-  .add('with close props??', () => (
+  .add('with center', () => (
+    <View
+      style={{
+        justifyContent:"center",
+        flex:1,
+      }}>
     <View>
       <LayoutableView>
         <View
@@ -77,7 +101,22 @@ storiesOf('LayoutableView', module)
       <View
         style={{
           height:50,
-          flex:1,
+          backgroundColor:"yellow"}} />
+    </View>
+    </View>
+  ))
+  .add('with disable', () => (
+    <View>
+      <LayoutableView
+        style={{backgroundColor:"green"}}
+        disable={true}>
+        <Text style={{height:50,backgroundColor:"red"}}>
+          foo
+        </Text>
+      </LayoutableView>
+      <View
+        style={{
+          height:50,
           backgroundColor:"yellow"}} />
     </View>
   ))

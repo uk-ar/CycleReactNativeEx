@@ -7,6 +7,7 @@ import {
 import { SwipeableRow3 } from './SwipeableRow';
 import { emptyFunction } from 'fbjs/lib/emptyFunction';
 
+//class for ref
 class SwipeableListView extends React.Component {
   render() {
     const { renderRow, generateActions,

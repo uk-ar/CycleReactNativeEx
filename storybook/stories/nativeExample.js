@@ -120,6 +120,7 @@ class LifeCycleView extends React.Component {
     action("constructor1")()
     this.state = {
       layouted: false,
+      fadeAnim: new Animated.Value(0.1),
       style:{
         opacity: 0,
         height: 0.1,
@@ -131,17 +132,27 @@ class LifeCycleView extends React.Component {
     action("componentWillMount2")()
   }
   animate(){
-    console.log("ro",this.root)
+    //console.log("ro",this.root)
     this.root.measure(
       (x, y, width, height) => {
         this.setState({
           style: {
-            opacity: 1,
-            transform:[{
-              scale: 1
-            }],
-            height: height
+            /* opacity: this.state.fadeAnim,
+             * transform:[{
+             *   scale: this.state.fadeAnim
+             * }],*/
+            height: this.state.fadeAnim.interpolate({
+              inputRange:[0,1],
+              outputRange:[0.1,height]
+            }),
+            //backgroundColor:"red",
           }})
+        Animated.timing(
+          this.state.fadeAnim, {
+            toValue: 1,
+            duration: 3000
+          }
+        ).start();
       }
     )
   }
@@ -152,7 +163,7 @@ class LifeCycleView extends React.Component {
     //this.props.data.length
     return (
       <View>
-        <AnimView
+        <Animated.View
           ref={()=>action("ref3")()}
           onLayout={()=>{
               if(!this.state.layouted){
@@ -166,11 +177,12 @@ class LifeCycleView extends React.Component {
           <View
             ref={c => this.root = c}
             style={{
-              position:"absolute",//to measure
+              position:this.state.layouted ? "relative" :
+                       "absolute",//to measure
               }}>
             {this.props.children}
           </View>
-        </AnimView>
+        </Animated.View>
         <View
           style={{
             alignSelf:"center",

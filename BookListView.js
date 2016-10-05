@@ -87,7 +87,7 @@ class BookListView extends React.Component {
         {...this.props}
         onSwipeEnd={
           ({gestureState, rowData, sectionID, rowID, highlightRow, action}) =>
-            onRelease(rowData,action)//book,to bucket
+            onRelease(rowData,rowID,action)//book,to bucket
                    }
         renderScrollComponent={props =>
           <ScrollView

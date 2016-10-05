@@ -31,6 +31,43 @@ function debugView(string) {
   }
 }
 
+class TestListView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
+    };
+  }
+  componentWillMount(){
+    this.setState({ds:this.state.ds.cloneWithRows(
+      {a:{title:'row 1',isbn:'123'},
+       b:{title:'row 2',isbn:'456'}
+      })})
+  }
+  render(){
+    console.log(this.state.ds._dataBlob.s1)
+    return(
+      <BookListView
+        style={{paddingTop:20}}
+        generateActions={()=>genActions2('search')}
+        dataSource={this.state.ds}
+        onRelease={(rowData,rowID,action)=>{
+            
+            const {[rowID]:foo,...rest} = this.state.ds._dataBlob.s1
+            console.log("foo",foo,rest)
+            this.setState({ds:this.state.ds.cloneWithRows(
+              {...rest,[rowID]:{...rowData}}
+            )})
+          }}
+        renderRow={(rowData,rowID,sectionID) =>
+          debugView("row")(rowData,rowID,sectionID)
+                  }
+        renderSectionHeader={debugView("head")}
+      />
+    )
+  }
+}
+
 storiesOf('BookListView', module)
   .addDecorator(getStory => (
     <CenterView>{getStory()}</CenterView>
@@ -64,4 +101,7 @@ storiesOf('BookListView', module)
         renderSectionHeader={debugView("head")}
       />
     )
+  })
+  .add('with class', () => {
+    return(<TestListView />)
   })
