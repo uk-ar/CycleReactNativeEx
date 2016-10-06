@@ -30,7 +30,7 @@ import Rx from 'rx';
 function main({ RN, HTTP, EE }) {
   const actions = intent(RN, HTTP);
   const state$ = model(actions);
-  // const request$ = Rx.Observable.merge(actions.requestBooks$, actions.requestStatus$);
+  // const request$ = Rx.Observable.merge(actions.requestSearchedBooks$, actions.requestStatus$);
   // 0192521722
   // qwerty
   /* actions.request$.map(r => console.log('request:', r))

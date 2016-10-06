@@ -63,7 +63,7 @@ function intent(RN, HTTP) {
                          .map(([text]) => text)
                          //.do(i => console.log('search text change:%O', i));
 
-  const requestBooks$ =
+  const requestSearchedBooks$ =
     changeQuery$.debounce(500)
                 .filter(query => query.length > 1)
                 //.do(i => console.log('requestBooks', i))
@@ -77,7 +77,7 @@ function intent(RN, HTTP) {
                   accept: 'Accept-Language:ja,en-US;q=0.8,en;q=0.6'
                 }));
 
-  const booksResponse$ =
+  const searchedBooksResponse$ =
     HTTP.select('search')
         .switch()
         .map(res => res.text)
@@ -294,15 +294,15 @@ function intent(RN, HTTP) {
           requestStatus$: requestSearchedBooksStatus$ } =
             createBooksStatusStream(
               // merge savedBooks to searchedBooks
-              booksResponse$
+              searchedBooksResponse$
                 .startWith(mockSearcheBooks)
-                .combineLatest(
-                  savedBooks$.map(arrayToObject),
-                  (searchedBooks, savedBooks) =>
-                    searchedBooks.map(book =>
-                      savedBooks[book.isbn] || book))
+              /* .combineLatest(
+               *   savedBooks$.map(arrayToObject),
+               *   (searchedBooks, savedBooks) =>
+               *     searchedBooks.map(book =>
+               *       savedBooks[book.isbn] || book))*/
               // reuse books status
-              // booksResponse$
+              // searchedBooksResponse$
                 //.do(i => console.log('in:', i))
                 //.do(i => console.log('booksres0:', i))
               // .map(books => books.map((book) => ({...book, bucket:"foo"})))
@@ -332,10 +332,10 @@ function intent(RN, HTTP) {
   // TODO:
   const request$ = Rx.Observable
                      .merge(requestSavedBooksStatus$,
-                            requestBooks$,
+                            requestSearchedBooks$,
                             requestSearchedBooksStatus$);
   /* const { booksStatus$: searchedBooksStatus$, requestStatus$ } =
-   *   createBooksStatusStream(booksResponse$, 'savedBooksStatus');*/
+   *   createBooksStatusStream(searchedBooksResponse$, 'savedBooksStatus');*/
 
   /* const savedBooksResponse$ =
    *   //Rx.Observable.empty()
@@ -413,12 +413,19 @@ function intent(RN, HTTP) {
       .do(i => console.log('section selected1:%O', i))
       .shareReplay();
 
+  const booksLoadingState$ =
+    requestSearchedBooks$
+      .map((_) => true)
+      .merge(searchedBooksResponse$.map((_) => false))
+      .startWith(false)
+      .shareReplay();
+
   return {
     //savedBooks$,
+    booksLoadingState$,
     savedBooksStatus$,
-    request$,
-    requestBooks$, // for loading status
     searchedBooksStatus$,
+    request$,
     // request$,
     // onpress -> triggers animation -> change selectedSection
     selectedSection$,
@@ -443,7 +450,7 @@ function intent(RN, HTTP) {
                   .startWith(false)
                   .scan((current, event) => !current)
                   .do(i => console.log('sort:%O', i)),
-    // booksResponse$,
+    // searchedBooksResponse$,
     // booksStatusResponse$,
   };
 }

@@ -22,14 +22,6 @@ function model(actions) {
   /* const statusRequest$ = Rx.Observable.just("http://api.calil.jp/check?appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=Tokyo_Fuchu&format=json&isbn=9784828867472") */
 
   const selectedBook$ = actions.goToBookView$;
-  const booksLoadingState$ =
-    Rx.Observable.just(true);
-  /* actions.requestBooks$.map((_) => true)
-   *        .merge(
-   *          // response event
-   *          actions.booksResponse$.map((_) => false));*/
-  /* searchRequest$,statusRequest$
-     searchRequest,statusRequest, */
 
   const initialNavigationState = {
     key: 'MainNavigation',
@@ -129,7 +121,7 @@ function model(actions) {
       ,
       actions.selectedSection$.do(i => console.log('selectedSection', i))
       ,
-      booksLoadingState$.do(i => console.log('booksLoadingState', i))
+      actions.booksLoadingState$.do(i => console.log('booksLoadingState', i))
       ,
       (books, selectedSection, booksLoadingState) => {
         const sections = {
@@ -171,7 +163,7 @@ function model(actions) {
           getSectionHeaderData: (dataBlob, sectionID) =>
             dataBlob.sections[sectionID]
         }))
-      //.do(i => console.log('datasource:', i));
+      .do(i => console.log('datasource:', i));
       // .subscribe()
 
       // .do(i => console.log('rowIDs?:', i));
@@ -213,7 +205,7 @@ function model(actions) {
        *               LayoutAnimation.Properties.opacity))),*/
       // counts$,
       // actions.savedBooks$,
-      booksLoadingState$.startWith(false).distinctUntilChanged(),
+      actions.booksLoadingState$.startWith(false).distinctUntilChanged(),
       navigationState$.distinctUntilChanged(),
       selectedBook$.startWith(null).distinctUntilChanged(),
       // LayoutAnimation treate listview as different
