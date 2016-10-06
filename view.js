@@ -82,7 +82,7 @@ function ItemsFooter({ payload, count }) {
   );
 }
 
-// import { Closeable2 } from './Closeable';
+import { LayoutableView } from './Closeable';
 import { AnimView } from './AnimView';
 Touchable.BookListView = Touchable.createCycleComponent(
   BookListView);
@@ -91,7 +91,8 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
   // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
   // TODO: transition to detail view
-  console.log('render main', { items, sectionIDs, rowIDs, booksLoadingState, selectedSection });
+  //console.log('render main', { items, sectionIDs, rowIDs, booksLoadingState, selectedSection });
+  //console.log("render main");
   /* LayoutAnimation.configureNext(
    *   LayoutAnimation.create(1000,
    *                          LayoutAnimation.Types.easeInEaseOut,
@@ -106,17 +107,13 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
   // <BookListView
   //        key={selectedSection}
   return (
-    <View
-      key="main"
-      style={{
-        flex: 1,
-        backgroundColor: '#1A237E', // indigo 900
-      }}
-    >
-      <Header />
-      { /* listView should have onRelease method? */ }
-      { /* key is for rerender header */ }
       <Touchable.BookListView
+        style={{
+          paddingHorizontal: 3,
+          // height:100,
+          flex: 1,
+          backgroundColor: '#1A237E', // indigo 900
+        }}
         removeClippedSubviews={false}
         onContentSizeChange={(contentWidth, contentHeight) =>
           // console.log('change', contentWidth, contentHeight)
@@ -133,19 +130,23 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
         generateActions={(rowData, sectionID, rowID)=>
           genActions2(sectionID)}
         renderRow={(rowData, sectionID, rowID) => {
-          // console.log('row:', rowData, sectionID, rowID);
-          return (
-            <BookRow1
+            // console.log('row:', rowData, sectionID, rowID);
+            //              <LayoutableView disable={rowData.appear ? false : true}>
+            return (
+              //              <LayoutableView disable={true}>
+              <LayoutableView disable={rowData.appear ? false : true}>
+                <BookRow1
                 key={rowID}
                 selector="bookcell"
                 bucket={sectionID}
                 onSwipeEnd={()=>console.log(sectionID,rowData)}
                            >
-              <BookCell
+                  <BookCell
                   book={rowData}
                   style={{ backgroundColor: materialColor.grey['50'] }}
                         />
-            </BookRow1>
+                </BookRow1>
+              </LayoutableView>
             );
         }}
         renderSectionFooter={(sectionData, sectionID) => {
@@ -180,12 +181,7 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
             payload={[sectionID,this.listview]}
             /> */
         }}
-        style={{
-          paddingHorizontal: 3,
-    // height:100,
-        }}
       />
-    </View>
     );
 }
 

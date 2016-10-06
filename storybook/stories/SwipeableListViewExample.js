@@ -71,9 +71,7 @@ storiesOf('SwipeableListView', module)
             dataSource={dataSource}
             renderRow={(rowData,rowID,sectionID) =>
               <LayoutableView>
-                <View>
                       {debugView("row")(rowData,rowID,sectionID)}
-                </View>
               </LayoutableView>
                       }
           />

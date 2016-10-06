@@ -70,10 +70,20 @@ class TestListView extends React.Component {
     this.state = {
       ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
     };
-    this.data = ['row 0', 'row 1'];
+    this.data = [{key:1,data:"1"}, {key:2,data:"2"}];
+  }
+  updateDataSource(){
+    this.setState(
+      {ds:this.state.ds.cloneWithRows(
+        this.data.reduce((acc,elem)=>{
+          acc[elem.key] = elem.data
+          return acc
+          //{...acc,[elem.key]:elem.data}
+        },{})
+      )})//return acc
   }
   componentWillMount(){
-    this.setState({ds:this.state.ds.cloneWithRows(this.data)})
+    this.updateDataSource();
   }
   render(){
     //console.log(this.state.ds._dataBlob.s1)
@@ -86,9 +96,12 @@ class TestListView extends React.Component {
               [head,...this.data]= this.data
               //console.log("r",rest)
               console.log("r",this.data)
-              this.data.push(`row ${Math.random()}`)
+              //this.data.push(`row ${Math.random()}`)
+              const i = Math.random()
+              this.data.push({key:i,data:`${i}`})
               console.log("r",this.data)
-              this.setState({ds:this.state.ds.cloneWithRows(this.data)})
+              //this.setState({ds:this.state.ds.cloneWithRows(this.data)})
+              this.updateDataSource()
             }}>
           pressMe
         </Text>

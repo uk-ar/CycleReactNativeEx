@@ -6,7 +6,8 @@ import {
   Animated,
   View,
   ListView,
-  ScrollView
+  ScrollView,
+  LayoutAnimation
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import util from 'util'
@@ -25,76 +26,157 @@ import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableR
 import {withDebug,VerticalCenterView,TestListView,debugView} from './common'
 
 class TestListView3 extends React.Component {
+//swipe and reoder
   constructor(props) {
     super(props);
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+    })
+    this.dataBlob = {
+      foo:[{key:"a",data:"a"}, {key:"b",data:"b"},{key:"c",data:"c"},
+           {key:"d",data:"e"}, {key:"ea",data:"fe"},{key:"ef",data:"ee"}],
+      bar:[{key:"d",data:"d"}, {key:"e",data:"e"},{key:"f",data:"f"},
+           {key:"ef",data:"efe"}, {key:"eaq",data:"fe"},{key:"ef",data:"ee"}]
+    }
+    this.sectionIdentities = ["foo","bar"]
     this.state = {
-      ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
-    };
-  }
-  componentWillMount(){
-    this.setState({ds:this.state.ds.cloneWithRows(
-      {a:{title:'row 1',isbn:'123'},
-       b:{title:'row 2',isbn:'456'}
-      })})
+      ds: ds.cloneWithRowsAndSections(this.dataBlob,this.sectionIdentities)
+    }
   }
   render(){
-    console.log(this.state.ds._dataBlob.s1)
-    return(
-      <BookListView
-        style={{paddingTop:20}}
-        generateActions={()=>genActions2('search')}
-        dataSource={this.state.ds}
-        onRelease={(rowData,rowID,action)=>{
+    //console.log(this.state.ds._dataBlob.s1)
+    const dataSource = this.state.ds
+    console.log("ds:",dataSource.getRowCount(),
+                dataSource.getRowAndSectionCount(),
+                dataSource.getSectionLengths(),
+                dataSource.getRowData(0,0),
+                dataSource.getRowData(1,0)
+      
+    );
 
-            const {[rowID]:foo,...rest} = this.state.ds._dataBlob.s1
-            console.log("foo",foo,rest)
-            this.setState({ds:this.state.ds.cloneWithRows(
-              {...rest,[rowID]:{...rowData}}
-            )})
-          }}
-        renderRow={(rowData,rowID,sectionID) =>
-          debugView("row")(rowData,rowID,sectionID)
-                  }
-        renderSectionHeader={debugView("head")}
-      />
+    let obj={};
+    let sectionLengths=dataSource.getSectionLengths()
+    //sectionLengths.map((i)=>)
+    /* for(let i = 0;i<sectionLengths.length;i++){
+     *   
+     * }*/
+    console.log(obj)  
+    for(let i = 0;i<dataSource.getRowCount();i++){
+      //dataSource.getSectionLengths()
+      console.log("fo",i,
+                  //dataSource.getSectionHeaderData(i),
+                  dataSource.getRowIDForFlatIndex(i),
+                  dataSource.getSectionIDForFlatIndex(i));
+      const sectionID = dataSource.getSectionIDForFlatIndex(i)
+      const rowID = dataSource.getRowIDForFlatIndex(i)
+      
+      obj[sectionID] = obj[sectionID] || []
+      
+      //obj[sectionID]=dataSource.getSectionHeaderData(sectionID)
+        //"a"//dataSource.getRowData(sectionID,rowID)
+                                                              
+                                                 }
+                     console.log(obj)
+
+    return(
+      <View
+        style={{flex:1,paddingTop:20}}>        
+        <BookListView
+          ref={c=> this.listview = c}
+          style={{paddingTop:20}}
+          generateActions={()=>genActions2('search')}
+          dataSource={this.state.ds}
+          renderRow={(rowData,rowID,sectionID) =>
+            <LayoutableView>
+                    {debugView("row")(rowData,rowID,sectionID)}
+            </LayoutableView>
+                    }
+          renderSectionHeader={(sectionData, sectionID)=>
+            <Text key={sectionID}
+          onPress={()=>{
+              if(this.sectionIdentities.length==2){
+                this.sectionIdentities = [sectionID]
+              }else{
+                this.sectionIdentities = ["foo","bar"]
+              }
+              LayoutAnimation.configureNext(LayoutAnimation.Presets.spring)
+              this.setState(
+                {ds:this.state.ds.cloneWithRowsAndSections(
+                  this.dataBlob,this.sectionIdentities)},
+                ()=>{
+                  this.listview.scrollToSectionHeader(sectionID)
+                }
+              )
+            }}>
+                  press me
+            </Text>
+                              }
+        />
+      </View>
     )
   }
 }
-
 class TestListView2 extends React.Component {
+  //swipe and reoder
   constructor(props) {
     super(props);
     this.state = {
       ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
     };
-    this.data = [{title:'row 1',isbn:123},{title:'row 2',isbn:456}]
+    this.data = [{key:"a",data:"a"}, {key:"b",data:"b"},{key:"c",data:"c"}];
+  }
+  updateDataSource(){
+    this.setState(
+      {ds:this.state.ds.cloneWithRows(
+        this.data.reduce((acc,elem)=>{
+          acc[elem.key] = elem.data
+          return acc
+        },{})
+      )})//return acc
   }
   componentWillMount(){
-    this.setState({ds:this.state.ds.cloneWithRows(this.data)})
+    this.updateDataSource();
   }
   render(){
-    console.log(this.state.ds._dataBlob.s1)
+    //console.log(this.state.ds._dataBlob.s1)
     return(
-      <BookListView
-        style={{paddingTop:20}}
-        generateActions={()=>genActions2('search')}
-        dataSource={this.state.ds}
-        onRelease={(rowData,rowID,action)=>{
-          console.log("foo",rowData,rowID,action,this.state.ds._dataBlob.s1)
-          //const array = [...this.state.ds._dataBlob.s1,rowData]
-          this.data = this.data.filter((elem,i)=> rowData.isbn !== elem.isbn)
-          //const {[rowID]:foo,...rest} = this.state.ds._dataBlob.s1
-          //console.log("foo",foo,rest)
-          console.log("foo",this.data)
-          this.setState({ds:this.state.ds.cloneWithRows(this.data)})
-          }}
-      renderRow={(rowData,rowID,sectionID) =>
-        <View key={rowID}>
-                  {debugView("row")(rowData,rowID,sectionID)}
-        </View>
-      }
-        renderSectionHeader={debugView("head")}
-      />
+      <View
+        style={{flex:1,paddingTop:20}}>
+        <Text
+          onPress={()=>{
+              [head,...this.data]= this.data
+              const i = Math.random()
+              this.data.push({key:i,data:`${i}`})
+              this.updateDataSource()
+            }}>
+          pressMe
+        </Text>
+        <BookListView
+          style={{paddingTop:20}}
+          generateActions={()=>genActions2('search')}
+          dataSource={this.state.ds}
+          onRelease={(rowData,rowID,action)=>{
+              //rowID is string
+              this.data =
+                this.data 
+                    .filter((elem)=>
+                      elem.key.toString() !== rowID)
+              //console.log("td:", this.data, rowID)
+              this.updateDataSource()
+
+              this.data.push({key:rowID,data:rowData})
+              //console.log("td:",this.data)
+              this.updateDataSource()
+            }}
+          renderRow={(rowData,rowID,sectionID) =>
+            <LayoutableView>
+                    {debugView("row")(rowData,rowID,sectionID)}
+            </LayoutableView>
+                    }
+          renderSectionHeader={debugView("head")}
+        />
+      </View>
     )
   }
 }
@@ -155,4 +237,7 @@ storiesOf('BookListView', module)
   })
   .add('with class', () => {
     return(<TestListView2 />)
+  })
+  .add('with class2', () => {
+    return(<TestListView3 />)
   })

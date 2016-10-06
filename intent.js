@@ -50,24 +50,23 @@ const initialBooks = mockbooks;
 
 function intent(RN, HTTP) {
   // Actions
-  // mojibake シンプ Q思考
   const release$ = RN.select('listview')
                      .events('release')
-                     .do((...args) => console.log('foo0:', ...args))
-                     .map(([book,action]) => [book,action.target])
-                     .do((...args) => console.log('foo1:', ...args))
+                     //.do((...args) => console.log('foo0:', ...args))
+                     .map(([book, key, action]) => [book,action.target])
+                     //.do((...args) => console.log('foo1:', ...args))
                      .filter(([_,target]) => target !== null)
-                     .do((...args) => console.log('foo2:', ...args));
+                     //.do((...args) => console.log('foo2:', ...args));
 
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')
                          .map(([text]) => text)
-                         .do(i => console.log('search text change:%O', i));
+                         //.do(i => console.log('search text change:%O', i));
 
   const requestBooks$ =
     changeQuery$.debounce(500)
                 .filter(query => query.length > 1)
-                .do(i => console.log('requestBooks', i))
+                //.do(i => console.log('requestBooks', i))
                 .map(q => ({
                   category: 'search',
                   url: RAKUTEN_SEARCH_API + encodeURI(q),
@@ -77,34 +76,26 @@ function intent(RN, HTTP) {
                    *           'ja,en-US;q=0.8,en;q=0.6' }*/
                   accept: 'Accept-Language:ja,en-US;q=0.8,en;q=0.6'
                 }));
-  // NGsearch:ぐらと
-  // ああ　あ
-
-  function createResponseStream(category) {
-    return (
-      HTTP.select(category)
-          .switch()
-          .map(res => res.text)
-          // .do(res => console.log(res))
-          .map(res => JSON.parse(res))
-    ); }
 
   const booksResponse$ =
-    createResponseStream('search')
-      .map(body =>
-        body.Items
-            .filter(book => book.isbn)
-        // reject non book
-            .filter(book =>
-              book.isbn.startsWith('978') || book.isbn.startsWith('979'))
-            .map(({ title, author, isbn, largeImageUrl }) => ({
-              title: title.replace(/^【バーゲン本】/, ''),
-              author,
-              isbn,
-              thumbnail: largeImageUrl,
-            }))
-      )
-      .do(i => console.log('books change:%O', i))
+    HTTP.select('search')
+        .switch()
+        .map(res => res.text)
+        .map(res => JSON.parse(res))
+        .map(body =>
+          body.Items
+              .filter(book => book.isbn)
+          // reject non book
+              .filter(book =>
+                book.isbn.startsWith('978') || book.isbn.startsWith('979'))
+              .map(({ title, author, isbn, largeImageUrl }) => ({
+                title: title.replace(/^【バーゲン本】/, ''),
+                author,
+                isbn,
+                thumbnail: largeImageUrl,
+              }))
+        )
+      //.do(i => console.log('books change:%O', i))
       .share();
 
   function createBooksStatusStream(books$, category) {
@@ -140,39 +131,58 @@ function intent(RN, HTTP) {
     }
 
     const requestStatus$ =
-      books$.do(i => console.log('connect:%O', i))
+      books$
+        //.do(i => console.log('connect:%O', i))
             .map(books => books.map(book => book.isbn))
-            .do(i => console.log('isbns:%O', i))
+            //.do(i => console.log('isbns:%O', i))
             .filter(isbns => isbns.length > 0)
             .map(q => ({
               category,
               url: CALIL_STATUS_API + encodeURI(q)
             }))
-            .do(i => console.log('status req:%O', i))
+            //.do(i => console.log('status req:%O', i))
             .shareReplay();
 
+    /* function createResponseStream(category) {
+     *   return (
+     *     HTTP.select(category)
+     *     //should handle as meta stream because of retry
+     *         .switch()
+     *         .map(res => res.text)
+     *     // .do(res => console.log(res))
+     *         .map(res => JSON.parse(res))
+     *   ); }
+     */
+
     const booksStatusResponse$ =
-      createResponseStream(category)
-        .do(i => console.log('books status:%O', i, i.continue))// executed by retry
-    // ok to retry but not output stream
-    // .flatMap(result => result.continue === 1 ?
-    //                 [result, Observable.throw(error)] : [result])
-        .flatMap(result => [{ ...result, continue: 0 }, result])
-        .map((result) => {
-          if (result.continue === 1) {
-            throw result;
-          }
-          return result;
-        })
-        .retryWhen(errors =>
-          errors.delay(2000)
-        )
-        .distinctUntilChanged(i => JSON.stringify(i))
-        .map(result => result.books)
+      HTTP.select(category)
+    //should handle as meta stream because of retry
+          .map(stream =>
+            stream.map(res => res.text)
+                  //.do(i => console.log('books response recived:%O', i))
+            // .do(res => console.log(res))
+                  .map(res => JSON.parse(res))
+            //.do(i => console.log('books status:%O', i, i.continue))// executed by retry
+            // ok to retry but not output stream
+            // .flatMap(result => result.continue === 1 ?
+            //                 [result, Observable.throw(error)] : [result])
+                  .flatMap(result => [{ ...result, continue: 0 }, result])
+                  .map((result) => {
+                    if (result.continue === 1) {
+                      throw result;
+                    }
+                    return result;
+                  })
+                  .retryWhen(errors =>
+                    errors.delay(2000)
+                  )
+                  .distinctUntilChanged(i => JSON.stringify(i))
+                  .map(result => result.books))
+          .switch()
     /* .do(books =>
        Object.keys(books).map(function(v) { return obj[k] })
        books.filter(book => book["Tokyo_Fuchu"]["status"] == "OK")) */
-        .do(i => console.log('books status change:%O', i));
+          .do(i => console.log('books status change:%O', i));
 
     const booksStatus$ =
       Rx.Observable
@@ -185,6 +195,7 @@ function intent(RN, HTTP) {
           booksStatusResponse$.startWith({}),
           mergeBooksStatus,
         ) // .do(i => console.log('books$:', category, i))
+        //.switch()
         .shareReplay();
     return ({
       booksStatus$,
@@ -193,8 +204,8 @@ function intent(RN, HTTP) {
 
   const changeBucket$ =
     release$
-      .do(i => console.log('release:', i))
-      .filter(([book, bucket, bookRow]) => bucket !== null)
+      //.do(i => console.log('release:', i))
+      //.filter(([book, bucket, bookRow]) => bucket !== null)
   // TODO:change to isbn
   /* .map(([book, bucket]) => (
    *   { type: 'replace',
@@ -209,44 +220,46 @@ function intent(RN, HTTP) {
   /* .flatMap(([book, bucket, bookRow]) =>
    *   bookRow.close().then(()=>[book, bucket, bookRow])
    *   )*/
-      .map(([book, bucket, bookRow]) => {
-        return ({ type: 'replace', book, bucket, bookRow });
-      })
-  /* .flatMap(([book, bucket, bookRow]) =>
-   *   [{ type: 'remove', book, bookRow},
-   *    //bookRow.close(),
-   *    { type: 'add', book, bucket }])*/
+  /* .map(([book, bucket]) => {
+   *   return ({ type: 'replace', book, bucket});
+   * })*/
+      .flatMap(([book, bucket]) =>
+        [{ type: 'remove', book},
+         //bookRow.close(),
+         { type: 'add',    book, bucket }])
   /* .map(([book, bucket]) => (
    *   { type: 'replace',
    *     book: Object.assign(
    *       {}, book, { bucket, modifyDate: new Date(Date.now()) }) }))*/
-      .do(i => console.log('rel:%O', i))
+      //.do(i => console.log('rel:%O', i))
       .shareReplay();
 
   // [{isbn:,mod},{isbn:,mod}]
   const savedBooks$ =
     changeBucket$
       .startWith(initialBooks)
-      .scan((books, { type, book, bucket, bookRow }) => {
-        console.log('type:', type, book, bucket, bookRow);
+      .scan((books, { type, book, bucket }) => {
+        //console.log('type:', type, book, bucket, bookRow);
         switch (type) {
-            /* case 'remove':
-             *   return books.filter((elem) =>
-             *     elem.isbn.toString() !== book.isbn.toString());
-             * case 'add':
-             *   return [{...book,bucket}].concat(books);*/
-          case 'replace':
-            /* return [book].concat(
-             *   books.filter((elem) => elem.isbn.toString() !== book.isbn.toString()));*/
-            return [{ ...book, bucket, modifyDate: new Date(Date.now()) }]
-            // return []
-              .concat(books.filter(elem =>
-                elem.isbn.toString() !== book.isbn.toString()));
+          case 'remove':
+            return books.filter((elem) =>
+              elem.isbn.toString() !== book.isbn.toString());
+          case 'add':
+            return [
+              {...book, bucket,
+               modifyDate: new Date(Date.now()), appear:true}]
+              .concat(books);
+            /* case 'replace':
+             *   return [{ ...book, bucket, modifyDate: new Date(Date.now()) }]
+             *     .concat(books.filter(elem =>
+             *       elem.isbn.toString() !== book.isbn.toString()));*/
           default:
             return books;
         }
       } // ).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
-      ).shareReplay();
+      )
+      //.do((books)=> console.log("books:",books))
+      .shareReplay();
 
   savedBooks$.do((books) => {
     realm.write(() => {
@@ -290,11 +303,11 @@ function intent(RN, HTTP) {
                       savedBooks[book.isbn] || book))
               // reuse books status
               // booksResponse$
-                .do(i => console.log('in:', i))
-                .do(i => console.log('booksres0:', i))
+                //.do(i => console.log('in:', i))
+                //.do(i => console.log('booksres0:', i))
               // .map(books => books.map((book) => ({...book, bucket:"foo"})))
               // .map(books => books.map((book) => book.isbn ))
-                .do(i => console.log('booksres1:', i))
+                //.do(i => console.log('booksres1:', i))
               //
               ,
               'searchedBooksStatus');
@@ -345,9 +358,9 @@ function intent(RN, HTTP) {
           .events('press').map(([_, listview]) => [null, listview])
           .shareReplay()
       )
-      .do(i => console.log('bar', i))
+      //.do(i => console.log('bar', i))
       .distinctUntilChanged(([section, listview]) => section)
-      .do(i => console.log('foo', i))
+      //.do(i => console.log('foo', i))
       .shareReplay();
 
   const scrollListView$ =
@@ -401,10 +414,11 @@ function intent(RN, HTTP) {
       .shareReplay();
 
   return {
-    savedBooks$,
+    //savedBooks$,
     savedBooksStatus$,
     request$,
     requestBooks$, // for loading status
+    searchedBooksStatus$,
     // request$,
     // onpress -> triggers animation -> change selectedSection
     selectedSection$,
@@ -431,7 +445,6 @@ function intent(RN, HTTP) {
                   .do(i => console.log('sort:%O', i)),
     // booksResponse$,
     // booksStatusResponse$,
-    searchedBooksStatus$,
   };
 }
 

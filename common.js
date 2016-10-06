@@ -7,6 +7,10 @@ const LIBRARY_ID = 'Tokyo_Fuchu';
 
 const CALIL_STATUS_API = `http://api.calil.jp/check?callback=no&appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=${LIBRARY_ID}&format=json&isbn=`;
 
+// mojibake シンプ Q思考
+// NGsearch:ぐらと
+// ああ　あ
+
 const MOCKED_MOVIES_DATA = [
   { title: 'ぐりとぐらの絵本7冊セット', author: '',
   thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/2147/9784834032147.jpg?_ex=200x200',

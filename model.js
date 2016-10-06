@@ -110,20 +110,27 @@ function model(actions) {
   // update with animation when selectedSection$ changed
   const books$ =
     Rx.Observable.combineLatest(
-      searchedBooks$.do(i => console.log('searched books')),
-      actions.savedBooksStatus$.do(i => console.log('saved books')),
+      searchedBooks$//.do(i => console.log('searched books'))
+      ,
+      actions.savedBooksStatus$//.do(i => console.log('saved books'))
+      ,
       genItems)
+      //.debounce(100)//ms
   /* .do(i=>console.log("items:",JSON.stringify(i)))
    * .distinctUntilChanged(x => JSON.stringify(x),(a,b)=>a!==b) */
+      .do(i=>console.log("items:",i))
       .shareReplay();
 
   const limit = 2;
 
   const dataSource$ =
     Rx.Observable.combineLatest(
-      books$,
-      actions.selectedSection$,
-      booksLoadingState$,
+      books$//.do(i => console.log('books', i))
+      ,
+      actions.selectedSection$.do(i => console.log('selectedSection', i))
+      ,
+      booksLoadingState$.do(i => console.log('booksLoadingState', i))
+      ,
       (books, selectedSection, booksLoadingState) => {
         const sections = {
           search: { close: selectedSection, loadingState: booksLoadingState },
@@ -164,7 +171,7 @@ function model(actions) {
           getSectionHeaderData: (dataBlob, sectionID) =>
             dataBlob.sections[sectionID]
         }))
-      .do(i => console.log('datasource:', i));
+      //.do(i => console.log('datasource:', i));
       // .subscribe()
 
       // .do(i => console.log('rowIDs?:', i));
@@ -216,7 +223,6 @@ function model(actions) {
       (/* items, sectionIDs, rowIDs,*/
        dataSource, selectedSection, booksLoadingState, navigationState, selectedBook, i) => ({ /* items, sectionIDs, rowIDs,*/
          dataSource, selectedSection, booksLoadingState, navigationState, selectedBook, i }))
-    .debounce(10);// for delay of selectedSection and sectionIDs
   return state$;
 }
 

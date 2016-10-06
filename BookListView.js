@@ -80,8 +80,10 @@ class BookListView extends React.Component {
   }
   render() {
     this.sections = this.sections || {};// refs
-    console.log('this.props', this.props);
-    const {onRelease, ...props} = this.props;
+    //console.log('this.props', this.props);
+    const {onRelease,dataSource, ...props} = this.props;
+
+    //dataSource.
     return (
       <EnhancedListView
         {...this.props}

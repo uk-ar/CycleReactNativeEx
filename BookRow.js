@@ -6,7 +6,7 @@ import { genActions2 } from './Action';
 class BookRow1 extends React.Component {
   constructor(props) {
     super(props);
-    console.log("const",props)
+    //console.log("const",props)
   }
   render() {
     const { bucket, ...props } = this.props;
@@ -14,7 +14,6 @@ class BookRow1 extends React.Component {
     return (
       <SwipeableRow3
         {...props}
-        ref={c => (this.row = c)}
         {...genActions2(bucket)}
       />
     );
