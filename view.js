@@ -115,10 +115,6 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
           backgroundColor: '#1A237E', // indigo 900
         }}
         removeClippedSubviews={false}
-        onContentSizeChange={(contentWidth, contentHeight) =>
-          // console.log('change', contentWidth, contentHeight)
-          null
-                            }
         selector="listview"
         dataSource={dataSource}
         ref={(c) => {
@@ -132,19 +128,23 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
         renderRow={(rowData, sectionID, rowID) => {
             // console.log('row:', rowData, sectionID, rowID);
             //              <LayoutableView disable={rowData.appear ? false : true}>
+            //              <LayoutableView disable={true}>
             return (
-              //              <LayoutableView disable={true}>
-              <LayoutableView disable={rowData.appear ? false : true}>
+              <LayoutableView
+                 key={rowID}
+                 disable={rowData.appear ? false : true}>
                 <BookRow1
-                key={rowID}
                 selector="bookcell"
                 bucket={sectionID}
                 onSwipeEnd={()=>console.log(sectionID,rowData)}
                            >
-                  <BookCell
-                  book={rowData}
-                  style={{ backgroundColor: materialColor.grey['50'] }}
-                        />
+                  <Text
+                           style={{ backgroundColor: materialColor.grey['50'] }}
+                           >Foo</Text>
+                           {/* <BookCell
+                           book={rowData}
+                           style={{ backgroundColor: materialColor.grey['50'] }}
+                           /> */}
                 </BookRow1>
               </LayoutableView>
             );

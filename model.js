@@ -75,42 +75,37 @@ function model(actions) {
         return acc;
       }, {});
     }
-    function filterBooks(books, bucket) {
+    function collectBooks(books, bucket) {
       let ret = {};
       let booksInBucket = books.filter(book => book.bucket === bucket);
       ret[bucket] = booksToObject(booksInBucket);
       ret[`${bucket}_end`] = {};
       return ret;
     }
+    const obj = booksToObject(savedBooks)
     return {
-      search: booksToObject(searchedBooks),
+      search: booksToObject(
+        searchedBooks.map(book => obj[`isbn-${book.isbn}`] || book)),
       search_end: {},
-      ...filterBooks(savedBooks, 'liked'),
-      ...filterBooks(savedBooks, 'borrowed'),
-      ...filterBooks(savedBooks, 'done'),
+      ...collectBooks(savedBooks, 'liked'),
+      ...collectBooks(savedBooks, 'borrowed'),
+      ...collectBooks(savedBooks, 'done'),
     };
   }
-
-  const searchedBooks$ =
-    actions.searchedBooksStatus$
-           // .startWith(MOCKED_MOVIES_DATA)
-           .map(books =>
-             books.map(book => ({ ...book, key: `isbn-${book.isbn}` })))
-           .shareReplay();
-
   // selectedSection triggers scroll and update value when animation end
   // update with animation when selectedSection$ changed
   const books$ =
     Rx.Observable.combineLatest(
-      searchedBooks$//.do(i => console.log('searched books'))
+      actions.searchedBooksStatus$
+      //searchedBooks$//.do(i => console.log('searched books'))
       ,
       actions.savedBooksStatus$//.do(i => console.log('saved books'))
       ,
       genItems)
-      //.debounce(100)//ms
+      .debounce(1)//ms sync searchedBooksStatus$ & savedBooksStatus$
   /* .do(i=>console.log("items:",JSON.stringify(i)))
    * .distinctUntilChanged(x => JSON.stringify(x),(a,b)=>a!==b) */
-      .do(i=>console.log("items:",i))
+      //.do(i=>console.log("items:",i))
       .shareReplay();
 
   const limit = 2;
@@ -163,7 +158,7 @@ function model(actions) {
           getSectionHeaderData: (dataBlob, sectionID) =>
             dataBlob.sections[sectionID]
         }))
-      .do(i => console.log('datasource:', i));
+      //.do(i => console.log('datasource:', i));
       // .subscribe()
 
       // .do(i => console.log('rowIDs?:', i));

@@ -24,15 +24,32 @@ class CloseableView extends React.Component {
       //console.log("start open")
       this.inner.measure((x, y, width, height) => {
         // TODO:filter Props
-        this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
+        //this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
+        this.style = { height };
         this.setState({ close: false }, () => { // widen
           this.outer.animate(
-            { opacity: 0.1, transform: [{ scale: 0.1 }], height: 0.01 }, this.style)
+            //{ opacity: 0.1, transform: [{ scale: 0.1 }], height: 0.01 }
+            { height: 0.01 }
+            , this.style)
               .then(() => {
                 //console.log("finish open")
                 resolve();
               });
         });
+        /* this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
+         * this.setState({ close: false }, () => { // widen
+         *   this.outer.animate(
+         *     { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }]},
+         *     { height      , opacity: 0.1, transform: [{ scale: 0.1 }]})
+         *       .then(()=>
+         *         this.outer.animate(
+         *           {opacity: 0.1, transform: [{ scale: 0.1 }]},
+         *           {opacity:   1, transform: [{ scale:   1 }]}))
+         *       .then(() => {
+         *         //console.log("finish open")
+         *         resolve();
+         *       });*/
+        //});
       });
     });
   }
@@ -150,7 +167,7 @@ class LayoutableView extends React.Component {
             if(!this.state.layouted){
               this.setState({layouted:true})
             }
-            onLayout(...args)
+            //onLayout(...args)
           }}
         {...props}
       />

@@ -22,8 +22,61 @@ import {genActions2,Action} from '../../Action';
 import {BookListView} from '../../BookListView';
 import {LayoutableView} from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
+import {SwipeableListView} from '../../SwipeableListView';
 
 import {withDebug,VerticalCenterView,TestListView,debugView} from './common'
+
+class NestedListView extends React.Component {
+  //Nested ListView
+  constructor(props) {
+    super(props);
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+    })
+    this.dataBlob = {
+      foo:[[{key:"a",data:"a"}, {key:"b",data:"b"},{key:"c",data:"c"}]],
+      bar:[[{key:"d",data:"d"}, {key:"e",data:"e"},{key:"f",data:"f"}]],
+      baz:[[{key:"d",data:"d"}, {key:"e",data:"e"},{key:"f",data:"f"}]]
+    }
+    //this.sectionIdentities = ["foo","bar"]
+    this.state = {
+      ds: ds.cloneWithRowsAndSections(this.dataBlob),
+      foo: ds.cloneWithRows(this.dataBlob.foo[0]),
+      bar: ds.cloneWithRows(this.dataBlob.bar[0]),
+      baz: ds.cloneWithRows(this.dataBlob.baz[0]),
+    }
+  }
+  render(){
+    //console.log(this.state.ds._dataBlob.s1)
+    const dataSource = this.state.ds
+    return(
+      <View
+        style={{flex:1,paddingTop:20}}>
+        <ListView
+          ref={c=> this.listview = c}
+          style={{paddingTop:20}}
+          dataSource={this.state.ds}
+          renderRow={(rowData,sectionID,rowID) =>{
+              /* renderRow={(rowData,rowID,sectionID) => null
+              //return{debugView("row")(rowData,rowID,sectionID)}
+              } */
+              return(
+                <SwipeableListView
+                    generateActions={()=>genActions2('search')}
+                    style={{height:200}}
+                    scrollEnabled={false}
+               dataSource={
+                 this.state[sectionID]
+                     .cloneWithRows(this.dataBlob[sectionID][0])}
+               renderRow={debugView("row")}
+            />)}}
+          renderSectionHeader={debugView("head")}
+        />
+      </View>
+    )
+  }
+}
 
 class TestListView3 extends React.Component {
 //swipe and reoder
@@ -52,16 +105,16 @@ class TestListView3 extends React.Component {
                 dataSource.getSectionLengths(),
                 dataSource.getRowData(0,0),
                 dataSource.getRowData(1,0)
-      
+
     );
 
     let obj={};
     let sectionLengths=dataSource.getSectionLengths()
     //sectionLengths.map((i)=>)
     /* for(let i = 0;i<sectionLengths.length;i++){
-     *   
+     *
      * }*/
-    console.log(obj)  
+    console.log(obj)
     for(let i = 0;i<dataSource.getRowCount();i++){
       //dataSource.getSectionLengths()
       console.log("fo",i,
@@ -70,18 +123,18 @@ class TestListView3 extends React.Component {
                   dataSource.getSectionIDForFlatIndex(i));
       const sectionID = dataSource.getSectionIDForFlatIndex(i)
       const rowID = dataSource.getRowIDForFlatIndex(i)
-      
+
       obj[sectionID] = obj[sectionID] || []
-      
+
       //obj[sectionID]=dataSource.getSectionHeaderData(sectionID)
         //"a"//dataSource.getRowData(sectionID,rowID)
-                                                              
+
                                                  }
                      console.log(obj)
 
     return(
       <View
-        style={{flex:1,paddingTop:20}}>        
+        style={{flex:1,paddingTop:20}}>
         <BookListView
           ref={c=> this.listview = c}
           style={{paddingTop:20}}
@@ -147,7 +200,7 @@ class TestListView2 extends React.Component {
           onPress={()=>{
               [head,...this.data]= this.data
               const i = Math.random()
-              this.data.push({key:i,data:`${i}`})
+              this.data=[{key:i,data:`${i}`},...this.data]
               this.updateDataSource()
             }}>
           pressMe
@@ -159,13 +212,14 @@ class TestListView2 extends React.Component {
           onRelease={(rowData,rowID,action)=>{
               //rowID is string
               this.data =
-                this.data 
+                this.data
                     .filter((elem)=>
                       elem.key.toString() !== rowID)
               //console.log("td:", this.data, rowID)
               this.updateDataSource()
 
-              this.data.push({key:rowID,data:rowData})
+              //this.data.push({key:rowID,data:rowData})
+              this.data=[{key:rowID,data:rowData},...this.data]
               //console.log("td:",this.data)
               this.updateDataSource()
             }}
@@ -240,4 +294,7 @@ storiesOf('BookListView', module)
   })
   .add('with class2', () => {
     return(<TestListView3 />)
+  })
+  .add('with class4', () => {
+    return(<NestedListView />)
   })

@@ -182,20 +182,21 @@ function intent(RN, HTTP) {
     /* .do(books =>
        Object.keys(books).map(function(v) { return obj[k] })
        books.filter(book => book["Tokyo_Fuchu"]["status"] == "OK")) */
-          .do(i => console.log('books status change:%O', i));
+          //.do(i => console.log('books status change:%O', i));
 
     const booksStatus$ =
       Rx.Observable
         .combineLatest(
           // books$.map((book) => ({...book, key: book.isbn})),
           // books$.map((book) => book),
-          books$.map(books =>
-            books.map(book => ({ ...book, key: `isbn-${book.isbn}` }))),
+          books$,
           // books$,
           booksStatusResponse$.startWith({}),
           mergeBooksStatus,
         ) // .do(i => console.log('books$:', category, i))
-        //.switch()
+    //.switch()
+        .map(books =>
+          books.map(book => ({ ...book, key: `isbn-${book.isbn}` })))
         .shareReplay();
     return ({
       booksStatus$,

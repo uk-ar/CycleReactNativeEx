@@ -68,11 +68,10 @@ class AnimView extends React.Component {
     this.prevStyle = next;
     const animationConfig = this.props.animationConfig;
     return new Promise((resolve, reject) => {
-      // resolve("done");
       this.setState({ animatedStyle }, () => {
         Animated.timing(
           this.counter,
-          { ...animationConfig, toValue: 1 }
+          { ...animationConfig, toValue: 1 }//useNativeDriver: true android only
         ).start(() => {
           resolve();
         });
