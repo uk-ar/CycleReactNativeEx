@@ -39,37 +39,73 @@ class NestedListView extends React.Component {
       bar:[[{key:"d",data:"d"}, {key:"e",data:"e"},{key:"f",data:"f"}]],
       baz:[[{key:"d",data:"d"}, {key:"e",data:"e"},{key:"f",data:"f"}]]
     }
-    //this.sectionIdentities = ["foo","bar"]
     this.state = {
-      ds: ds.cloneWithRowsAndSections(this.dataBlob),
-      foo: ds.cloneWithRows(this.dataBlob.foo[0]),
-      bar: ds.cloneWithRows(this.dataBlob.bar[0]),
-      baz: ds.cloneWithRows(this.dataBlob.baz[0]),
+      ds:  ds,
+      foo: ds,
+      bar: ds,
+      baz: ds,
     }
   }
+  componentWillMount(){
+    this.updateDataSource()
+  }
+  updateDataSource(){
+    this.setState({
+      ds:  this.state.ds.cloneWithRowsAndSections(this.dataBlob),
+      foo: this.state.foo.cloneWithRows(this.dataBlob.foo[0]),
+      bar: this.state.bar.cloneWithRows(this.dataBlob.bar[0]),
+      baz: this.state.baz.cloneWithRows(this.dataBlob.baz[0]),
+    })
+  }
   render(){
-    //console.log(this.state.ds._dataBlob.s1)
     const dataSource = this.state.ds
+    const i = Math.random()
     return(
       <View
         style={{flex:1,paddingTop:20}}>
+        <Text
+          onPress={()=>{
+              let next = this.dataBlob.foo[0]
+              const i = Math.random()
+              this.dataBlob = {
+                foo:[[{key:i,data:`${i}`},...next]],
+                bar:[[...this.dataBlob.bar[0]]],
+                baz:[[...this.dataBlob.baz[0]]],
+              }
+              this.updateDataSource()
+            }}>
+          pressMe
+        </Text>
         <ListView
+          removeClippedSubviews={false}
           ref={c=> this.listview = c}
-          style={{paddingTop:20}}
           dataSource={this.state.ds}
           renderRow={(rowData,sectionID,rowID) =>{
-              /* renderRow={(rowData,rowID,sectionID) => null
-              //return{debugView("row")(rowData,rowID,sectionID)}
-              } */
+              console.log("rerend1",rowData,sectionID,rowID)
+              //dynamic height cannot works
+              //                    style={{maxHeight:200}}
+              const i = Math.random();
+              let next = this.dataBlob[sectionID][0].slice();
               return(
                 <SwipeableListView
-                    generateActions={()=>genActions2('search')}
                     style={{height:200}}
+                    generateActions={()=>genActions2('search')}
                     scrollEnabled={false}
                dataSource={
                  this.state[sectionID]
-                     .cloneWithRows(this.dataBlob[sectionID][0])}
-               renderRow={debugView("row")}
+                     .cloneWithRows(
+                       this.dataBlob[sectionID][0].reduce((acc,elem)=>{
+                         acc[elem.key] = elem.data
+                         return acc
+                       },{})
+                     )}
+                    renderRow={(rowData,sectionID,rowID) =>{
+                        return (
+                          <LayoutableView key={rowID}>
+                              {debugView("row")(rowData,sectionID,rowID)}
+                          </LayoutableView>
+                        )
+                      }}
             />)}}
           renderSectionHeader={debugView("head")}
         />
@@ -78,8 +114,91 @@ class NestedListView extends React.Component {
   }
 }
 
+class NestedListView2 extends React.Component {
+  //Nested ListView
+  constructor(props) {
+    super(props);
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+    })
+    this.dataBlob = {
+      foo:[{key:"a",data:"a"}, {key:"b",data:"b"},{key:"c",data:"c"}],
+      bar:[{key:"d",data:"d"}, {key:"e",data:"e"},{key:"f",data:"f"}],
+      baz:[{key:"d",data:"d"}, {key:"e",data:"e"},{key:"f",data:"f"}]
+    }
+    //this.sectionIdentities = ["foo","bar"]
+    this.state = {
+      ds:  ds
+    }
+  }
+  componentWillMount(){
+    this.updateDataSource()
+  }
+  updateDataSource(){
+    this.setState({
+      ds:  this.state.ds.cloneWithRowsAndSections(this.dataBlob)      
+    })
+  }
+  render(){
+    //console.log(this.state.ds._dataBlob.s1)
+    //console.log("this.rerender")
+    const dataSource = this.state.ds
+    return(
+      <View
+        style={{flex:1,paddingTop:20}}>
+        <Text
+          onPress={()=>{
+              //console.log("onPress",this.state)
+              let next = this.dataBlob.foo
+              const i = Math.random()
+              this.dataBlob = {
+                foo:[...next,{key:i,data:`${i}`}],
+                bar:this.dataBlob.bar,
+                baz:this.dataBlob.baz,
+              }
+              this.updateDataSource()
+              /* [head,...this.data]= this.data
+                 const i = Math.random()
+                 this.data=[{key:i,data:`${i}`},...this.data]
+                 this.updateDataSource() */
+            }}>
+          pressMe
+        </Text>
+        <ListView
+          ref={c=> this.listview = c}
+          style={{paddingTop:20}}
+          dataSource={this.state.ds}
+          renderRow={(rowData,sectionID,rowID) =>{
+              //console.log("rerend1")
+              /* renderRow={(rowData,rowID,sectionID) => null
+                 //return{debugView("row")(rowData,rowID,sectionID)}
+                 } */
+              //dynamic height cannot works
+              //                    style={{height:200}}
+              return debugView("row")(rowData,sectionID,rowID)
+              /* return(
+              <SwipeableListView
+              generateActions={()=>genActions2('search')}
+              scrollEnabled={false}
+              dataSource={
+              this.state[sectionID]
+              .cloneWithRows(this.dataBlob[sectionID][0])}
+              renderRow={(rowData,sectionID,rowID) =>{
+              //console.log("rerend2",rowData,sectionID,rowID)
+              return debugView("row")(rowData,sectionID,rowID)
+              }}
+              />) */
+            }}
+          renderSectionHeader={debugView("head")}
+        />
+      </View>
+    )
+  }
+}
+
 class TestListView3 extends React.Component {
-//swipe and reoder
+  //section version swipe and reoder
   constructor(props) {
     super(props);
     const ds = new ListView.DataSource({
@@ -172,6 +291,7 @@ class TestListView3 extends React.Component {
 }
 class TestListView2 extends React.Component {
   //swipe and reoder
+  // press to replace
   constructor(props) {
     super(props);
     this.state = {
@@ -198,7 +318,8 @@ class TestListView2 extends React.Component {
         style={{flex:1,paddingTop:20}}>
         <Text
           onPress={()=>{
-              [head,...this.data]= this.data
+              //replace
+              //[head,...this.data]= this.data
               const i = Math.random()
               this.data=[{key:i,data:`${i}`},...this.data]
               this.updateDataSource()
@@ -224,14 +345,12 @@ class TestListView2 extends React.Component {
               this.updateDataSource()
             }}
           renderRow={(rowData,rowID,sectionID) =>
-            <LayoutableView>
-                    {debugView("row")(rowData,rowID,sectionID)}
-            </LayoutableView>
+                    debugView("row")(rowData,rowID,sectionID)
                     }
           renderSectionHeader={debugView("head")}
         />
       </View>
-    )
+    )//            <LayoutableView>
   }
 }
 
@@ -289,12 +408,15 @@ storiesOf('BookListView', module)
       </TestListView>
     )
   })
-  .add('with class', () => {
+  .add('with class2', () => {
     return(<TestListView2 />)
   })
-  .add('with class2', () => {
+  .add('with class3', () => {
     return(<TestListView3 />)
   })
-  .add('with class4', () => {
+  .add('with nextedListView', () => {
     return(<NestedListView />)
+  })
+  .add('with nextedListView2', () => {
+    return(<NestedListView2 />)
   })

@@ -19,9 +19,9 @@ import {withDebug} from './common';
 const CloseableViewDebug = withDebug(CloseableView)
 
 storiesOf('CloseableView', module)
-  .addDecorator(getStory => (
-    <CenterView>{getStory()}</CenterView>
-  ))
+/* .addDecorator(getStory => (
+ *   <CenterView>{getStory()}</CenterView>
+ * ))*/
   .add('with close props', () => (
     <CloseableViewDebug
       data={[{close:"true"},
@@ -40,9 +40,9 @@ storiesOf('CloseableView', module)
         }}/>
   ))
   .add('with toggle 2', () => (
-    <View>
+    <View style={{marginTop:20}}>
       <CloseableViewDebug
-        data={[{style:{height:10,backgroundColor:"red"}}]}
+        data={[{style:{height:100,backgroundColor:"red"},close:true}]}
         onPress={(props,self)=>{
             self.toggle();
             //console.log(self);
@@ -53,6 +53,21 @@ storiesOf('CloseableView', module)
           height:50,
           backgroundColor:"yellow"}} />
     </View>
+  ))
+  .add('with scrollview', () => (
+    <ScrollView style={{marginTop:20}}>
+      <CloseableViewDebug
+        data={[{style:{height:100,backgroundColor:"red"},close:true}]}
+        onPress={(props,self)=>{
+            self.toggle();
+            //console.log(self);
+            //self.animateTo({height:20,backgroundColor:"red"})
+          }}/>
+      <View
+        style={{
+          height:50,
+          backgroundColor:"yellow"}} />
+    </ScrollView>
   ))
 /* style={[style, {
  *   flexDirection: 'row',
@@ -77,6 +92,19 @@ storiesOf('LayoutableView', module)
           height:50,
           backgroundColor:"yellow"}} />
     </View>
+  ))
+  .add('with scroll', () => (
+    <ScrollView>
+      <LayoutableView>
+        <Text style={{height:50,backgroundColor:"red"}}>
+          foo
+        </Text>
+      </LayoutableView>
+      <View
+        style={{
+          height:50,
+          backgroundColor:"yellow"}} />
+    </ScrollView>
   ))
   .add('with center', () => (
     <View

@@ -74,7 +74,9 @@ class AnimView extends React.Component {
           { ...animationConfig, toValue: 1 }//useNativeDriver: true android only
         ).start(() => {
           resolve();
-        });
+        })
+        /* setTimeout(()=>
+         *   )*/
       });
     });
   }

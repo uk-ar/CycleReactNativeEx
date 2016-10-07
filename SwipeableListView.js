@@ -2,6 +2,7 @@ import React from 'react';
 
 import {
   ListView,
+  View
 } from 'react-native';
 
 import { SwipeableRow3 } from './SwipeableRow';

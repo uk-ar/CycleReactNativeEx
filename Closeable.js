@@ -24,12 +24,14 @@ class CloseableView extends React.Component {
       //console.log("start open")
       this.inner.measure((x, y, width, height) => {
         // TODO:filter Props
-        //this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
-        this.style = { height };
+        this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
+        //this.style = { height };
+        //this.style = { opacity: 1, transform: [{ scale: 1 }] };
         this.setState({ close: false }, () => { // widen
           this.outer.animate(
-            //{ opacity: 0.1, transform: [{ scale: 0.1 }], height: 0.01 }
-            { height: 0.01 }
+            { height: 0.01,opacity: 0.1, transform: [{ scale: 0.1 }] }
+            //{ height: 0.01 }
+            //{ opacity: 0.1, transform: [{ scale: 0.1 }]}
             , this.style)
               .then(() => {
                 //console.log("finish open")
@@ -80,22 +82,22 @@ class CloseableView extends React.Component {
    *   console.log('didmount');
    * }*/
   render() {
+    const {animationConfig,style,...props} = this.props
     return (
       <AnimView
         style={[this.style,
                 { overflow: 'hidden'}]}
+        animationConfig={animationConfig}
         ref={c => this.outer = c}
       >
         <View
           collapsable={false}
           ref={c => this.inner = c}
-          {...this.props}
-          style={[this.props.style,
+          {...props}
+          style={[style,
                   this.state.close ?
                   { position: 'absolute' } : null]}
-        >
-          {this.props.children}
-        </View>
+        />
       </AnimView>
     );
   }
@@ -163,6 +165,7 @@ class LayoutableView extends React.Component {
       <CloseableView
         ref={ c => this.closable = c }
         close={this.state.layouted ? false : true}
+        animationConfig={{delay:1000,duration:1000}}
         onLayout={(...args)=>{
             if(!this.state.layouted){
               this.setState({layouted:true})
