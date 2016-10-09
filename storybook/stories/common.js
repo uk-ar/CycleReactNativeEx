@@ -70,7 +70,7 @@ class TestListView extends React.Component {
     this.state = {
       ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
     };
-    this.data = [{key:1,data:"1"}, {key:2,data:"2"}];
+    this.data = [{key:"a1",data:"a1"}, {key:"a2",data:"a2"}];
   }
   updateDataSource(){
     this.setState(
@@ -93,12 +93,13 @@ class TestListView extends React.Component {
         <Text
           onPress={()=>{
               //const [head,...rest]= this.data
-              [head,...this.data]= this.data
+              //[head,...this.data]= this.data
               //console.log("r",rest)
               console.log("r",this.data)
               //this.data.push(`row ${Math.random()}`)
               const i = Math.random()
-              this.data.push({key:i,data:`${i}`})
+              //this.data.push({key:i,data:`${i}`})
+              this.data = [{key:`a${i}`,data:`${i}`}, ...this.data]
               console.log("r",this.data)
               //this.setState({ds:this.state.ds.cloneWithRows(this.data)})
               this.updateDataSource()

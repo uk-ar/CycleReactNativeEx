@@ -149,3 +149,91 @@ storiesOf('SwipeableRow3', module)
             </View>
     </SwipeableRow3>
   ))
+
+class Actions extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { index:0 };
+  }
+  render(){
+    const { leftActions, rightActions } = genActions2('search');
+    const widths=[10,150,300]
+    return (
+      <View style={{marginTop:20}}>
+        <Text
+          onPress={()=>{
+              this.setState(
+                {index:(this.state.index+1)%3})
+            }}>
+          Press me
+        </Text>
+        <SwipeableActions
+          style={{width:widths[this.state.index]}}
+          actions={leftActions}/>
+      </View>
+    )
+  }
+}
+
+storiesOf('SwipeableActions', module)
+  .add('with book', () => (
+    //style={{width:100,flexDirection:"row"}}
+    <SwipeableActions
+      style={{margin:50,height:10,backgroundColor:"red"}}
+      actions={[<Text>foo</Text>,<Text>bar</Text>]}
+    />
+  )).add('with search', () => {
+    const { leftActions, rightActions } = genActions2('search');
+    return (
+      <View>
+        <SwipeableActions
+          actions={leftActions}/>
+        <SwipeableActions
+          actions={rightActions}/>
+      </View>
+    )
+  }).add('with liked', () => {
+    const { leftActions, rightActions } = genActions2('liked');
+    return (
+      <View>
+        <SwipeableActions
+          actions={leftActions}/>
+        <SwipeableActions
+          actions={rightActions}/>
+      </View>
+    )
+  }).add('with borrowed', () => {
+    const { leftActions, rightActions } = genActions2('borrowed');
+    return (
+      <View>
+        <SwipeableActions
+          actions={leftActions}/>
+        <SwipeableActions
+          actions={rightActions}/>
+      </View>
+    )
+  }).add('with done', () => {
+    const { leftActions, rightActions } = genActions2('done');
+    return (
+      <View>
+        <SwipeableActions
+          actions={leftActions}/>
+        <SwipeableActions
+          actions={rightActions}/>
+      </View>
+    )
+  }).add('with Toggle', () => {
+    const { leftActions, rightActions } = genActions2('search');
+    return (
+      <Actions />
+    )}).add('with sw b', () => {
+      const { leftActions, rightActions } = genActions2('done');
+      return (
+        <SwipeableButtons2
+          ref="rightButtons"
+          direction="right"
+          width={new Animated.Value(100)}
+          buttons={leftActions}
+        />
+      )
+    })

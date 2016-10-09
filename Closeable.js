@@ -20,17 +20,18 @@ class CloseableView extends React.Component {
     this.style = this.props.close ? { height: 0.01 } : { height: null };
   }
   open() {
+    //keys=['height', 'opacity', 'transform']
     return new Promise((resolve, reject) => {
       //console.log("start open")
       this.inner.measure((x, y, width, height) => {
         // TODO:filter Props
-        this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
-        //this.style = { height };
+        //this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
+        this.style = { height };
         //this.style = { opacity: 1, transform: [{ scale: 1 }] };
         this.setState({ close: false }, () => { // widen
           this.outer.animate(
-            { height: 0.01,opacity: 0.1, transform: [{ scale: 0.1 }] }
-            //{ height: 0.01 }
+            //{ height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] }
+            { height: 0.01 }
             //{ opacity: 0.1, transform: [{ scale: 0.1 }]}
             , this.style)
               .then(() => {

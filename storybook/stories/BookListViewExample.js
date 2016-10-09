@@ -26,6 +26,32 @@ import {SwipeableListView} from '../../SwipeableListView';
 
 import {withDebug,VerticalCenterView,TestListView,debugView} from './common'
 
+class NestedListViewDataSource {
+  constructor(params: Object) {
+    this._dataSource = new ListView.DataSource(params);
+  }
+  cloneWithRowsAndSections(
+    dataBlob: any,
+    sectionIdentities: ?Array<string>,
+    rowIdentities: ?Array<Array<string>>
+  ): SwipeableListViewDataSource {
+    this._dataSource = this._dataSource.cloneWithRowsAndSections(
+      Object.keys(dataBlob)
+            .reduce((acc,key) => {
+              acc[key] = [dataBlob[key]]
+              return acc;
+            },{}),
+      sectionIdentities,
+      rowIdentities
+    );
+    //this._dataBlob = dataBlob;
+
+    return this;
+  }
+  getDataSource(): ListViewDataSource {
+    return this._dataSource;
+  }
+}
 class NestedListView extends React.Component {
   //Nested ListView
   constructor(props) {
@@ -137,7 +163,7 @@ class NestedListView2 extends React.Component {
   }
   updateDataSource(){
     this.setState({
-      ds:  this.state.ds.cloneWithRowsAndSections(this.dataBlob)      
+      ds:  this.state.ds.cloneWithRowsAndSections(this.dataBlob)
     })
   }
   render(){
@@ -196,6 +222,98 @@ class NestedListView2 extends React.Component {
     )
   }
 }
+
+class NestedListView3 extends React.Component {
+  //NestedListViewDataSource
+  constructor(props) {
+    super(props);
+    const ds = new NestedListViewDataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+    })
+    const ds2 = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+    })
+    this.dataBlob = {
+      foo:[{key:"a",data:"a"}, {key:"b",data:"b"},{key:"c",data:"c"}],
+      bar:[{key:"d",data:"d"}, {key:"e",data:"e"},{key:"f",data:"f"}],
+      baz:[{key:"d",data:"d"}, {key:"e",data:"e"},{key:"f",data:"f"}]
+    }
+    this.state = {
+      ds:  ds,
+      foo: ds2,
+      bar: ds2,
+      baz: ds2,
+    }
+  }
+  componentWillMount(){
+    this.updateDataSource()
+  }
+  updateDataSource(){
+    this.setState({
+      ds:  this.state.ds.cloneWithRowsAndSections(this.dataBlob),
+      foo: this.state.foo.cloneWithRows(this.dataBlob.foo),
+      bar: this.state.bar.cloneWithRows(this.dataBlob.bar),
+      baz: this.state.baz.cloneWithRows(this.dataBlob.baz),
+    })
+  }
+  render(){
+    const dataSource = this.state.ds
+    const i = Math.random()
+    return(
+      <View
+        style={{flex:1,paddingTop:20}}>
+        <Text
+          onPress={()=>{
+              const i = Math.random()
+              this.dataBlob = {
+                foo:[{key:i,data:`${i}`},...this.dataBlob.foo],
+                bar:[...this.dataBlob.bar],
+                baz:[...this.dataBlob.baz],
+              }
+              this.updateDataSource()
+            }}>
+          pressMe
+        </Text>
+        <ListView
+          removeClippedSubviews={false}
+          ref={c=> this.listview = c}
+          dataSource={this.state.ds.getDataSource()}
+          renderRow={(rowData,sectionID,rowID) =>{
+              console.log("rerend1",rowData,sectionID,rowID)
+              //dynamic height cannot works
+              //                    style={{maxHeight:200}}
+              //const i = Math.random();
+              return(
+                <SwipeableListView
+                    style={{height:200}}
+                    generateActions={()=>genActions2('search')}
+                    scrollEnabled={false}
+                    dataSource={
+                      this.state[sectionID]
+                          .cloneWithRows(
+                            //this.dataBlob[sectionID]
+                            this.dataBlob[sectionID].reduce((acc,elem)=>{
+                              acc[elem.key] = elem.data
+                              return acc
+                            },{})
+                          )
+                               }
+                    renderRow={(rowData,sectionID,rowID) =>{
+                        return (
+                          <LayoutableView key={rowID}>
+                             {debugView("row")(rowData,sectionID,rowID)}
+                          </LayoutableView>
+                        )
+                      }}
+                                              />)}}
+          renderSectionHeader={debugView("head")}
+        />
+      </View>
+    )
+  }
+}
+
 
 class TestListView3 extends React.Component {
   //section version swipe and reoder
@@ -408,10 +526,10 @@ storiesOf('BookListView', module)
       </TestListView>
     )
   })
-  .add('with class2', () => {
+  .add('with TestListView2', () => {
     return(<TestListView2 />)
   })
-  .add('with class3', () => {
+  .add('with TestListView3', () => {
     return(<TestListView3 />)
   })
   .add('with nextedListView', () => {
@@ -419,4 +537,7 @@ storiesOf('BookListView', module)
   })
   .add('with nextedListView2', () => {
     return(<NestedListView2 />)
+  })
+  .add('with nextedListView3', () => {
+    return(<NestedListView3 />)
   })

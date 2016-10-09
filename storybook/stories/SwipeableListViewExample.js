@@ -79,7 +79,7 @@ storiesOf('SwipeableListView', module)
       </TestListView>
     )
   })
-  .add('with lv add row', () => {
+  .add('with Normal listview add row', () => {
     return(
       <TestListView>
         {(dataSource)=>

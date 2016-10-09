@@ -5,7 +5,7 @@ import {
   View
 } from 'react-native';
 
-import { SwipeableRow3 } from './SwipeableRow';
+import { _SwipeableRow3,SwipeableRow3 } from './SwipeableRow';
 import { emptyFunction } from 'fbjs/lib/emptyFunction';
 
 //class for ref
