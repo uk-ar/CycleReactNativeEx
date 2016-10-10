@@ -445,66 +445,48 @@ class TestListView2 extends React.Component {
             }}>
           pressMe
         </Text>
-      <BookListView
-      ref={ c => this.listview=c }
+        <BookListView
+          ref={ c => this.listview=c }
           style={{paddingTop:20}}
           generateActions={()=>genActions2('search')}
           dataSource={this.state.ds}
-      onRelease={(rowData,rowID,action)=>{
-        console.log("onR",rowData,rowID,action)
-              //rowID is string
-        /* this.data =
-         *   this.data
-         *       .filter((elem)=>
-         *         elem.key.toString() !== rowID)
-         * //console.log("td:", this.data, rowID)
-         * this.updateDataSource()
+          renderRow={(rowData,sectionID,rowID,highlightRow) => {
+              return (
+                <SwipeableRow3
+                  ref={ c => {
+                      this.layoutable[sectionID] = this.layoutable[sectionID] || []
+                      this.layoutable[sectionID][rowID] = c
+                    }}
+                  disable={rowData.fadeIn ? false : true}
+                  {...genActions2('search')}
+                  onSwipeStart={({gestureState,action}) =>{
+                      this.listview.setNativeProps({ scrollEnabled: false })
+                    }}
+                  onSwipeEnd={({gestureState,action}) =>{
+                      this.listview.setNativeProps({ scrollEnabled: true })
 
-         * //this.data.push({key:rowID,data:rowData})
-         * this.data=[{key:rowID,data:rowData},...this.data]
-         * //console.log("td:",this.data)
-         * this.updateDataSource()*/
-            }}
-      renderRow={(rowData,sectionID,rowID,highlightRow) =>
-        <LayoutableView
-        ref={ c => {
-          this.layoutable[sectionID] = this.layoutable[sectionID] || []
-          this.layoutable[sectionID][rowID] = c
-          //this.layoutable = c
-        }}
-        disable={rowData.fadeIn ? false : true}
-        >
-          <SwipeableRow3
-            {...genActions2('search')}
-            onSwipeStart={({gestureState,action}) =>{
-                this.listview.setNativeProps({ scrollEnabled: false })
-                //this.row1.getCurrentAction() not working
-              }}
-            onSwipeEnd={({gestureState,action}) =>{
-              this.listview.setNativeProps({ scrollEnabled: true })
-                //console.log("onSwipeEnd:",this.layoutable)
-                this.layoutable[sectionID][rowID].close()
-                  .then(()=>{
-                    //this.layoutable
-                    this.data =
-                      this.data
-                          .filter((elem)=>
-                            elem.key.toString() !== rowID)
-                    //console.log("td:", this.data, rowID)
-                    this.updateDataSource()
+                      console.log("row",this.layoutable[sectionID][rowID])
 
-                    //this.data.push({key:rowID,data:rowData})
-                    this.data=[{key:rowID,data:rowData.data,fadeIn:true},
-                               ...this.data]
-                    //console.log("td:",this.data)
-                    this.updateDataSource()
-                  })
-              }}
-                       >
-                       {debugView("row")(rowData,rowID,sectionID)}
-          </SwipeableRow3>
-        </LayoutableView>
-                    }
+                      if(action.target === null){ return }
+                      this.layoutable[sectionID][rowID].close()
+                          .then(()=>{
+                            //this.layoutable
+                            this.data =
+                              this.data
+                                  .filter((elem)=>
+                                    elem.key.toString() !== rowID)
+                            this.updateDataSource()
+
+                            this.data=[{key:rowID,data:rowData.data,fadeIn:true},
+                                       ...this.data]
+                            this.updateDataSource()
+                          })
+                    }}
+                >
+                  {debugView("row")(rowData,rowID,sectionID)}
+                </SwipeableRow3>
+              )
+          }}
           renderSectionHeader={debugView("head")}
         />
       </View>

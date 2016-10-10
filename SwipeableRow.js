@@ -13,7 +13,7 @@ import cloneReferencedElement from 'react-clone-referenced-element';
 import { emptyFunction } from 'fbjs/lib/emptyFunction';
 
 import { AnimView } from './AnimView';
-import { CloseableView } from './Closeable';
+import { CloseableView,LayoutableView } from './Closeable';
 import { Action } from './Action';
 
 const {
@@ -51,11 +51,14 @@ class MeasureableView extends React.Component {
 }
 
 function withState2(RowComponent) {
-  return class extends RowComponent {
+  return class extends React.Component {
     constructor(props) {
       super(props);
       this.state = { ...this.state, lock: false };
       this.onSwipeEnd = this.onSwipeEnd.bind(this)
+    }
+    close() {
+      return this.row.close();
     }
     onSwipeEnd(gestureState){
       const fn = this.props.onSwipeEnd || function () {};
@@ -147,6 +150,7 @@ class _SwipeableRow3 extends React.Component {
     });
     this.getCurrentActions = this.getCurrentActions.bind(this)
     this.getCurrentAction = this.getCurrentAction.bind(this)
+    this.close = this.close.bind(this)
   }
   swipeTo(anim) {
     return new Promise((resolve, reject) => {
@@ -185,6 +189,8 @@ class _SwipeableRow3 extends React.Component {
       ]));
   }
   close() {
+    console.log("root",this)
+    //this.row
     return this.root.close();
   }
   getCurrentActions() {
@@ -209,7 +215,7 @@ class _SwipeableRow3 extends React.Component {
         ref: c => (this.rightActions = c)
       });
     return (
-      <CloseableView
+      <LayoutableView
         ref={c => (this.root = c)}
         {...this.panResponder.panHandlers}
         {...props}
@@ -230,7 +236,7 @@ class _SwipeableRow3 extends React.Component {
         <Animated.View style={{ width: Animated.multiply(this.panX, -1) }}>
           {rightActionsElement}
         </Animated.View>
-      </CloseableView>
+      </LayoutableView>
     );
   }
 }
