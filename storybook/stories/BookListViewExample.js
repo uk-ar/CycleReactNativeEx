@@ -465,7 +465,7 @@ class TestListView2 extends React.Component {
                   onSwipeEnd={({gestureState,action}) =>{
                       this.listview.setNativeProps({ scrollEnabled: true })
 
-                      console.log("row",this.layoutable[sectionID][rowID])
+                      //console.log("row",this.layoutable[sectionID][rowID])
 
                       if(action.target === null){ return }
                       this.layoutable[sectionID][rowID].close()

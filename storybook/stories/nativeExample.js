@@ -5,9 +5,11 @@ import {
   PanResponder,
   Animated,
   View,
-  ScrollView
+  ScrollView,
+  ListView
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
+import ReactTransitionGroup from 'react-addons-transition-group';
 
 import Button from './Button';
 import CenterView from './CenterView';
@@ -15,6 +17,7 @@ import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 import {AnimView} from '../../AnimView';
+import {withDebug,VerticalCenterView,TestListView,debugView} from './common'
 
 class ScrollPositionView extends React.Component {
   constructor(props) {
@@ -194,7 +197,59 @@ class LifeCycleView extends React.Component {
   }
 }
 
-import {withDebug} from './common';
+class LifeCycleView2 extends React.Component {
+  constructor(props) {
+    super(props);
+    action("constructor1")()
+    this.state = {
+      layouted: false,
+    };
+  }
+  componentWillAppear(callback){
+    action("componentWillAppear")()
+    callback()
+  }
+  componentDidAppear(){
+    action("componentDidAppear")()
+  }
+  componentWillEnter(callback){
+    action("componentWillEnter")()
+    callback()
+  }
+  componentDidEnter(){
+    action("componentDidEnter")()
+  }
+  componentWillLeave(callback){
+    action("componentWillLeave")()
+    callback()
+  }
+  componentDidLeave(){
+    action("componentDidLeave")()
+  }
+  componentWillMount() {
+    action("componentWillMount2")()
+  }
+  componentDidMount() {
+    action("componentDidMount4")()
+  }
+  render(){
+    //this.props.data.length
+    return (
+      <View
+        ref={()=>action("ref3")()}
+        onLayout={()=>{
+            if(!this.state.layouted){
+              action("onFirstLayout5")()
+              this.setState({layouted:true})
+            }
+          }}
+      >
+        {this.props.children}
+      </View>
+    )
+  }
+}
+
 const NestedViewDebug = withDebug(NestedView)
 
 storiesOf('View', module)
@@ -218,4 +273,43 @@ storiesOf('View', module)
           width:100,height:100,
           backgroundColor:"green"}}/>
     </LifeCycleView>
+  ))
+  .add('lifecycle2 ', () => (
+    <ReactTransitionGroup component={View}>
+      <LifeCycleView2>
+        <View
+          style={{
+            width:100,height:100,
+            backgroundColor:"green"}}/>
+      </LifeCycleView2>
+      <LifeCycleView2>
+        <View
+          style={{
+            width:100,height:100,
+            backgroundColor:"green"}}/>
+      </LifeCycleView2>
+    </ReactTransitionGroup>
+  ))
+  .add('lifecycle2 inside listview', () => (
+    <TestListView>
+      {(dataSource)=>
+        <ListView
+          style={{paddingTop:20,flex:1}}
+          dataSource={dataSource}
+          renderScrollComponent={({children, ...props}) =>{
+              //<ScrollView {...props}>
+              console.log("c",children,props)
+              return (
+              <ScrollView {...props}>
+                <ReactTransitionGroup {...children} component={View}/>
+              </ScrollView>)
+            }}
+          renderRow={(rowData,rowID,sectionID) =>
+            <LifeCycleView2>
+              {debugView("row")(rowData,rowID,sectionID)}
+            </LifeCycleView2>
+                    }
+        />
+      }
+    </TestListView>
   ))
