@@ -31,20 +31,22 @@ function debugRenderRow(rowData, sectionID, columnID) {
 }
 
 // http://blog.koba04.com/post/2016/07/15/a-brief-note-of-reacteurope2016-sessions/
-const EnhancedListView = compose(
-  /* withHandlers({
-   *   onScroll: props => e => console.log("foo:",e.nativeEvent.contentOffset.y)
-   * }),*/
-  withHandlers({
-    renderSectionHeader: props => (sectionData, sectionID) => {
-      return sectionID.endsWith('_end') ?
-             props.renderSectionFooter(sectionData, sectionID) :
-             props.renderSectionHeader(sectionData, sectionID);
-    }
-  }),
-)(SwipeableListView);
+/* const EnhancedListView = compose(
+ *   withHandlers({
+ *     renderSectionHeader: props => (sectionData, sectionID) => {
+ *       return sectionID.endsWith('_end') ?
+ *              props.renderSectionFooter(sectionData, sectionID) :
+ *              props.renderSectionHeader(sectionData, sectionID);
+ *     }
+ *   }),
+ * )(SwipeableListView);*/
+const EnhancedListView = SwipeableListView;
 
 class BookListView extends React.Component {
+  setNativeProps(props) {
+    // for Touchable
+    this.listview.setNativeProps(props);
+  }
   // class because refs & methods
   scrollTo(...args) {
     return new Promise((resolve, reject) => {
@@ -86,16 +88,19 @@ class BookListView extends React.Component {
     //dataSource.
     return (
       <EnhancedListView
+        ref={c => this.listview = c}
         {...this.props}
         onSwipeEnd={
-          ({gestureState, rowData, sectionID, rowID, highlightRow, action}) =>
+          ({gestureState, rowData, sectionID, rowID, highlightRow, action}) =>{
+            console.log("onSwipeEnd")
             onRelease(rowData,rowID,action)//book,to bucket
-                   }
+          }}
         renderScrollComponent={props =>
           <ScrollView
             ref={c => this.scrollview = c}
             {...props}
-          />}
+            />}
+
         renderSectionHeader={(sectionData, sectionID) =>
           <View
             ref={(c) => {
@@ -105,6 +110,10 @@ class BookListView extends React.Component {
             {this.props.renderSectionHeader(sectionData, sectionID)}
           </View>}
       />);
+    /* renderSectionHeader: props => (sectionData, sectionID) => {
+     *   return sectionID.endsWith('_end') ?
+     *          props.renderSectionFooter(sectionData, sectionID) :
+     *          props.renderSectionHeader(sectionData, sectionID);*/
   }
 }
 

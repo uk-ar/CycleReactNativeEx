@@ -25,13 +25,13 @@ class CloseableView extends React.Component {
       //console.log("start open")
       this.inner.measure((x, y, width, height) => {
         // TODO:filter Props
-        //this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
-        this.style = { height };
+        this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
+        //this.style = { height };
         //this.style = { opacity: 1, transform: [{ scale: 1 }] };
         this.setState({ close: false }, () => { // widen
           this.outer.animate(
-            //{ height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] }
-            { height: 0.01 }
+            { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] }
+            //{ height: 0.01 }
             //{ opacity: 0.1, transform: [{ scale: 0.1 }]}
             , this.style)
               .then(() => {
@@ -58,14 +58,15 @@ class CloseableView extends React.Component {
   }
   close() {
     return new Promise((resolve, reject) => {
-      //console.log("start close")
+      console.log("start close")
       this.inner.measure((x, y, width, height) => {
+        console.log("measure close",x, y, width, height)
         this.style = { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] };
         this.outer.animate(
           { height, opacity: 1, transform: [{ scale: 1 }] }, this.style)
             .then(() => {
               this.setState({ close: true });// shrink
-              //console.log("finish closed")
+              console.log("finish closed")
               resolve();
             });
       });
@@ -158,13 +159,19 @@ class LayoutableView extends React.Component {
       layouted: props.disable ? true : false
     };
   }
+  close(){
+    return this.closeable.close()
+  }
+  open(){
+    return this.closeable.open()
+  }
   render(){
     //this.props.data.length
     const { disable, onLayout, ...props } = this.props
     //const {transform,...otherStyle} = this.state.style
     return (
       <CloseableView
-        ref={ c => this.closable = c }
+        ref={ c => this.closeable = c }
         close={this.state.layouted ? false : true}
         animationConfig={{delay:1000,duration:1000}}
         onLayout={(...args)=>{
@@ -182,7 +189,7 @@ class LayoutableView extends React.Component {
 //const LayoutableView = makeLayoutableComponent(AnimView);
 
 LayoutableView.propTypes = {
-  ...View.propTypes,//  ...Closable.propTypes,
+  ...View.propTypes,//  ...Closeable.propTypes,
   onLayout:React.PropTypes.func,
 };
 

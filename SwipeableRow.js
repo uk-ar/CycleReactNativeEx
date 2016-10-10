@@ -50,8 +50,8 @@ class MeasureableView extends React.Component {
   }
 }
 
-function withState2(DecoratedComponent) {
-  return class extends DecoratedComponent {
+function withState2(RowComponent) {
+  return class extends RowComponent {
     constructor(props) {
       super(props);
       this.state = { ...this.state, lock: false };
@@ -68,19 +68,20 @@ function withState2(DecoratedComponent) {
                           Promise.resolve()))
         } else if (0 < gestureStateSave.dx) {
           promise = this.row.swipeToMax(gestureStateSave.vx)
-                        .then(() => this.row.close())
+                        //.then(() => this.row.close())
         } else {
           promise = this.row.swipeToMin(gestureStateSave.vx)
-                        .then(() => this.row.close())
+                        //.then(() => this.row.close())
         }
         promise
-          .then(() => fn({gestureStateSave,action:this.row.getCurrentAction()}));
+          .then(() => fn({
+            gestureStateSave,action:this.row.getCurrentAction()}));
       });
     }
     render() {
       const { onSwipeEnd, onSwipeStart, ...props } = { ...this.props };
       return (
-        <DecoratedComponent
+        <RowComponent
           {...props}
           ref={c => this.row = c}
           renderActions={actions =>
@@ -235,7 +236,7 @@ class _SwipeableRow3 extends React.Component {
 }
 const SwipeableRow3 = withState2(_SwipeableRow3);
 
-class SwipeableActionsOld extends React.Component {
+class SwipeableActions extends React.Component {
   setNativeProps(nativeProps) {
     // for Touchable
     this.root.setNativeProps(nativeProps);
@@ -312,116 +313,6 @@ class SwipeableActionsOld extends React.Component {
     );
   }
 }
-class SwipeableActions extends React.Component {
-  setNativeProps(nativeProps) {
-    // for Touchable
-    this.root.setNativeProps(nativeProps);
-  }
-  constructor(props) {
-    super(props);
-    this.state = { index: 0 };
-    this.thresholds = [];
-    this.layouted = false;
-  }
-  /* getCurrentAction() {
-   *   return this.props.actions[this.state.index];
-   * }*/
-  render() {
-    // console.log("c",calcIndex(0,[30,50,80]))
-    function calcIndex(value, thresholds) {
-      let index = thresholds.findIndex((elem, i) =>
-        value < elem
-      );
-      if (index === -1) { index = thresholds.length - 1; }
-      return index;
-    }
-
-    const { actions, style, ...props } = this.props;
-    let content = (
-      <View
-        onLayout={
-          ({ nativeEvent: { layout: { x, y, width, height } } }) => {
-            if(!this.layouted){
-              this.thresholds[this.state.index] =
-                this.thresholds[this.state.index] || width;
-            }else{
-              const index = calcIndex(width, this.thresholds);
-              if (this.state.index !== index && !this.props.lock) {
-                //this.setState({ index });
-              }
-            }
-            /* if (Object.keys(this.thresholds).length === array.length) {
-               this.setState({ index: 0 });// for re-render
-               } */
-          }}>
-        <Text>
-          foo
-        </Text>
-      </View>
-    )
-    content = (
-      <Text>
-        fo
-      </Text>
-    )
-    //<Action {...actions[this.state.index]} />
-    this.layouted = true;
-    return content
-
-    if (this.state.index == null) {
-      /* style={{ flexDirection: 'row',
-       *          opacity: 0,
-       *          width: 0.01,
-       *          overflow: 'hidden' }}
-       */
-      return (
-        <View
-          ref={c => (this.root = c)}
-          {...props}
-          style={{
-            flexDirection: 'row',
-            opacity: 0,
-          }}
-        >
-          {actions.map((action, i, array) =>
-            <MeasureableView
-              key={i}
-              onFirstLayout={
-                ({ nativeEvent: { layout: { x, y, width, height } } }) => {
-                  this.thresholds[i] = width;
-                  if (Object.keys(this.thresholds).length === array.length) {
-                    this.setState({ index: 0 });// for re-render
-                  }
-                }}
-            >
-              <Action {...action} />
-            </MeasureableView>
-           )}
-        </View>);
-    }
-    const currentAction = actions[this.state.index];
-    // onLayout may cause over position
-    // but cannot addListener to multiply animatedValue...
-    return (
-      <AnimView
-        ref={c => (this.root = c)}
-        {...props}
-        style={[style,
-                { backgroundColor: currentAction.backgroundColor,
-                  overflow: 'hidden' }
-          ]}
-        onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
-            const index = calcIndex(width, this.thresholds);
-            if (this.state.index !== index && !this.props.lock) {
-              this.setState({ index });
-            }
-          }}
-      >
-        <Action {...currentAction} />
-      </AnimView>
-    );
-  }
-}
 SwipeableRow3.propTypes = {
   ...View.propTypes,//  ...Closable.propTypes,
   onSwipeStart:React.PropTypes.func,
@@ -441,4 +332,4 @@ SwipeableRow3.defaultProps = {
 
 // scroll view base
 // ref: http://browniefed.com/blog/react-native-animated-listview-row-swipe/
-module.exports = { SwipeableRow3,_SwipeableRow3, AnimView, MeasureableView, SwipeableActions, withState2 };
+module.exports = { SwipeableRow3, AnimView, MeasureableView, SwipeableActions, withState2 };

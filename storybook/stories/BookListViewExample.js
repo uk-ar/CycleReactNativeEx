@@ -416,12 +416,13 @@ class TestListView2 extends React.Component {
       ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
     };
     this.data = [{key:"a",data:"a"}, {key:"b",data:"b"},{key:"c",data:"c"}];
+    this.layoutable = []
   }
   updateDataSource(){
     this.setState(
       {ds:this.state.ds.cloneWithRows(
         this.data.reduce((acc,elem)=>{
-          acc[elem.key] = elem.data
+          acc[elem.key] = elem
           return acc
         },{})
       )})//return acc
@@ -439,31 +440,70 @@ class TestListView2 extends React.Component {
               //replace
               //[head,...this.data]= this.data
               const i = Math.random()
-              this.data=[{key:i,data:`${i}`},...this.data]
+              this.data=[{key:`a-${i}`,data:`${i}`},...this.data]
               this.updateDataSource()
             }}>
           pressMe
         </Text>
-        <BookListView
+      <BookListView
+      ref={ c => this.listview=c }
           style={{paddingTop:20}}
           generateActions={()=>genActions2('search')}
           dataSource={this.state.ds}
-          onRelease={(rowData,rowID,action)=>{
+      onRelease={(rowData,rowID,action)=>{
+        console.log("onR",rowData,rowID,action)
               //rowID is string
-              this.data =
-                this.data
-                    .filter((elem)=>
-                      elem.key.toString() !== rowID)
-              //console.log("td:", this.data, rowID)
-              this.updateDataSource()
+        /* this.data =
+         *   this.data
+         *       .filter((elem)=>
+         *         elem.key.toString() !== rowID)
+         * //console.log("td:", this.data, rowID)
+         * this.updateDataSource()
 
-              //this.data.push({key:rowID,data:rowData})
-              this.data=[{key:rowID,data:rowData},...this.data]
-              //console.log("td:",this.data)
-              this.updateDataSource()
+         * //this.data.push({key:rowID,data:rowData})
+         * this.data=[{key:rowID,data:rowData},...this.data]
+         * //console.log("td:",this.data)
+         * this.updateDataSource()*/
             }}
-          renderRow={(rowData,rowID,sectionID) =>
-                    debugView("row")(rowData,rowID,sectionID)
+      renderRow={(rowData,sectionID,rowID,highlightRow) =>
+        <LayoutableView
+        ref={ c => {
+          this.layoutable[sectionID] = this.layoutable[sectionID] || []
+          this.layoutable[sectionID][rowID] = c
+          //this.layoutable = c
+        }}
+        disable={rowData.fadeIn ? false : true}
+        >
+          <SwipeableRow3
+            {...genActions2('search')}
+            onSwipeStart={({gestureState,action}) =>{
+                this.listview.setNativeProps({ scrollEnabled: false })
+                //this.row1.getCurrentAction() not working
+              }}
+            onSwipeEnd={({gestureState,action}) =>{
+              this.listview.setNativeProps({ scrollEnabled: true })
+                //console.log("onSwipeEnd:",this.layoutable)
+                this.layoutable[sectionID][rowID].close()
+                  .then(()=>{
+                    //this.layoutable
+                    this.data =
+                      this.data
+                          .filter((elem)=>
+                            elem.key.toString() !== rowID)
+                    //console.log("td:", this.data, rowID)
+                    this.updateDataSource()
+
+                    //this.data.push({key:rowID,data:rowData})
+                    this.data=[{key:rowID,data:rowData.data,fadeIn:true},
+                               ...this.data]
+                    //console.log("td:",this.data)
+                    this.updateDataSource()
+                  })
+              }}
+                       >
+                       {debugView("row")(rowData,rowID,sectionID)}
+          </SwipeableRow3>
+        </LayoutableView>
                     }
           renderSectionHeader={debugView("head")}
         />
