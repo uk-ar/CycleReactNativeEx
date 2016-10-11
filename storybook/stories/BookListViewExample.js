@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import util from 'util'
+import _ from 'lodash'
 
 import Button from './Button';
 import CenterView from './CenterView';
@@ -261,8 +262,7 @@ class NestedListView3 extends React.Component {
     const dataSource = this.state.ds
     const i = Math.random()
     return(
-      <View
-        style={{flex:1,paddingTop:20}}>
+      <View>
         <Text
           onPress={()=>{
               const i = Math.random()
@@ -314,9 +314,70 @@ class NestedListView3 extends React.Component {
   }
 }
 
+class TestListView4 extends React.Component {
+  //with section & transition
+  constructor(props) {
+    super(props);
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+    })
+    this.dataBlob = {
+      foo:{a:"a", b:"b",c:"c"},
+      bar:{d:"d", e:"e",f:"f"}
+    }
+    this.state = {ds}
+  }
+  componentWillMount(){
+    this.updateDataSource()
+  }
+  updateDataSource(){
+    const newDS = this.state.ds.cloneWithRowsAndSections(this.dataBlob)
+    console.log("nds",this.state.ds.rowIdentities[0],newDS.rowIdentities[0])
+    /* console.log("removed",
+     *             _.difference(this.state.ds.rowIdentities[0],newDS.rowIdentities[0]),
+     *             newDS)
+     * console.log("added",
+     *             _.difference(newDS.rowIdentities[0],this.state.ds.rowIdentities[0]))*/
+    this.setState({ds:newDS})
+  }
+  render(){
+    return(
+      <View
+        style={{flex:1,paddingTop:20}}>
+        <Text
+          onPress={()=>{
+              const i = Math.random()
+              this.dataBlob = {
+                foo:{[i]:`${i}`,...this.dataBlob.foo},
+                bar:this.dataBlob.bar
+              }
+              this.updateDataSource()
+            }}>
+          pressMe
+        </Text>
+        <BookListView
+          ref={c=> this.listview = c}
+          style={{paddingTop:20}}
+          generateActions={()=>genActions2('search')}
+          dataSource={this.state.ds}
+          renderRow={(rowData,rowID,sectionID) =>
+            <LayoutableView>
+                    {debugView("row")(rowData,rowID,sectionID)}
+            </LayoutableView>
+                    }
+          renderSectionHeader={ (sectionData,sectionID)=>
+            debugView("header")(sectionData,sectionID)
+                              }
+        />
+      </View>
+    )
+  }
+}
 
 class TestListView3 extends React.Component {
   //section version swipe and reoder
+  //select section
   constructor(props) {
     super(props);
     const ds = new ListView.DataSource({
@@ -337,16 +398,29 @@ class TestListView3 extends React.Component {
   render(){
     //console.log(this.state.ds._dataBlob.s1)
     const dataSource = this.state.ds
-    console.log("ds:",dataSource.getRowCount(),
-                dataSource.getRowAndSectionCount(),
-                dataSource.getSectionLengths(),
-                dataSource.getRowData(0,0),
-                dataSource.getRowData(1,0)
-
-    );
-
     let obj={};
-    let sectionLengths=dataSource.getSectionLengths()
+    console.log("ds:",dataSource.getRowCount(),//12
+    )
+    const count=dataSource.getRowCount()
+    console.log("keys:",
+                dataSource.getSectionLengths(),
+                count,
+                dataSource.getSectionHeaderData(0))
+    //[...Array(count).keys()]//.map(i=>console.log(i))
+    //const a=Array.from(Array(3).keys())
+    /* Array.from(Array(count).keys()).map(i=>
+     *   console.log(dataSource.getRowIDForFlatIndex(i)))*/
+
+    //console.log("keys:",a)
+                          //
+    /*             dataSource.getRowAndSectionCount(),
+     *             dataSource.getSectionLengths(),
+     *             dataSource.getRowData(0,0),
+     *             dataSource.getRowData(1,0)
+
+     * );
+
+     * let sectionLengths=dataSource.getSectionLengths()*/
     //sectionLengths.map((i)=>)
     /* for(let i = 0;i<sectionLengths.length;i++){
      *
@@ -354,18 +428,21 @@ class TestListView3 extends React.Component {
     console.log(obj)
     for(let i = 0;i<dataSource.getRowCount();i++){
       //dataSource.getSectionLengths()
-      console.log("fo",i,
-                  //dataSource.getSectionHeaderData(i),
-                  dataSource.getRowIDForFlatIndex(i),
-                  dataSource.getSectionIDForFlatIndex(i));
+      /* console.log("fo",i,
+      //dataSource.getSectionHeaderData(i),
+      dataSource.getRowIDForFlatIndex(i),
+      dataSource.getSectionIDForFlatIndex(i));
       const sectionID = dataSource.getSectionIDForFlatIndex(i)
       const rowID = dataSource.getRowIDForFlatIndex(i)
 
-      obj[sectionID] = obj[sectionID] || []
+      obj[sectionID] = obj[sectionID] || [] */
 
       //obj[sectionID]=dataSource.getSectionHeaderData(sectionID)
-        //"a"//dataSource.getRowData(sectionID,rowID)
-
+      //"a"//dataSource.getRowData(sectionID,rowID)
+      //http://qiita.com/taizo/items/bab2db414e83d11b18f8
+      //http://e10s.hateblo.jp/entry/20070526/1180173036
+      //https://github.com/facebook/react/blob/master/src/addons/transitions/ReactTransitionGroup.js
+      //https://github.com/facebook/react-native/blob/master/Libraries/CustomComponents/ListView/ListViewDataSource.js
                                                  }
                      console.log(obj)
 
@@ -451,6 +528,8 @@ class TestListView2 extends React.Component {
           generateActions={()=>genActions2('search')}
           dataSource={this.state.ds}
           renderRow={(rowData,sectionID,rowID,highlightRow) => {
+              /* console.log("should",
+              this.state.ds.rowShouldUpdate(sectionID,rowID)) */
               return (
                 <SwipeableRow3
                   ref={ c => {
@@ -495,9 +574,9 @@ class TestListView2 extends React.Component {
 }
 
 storiesOf('BookListView', module)
-  .addDecorator(getStory => (
-    <CenterView>{getStory()}</CenterView>
-  ))
+/* .addDecorator(getStory => (
+ *   <CenterView>{getStory()}</CenterView>
+ * ))*/
   .add('with book', () => {
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     return(
@@ -553,6 +632,9 @@ storiesOf('BookListView', module)
   })
   .add('with TestListView3', () => {
     return(<TestListView3 />)
+  })
+  .add('with TestListView4', () => {
+    return(<TestListView4 />)
   })
   .add('with nextedListView', () => {
     return(<NestedListView />)

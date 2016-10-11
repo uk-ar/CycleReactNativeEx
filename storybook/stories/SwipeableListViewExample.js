@@ -21,7 +21,8 @@ import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableR
 import {SwipeableListView} from '../../SwipeableListView';
 import {LayoutableView} from '../../Closeable';
 
-import {withDebug,VerticalCenterView,TestListView,debugView} from './common'
+import {withDebug,VerticalCenterView,TestSectionListView,
+        TestListView,debugView} from './common'
 
 storiesOf('SwipeableListView', module)
 /* .addDecorator(getStory => (
@@ -96,5 +97,43 @@ storiesOf('SwipeableListView', module)
           />
         }
       </TestListView>
+    )
+  })
+  .add('with Normal listview section add row', () => {
+    return(
+      <TestSectionListView>
+        {(dataSource)=>
+          <ListView
+            style={{paddingTop:20,flex:1}}
+            dataSource={dataSource}
+            renderRow={(rowData,rowID,sectionID) =>
+                <View>
+                      {debugView("row")(rowData,rowID,sectionID)}
+                </View>
+                      }
+            renderSectionHeader={(sectionData,sectionID) =>
+              debugView("section")(sectionData,sectionID)
+                                }
+          />
+        }
+      </TestSectionListView>
+    )
+  })
+  .add('with section add row', () => {
+    return(
+      <TestSectionListView>
+        {(dataSource)=>
+          <SwipeableListView
+            style={{paddingTop:20,flex:1}}
+            dataSource={dataSource}
+            renderRow={(rowData,rowID,sectionID) =>
+              debugView("row")(rowData,rowID,sectionID)
+                      }
+            renderSectionHeader={(sectionData,sectionID) =>
+              debugView("section")(sectionData,sectionID)
+                         }
+          />
+        }
+      </TestSectionListView>
     )
   })

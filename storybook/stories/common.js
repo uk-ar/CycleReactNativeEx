@@ -112,6 +112,46 @@ class TestListView extends React.Component {
   }
 }
 
+class TestSectionListView extends React.Component {
+  constructor(props) {
+    super(props);
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+    })
+    this.data = {
+      s1:{r1:"r1",r2:"r2"},
+      s2:{r3:"r1",r4:"r2",r5:"r3"},
+    };
+    this.state = {
+      ds: ds.cloneWithRowsAndSections(this.data)
+    };
+  }
+  updateDataSource(){
+    this.setState(
+      {ds:this.state.ds.cloneWithRowsAndSections(this.data)})
+  }
+  render(){
+    return(
+      <View
+        style={{flex:1,paddingTop:20}}>
+        <Text
+          onPress={()=>{
+              const i = Math.random()
+              this.data = {
+                s1:{[`r${i}`]:`r${i}`,r1:"r1"},
+                s2:{r3:"r1"}
+              };
+              this.updateDataSource()
+            }}>
+          pressMe
+        </Text>
+        { this.props.children(this.state.ds) }
+      </View>
+    )
+  }
+}
+
 function debugView(string) {
   return function (props){
     return (
@@ -121,4 +161,4 @@ function debugView(string) {
   }
 }
 
-module.exports = {withDebug,VerticalCenterView,TestListView,debugView}
+module.exports = {withDebug,VerticalCenterView,TestListView,debugView,TestSectionListView}
