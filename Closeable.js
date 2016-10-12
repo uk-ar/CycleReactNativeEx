@@ -157,7 +157,7 @@ class LayoutableView extends React.Component {
     super(props);
     this.state = {
       //props.transitionEnter
-      layouted: props.disable ? true : false
+      layouted: props.transitionEnter ? false : true
     };
   }
   close(){
@@ -168,7 +168,7 @@ class LayoutableView extends React.Component {
   }
   render(){
     //this.props.data.length
-    const { disable, onLayout, ...props } = this.props
+    const { transitionEnter, onLayout, ...props } = this.props
     //const {transform,...otherStyle} = this.state.style
     //animationConfig={{delay:1000,duration:1000}}
     return (

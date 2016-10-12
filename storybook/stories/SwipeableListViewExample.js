@@ -24,6 +24,92 @@ import {LayoutableView} from '../../Closeable';
 import {withDebug,VerticalCenterView,TestSectionListView,
         TestListView,debugView} from './common'
 
+class TestListView2 extends React.Component {
+  //swipe and reoder
+  // press to replace
+  constructor(props) {
+    super(props);
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
+    //this.data = [{key:"a",data:"a"}, {key:"b",data:"b"},{key:"c",data:"c"}];
+    this.data = {"a":"a", "b":"b" ,"c":"c"};
+    this.state = {
+      ds: ds.cloneWithRows(this.data)
+    };
+  }
+  
+  updateDataSource(){
+    /* this.setState(
+     *   {ds:this.state.ds.cloneWithRows(
+     *     this.data.reduce((acc,elem)=>{
+     *       acc[elem.key] = elem
+     *       return acc
+     *     },{})
+     *   )})//return acc*/
+    this.setState(
+      {ds:this.state.ds.cloneWithRows(this.data
+      )})
+  }
+  render(){
+    //console.log(this.state.ds._dataBlob.s1)
+    return(
+      <View
+        style={{flex:1,paddingTop:20}}>
+        <Text
+          onPress={()=>{
+              //replace
+              //[head,...this.data]= this.data
+              const i = Math.random()
+              const s1 = {...this.data}
+              delete s1[Object.keys(s1)[Object.keys(s1).length-1]]
+              this.data={[`r${i}`]:`r${i}`,...s1}
+              this.updateDataSource()
+            }}>
+          pressMe
+        </Text>
+        <SwipeableListView
+          ref={ c => this.listview=c }
+          style={{paddingTop:20}}
+          generateActions={()=>genActions2('search')}
+          dataSource={this.state.ds}
+          onSwipeEnd={({rowData,rowID,action}) =>{
+              //close animation
+              //updata datasource(remove)
+              //open animation
+              //updata datasource(add)
+
+              //onSwipeEnd={({gestureState,action}) =>{
+              //console.log("gs",gestureState,action)
+              //console.log("gs",obj)
+              //this.layoutable[sectionID][rowID].close()
+              //.then(()=>{
+              //this.layoutable
+              console.log("start swipeEnd",rowID)
+              const s1 = {...this.data}
+              delete s1[rowID]
+              this.data = s1
+              /* this.data = 
+              this.data
+              .filter((elem)=>
+              elem.key !== rowID) */
+              //elem.key.toString() !== rowID)
+              console.log("middle swipeEnd",this.data)
+              //this.updateDataSource()
+              this.data=[{key:rowID,data:rowData.data},...this.data]
+              this.updateDataSource()
+              
+              console.log("fin swipeEnd")
+                       //})
+            }}
+          renderRow={(rowData,sectionID,rowID,highlightRow) => {
+              return (debugView("row")(rowData,rowID,sectionID))
+            }}
+          renderSectionHeader={debugView("head")}
+        />
+      </View>
+    )
+  }
+}
+
 storiesOf('SwipeableListView', module)
 /* .addDecorator(getStory => (
  *   <CenterView>{getStory()}</CenterView>
@@ -124,6 +210,7 @@ storiesOf('SwipeableListView', module)
       <TestSectionListView>
         {(dataSource)=>
           <SwipeableListView
+            generateActions={()=>genActions2('search')}
             style={{paddingTop:20,flex:1}}
             dataSource={dataSource}
             renderRow={(rowData,rowID,sectionID) =>
@@ -137,3 +224,7 @@ storiesOf('SwipeableListView', module)
       </TestSectionListView>
     )
   })
+  .add('with TestListView2', () =>
+    <TestListView2/>
+  )
+

@@ -120,7 +120,7 @@ class TestSectionListView extends React.Component {
       sectionHeaderHasChanged: (s1, s2) => s1 !== s2
     })
     this.data = {
-      s1:{r1:"r1",r2:"r2"},
+      s1:{r1:"r1",r2:"r2",r6:"r6"},
       s2:{r3:"r1",r4:"r2",r5:"r3"},
     };
     this.state = {
@@ -138,8 +138,10 @@ class TestSectionListView extends React.Component {
         <Text
           onPress={()=>{
               const i = Math.random()
+              const s1 = {...this.data.s1}
+              delete s1[Object.keys(s1)[Object.keys(s1).length-1]]
               this.data = {
-                s1:{[`r${i}`]:`r${i}`,r1:"r1"},
+                s1:{[`r${i}`]:`r${i}`,...s1},
                 s2:{r3:"r1"}
               };
               this.updateDataSource()

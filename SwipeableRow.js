@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 
 import cloneReferencedElement from 'react-clone-referenced-element';
-import { emptyFunction } from 'fbjs/lib/emptyFunction';
+import emptyFunction from 'fbjs/lib/emptyFunction';
 
 import { AnimView } from './AnimView';
 import { CloseableView,LayoutableView } from './Closeable';
