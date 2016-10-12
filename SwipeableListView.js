@@ -15,17 +15,16 @@ class _SwipeableListView extends React.Component {
     super(props);
     this.state = {
       dataSource: this.props.dataSource,
-      added: null
     };
-    this.closeable=[]
-    this.promise = null
+    this.closeable = []
+    this.added = null
   }
   setNativeProps(props) {
     // for scroll lock
     this.listview.setNativeProps(props);
   }
   close(sectionID,rowID){
-    
+    return this.closeable[sectionID][rowID].close()
   }
   changeDataSource(dataSource){
     function toRowsAndSections(arrays){
@@ -55,50 +54,14 @@ class _SwipeableListView extends React.Component {
             row:this.state.dataSource
                     .rowIdentities[sectionIndex][rowIndex]}))
 
-    if(this.promise){
-      this.promise.then(()=>
-        Promise.all(
-          removed.map(({section,row})=>this.closeable[section][row].close()))
-               .then(()=>{
-                 this.setState({
-                   dataSource: dataSource,
-                   added:difference(dataSource.rowIdentities,
-                                    this.state.dataSource.rowIdentities)
-                 },
-                               () => Promise.resolve())
-               }))
-    } else {
-      this.promise =
-        Promise.all(
-          removed.map(({section,row})=>this.closeable[section][row].close()))
-               .then(()=>{
-                 this.setState({
-                   dataSource: dataSource,
-                   added:difference(dataSource.rowIdentities,
-                                    this.state.dataSource.rowIdentities)
-                 },
-                               () => Promise.resolve())
-               })
-    }
+    this.added = difference(dataSource.rowIdentities,
+                            this.state.dataSource.rowIdentities)
+
+    this.setState({dataSource: dataSource})
   }
   componentWillReceiveProps(nextProps: Props): void {
     if (this.state.dataSource !== nextProps.dataSource) {
       this.changeDataSource(nextProps.dataSource)
-      //console.log("rem",removed,this.added)
-      //console.log("add",this.added)
-      
-      //add data after close
-      /* .then(()=>
-       *   this.setState({ dataSource: nextProps.dataSource},() =>
-       *     Promise.resolve()))*/
-      //console.log(removed,)
-      //console.log(nextProps.dataSource)
-
-      //open
-      //willAppear
-      /* console.log("add?",
-       *             difference(nextProps.dataSource.rowIdentities,
-       *                        this.state.dataSource.rowIdentities))*/
     }
   }
   rowShouldEnter(sectionID,rowID){
@@ -143,6 +106,7 @@ class SwipeableListView extends React.Component {
     super(props);
   }
   close(sectionID,rowID){
+    return this.listview.close(sectionID,rowID)
   }
   render() {
     const { renderRow, generateActions,
