@@ -375,6 +375,68 @@ class TestListView4 extends React.Component {
   }
 }
 
+class MultipleListView extends React.Component {
+  //Nested ListView
+  constructor(props) {
+    super(props);
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+    })
+    this.dataBlob = {
+      foo:[{key:"a",data:"a"}, {key:"b",data:"b"},{key:"c",data:"c"}],
+      bar:[{key:"d",data:"d"}, {key:"e",data:"e"},{key:"f",data:"f"}],
+      baz:[{key:"d",data:"d"}, {key:"e",data:"e"},{key:"f",data:"f"}]
+    }
+    this.state = {
+      foo: ds,
+      bar: ds,
+      baz: ds,
+    }
+  }
+  componentWillMount(){
+    this.updateDataSource()
+  }
+  updateDataSource(){
+    this.setState({
+      //ds:  this.state.ds.cloneWithRowsAndSections(this.dataBlob),
+      foo: this.state.foo.cloneWithRowsAndSections(this.dataBlob.foo),
+      bar: this.state.bar.cloneWithRowsAndSections(this.dataBlob.bar),
+      baz: this.state.baz.cloneWithRowsAndSections(this.dataBlob.baz),
+    })
+  }
+  render(){
+    const dataSource = this.state.ds
+    const i = Math.random()
+    return(
+      <ScrollView
+        style={{flex:1,paddingTop:20}}>
+        <Text
+          onPress={()=>{
+              let next = this.dataBlob.foo[0]
+              const i = Math.random()
+              this.dataBlob = {
+                foo:[[{key:i,data:`${i}`},...next]],
+                bar:[[...this.dataBlob.bar[0]]],
+                baz:[[...this.dataBlob.baz[0]]],
+              }
+              this.updateDataSource()
+            }}>
+          pressMe
+        </Text>
+        {["foo","bar","baz"].map((elem)=>
+          <ListView
+            style={{height:200}}
+            dataSource={this.state[elem]}
+            renderRow={debugView("head")}
+            renderSectionHeader={debugView("head")}
+          />
+         )}
+      </ScrollView>
+    )
+  }
+}
+
 class TestListView3 extends React.Component {
   //section version swipe and reoder
   //select section
@@ -730,4 +792,6 @@ storiesOf('BookListView', module)
   .add('with TestBookListView1', () => {
     return(<TestBookListView1/>)
   })
-
+  .add('with MultipleListView', () => {
+    return(<MultipleListView/>)
+  })
