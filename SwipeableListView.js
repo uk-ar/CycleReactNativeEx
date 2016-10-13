@@ -43,7 +43,9 @@ class _SwipeableListView extends React.Component {
           b[section].indexOf(row) === -1
         ))
     }
-
+    /* console.log("ds:",
+     *             this.state.dataSource.rowIdentities,dataSource.rowIdentities)*/
+    
     const removed =
       toRowsAndSections(
         difference(this.state.dataSource.rowIdentities,
@@ -106,12 +108,13 @@ class SwipeableListView extends React.Component {
     super(props);
   }
   close(sectionID,rowID){
+    //console.log("sw cl",sectionID,rowID,this.listview,this.props.dataSource)
     return this.listview.close(sectionID,rowID)
   }
   render() {
     const { renderRow, generateActions,
             onSwipeStart, onSwipeEnd, ...props } = this.props;
-
+    //console.log("sw re",this.props.dataSource)
     return(
       //
       <_SwipeableListView
@@ -126,7 +129,8 @@ class SwipeableListView extends React.Component {
                      {gestureState, rowData, sectionID, rowID, highlightRow, action})
                    //this.row1.getCurrentAction() not working
                  }}
-               onSwipeEnd={({gestureState,action}) =>{
+              onSwipeEnd={({gestureState,action}) =>{
+                  //console.log("swlv",gestureState,action)
                    this.listview.setNativeProps({ scrollEnabled: true })
                    onSwipeEnd && onSwipeEnd(
                      {gestureState, rowData, sectionID, rowID, highlightRow, action})

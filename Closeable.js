@@ -58,15 +58,15 @@ class CloseableView extends React.Component {
   }
   close() {
     return new Promise((resolve, reject) => {
-      console.log("start close")
+      //console.log("start close")
       this.inner.measure((x, y, width, height) => {
-        console.log("measure close",x, y, width, height)
+        //console.log("measure close",x, y, width, height)
         this.style = { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] };
         this.outer.animate(
           { height, opacity: 1, transform: [{ scale: 1 }] }, this.style)
             .then(() => {
               this.setState({ close: true });// shrink
-              console.log("finish closed")
+              //console.log("finish closed")
               resolve();
             });
       });

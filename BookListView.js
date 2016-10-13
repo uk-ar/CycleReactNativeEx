@@ -42,6 +42,79 @@ function debugRenderRow(rowData, sectionID, columnID) {
  * )(SwipeableListView);*/
 const EnhancedListView = SwipeableListView;
 
+class BookListView1 extends React.Component {
+  constructor(props) {
+    super(props);
+    /* this.state = {
+     *   dataSource: this.props.dataSource,
+     * };
+     * this.closeable = []
+     * this.added = null*/
+    this.dataSources = {}
+    this.listviews = {}
+    this.dataSource = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+    })
+  }
+  close(sectionID,rowID){
+    //console.log("close",sectionID,rowID,this.listviews,this.dataSources)
+    return this.listviews[sectionID].close("s1",rowID)
+  }
+  render(){
+    const {
+      renderRow,
+      dataSource,
+      generateActions,
+      onSwipeEnd,
+      //TODO: onSwipeStart?
+      ...props } = this.props;
+    //console.log("r",Object.keys(dataSource._dataBlob))
+    const nestedDataSource =
+      Object.keys(dataSource._dataBlob)
+            .reduce((acc,sectionID) => {
+              acc[sectionID] = [dataSource._dataBlob[sectionID]]
+              return acc;
+            },{})
+    this.dataSource =
+      this.dataSource.cloneWithRowsAndSections(nestedDataSource)
+    //console.log("n",nestedDataSource)
+    //TODO:lock on swipe
+    return (
+      <ListView
+        {...props}
+        dataSource={this.dataSource}
+        renderRow={(rowData,sectionID,rowID,highlightRow) => {
+            //console.log("row",sectionID,rowID)
+            this.dataSources[sectionID] =
+              this.dataSources[sectionID] || new ListView.DataSource(
+                {rowHasChanged: (r1, r2) => r1 !== r2})
+            return (
+              <SwipeableListView
+                  style={{height:200}}
+                ref={c => this.listviews[sectionID] = c}
+                onSwipeEnd={
+                  ({gestureState,rowData,rowID, highlightRow,action})=>{
+                    //console.log("ac",{gestureState,rowData,rowID, highlightRow,action})
+                    onSwipeEnd(
+                      {gestureState, rowData, sectionID,
+                       rowID, highlightRow, action})
+                  }}
+                generateActions={
+                  (rowData,_,rowID,highlightRow) => {
+                    //console.log("ga",rowData,rowID,highlightRow,generateActions)
+                    return generateActions(rowData,sectionID,rowID,highlightRow)}}
+                dataSource={this.dataSources[sectionID].cloneWithRows(rowData)}
+                renderRow={(rowData,_,rowID,highlightRow) => {
+                    return renderRow(rowData,sectionID,rowID,highlightRow)
+                  }}/>
+            )
+          }}
+      />
+    )
+  }
+}
+
 class BookListView extends React.Component {
   setNativeProps(props) {
     // for Touchable
@@ -128,4 +201,4 @@ BookListView.defaultProps = {
   onRelease:function(){},
 };
 
-module.exports = { BookListView };
+module.exports = { BookListView,BookListView1 };

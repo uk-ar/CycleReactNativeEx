@@ -61,7 +61,7 @@ function withState2(RowComponent) {
       return this.row.close();
     }
     onSwipeEnd(gestureState){
-      const fn = this.props.onSwipeEnd || function () {};
+      //const fn = ;//TODO:default
       const gestureStateSave = {...gestureState}; // save value for async
       this.setState({ lock: true }, () => {
         let promise;
@@ -76,9 +76,11 @@ function withState2(RowComponent) {
           promise = this.row.swipeToMin(gestureStateSave.vx)
                         //.then(() => this.row.close())
         }
+        //console.log("on",gestureStateSave,this.row.getCurrentAction())
         promise
-          .then(() => fn({
-            gestureStateSave,action:this.row.getCurrentAction()}));
+          .then(() => this.props.onSwipeEnd({
+            gestureState:gestureStateSave,
+            action:this.row.getCurrentAction()}));
       });
     }
     render() {
