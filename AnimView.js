@@ -71,10 +71,10 @@ class AnimView extends React.Component {
       this.setState({ animatedStyle }, () => {
         Animated.timing(
           this.counter,
-          { ...animationConfig, toValue: 1 }//useNativeDriver: true android only
+          { ...animationConfig, toValue: 1 }// useNativeDriver: true android only
         ).start(() => {
           resolve();
-        })
+        });
         /* setTimeout(()=>
          *   )*/
       });

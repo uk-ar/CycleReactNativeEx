@@ -13,7 +13,7 @@ import cloneReferencedElement from 'react-clone-referenced-element';
 import emptyFunction from 'fbjs/lib/emptyFunction';
 
 import { AnimView } from './AnimView';
-import { CloseableView,LayoutableView } from './Closeable';
+import { CloseableView, LayoutableView } from './Closeable';
 import { Action } from './Action';
 
 const {
@@ -55,32 +55,32 @@ function withState2(RowComponent) {
     constructor(props) {
       super(props);
       this.state = { ...this.state, lock: false };
-      this.onSwipeEnd = this.onSwipeEnd.bind(this)
+      this.onSwipeEnd = this.onSwipeEnd.bind(this);
     }
     close() {
       return this.row.close();
     }
-    onSwipeEnd(gestureState){
-      //const fn = ;//TODO:default
-      const gestureStateSave = {...gestureState}; // save value for async
+    onSwipeEnd(gestureState) {
+      // const fn = ;//TODO:default
+      const gestureStateSave = { ...gestureState }; // save value for async
       this.setState({ lock: true }, () => {
         let promise;
         if (this.row.getCurrentActions().state.index === 0) {
           promise = this.row.swipeToFlat(gestureStateSave.vx)
                         .then(() => this.setState({ lock: false }, () =>
-                          Promise.resolve()))
+                          Promise.resolve()));
         } else if (0 < gestureStateSave.dx) {
-          promise = this.row.swipeToMax(gestureStateSave.vx)
-                        //.then(() => this.row.close())
+          promise = this.row.swipeToMax(gestureStateSave.vx);
+                        // .then(() => this.row.close())
         } else {
-          promise = this.row.swipeToMin(gestureStateSave.vx)
-                        //.then(() => this.row.close())
+          promise = this.row.swipeToMin(gestureStateSave.vx);
+                        // .then(() => this.row.close())
         }
-        //console.log("on",gestureStateSave,this.row.getCurrentAction())
+        // console.log("on",gestureStateSave,this.row.getCurrentAction())
         promise
           .then(() => this.props.onSwipeEnd({
-            gestureState:gestureStateSave,
-            action:this.row.getCurrentAction()}));
+            gestureState: gestureStateSave,
+            action: this.row.getCurrentAction() }));
       });
     }
     render() {
@@ -93,12 +93,12 @@ function withState2(RowComponent) {
             <SwipeableActions
               actions={actions}
               lock={this.state.lock}
-              style={{flex:1}}
+              style={{ flex: 1 }}
             />
           }
           onSwipeEnd={this.onSwipeEnd}
-          onSwipeStart={(gestureState)=>
-            onSwipeStart({gestureState,action:this.row.getCurrentAction()})}
+          onSwipeStart={gestureState =>
+            onSwipeStart({ gestureState, action: this.row.getCurrentAction() })}
         />
       );
     }
@@ -150,9 +150,9 @@ class _SwipeableRow3 extends React.Component {
         this.setState({ positiveSwipe: false });
       }
     });
-    this.getCurrentActions = this.getCurrentActions.bind(this)
-    this.getCurrentAction = this.getCurrentAction.bind(this)
-    this.close = this.close.bind(this)
+    this.getCurrentActions = this.getCurrentActions.bind(this);
+    this.getCurrentAction = this.getCurrentAction.bind(this);
+    this.close = this.close.bind(this);
   }
   swipeTo(anim) {
     return new Promise((resolve, reject) => {
@@ -191,23 +191,23 @@ class _SwipeableRow3 extends React.Component {
       ]));
   }
   close() {
-    console.log("root",this)
-    //this.row
+    console.log('root', this);
+    // this.row
     return this.root.close();
   }
   getCurrentActions() {
-    //console.log("actions",this.row,this.state.positiveSwipe, this.leftActions ,this.rightActions)
+    // console.log("actions",this.row,this.state.positiveSwipe, this.leftActions ,this.rightActions)
     return this.state.positiveSwipe ? this.leftActions : this.rightActions;
   }
   getCurrentAction() {
-    const actions = this.getCurrentActions()
-    return actions.props.actions[actions.state.index]
+    const actions = this.getCurrentActions();
+    return actions.props.actions[actions.state.index];
   }
   render() {
     const { onSwipeStart, onSwipeEnd,
             leftActions, rightActions, renderActions,
             children, style, ...props } = this.props;
-    //const leftActionsElement = cloneReferencedElement(
+    // const leftActionsElement = cloneReferencedElement(
     const leftActionsElement = React.cloneElement(
       renderActions(leftActions), {
         ref: c => (this.leftActions = c)
@@ -322,20 +322,20 @@ class SwipeableActions extends React.Component {
   }
 }
 SwipeableRow3.propTypes = {
-  ...View.propTypes,//  ...Closable.propTypes,
-  onSwipeStart:React.PropTypes.func,
-  onSwipeEnd:React.PropTypes.func,
-  leftActions:React.PropTypes.array.isRequired,
-  rightActions:React.PropTypes.array.isRequired,
-  renderActions:React.PropTypes.func,
+  ...View.propTypes, //  ...Closable.propTypes,
+  onSwipeStart: React.PropTypes.func,
+  onSwipeEnd: React.PropTypes.func,
+  leftActions: React.PropTypes.array.isRequired,
+  rightActions: React.PropTypes.array.isRequired,
+  renderActions: React.PropTypes.func,
 };
 
 SwipeableRow3.defaultProps = {
   ...View.defaultProps,
-  onSwipeStart:emptyFunction,
-  onSwipeEnd:emptyFunction,
-  leftActions:[],
-  rightActions:[],
+  onSwipeStart: emptyFunction,
+  onSwipeEnd: emptyFunction,
+  leftActions: [],
+  rightActions: [],
 };
 
 // scroll view base

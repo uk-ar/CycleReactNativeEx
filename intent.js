@@ -52,21 +52,21 @@ function intent(RN, HTTP) {
   // Actions
   const release$ = RN.select('listview')
                      .events('release')
-                     //.do((...args) => console.log('foo0:', ...args))
-                     .map(([book, key, action]) => [book,action.target])
-                     //.do((...args) => console.log('foo1:', ...args))
-                     .filter(([_,target]) => target !== null)
-                     //.do((...args) => console.log('foo2:', ...args));
+                     // .do((...args) => console.log('foo0:', ...args))
+                     .map(([book, key, action]) => [book, action.target])
+                     // .do((...args) => console.log('foo1:', ...args))
+                     .filter(([_, target]) => target !== null);
+                     // .do((...args) => console.log('foo2:', ...args));
 
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')
-                         .map(([text]) => text)
-                         //.do(i => console.log('search text change:%O', i));
+                         .map(([text]) => text);
+                         // .do(i => console.log('search text change:%O', i));
 
   const requestSearchedBooks$ =
     changeQuery$.debounce(500)
                 .filter(query => query.length > 1)
-                //.do(i => console.log('requestBooks', i))
+                // .do(i => console.log('requestBooks', i))
                 .map(q => ({
                   category: 'search',
                   url: RAKUTEN_SEARCH_API + encodeURI(q),
@@ -95,7 +95,7 @@ function intent(RN, HTTP) {
                 thumbnail: largeImageUrl,
               }))
         )
-      //.do(i => console.log('books change:%O', i))
+      // .do(i => console.log('books change:%O', i))
       .share();
 
   function createBooksStatusStream(books$, category) {
@@ -132,15 +132,15 @@ function intent(RN, HTTP) {
 
     const requestStatus$ =
       books$
-        //.do(i => console.log('connect:%O', i))
+        // .do(i => console.log('connect:%O', i))
             .map(books => books.map(book => book.isbn))
-            //.do(i => console.log('isbns:%O', i))
+            // .do(i => console.log('isbns:%O', i))
             .filter(isbns => isbns.length > 0)
             .map(q => ({
               category,
               url: CALIL_STATUS_API + encodeURI(q)
             }))
-            //.do(i => console.log('status req:%O', i))
+            // .do(i => console.log('status req:%O', i))
             .shareReplay();
 
     /* function createResponseStream(category) {
@@ -156,13 +156,13 @@ function intent(RN, HTTP) {
 
     const booksStatusResponse$ =
       HTTP.select(category)
-    //should handle as meta stream because of retry
+    // should handle as meta stream because of retry
           .map(stream =>
             stream.map(res => res.text)
-                  //.do(i => console.log('books response recived:%O', i))
+                  // .do(i => console.log('books response recived:%O', i))
             // .do(res => console.log(res))
                   .map(res => JSON.parse(res))
-            //.do(i => console.log('books status:%O', i, i.continue))// executed by retry
+            // .do(i => console.log('books status:%O', i, i.continue))// executed by retry
             // ok to retry but not output stream
             // .flatMap(result => result.continue === 1 ?
             //                 [result, Observable.throw(error)] : [result])
@@ -178,11 +178,11 @@ function intent(RN, HTTP) {
                   )
                   .distinctUntilChanged(i => JSON.stringify(i))
                   .map(result => result.books))
-          .switch()
+          .switch();
     /* .do(books =>
        Object.keys(books).map(function(v) { return obj[k] })
        books.filter(book => book["Tokyo_Fuchu"]["status"] == "OK")) */
-          //.do(i => console.log('books status change:%O', i));
+          // .do(i => console.log('books status change:%O', i));
 
     const booksStatus$ =
       Rx.Observable
@@ -194,7 +194,7 @@ function intent(RN, HTTP) {
           booksStatusResponse$.startWith({}),
           mergeBooksStatus,
         ) // .do(i => console.log('books$:', category, i))
-    //.switch()
+    // .switch()
         .map(books =>
           books.map(book => ({ ...book, key: `isbn-${book.isbn}` })))
         .shareReplay();
@@ -205,8 +205,8 @@ function intent(RN, HTTP) {
 
   const changeBucket$ =
     release$
-      //.do(i => console.log('release:', i))
-      //.filter(([book, bucket, bookRow]) => bucket !== null)
+      // .do(i => console.log('release:', i))
+      // .filter(([book, bucket, bookRow]) => bucket !== null)
   // TODO:change to isbn
   /* .map(([book, bucket]) => (
    *   { type: 'replace',
@@ -225,14 +225,14 @@ function intent(RN, HTTP) {
    *   return ({ type: 'replace', book, bucket});
    * })*/
       .flatMap(([book, bucket]) =>
-        [{ type: 'remove', book},
-         //bookRow.close(),
-         { type: 'add',    book, bucket }])
+        [{ type: 'remove', book },
+         // bookRow.close(),
+         { type: 'add', book, bucket }])
   /* .map(([book, bucket]) => (
    *   { type: 'replace',
    *     book: Object.assign(
    *       {}, book, { bucket, modifyDate: new Date(Date.now()) }) }))*/
-      //.do(i => console.log('rel:%O', i))
+      // .do(i => console.log('rel:%O', i))
       .shareReplay();
 
   // [{isbn:,mod},{isbn:,mod}]
@@ -240,15 +240,15 @@ function intent(RN, HTTP) {
     changeBucket$
       .startWith(initialBooks)
       .scan((books, { type, book, bucket }) => {
-        //console.log('type:', type, book, bucket, bookRow);
+        // console.log('type:', type, book, bucket, bookRow);
         switch (type) {
           case 'remove':
-            return books.filter((elem) =>
+            return books.filter(elem =>
               elem.isbn.toString() !== book.isbn.toString());
           case 'add':
             return [
-              {...book, bucket,
-               modifyDate: new Date(Date.now()), appear:true}]
+              { ...book, bucket,
+               modifyDate: new Date(Date.now()), appear: true }]
               .concat(books);
             /* case 'replace':
              *   return [{ ...book, bucket, modifyDate: new Date(Date.now()) }]
@@ -259,7 +259,7 @@ function intent(RN, HTTP) {
         }
       } // ).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
       )
-      //.do((books)=> console.log("books:",books))
+      // .do((books)=> console.log("books:",books))
       .shareReplay();
 
   savedBooks$.do((books) => {
@@ -304,11 +304,11 @@ function intent(RN, HTTP) {
                *       savedBooks[book.isbn] || book))*/
               // reuse books status
               // searchedBooksResponse$
-                //.do(i => console.log('in:', i))
-                //.do(i => console.log('booksres0:', i))
+                // .do(i => console.log('in:', i))
+                // .do(i => console.log('booksres0:', i))
               // .map(books => books.map((book) => ({...book, bucket:"foo"})))
               // .map(books => books.map((book) => book.isbn ))
-                //.do(i => console.log('booksres1:', i))
+                // .do(i => console.log('booksres1:', i))
               //
               ,
               'searchedBooksStatus');
@@ -359,9 +359,9 @@ function intent(RN, HTTP) {
           .events('press').map(([_, listview]) => [null, listview])
           .shareReplay()
       )
-      //.do(i => console.log('bar', i))
+      // .do(i => console.log('bar', i))
       .distinctUntilChanged(([section, listview]) => section)
-      //.do(i => console.log('foo', i))
+      // .do(i => console.log('foo', i))
       .shareReplay();
 
   const scrollListView$ =
@@ -416,13 +416,13 @@ function intent(RN, HTTP) {
 
   const booksLoadingState$ =
     requestSearchedBooks$
-      .map((_) => true)
-      .merge(searchedBooksResponse$.map((_) => false))
+      .map(_ => true)
+      .merge(searchedBooksResponse$.map(_ => false))
       .startWith(false)
       .shareReplay();
 
   return {
-    //savedBooks$,
+    // savedBooks$,
     booksLoadingState$,
     savedBooksStatus$,
     searchedBooksStatus$,

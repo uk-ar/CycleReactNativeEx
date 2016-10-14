@@ -82,7 +82,7 @@ function model(actions) {
       ret[`${bucket}_end`] = {};
       return ret;
     }
-    const obj = booksToObject(savedBooks)
+    const obj = booksToObject(savedBooks);
     return {
       search: booksToObject(
         searchedBooks.map(book => obj[`isbn-${book.isbn}`] || book)),
@@ -97,22 +97,22 @@ function model(actions) {
   const books$ =
     Rx.Observable.combineLatest(
       actions.searchedBooksStatus$
-      //searchedBooks$//.do(i => console.log('searched books'))
+      // searchedBooks$//.do(i => console.log('searched books'))
       ,
-      actions.savedBooksStatus$//.do(i => console.log('saved books'))
+      actions.savedBooksStatus$// .do(i => console.log('saved books'))
       ,
       genItems)
-      .debounce(1)//ms sync searchedBooksStatus$ & savedBooksStatus$
+      .debounce(1)// ms sync searchedBooksStatus$ & savedBooksStatus$
   /* .do(i=>console.log("items:",JSON.stringify(i)))
    * .distinctUntilChanged(x => JSON.stringify(x),(a,b)=>a!==b) */
-      //.do(i=>console.log("items:",i))
+      // .do(i=>console.log("items:",i))
       .shareReplay();
 
   const limit = 2;
 
   const dataSource$ =
     Rx.Observable.combineLatest(
-      books$//.do(i => console.log('books', i))
+      books$// .do(i => console.log('books', i))
       ,
       actions.selectedSection$.do(i => console.log('selectedSection', i))
       ,
@@ -157,8 +157,8 @@ function model(actions) {
           sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
           getSectionHeaderData: (dataBlob, sectionID) =>
             dataBlob.sections[sectionID]
-        }))
-      //.do(i => console.log('datasource:', i));
+        }));
+      // .do(i => console.log('datasource:', i));
       // .subscribe()
 
       // .do(i => console.log('rowIDs?:', i));
@@ -209,7 +209,7 @@ function model(actions) {
       // actions.selectedSection$.startWith("search"),
       (/* items, sectionIDs, rowIDs,*/
        dataSource, selectedSection, booksLoadingState, navigationState, selectedBook, i) => ({ /* items, sectionIDs, rowIDs,*/
-         dataSource, selectedSection, booksLoadingState, navigationState, selectedBook, i }))
+         dataSource, selectedSection, booksLoadingState, navigationState, selectedBook, i }));
   return state$;
 }
 

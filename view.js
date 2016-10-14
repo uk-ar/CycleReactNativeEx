@@ -91,8 +91,8 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
   // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
   // TODO: transition to detail view
-  //console.log('render main', { items, sectionIDs, rowIDs, booksLoadingState, selectedSection });
-  //console.log("render main");
+  // console.log('render main', { items, sectionIDs, rowIDs, booksLoadingState, selectedSection });
+  // console.log("render main");
   /* LayoutAnimation.configureNext(
    *   LayoutAnimation.create(1000,
    *                          LayoutAnimation.Types.easeInEaseOut,
@@ -120,27 +120,28 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
         ref={(c) => {
           this.listview = c;
             // c.scrollTo({x:0,y:100,animated:false})
-          }}
+        }}
         directionalLockEnabled
         enableEmptySections
-        generateActions={(rowData, sectionID, rowID)=>
+        generateActions={(rowData, sectionID, rowID) =>
           genActions2(sectionID)}
         renderRow={(rowData, sectionID, rowID) => {
             // console.log('row:', rowData, sectionID, rowID);
             //              <LayoutableView disable={rowData.appear ? false : true}>
             //              <LayoutableView disable={true}>
-            return (
+          return (
               <LayoutableView
-                 key={rowID}
-                 disable={rowData.appear ? false : true}>
+                key={rowID}
+                disable={rowData.appear ? false : true}
+              >
                 <BookRow1
-                selector="bookcell"
-                bucket={sectionID}
-                onSwipeEnd={()=>console.log(sectionID,rowData)}
-                           >
+                  selector="bookcell"
+                  bucket={sectionID}
+                  onSwipeEnd={() => console.log(sectionID, rowData)}
+                >
                   <Text
-                           style={{ backgroundColor: materialColor.grey['50'] }}
-                           >Foo</Text>
+                    style={{ backgroundColor: materialColor.grey['50'] }}
+                  >Foo</Text>
                            {/* <BookCell
                            book={rowData}
                            style={{ backgroundColor: materialColor.grey['50'] }}
@@ -160,21 +161,22 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
               />);
         }}
         renderSectionHeader={(sectionData, sectionID) => {
-          //console.log('header', sectionData, sectionID, this.listview, this);// ,
+          // console.log('header', sectionData, sectionID, this.listview, this);// ,
           const { close, loadingState } = sectionData;
             // close or not
           return (sectionID === 'search') ?
             <SearchHeader
-               {...sectionData}
-               payload={[sectionID, this.listview]}/> :
+              {...sectionData}
+              payload={[sectionID, this.listview]}
+            /> :
             <Text
-              style={{color:"white"}}
-                onPress={() => {
-                      console.log('listview', this.listview);
+              style={{ color: 'white' }}
+              onPress={() => {
+                console.log('listview', this.listview);
               }}
             >
               bar
-            </Text>
+            </Text>;
             /* <ItemsHeader
             {...sectionData}
             section={sectionID}
