@@ -20,7 +20,7 @@ import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {BookRow1} from '../../BookRow';
 import {genActions2,Action} from '../../Action';
-import {BookListView1,BookListView} from '../../BookListView';
+import {BookListView2,BookListView1,BookListView} from '../../BookListView';
 import {LayoutableView} from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 import {SwipeableListView} from '../../SwipeableListView';
@@ -642,11 +642,12 @@ class TestBookListView1 extends React.Component {
     super(props);
     const ds = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
-      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+      getSectionHeaderData: (dataBlob, sectionID) => dataBlob[sectionID][0]
     })
     this.data = {
-      s1:{r1:"a", r2:"b" ,r3:"c"},
-      s2:{r4:"r4", r5:"r5" ,r6:"r6"}
+      s1:{r1:"a", r2:"b", r3:"c"},
+      s2:{r4:"r4", r5:"r5", r6:"r6"}
     };
     this.state = {
       ds: ds.cloneWithRowsAndSections(this.data)
@@ -678,7 +679,7 @@ class TestBookListView1 extends React.Component {
             }}>
           pressMe
         </Text>
-        <BookListView1
+        <BookListView2
           ref={ c => this.listview=c }
           style={{paddingTop:20}}
           generateActions={()=>genActions2('search')}
@@ -689,7 +690,7 @@ class TestBookListView1 extends React.Component {
               this.listview
                   .close(sectionID,rowID)
                   .then(()=>{
-                    const s = this.data[sectionID]
+                    const s = {...this.data[sectionID]}//clone
                     delete s[rowID]
                     this.data = {...this.data,[sectionID]:s}
                     return this.updateDataSource()

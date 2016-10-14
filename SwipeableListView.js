@@ -10,7 +10,7 @@ import emptyFunction from 'fbjs/lib/emptyFunction';
 import { LayoutableView, CloseableView } from './Closeable';
 
 //class for ref
-class _SwipeableListView extends React.Component {
+class SwipeableListView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -45,7 +45,7 @@ class _SwipeableListView extends React.Component {
     }
     /* console.log("ds:",
      *             this.state.dataSource.rowIdentities,dataSource.rowIdentities)*/
-    
+
     const removed =
       toRowsAndSections(
         difference(this.state.dataSource.rowIdentities,
@@ -97,47 +97,6 @@ class _SwipeableListView extends React.Component {
                   {renderRow(rowData, sectionID, rowID, highlightRow)}
               </LayoutableView>
             )
-          }}
-        {...props}
-      />);
-  }
-}
-
-class SwipeableListView extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-  close(sectionID,rowID){
-    //console.log("sw cl",sectionID,rowID,this.listview,this.props.dataSource)
-    return this.listview.close(sectionID,rowID)
-  }
-  render() {
-    const { renderRow, generateActions,
-            onSwipeStart, onSwipeEnd, ...props } = this.props;
-    //console.log("sw re",this.props.dataSource)
-    return(
-      //
-      <_SwipeableListView
-        ref={c => (this.listview = c)}
-        renderRow={(rowData, sectionID, rowID, highlightRow) =>{
-          return (
-            <SwipeableRow3
-                {...generateActions(rowData, sectionID, rowID, highlightRow)}
-               onSwipeStart={({gestureState,action}) =>{
-                   this.listview.setNativeProps({ scrollEnabled: false })
-                   onSwipeStart && onSwipeStart(
-                     {gestureState, rowData, sectionID, rowID, highlightRow, action})
-                   //this.row1.getCurrentAction() not working
-                 }}
-              onSwipeEnd={({gestureState,action}) =>{
-                  //console.log("swlv",gestureState,action)
-                   this.listview.setNativeProps({ scrollEnabled: true })
-                   onSwipeEnd && onSwipeEnd(
-                     {gestureState, rowData, sectionID, rowID, highlightRow, action})
-                 }}
-                          >
-                          {renderRow(rowData, sectionID, rowID, highlightRow)}
-            </SwipeableRow3>)
           }}
         {...props}
       />);

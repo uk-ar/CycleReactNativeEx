@@ -11,7 +11,7 @@ import {
 
 import util from 'util';
 import { compose, withHandlers } from 'recompose';
-import { emptyFunction } from 'fbjs/lib/emptyFunction';
+import emptyfunction from 'fbjs/lib/emptyFunction';
 
 import Dimensions from 'Dimensions';
 const {
@@ -19,6 +19,7 @@ const {
 } = Dimensions.get('window');
 
 import { SwipeableListView } from './SwipeableListView';
+import { SwipeableRow3 } from './SwipeableRow';
 
 const RCTUIManager = require('NativeModules').UIManager;
 
@@ -57,6 +58,10 @@ class BookListView1 extends React.Component {
       sectionHeaderHasChanged: (s1, s2) => s1 !== s2
     })
   }
+  setNativeProps(props) {
+    // for Touchable
+    this.listview.setNativeProps(props);
+  }
   close(sectionID,rowID){
     //console.log("close",sectionID,rowID,this.listviews,this.dataSources)
     return this.listviews[sectionID].close("s1",rowID)
@@ -84,6 +89,7 @@ class BookListView1 extends React.Component {
       <ListView
         {...props}
         dataSource={this.dataSource}
+        ref={c => this.listview = c}
         renderRow={(rowData,sectionID,rowID,highlightRow) => {
             //console.log("row",sectionID,rowID)
             this.dataSources[sectionID] =
@@ -92,6 +98,7 @@ class BookListView1 extends React.Component {
             return (
               <SwipeableListView
                   style={{height:200}}
+                        scrollEnabled={false}
                 ref={c => this.listviews[sectionID] = c}
                 onSwipeEnd={
                   ({gestureState,rowData,rowID, highlightRow,action})=>{
@@ -107,11 +114,52 @@ class BookListView1 extends React.Component {
                 dataSource={this.dataSources[sectionID].cloneWithRows(rowData)}
                 renderRow={(rowData,_,rowID,highlightRow) => {
                     return renderRow(rowData,sectionID,rowID,highlightRow)
-                  }}/>
+                  }}
+                          />
             )
           }}
       />
     )
+  }
+}
+
+class BookListView2 extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  close(sectionID,rowID){
+    //console.log("sw cl",sectionID,rowID,this.listview,this.props.dataSource)
+    return this.listview.close(sectionID,rowID)
+  }
+  render() {
+    const { renderRow, generateActions,
+            onSwipeStart, onSwipeEnd, ...props } = this.props;
+    //console.log("sw re",this.props.dataSource)
+    return(
+      <BookListView1
+      ref={c => (this.listview = c)}
+      renderRow={(rowData, sectionID, rowID, highlightRow) =>{
+        return (
+          <SwipeableRow3
+            {...generateActions(rowData, sectionID, rowID, highlightRow)}
+            onSwipeStart={({gestureState,action}) =>{
+                this.listview.setNativeProps({ scrollEnabled: false })
+                onSwipeStart && onSwipeStart(
+                  {gestureState, rowData, sectionID, rowID, highlightRow, action})
+                //this.row1.getCurrentAction() not working
+              }}
+            onSwipeEnd={({gestureState,action}) =>{
+                //console.log("swlv",gestureState,action)
+                this.listview.setNativeProps({ scrollEnabled: true })
+                onSwipeEnd && onSwipeEnd(
+                  {gestureState, rowData, sectionID, rowID, highlightRow, action})
+              }}
+          >
+            {renderRow(rowData, sectionID, rowID, highlightRow)}
+          </SwipeableRow3>)
+      }}
+      {...props}
+      />);
   }
 }
 
@@ -201,4 +249,4 @@ BookListView.defaultProps = {
   onRelease:function(){},
 };
 
-module.exports = { BookListView,BookListView1 };
+module.exports = { BookListView,BookListView1,BookListView2 };
