@@ -64,21 +64,21 @@ class BookListView1 extends React.Component {
   }
   close(sectionID, rowID) {
     // console.log("close",sectionID,rowID,this.listviews,this.dataSources)
-    return this.listviews[sectionID].close('s1', rowID);
+    return this.listviews[sectionID].close(sectionID, rowID);
   }
   render() {
     const {
       renderRow,
       dataSource,
-      generateActions,
       onSwipeEnd,
+      onSwipeStart,
       // TODO: onSwipeStart?
       ...props } = this.props;
     // console.log("r",Object.keys(dataSource._dataBlob))
     const nestedDataSource =
       Object.keys(dataSource._dataBlob)
             .reduce((acc, sectionID) => {
-              acc[sectionID] = [dataSource._dataBlob[sectionID]];
+              acc[sectionID] = [{[sectionID]: dataSource._dataBlob[sectionID]}];
               return acc;
             }, {});
     this.dataSource =
@@ -91,31 +91,25 @@ class BookListView1 extends React.Component {
         dataSource={this.dataSource}
         ref={c => this.listview = c}
         renderRow={(rowData, sectionID, rowID, highlightRow) => {
-            // console.log("row",sectionID,rowID)
-          this.dataSources[sectionID] =
-              this.dataSources[sectionID] || new ListView.DataSource(
-                { rowHasChanged: (r1, r2) => r1 !== r2 });
-          return (
+            this.dataSources[sectionID] =
+              this.dataSources[sectionID] || new ListView.DataSource({
+                rowHasChanged: (r1, r2) => r1 !== r2 ,
+                sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+              });
+            const num = Math.min(Object.keys(rowData[sectionID]).length,2)
+            //console.log("?",num)
+            return (
               <SwipeableListView
-                style={{ height: 200 }}
+                enableEmptySections={true}
                 scrollEnabled={false}
+                style={{ height: 100 * num }}
                 ref={c => this.listviews[sectionID] = c}
-                onSwipeEnd={
-                  ({ gestureState, rowData, rowID, highlightRow, action }) => {
-                    // console.log("ac",{gestureState,rowData,rowID, highlightRow,action})
-                    onSwipeEnd(
-                      { gestureState, rowData, sectionID,
-                       rowID, highlightRow, action });
-                  }}
-                generateActions={
-                  (rowData, _, rowID, highlightRow) => {
-                    // console.log("ga",rowData,rowID,highlightRow,generateActions)
-                    return generateActions(rowData, sectionID, rowID, highlightRow); }}
-                dataSource={this.dataSources[sectionID].cloneWithRows(rowData)}
-                renderRow={(rowData, _, rowID, highlightRow) => {
-                  return renderRow(rowData, sectionID, rowID, highlightRow);
-                }}
-              />
+                onSwipeEnd={onSwipeEnd}
+                onSwipeStart={onSwipeStart}
+                renderRow={renderRow}
+                dataSource={this.dataSources[sectionID]
+                                .cloneWithRowsAndSections(rowData)}
+                           />
             );
         }}
       />

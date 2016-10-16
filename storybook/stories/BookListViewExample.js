@@ -718,6 +718,77 @@ class TestBookListView1 extends React.Component {
   }
 }
 
+class TestBookListView2 extends React.Component {
+  //swipe and reoder
+  // press to replace
+  constructor(props) {
+    super(props);
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+      getSectionHeaderData: (dataBlob, sectionID) => dataBlob[sectionID][0]
+    })
+    this.data = {
+      search:{s1:"s1", s2:"s1", s3:"s3"},
+      liked:{l1:"l1", l2:"l2", l3:"l3"},
+      borrowed:{b1:"b1", b2:"b2", b3:"b3"},
+      done:{d1:"d1", d2:"d2", d3:"d3"}
+    };
+    this.state = {
+      ds: ds.cloneWithRowsAndSections(this.data)
+    };
+  }
+  updateDataSource(){
+    return new Promise((resolve, reject)=>
+      this.setState(
+        {ds:this.state.ds.cloneWithRowsAndSections(this.data)}, ()=>
+          resolve()
+      ))
+  }
+  render(){
+    //console.log("s1",this.state.ds._dataBlob.s1)
+    return(
+      <View
+        style={{flex:1,paddingTop:20}}>
+        <BookListView2
+          ref={ c => this.listview=c }
+          style={{paddingTop:20}}
+          generateActions={(rowData,sectionID)=>genActions2(sectionID)}
+          dataSource={this.state.ds}
+          onSwipeEnd={({rowData,sectionID,rowID,action,...rest}) =>{
+              //console.log("re",{rowData,sectionID,rowID,action,...rest})
+              if(action.target == null) { return }
+              this.listview
+                  .close(sectionID,rowID)
+                  .then(()=>{
+                    const s = {...this.data[sectionID]}//clone
+                    delete s[rowID]
+                    this.data = {...this.data,[sectionID]:s}
+                    return this.updateDataSource()
+                  })
+              //.catch((e)=>console.log("error",e))
+                  .then(()=>{
+                    /* console.log("then",
+                       {[rowID]:rowData,...this.data[sectionID]}) */
+                    this.data = {
+                      ...this.data,
+                      [action.target]:{[rowID]:rowData,...this.data[action.target]}
+                    }
+                    console.log("then",this.data)
+                    this.updateDataSource()
+                  })
+            }}
+          renderRow={(rowData,sectionID,rowID,highlightRow) => {
+              //console.log("user",rowData,sectionID,rowID,highlightRow)
+              return (debugView("row")(rowData,rowID,sectionID))
+            }}
+          renderSectionHeader={debugView("head")}
+        />
+      </View>
+    )
+  }
+}
+
 storiesOf('BookListView', module)
 /* .addDecorator(getStory => (
  *   <CenterView>{getStory()}</CenterView>
@@ -792,6 +863,9 @@ storiesOf('BookListView', module)
   })
   .add('with TestBookListView1', () => {
     return(<TestBookListView1/>)
+  })
+  .add('with TestBookListView2', () => {
+    return(<TestBookListView2/>)
   })
   .add('with MultipleListView', () => {
     return(<MultipleListView/>)

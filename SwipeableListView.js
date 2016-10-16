@@ -105,7 +105,7 @@ class SwipeableListView extends React.Component {
 
 SwipeableListView.propTypes = {
   ...ListView.propTypes,
-  generateActions: React.PropTypes.func.isRequired,
+  //generateActions: React.PropTypes.func.isRequired,
   onSwipeStart: React.PropTypes.func,
   onSwipeEnd: React.PropTypes.func,
 };
