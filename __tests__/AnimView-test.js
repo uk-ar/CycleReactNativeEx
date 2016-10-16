@@ -5,7 +5,7 @@ const SavePromise = Promise;
 const saveSetTimeout = setTimeout;
 
 var Animated = require('Animated');
-var { AnimView } = require('../AnimView');
+var { Stylish } = require('../Stylish');
 const {
   View,
   //Animated
@@ -23,21 +23,21 @@ describe('Animated tests', () => {
   beforeEach(() => {
     //jest.resetModules();
   });
-  
+
   /* it("promises work?", () => {
    *   return Promise.resolve().then(() => {
    *     expect(true).toBe(true)
    *   })
    * })*/
   it('renders 1 animated.view component', () => {
-    const tree = renderer.create(<AnimView/>);
+    const tree = renderer.create(<Stylish.View/>);
     expect(tree.toJSON()).toMatchSnapshot();
   });
   it('renders children when passed in', () => {
     const tree = renderer.create(
-      <AnimView>
+      <Stylish.View>
         <View key="foo"/>
-      </AnimView>);
+      </Stylish.View>);
     expect(tree.toJSON()).toMatchSnapshot();
   });
   //https://github.com/facebook/react-native/blob/master/Libraries/Animated/src/__tests__/Animated-test.js#L27
@@ -52,7 +52,7 @@ describe('Animated tests', () => {
   }
   it('animate correctly by animateTo', async () => {
     const tree = renderer.create(
-      <AnimView style={initialStyle}/>
+      <Stylish.View style={initialStyle}/>
     );
     const inst = tree.getInstance();
     expect(inst.state.animatedStyle)
@@ -72,10 +72,10 @@ describe('Animated tests', () => {
   })
   it('animate correctly by props change', async () => {
     const tree = renderer.create(
-      <AnimView style={initialStyle}/>
+      <Stylish.View style={initialStyle}/>
     );
     tree.update(
-      <AnimView style={nextStyle}/>
+      <Stylish.View style={nextStyle}/>
     );
     jest.runAllTimers();
     //expect(callback).toBeCalled();
@@ -89,7 +89,7 @@ describe('Animated tests', () => {
   });
   it('renders onPress to be called', () => {
     const callback = jest.fn();
-    const tree = renderer.create(<AnimView onPress={callback}/>);
+    const tree = renderer.create(<Stylish.View onPress={callback}/>);
     tree.getInstance().props.onPress()
     expect(callback).toBeCalled();
     expect(tree.toJSON()).toMatchSnapshot();

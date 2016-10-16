@@ -83,7 +83,7 @@ function ItemsFooter({ payload, count }) {
 }
 
 import { LayoutableView } from './Closeable';
-import { AnimView } from './AnimView';
+import { Stylish } from './Stylish';
 Touchable.BookListView = Touchable.createCycleComponent(
   BookListView);
 

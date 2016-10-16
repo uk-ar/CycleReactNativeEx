@@ -16,7 +16,7 @@ import CenterView from './CenterView';
 import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
-import {AnimView} from '../../AnimView';
+import { Stylish} from '../../Stylish';
 import {withDebug,VerticalCenterView,TestListView,debugView} from './common'
 
 class ScrollPositionView extends React.Component {

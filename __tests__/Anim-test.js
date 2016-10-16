@@ -5,7 +5,7 @@ const SavePromise = Promise;
 const saveSetTimeout = setTimeout;
 
 var Animated = require('Animated');
-var { AnimView } = require('../AnimView');
+var { Stylish } = require('../Stylish');
 
 jest
   .disableAutomock()
@@ -43,7 +43,7 @@ describe('Animated tests', () => {
   }
   it('animate correctly by animateTo', async () => {
     const tree = renderer.create(
-      <AnimView style={initialStyle}/>
+      <Stylish.View style={initialStyle}/>
     );
     const inst = tree.getInstance();
     expect(inst.state.animatedStyle)
@@ -63,10 +63,10 @@ describe('Animated tests', () => {
   })
   it('animate correctly by props change', async () => {
     const tree = renderer.create(
-      <AnimView style={initialStyle}/>
+      <Stylish.View style={initialStyle}/>
     );
     tree.update(
-      <AnimView style={nextStyle}/>
+      <Stylish.View style={nextStyle}/>
     );
     jest.runAllTimers();
     //expect(callback).toBeCalled();

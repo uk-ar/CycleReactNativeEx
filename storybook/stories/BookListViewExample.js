@@ -774,7 +774,7 @@ class TestBookListView2 extends React.Component {
                       ...this.data,
                       [action.target]:{[rowID]:rowData,...this.data[action.target]}
                     }
-                    console.log("then",this.data)
+                    //console.log("then",this.data)
                     this.updateDataSource()
                   })
             }}

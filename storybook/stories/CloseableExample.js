@@ -13,7 +13,7 @@ import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
 import { CloseableView, LayoutableView } from '../../Closeable';
-import { AnimView } from '../../AnimView';
+import { Stylish } from '../../Stylish';
 
 import {withDebug} from './common';
 const CloseableViewDebug = withDebug(CloseableView)

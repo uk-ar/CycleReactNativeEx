@@ -7,7 +7,7 @@ import {
   StyleSheet
 } from 'react-native';
 
-import { AnimView } from './AnimView';
+import { Stylish } from './Stylish';
 import { MeasureableView } from './SwipeableRow';
 const ReactTransitionGroup = require('react-addons-transition-group');
 
@@ -20,22 +20,22 @@ class CloseableView extends React.Component {
     this.style = this.props.close ? { height: 0.01 } : { height: null };
   }
   open() {
-    // keys=['height', 'opacity', 'transform']
+    //keys=['height', 'opacity', 'transform']
     return new Promise((resolve, reject) => {
-      // console.log("start open")
+      //console.log("start open")
       this.inner.measure((x, y, width, height) => {
         // TODO:filter Props
         this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
-        // this.style = { height };
-        // this.style = { opacity: 1, transform: [{ scale: 1 }] };
+        //this.style = { height };
+        //this.style = { opacity: 1, transform: [{ scale: 1 }] };
         this.setState({ close: false }, () => { // widen
           this.outer.animate(
             { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] }
-            // { height: 0.01 }
-            // { opacity: 0.1, transform: [{ scale: 0.1 }]}
+            //{ height: 0.01 }
+            //{ opacity: 0.1, transform: [{ scale: 0.1 }]}
             , this.style)
               .then(() => {
-                // console.log("finish open")
+                //console.log("finish open")
                 resolve();
               });
         });
@@ -52,21 +52,21 @@ class CloseableView extends React.Component {
          *         //console.log("finish open")
          *         resolve();
          *       });*/
-        // });
+        //});
       });
     });
   }
   close() {
     return new Promise((resolve, reject) => {
-      // console.log("start close")
+      console.log("start close")
       this.inner.measure((x, y, width, height) => {
-        // console.log("measure close",x, y, width, height)
+        console.log("measure close",x, y, width, height)
         this.style = { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] };
         this.outer.animate(
           { height, opacity: 1, transform: [{ scale: 1 }] }, this.style)
             .then(() => {
               this.setState({ close: true });// shrink
-              // console.log("finish closed")
+              console.log("finish closed")
               resolve();
             });
       });
@@ -84,11 +84,11 @@ class CloseableView extends React.Component {
    *   console.log('didmount');
    * }*/
   render() {
-    const { animationConfig, style, ...props } = this.props;
+    const {animationConfig,style,...props} = this.props
     return (
-      <AnimView
+      <Stylish.View
         style={[this.style,
-                { overflow: 'hidden' }]}
+                { overflow: 'hidden'}]}
         animationConfig={animationConfig}
         ref={c => this.outer = c}
       >
@@ -100,7 +100,7 @@ class CloseableView extends React.Component {
                   this.state.close ?
                   { position: 'absolute' } : null]}
         />
-      </AnimView>
+      </Stylish.View>
     );
   }
 }
@@ -129,74 +129,74 @@ function willRecieveProps(key, fn) {
   };
 }
 
-function makeLayoutableComponent(BaseComponent) {
+function makeLayoutableComponent(BaseComponent){
   return class extends BaseComponent {
     constructor(props) {
       super(props);
       this.state = { layouted: false };
     }
-    render() {
+    render(){
       const { onFirstLayout, ...props } = this.props;
-      // Add firstLayoutProps?
+      //Add firstLayoutProps?
       return (
         this.state.layouted ?
-        <BaseComponent {...this.props} /> :
+        <BaseComponent {...this.props}/> :
         <BaseComponent
           {...props}
           onLayout={(...args) => {
-            onFirstLayout(...args);
-            this.setState({ layouted: true });
-          }}
-        />);
+              onFirstLayout(...args);
+              this.setState({ layouted: true });
+            }}
+        />)
     }
-  };
+  }
 }
 
 class LayoutableView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // props.transitionEnter
+      //props.transitionEnter
       layouted: props.transitionEnter ? false : true
     };
   }
-  close() {
-    return this.closeable.close();
+  close(){
+    return this.closeable.close()
   }
-  open() {
-    return this.closeable.open();
+  open(){
+    return this.closeable.open()
   }
-  render() {
-    // this.props.data.length
-    const { transitionEnter, onLayout, ...props } = this.props;
-    // const {transform,...otherStyle} = this.state.style
-    // animationConfig={{delay:1000,duration:1000}}
+  render(){
+    //this.props.data.length
+    const { transitionEnter, onLayout, ...props } = this.props
+    //const {transform,...otherStyle} = this.state.style
+    //animationConfig={{delay:1000,duration:1000}}
     return (
       <CloseableView
-        ref={c => this.closeable = c}
+        ref={ c => this.closeable = c }
         close={this.state.layouted ? false : true}
-        onLayout={(...args) => {
-          if (!this.state.layouted) {
-            this.setState({ layouted: true });
-          }
-            // onLayout(...args)
-        }}
+        onLayout={(...args)=>{
+            if(!this.state.layouted){
+              this.setState({layouted:true})
+            }
+            //onLayout(...args)
+          }}
         {...props}
       />
-    );
+    )
   }
 }
 
-// const LayoutableView = makeLayoutableComponent(AnimView);
+//const LayoutableView = makeLayoutableComponent(AnimView);
 
 LayoutableView.propTypes = {
-  ...View.propTypes, //  ...Closeable.propTypes,
-  onLayout: React.PropTypes.func,
+  ...View.propTypes,//  ...Closeable.propTypes,
+  onLayout:React.PropTypes.func,
 };
 
 LayoutableView.defaultProps = {
   ...View.defaultProps,
-  onLayout() {},
+  onLayout:function(){},
 };
 
 module.exports = { CloseableView, LayoutableView };

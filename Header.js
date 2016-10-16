@@ -14,7 +14,7 @@ import {
 const FAIcon = require('react-native-vector-icons/FontAwesome');
 
 import { styles } from './styles';
-import { AnimView } from './AnimView';
+import { Stylish } from './Stylish';
 import { CloseableView } from './Closeable';
 import Touchable from '@cycle/react-native/src/Touchable';
 
@@ -46,7 +46,7 @@ class Header extends React.Component {
     //            close={!this.state.toggle}
     //          close={!this.state.toggle}
     return (
-      <AnimView
+      <Stylish.View
         style={{ padding: 10, opacity: this.state.opacity }}
         anim={{ duration: 500 }}
       >
@@ -57,7 +57,7 @@ class Header extends React.Component {
           close
           ref="close"
         >
-          <AnimView
+          <Stylish.View
             ref="view1"
             style={{
               // height:this.state.toggle ? 10 : 20,
@@ -66,10 +66,10 @@ class Header extends React.Component {
             }}
           >
             <Text>foo</Text>
-          </AnimView>
+          </Stylish.View>
         </CloseableView>
 
-        <AnimView
+        <Stylish.View
           ref="view2"
           style={{
             height: 10,
@@ -132,7 +132,7 @@ class Header extends React.Component {
             {'toggle'}
           </Text>
         </View>
-      </AnimView>);
+      </Stylish.View>);
   }
 }
 

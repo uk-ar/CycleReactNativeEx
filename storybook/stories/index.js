@@ -14,7 +14,7 @@ import CenterView from './CenterView';
 import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {genActions2,Action} from '../../Action';
-import {AnimView} from '../../AnimView';
+import { Stylish} from '../../Stylish';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 require("./nativeExample")
 require("./default")
