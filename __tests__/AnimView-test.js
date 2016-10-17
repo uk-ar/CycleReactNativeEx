@@ -5,7 +5,8 @@ const SavePromise = Promise;
 const saveSetTimeout = setTimeout;
 
 var Animated = require('Animated');
-var { Stylish } = require('../Stylish');
+var Stylish  = require('../Stylish');
+
 const {
   View,
   //Animated
@@ -18,6 +19,10 @@ import renderer from 'react-test-renderer';
 
 Promise = SavePromise;
 setTimeout = saveSetTimeout;
+
+jest
+  .disableAutomock()
+  .useFakeTimers()
 
 describe('Animated tests', () => {
   beforeEach(() => {

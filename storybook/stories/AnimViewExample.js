@@ -5,7 +5,8 @@ import {
   PanResponder,
   Animated,
   View,
-  ScrollView
+  ScrollView,
+  ListView,
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 
@@ -13,13 +14,15 @@ import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
-import { Stylish} from '../../Stylish';
+import Stylish from '../../Stylish';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 
 
 import {withDebug} from './common';
 
 const StylishViewDebug = withDebug(Stylish.View)
+const StylishListViewDebug = withDebug(Stylish.ListView)
+
 storiesOf('StylishView', module)
   .addDecorator(getStory => (
     <CenterView>{getStory()}</CenterView>
@@ -82,3 +85,18 @@ storiesOf('StylishView', module)
               animationConfig:{duration:1000}}]}
     />
   ))
+  .add('with ListView', () => {
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2
+    })
+    return(
+      <StylishListViewDebug
+        data={[{style:{height:10,backgroundColor:"red"},
+                dataSource:ds.cloneWithRows(["a","b"]),
+                renderRow:(rowData) => <Text>{rowData}</Text>},
+               {style:{height:20,backgroundColor:"green"},
+                dataSource:ds.cloneWithRows(["a","b"]),
+                renderRow:(rowData) => <Text>{rowData}</Text>}]}
+      />)
+  }
+  )

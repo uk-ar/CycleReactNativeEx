@@ -8,6 +8,7 @@ import {
 import { _SwipeableRow3, SwipeableRow3 } from './SwipeableRow';
 import emptyFunction from 'fbjs/lib/emptyFunction';
 import { LayoutableView, CloseableView } from './Closeable';
+import Stylish from './Stylish';
 
 // class for ref
 class SwipeableListView extends React.Component {
@@ -82,7 +83,7 @@ class SwipeableListView extends React.Component {
             dataSource, ...props } = this.props;
     // console.log("ds",this.state.dataSource)
     return (
-      <ListView
+      <Stylish.ListView
         dataSource={this.state.dataSource}
         ref={c => (this.listview = c)}
         renderRow={(rowData, sectionID, rowID, highlightRow) => {
@@ -102,6 +103,8 @@ class SwipeableListView extends React.Component {
       />);
   }
 }
+
+//const SwipeableListView = createStylishComponent(_SwipeableListView)
 
 SwipeableListView.propTypes = {
   ...ListView.propTypes,

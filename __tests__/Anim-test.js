@@ -5,7 +5,8 @@ const SavePromise = Promise;
 const saveSetTimeout = setTimeout;
 
 var Animated = require('Animated');
-var { Stylish } = require('../Stylish');
+// do not use import !! because of jest mocking feature
+var Stylish  = require('../Stylish');
 
 jest
   .disableAutomock()
@@ -41,6 +42,10 @@ describe('Animated tests', () => {
     width:3,
     height:4
   }
+
+  jest
+    .useFakeTimers()
+
   it('animate correctly by animateTo', async () => {
     const tree = renderer.create(
       <Stylish.View style={initialStyle}/>

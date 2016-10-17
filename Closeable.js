@@ -7,7 +7,7 @@ import {
   StyleSheet
 } from 'react-native';
 
-import { Stylish } from './Stylish';
+import Stylish from './Stylish';
 import { MeasureableView } from './SwipeableRow';
 const ReactTransitionGroup = require('react-addons-transition-group');
 
@@ -191,12 +191,10 @@ class LayoutableView extends React.Component {
 
 LayoutableView.propTypes = {
   ...View.propTypes,//  ...Closeable.propTypes,
-  onLayout:React.PropTypes.func,
 };
 
 LayoutableView.defaultProps = {
   ...View.defaultProps,
-  onLayout:function(){},
 };
 
 module.exports = { CloseableView, LayoutableView };

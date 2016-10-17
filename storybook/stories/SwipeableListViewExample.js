@@ -29,7 +29,10 @@ class TestSwipeableListView extends React.Component {
   // press to replace
   constructor(props) {
     super(props);
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+    })
     this.data = {"a":"a", "b":"b" ,"c":"c"};
     this.state = {
       ds: ds.cloneWithRows(this.data)
@@ -52,6 +55,7 @@ class TestSwipeableListView extends React.Component {
               delete s1[Object.keys(s1)[Object.keys(s1).length-1]]
               this.data={[`r${i}`]:`r${i}`,...s1}
               this.updateDataSource()
+              console.log("td",this.data)
             }}>
           pressMe
         </Text>

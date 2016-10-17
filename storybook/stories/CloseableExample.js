@@ -82,7 +82,7 @@ storiesOf('LayoutableView', module)
  * ))*/
   .add('with top', () => (
     <View>
-      <LayoutableView>
+      <LayoutableView transitionEnter={true}>
         <Text style={{height:50,backgroundColor:"red"}}>
           foo
         </Text>

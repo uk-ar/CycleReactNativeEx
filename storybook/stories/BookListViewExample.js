@@ -729,7 +729,7 @@ class TestBookListView2 extends React.Component {
       getSectionHeaderData: (dataBlob, sectionID) => dataBlob[sectionID][0]
     })
     this.data = {
-      search:{s1:"s1", s2:"s1", s3:"s3"},
+      search:{s1:"s1", s2:"s2", s3:"s3"},
       liked:{l1:"l1", l2:"l2", l3:"l3"},
       borrowed:{b1:"b1", b2:"b2", b3:"b3"},
       done:{d1:"d1", d2:"d2", d3:"d3"}
@@ -852,13 +852,13 @@ storiesOf('BookListView', module)
   .add('with TestListView4', () => {
     return(<TestListView4 />)
   })
-  .add('with nextedListView', () => {
+  .add('with NestedListView', () => {
     return(<NestedListView />)
   })
-  .add('with nextedListView2', () => {
+  .add('with NestedListView2', () => {
     return(<NestedListView2 />)
   })
-  .add('with nextedListView3', () => {
+  .add('with NestedListView3', () => {
     return(<NestedListView3 />)
   })
   .add('with TestBookListView1', () => {
