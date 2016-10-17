@@ -86,22 +86,13 @@ class TestListView extends React.Component {
     this.updateDataSource();
   }
   render(){
-    //console.log(this.state.ds._dataBlob.s1)
     return(
       <View
         style={{flex:1,paddingTop:20}}>
         <Text
           onPress={()=>{
-              //const [head,...rest]= this.data
-              //[head,...this.data]= this.data
-              //console.log("r",rest)
-              console.log("r",this.data)
-              //this.data.push(`row ${Math.random()}`)
               const i = Math.random()
-              //this.data.push({key:i,data:`${i}`})
               this.data = [{key:`a${i}`,data:`${i}`}, ...this.data]
-              console.log("r",this.data)
-              //this.setState({ds:this.state.ds.cloneWithRows(this.data)})
               this.updateDataSource()
             }}>
           pressMe
@@ -146,7 +137,19 @@ class TestSectionListView extends React.Component {
               };
               this.updateDataSource()
             }}>
-          pressMe
+          Press to pop last and push head
+        </Text>
+        <Text
+          onPress={()=>{
+              const s1 = {...this.data.s1}
+              delete s1[Object.keys(s1)[Object.keys(s1).length-1]]
+              this.data = {
+                s1:{...s1},
+                s2:{r3:"r1"}
+              };
+              this.updateDataSource()
+            }}>
+          Press to pop last
         </Text>
         { this.props.children(this.state.ds) }
       </View>

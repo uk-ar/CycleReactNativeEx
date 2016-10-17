@@ -57,7 +57,17 @@ class TestSwipeableListView extends React.Component {
               this.updateDataSource()
               console.log("td",this.data)
             }}>
-          pressMe
+          press to re-order(new & delete)
+        </Text>
+        <Text
+          onPress={()=>{
+              //delete
+              const s1 = {...this.data}
+              delete s1[Object.keys(s1)[Object.keys(s1).length-1]]
+              this.data={...s1}
+              this.updateDataSource()
+            }}>
+          press to remove last
         </Text>
         <SwipeableListView
           ref={ c => this.listview=c }
@@ -82,6 +92,88 @@ class TestSwipeableListView extends React.Component {
                     this.data={ [rowID]:rowData, ...this.data }
                     this.setState({
                       ds:this.state.ds.cloneWithRows(this.data)})
+                  })
+            }}
+          renderRow={(rowData,sectionID,rowID,highlightRow) => {
+              return (debugView("row")(rowData,rowID,sectionID))
+            }}
+          renderSectionHeader={debugView("head")}
+        />
+      </View>
+    )
+  }
+}
+
+class TestSectionSwipeableListView extends React.Component {
+  //swipe and reoder
+  // press to replace
+  constructor(props) {
+    super(props);
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+    })
+    this.data = {s1:{"a":"a", "b":"b" ,"c":"c"},
+                 s2:{"a":"a", "b":"b" ,"c":"c"}};
+    this.state = {
+      ds: ds.cloneWithRowsAndSections(this.data)
+    };
+  }
+  updateDataSource(){
+    this.setState(
+      {ds:this.state.ds.cloneWithRowsAndSections(this.data)})
+  }
+  render(){
+    //console.log("s1",this.state.ds._dataBlob.s1)
+    return(
+      <View
+        style={{flex:1,paddingTop:20}}>
+        <Text
+          onPress={()=>{
+              //replace
+              const i = Math.random()
+              const s1 = {...this.data}
+              delete s1[Object.keys(s1)[Object.keys(s1).length-1]]
+              this.data={[`r${i}`]:`r${i}`,...s1}
+              this.updateDataSource()
+              console.log("td",this.data)
+            }}>
+          press to re-order(new & delete)
+        </Text>
+        <Text
+          onPress={()=>{
+              //delete
+              this.listview.close("s1","a")
+              /* const s1 = {...this.data.s1}
+              delete s1[Object.keys(s1)[Object.keys(s1).length-1]]
+              this.data = {...this.data, s1 }
+              this.updateDataSource() */
+            }}>
+          press to remove last
+        </Text>
+        <SwipeableListView
+          ref={ c => this.listview=c }
+          style={{paddingTop:20}}
+          generateActions={()=>genActions2('search')}
+          dataSource={this.state.ds}
+          onSwipeEnd={({rowData,sectionID,rowID,action,...rest}) =>{
+              //console.log("re",{rowData,sectionID,rowID,action,...rest})
+              if(action.target == null) { return }
+              this.listview
+                  .close(sectionID,rowID)
+                  .then(()=>{
+                    const s1 = {...this.data}
+                    delete s1[rowID]
+                    this.data = s1
+                    this.setState({
+                      ds:this.state.ds.cloneWithRowsAndSections(this.data)},()=>
+                        Promise.resolve()
+                    )
+                  })
+                  .then(()=>{
+                    this.data={ [rowID]:rowData, ...this.data }
+                    this.setState({
+                      ds:this.state.ds.cloneWithRowsAndSections(this.data)})
                   })
             }}
           renderRow={(rowData,sectionID,rowID,highlightRow) => {
@@ -210,4 +302,7 @@ storiesOf('SwipeableListView', module)
   })
   .add('with TestSwipeableListView', () =>
     <TestSwipeableListView/>
+  )
+  .add('with TestSectionSwipeableListView', () =>
+    <TestSectionSwipeableListView/>
   )

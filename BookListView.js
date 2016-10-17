@@ -98,11 +98,13 @@ class BookListView1 extends React.Component {
               });
             const num = Math.min(Object.keys(rowData[sectionID]).length,2)
             //console.log("?",num)
+            //style={{ height: 100 * num }}
+            //                automaticallyAdjustContentInsets={false}
             return (
               <SwipeableListView
                 enableEmptySections={true}
                 scrollEnabled={false}
-                style={{ height: 100 * num }}
+                style={{borderColor:"red",borderWidth:3,height: 100 * num}}
                 ref={c => this.listviews[sectionID] = c}
                 onSwipeEnd={onSwipeEnd}
                 onSwipeStart={onSwipeStart}
@@ -118,9 +120,6 @@ class BookListView1 extends React.Component {
 }
 
 class BookListView2 extends React.Component {
-  constructor(props) {
-    super(props);
-  }
   close(sectionID, rowID) {
     // console.log("sw cl",sectionID,rowID,this.listview,this.props.dataSource)
     return this.listview.close(sectionID, rowID);

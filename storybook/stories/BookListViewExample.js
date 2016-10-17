@@ -429,11 +429,12 @@ class MultipleListView extends React.Component {
             style={{height:200}}
             dataSource={this.state[elem]}
             renderRow={debugView("head")}
-            renderSectionHeader={debugView("head")}
+            renderHeader={debugView("head")}
+            renderSectionHeader={debugView("section head")}
           />
          )}
       </ScrollView>
-    )
+    )//
   }
 }
 
@@ -768,8 +769,6 @@ class TestBookListView2 extends React.Component {
                   })
               //.catch((e)=>console.log("error",e))
                   .then(()=>{
-                    /* console.log("then",
-                       {[rowID]:rowData,...this.data[sectionID]}) */
                     this.data = {
                       ...this.data,
                       [action.target]:{[rowID]:rowData,...this.data[action.target]}
@@ -852,6 +851,9 @@ storiesOf('BookListView', module)
   .add('with TestListView4', () => {
     return(<TestListView4 />)
   })
+  .add('with MultipleListView', () => {
+    return(<MultipleListView/>)
+  })
   .add('with NestedListView', () => {
     return(<NestedListView />)
   })
@@ -866,7 +868,4 @@ storiesOf('BookListView', module)
   })
   .add('with TestBookListView2', () => {
     return(<TestBookListView2/>)
-  })
-  .add('with MultipleListView', () => {
-    return(<MultipleListView/>)
   })
