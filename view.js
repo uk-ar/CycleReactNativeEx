@@ -66,21 +66,7 @@ Touchable.BookRow1 = Touchable.createCycleComponent(
 
 import { genActions2 } from './Action';
 import { BookListView } from './BookListView';
-import { Header, ItemsHeader, SearchHeader } from './Header';
-function ItemsFooter({ payload, count }) {
-  return (
-    <Touchable.TouchableElement
-      selector="section"
-      payload={payload}
-    >
-      <View style={styles.sectionFooter}>
-        <Text>
-          {`すべて表示(${count})`}
-        </Text>
-      </View>
-    </Touchable.TouchableElement>
-  );
-}
+import { ItemsFooter, ItemsHeader } from './Header';
 
 import { LayoutableView } from './Closeable';
 import { Stylish } from './Stylish';
@@ -165,7 +151,7 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
           const { close, loadingState } = sectionData;
             // close or not
           return (sectionID === 'search') ?
-            <SearchHeader
+                 <SearchHeader
               {...sectionData}
               payload={[sectionID, this.listview]}
             /> :

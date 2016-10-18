@@ -25,6 +25,7 @@ require("./AnimViewExample")
 require("./CloseableExample")
 require("./BookCellExample")
 require("./BookRowExample")
+require("./HeaderExample")
 require("./BookListViewExample")
 
 storiesOf('Action', module)

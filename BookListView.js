@@ -66,17 +66,20 @@ class BookListView1 extends React.Component {
       onSwipeStart,
       // TODO: onSwipeStart?
       ...props } = this.props;
-    // console.log("r",Object.keys(dataSource._dataBlob))
+    //console.log("r",Object.keys(dataSource._dataBlob),{...dataSource._dataBlob})
     const nestedDataSource =
-      Object.keys(dataSource._dataBlob)
+      dataSource.sectionIdentities
+      //Object.keys(dataSource._dataBlob)//section
             .reduce((acc, sectionID) => {
               acc[sectionID] =
                 [{[sectionID]: dataSource._dataBlob[sectionID]}];
               return acc;
-            }, {});
-
+            }, {...dataSource._dataBlob});//keep section data
+    //console.log(nestedDataSource)
+    //console.log(this.dataSource._getSectionHeaderData)
     this.dataSource =
-      this.dataSource.cloneWithRowsAndSections(nestedDataSource);
+      this.dataSource.cloneWithRowsAndSections(nestedDataSource,
+                                               dataSource.sectionIdentities);
     // console.log("n",nestedDataSource)
     // TODO:lock on swipe
     return (
@@ -105,7 +108,7 @@ class BookListView1 extends React.Component {
                 renderSectionHeader={(sectionData,sectionID) =>
                   //workround for android
                   <View style={{height:1}}/>
-                                    }                          
+                                    }
                 dataSource={this.dataSources[sectionID]
                                 .cloneWithRowsAndSections(rowData)}
                            />

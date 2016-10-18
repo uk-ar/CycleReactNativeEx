@@ -139,6 +139,9 @@ import {
   Text,
   View,
   UIManager,
+  TouchableHighlight,
+  TouchableNativeFeedback,
+  Platform,
 } from 'react-native';
 
 import util from 'util';
@@ -156,6 +159,11 @@ function log(str) {
   };
 }
 
+TouchableElement = TouchableHighlight;
+if (Platform.OS === 'android') {
+  TouchableElement = TouchableNativeFeedback;
+}
+
 module.exports = {
   itemsInfo,
   STORAGE_KEY,
@@ -164,5 +172,6 @@ module.exports = {
   CALIL_STATUS_API,
   MOCKED_MOVIES_DATA,
   log,
+  TouchableElement,
   //makeEventEmitterDriver,
 };
