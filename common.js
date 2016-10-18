@@ -142,6 +142,7 @@ import {
   TouchableHighlight,
   TouchableNativeFeedback,
   Platform,
+  TextInput,
 } from 'react-native';
 
 import util from 'util';
@@ -159,12 +160,19 @@ function log(str) {
   };
 }
 
-TouchableElement = TouchableHighlight;
+let TouchableElement = TouchableHighlight;
 if (Platform.OS === 'android') {
   TouchableElement = TouchableNativeFeedback;
 }
+const FAIcon = require('react-native-vector-icons/FontAwesome');
+import Touchable from '@cycle/react-native/lib/Touchable';
+
+Touchable['FAIcon'] = Touchable.createCycleComponent(FAIcon)
+Touchable['TextInput'] = Touchable.createCycleComponent(TextInput)
+Touchable['TouchableElement'] = Touchable.createCycleComponent(TouchableElement)
 
 module.exports = {
+  Touchable,
   itemsInfo,
   STORAGE_KEY,
   RAKUTEN_SEARCH_API,
