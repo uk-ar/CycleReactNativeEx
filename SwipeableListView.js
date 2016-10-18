@@ -83,7 +83,7 @@ class SwipeableListView extends React.Component {
             dataSource, ...props } = this.props;
     // console.log("ds",this.state.dataSource)
     return (
-      <Stylish.ListView
+      <ListView
         dataSource={this.state.dataSource}
         ref={c => (this.listview = c)}
         renderRow={(rowData, sectionID, rowID, highlightRow) => {

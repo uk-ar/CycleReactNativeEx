@@ -46,17 +46,9 @@ const EnhancedListView = SwipeableListView;
 class BookListView1 extends React.Component {
   constructor(props) {
     super(props);
-    /* this.state = {
-     *   dataSource: this.props.dataSource,
-     * };
-     * this.closeable = []
-     * this.added = null*/
     this.dataSources = {};
+    this.dataSource = this.props.dataSource
     this.listviews = {};
-    this.dataSource = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2,
-      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
-    });
   }
   setNativeProps(props) {
     // for Touchable
@@ -78,9 +70,11 @@ class BookListView1 extends React.Component {
     const nestedDataSource =
       Object.keys(dataSource._dataBlob)
             .reduce((acc, sectionID) => {
-              acc[sectionID] = [{[sectionID]: dataSource._dataBlob[sectionID]}];
+              acc[sectionID] =
+                [{[sectionID]: dataSource._dataBlob[sectionID]}];
               return acc;
             }, {});
+
     this.dataSource =
       this.dataSource.cloneWithRowsAndSections(nestedDataSource);
     // console.log("n",nestedDataSource)
@@ -97,21 +91,25 @@ class BookListView1 extends React.Component {
                 sectionHeaderHasChanged: (s1, s2) => s1 !== s2
               });
             const num = Math.min(Object.keys(rowData[sectionID]).length,2)
-            //console.log("?",num)
-            //style={{ height: 100 * num }}
-            //                automaticallyAdjustContentInsets={false}
+            //Wrapper View for prevent layout destruction
             return (
-              <SwipeableListView
+              <View>
+                <SwipeableListView
                 enableEmptySections={true}
                 scrollEnabled={false}
-                style={{borderColor:"red",borderWidth:3,height: 100 * num}}
+                style={{maxHeight: 100 * num}}
                 ref={c => this.listviews[sectionID] = c}
                 onSwipeEnd={onSwipeEnd}
                 onSwipeStart={onSwipeStart}
                 renderRow={renderRow}
+                renderSectionHeader={(sectionData,sectionID) =>
+                  //workround for android
+                  <View style={{height:1}}/>
+                                    }                          
                 dataSource={this.dataSources[sectionID]
                                 .cloneWithRowsAndSections(rowData)}
                            />
+              </View>
             );
         }}
       />
@@ -151,6 +149,28 @@ class BookListView2 extends React.Component {
             {renderRow(rowData, sectionID, rowID, highlightRow)}
           </SwipeableRow3>);
         }}
+        {...props}
+      />);
+  }
+}
+
+class BookListView3 extends React.Component {
+  close(sectionID, rowID) {
+    return this.listview.close(sectionID, rowID);
+  }
+  render() {
+    const { renderSectionHeader,
+            renderSectionFooter,
+            ...props } = this.props;
+    // console.log("sw re",this.props.dataSource)
+    return (
+      <BookListView2
+        ref={c => (this.listview = c)}
+        renderSectionHeader={(sectionData, sectionID) => {
+            return sectionID.endsWith('_end') ?
+                   renderSectionFooter(sectionData, sectionID) :
+                   renderSectionHeader(sectionData, sectionID);
+          }}
         {...props}
       />);
   }
@@ -242,4 +262,4 @@ BookListView.defaultProps = {
   onRelease() {},
 };
 
-module.exports = { BookListView, BookListView1, BookListView2 };
+module.exports = { BookListView, BookListView1, BookListView2, BookListView3 };

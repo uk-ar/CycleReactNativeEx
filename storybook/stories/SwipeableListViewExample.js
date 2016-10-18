@@ -113,8 +113,10 @@ class TestSectionSwipeableListView extends React.Component {
       rowHasChanged: (r1, r2) => r1 !== r2,
       sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
     })
-    this.data = {s1:{"a":"a", "b":"b" ,"c":"c"},
-                 s2:{"a":"a", "b":"b" ,"c":"c"}};
+    this.data = {s1:{"a":"a"},
+                 s2:{"a":"a"}};
+    /* this.data = {s1:{"a":"a", "b":"b" ,"c":"c"},
+     *              s2:{"a":"a", "b":"b" ,"c":"c"}};*/
     this.state = {
       ds: ds.cloneWithRowsAndSections(this.data)
     };
@@ -127,7 +129,7 @@ class TestSectionSwipeableListView extends React.Component {
     //console.log("s1",this.state.ds._dataBlob.s1)
     return(
       <View
-        style={{flex:1,paddingTop:20}}>
+        style={{paddingTop:20}}>
         <Text
           onPress={()=>{
               //replace
@@ -153,7 +155,7 @@ class TestSectionSwipeableListView extends React.Component {
         </Text>
         <SwipeableListView
           ref={ c => this.listview=c }
-          style={{paddingTop:20}}
+          style={{paddingTop:20,borderColor:"red",borderWidth:3}}
           generateActions={()=>genActions2('search')}
           dataSource={this.state.ds}
           onSwipeEnd={({rowData,sectionID,rowID,action,...rest}) =>{
@@ -181,6 +183,9 @@ class TestSectionSwipeableListView extends React.Component {
             }}
           renderSectionHeader={debugView("head")}
         />
+        <Text>
+          end of listview
+        </Text>
       </View>
     )
   }
@@ -233,10 +238,14 @@ storiesOf('SwipeableListView', module)
             generateActions={()=>genActions2('search')}
             dataSource={dataSource}
             renderRow={(rowData,rowID,sectionID) =>
-              <LayoutableView>
-                      {debugView("row")(rowData,rowID,sectionID)}
-              </LayoutableView>
+              debugView("row")(rowData,rowID,sectionID)
                       }
+            renderSectionHeader={(sectionData,sectionID) =>
+              //workround for android
+              <View style={{height:1}}/>
+              //debugView("section")(sectionData,sectionID)
+              //null
+                                }
           />
         }
       </TestListView>

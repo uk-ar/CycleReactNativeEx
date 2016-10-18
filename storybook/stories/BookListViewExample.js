@@ -20,12 +20,12 @@ import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {BookRow1} from '../../BookRow';
 import {genActions2,Action} from '../../Action';
-import {BookListView2,BookListView1,BookListView} from '../../BookListView';
+import {BookListView3,BookListView2,BookListView1,BookListView} from '../../BookListView';
 import {LayoutableView} from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 import {SwipeableListView} from '../../SwipeableListView';
 
-import {withDebug,VerticalCenterView,TestListView,debugView} from './common'
+import {withDebug,VerticalCenterView,TestListView,TestSectionListView,debugView} from './common'
 
 class NestedListViewDataSource {
   constructor(params: Object) {
@@ -678,7 +678,27 @@ class TestBookListView1 extends React.Component {
               }
               this.updateDataSource()
             }}>
-          pressMe
+          press to push head and pop tail
+        </Text>
+        <Text
+          onPress={()=>{
+              //replace
+              const s1 = {...this.data.s1}
+              delete s1[Object.keys(s1)[Object.keys(s1).length-1]]
+              this.data={
+                s1:{...s1},
+                s2:this.data.s2
+              }
+              this.updateDataSource()
+            }}>
+          press to pop tail
+        </Text>
+        <Text
+          onPress={()=>{
+              this.listview
+                  .close("s1","r1")
+            }}>
+          press to close head
         </Text>
         <BookListView2
           ref={ c => this.listview=c }
@@ -788,6 +808,92 @@ class TestBookListView2 extends React.Component {
   }
 }
 
+class TestBookListView3 extends React.Component {
+  //swipe and reoder
+  // press to replace
+  constructor(props) {
+    super(props);
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+      getSectionHeaderData: (dataBlob, sectionID) => //
+        //dataBlob[sectionID][0]
+        this.sectionHeaderData[sectionID]
+    })
+    this.data = {
+      search:{s1:"s1", s2:"s2", s3:"s3"},
+      search_end:{},
+      liked:{l1:"l1", l2:"l2", l3:"l3"},
+      liked_end:{},
+      borrowed:{b1:"b1", b2:"b2", b3:"b3"},
+      borrowed_end:{},
+      done:{d1:"d1", d2:"d2", d3:"d3"},
+      done_end:{}      
+    };
+    this.sectionHeaderData = {
+      search:{text:"search"},
+      search_end:{text:"search_end"},
+      liked:{text:"liked"},
+      liked_end:{text:"liked_end"},
+      borrowed:{text:"borrowed"},
+      borrowed_end:{text:"borrowed_end"},
+      done:{text:"done"},
+      done_end:{text:"done_end"},
+    }
+    this.state = {
+      ds: ds.cloneWithRowsAndSections(this.data)
+    };
+  }
+  updateDataSource(){
+    return new Promise((resolve, reject)=>
+      this.setState(
+        {ds:this.state.ds.cloneWithRowsAndSections(this.data)}, ()=>
+          resolve()
+      ))
+  }
+  render(){
+    //console.log("s1",this.state.ds._dataBlob.s1)
+    return(
+      <View
+        style={{flex:1,paddingTop:20}}>
+        <BookListView3
+          ref={ c => this.listview=c }
+          style={{paddingTop:20}}
+          generateActions={(rowData,sectionID)=>genActions2(sectionID)}
+          dataSource={this.state.ds}
+          onSwipeEnd={({rowData,sectionID,rowID,action,...rest}) =>{
+              //console.log("re",{rowData,sectionID,rowID,action,...rest})
+              if(action.target == null) { return }
+              this.listview
+                  .close(sectionID,rowID)
+                  .then(()=>{
+                    const s = {...this.data[sectionID]}//clone
+                    delete s[rowID]
+                    this.data = {...this.data,[sectionID]:s}
+                    return this.updateDataSource()
+                  })
+              //.catch((e)=>console.log("error",e))
+                  .then(()=>{
+                    this.data = {
+                      ...this.data,
+                      [action.target]:{[rowID]:rowData,...this.data[action.target]}
+                    }
+                    //console.log("then",this.data)
+                    this.updateDataSource()
+                  })
+            }}
+          renderRow={(rowData,sectionID,rowID,highlightRow) => {
+              //console.log("user",rowData,sectionID,rowID,highlightRow)
+              return (debugView("row")(rowData,rowID,sectionID))
+            }}
+          renderSectionHeader={debugView("head")}
+          renderSectionFooter={debugView("foot")}
+        />
+      </View>
+    )
+  }
+}
+
 storiesOf('BookListView', module)
 /* .addDecorator(getStory => (
  *   <CenterView>{getStory()}</CenterView>
@@ -863,9 +969,33 @@ storiesOf('BookListView', module)
   .add('with NestedListView3', () => {
     return(<NestedListView3 />)
   })
+  .add('with add or remove row', () => {
+    return(
+      <TestSectionListView>
+        {(dataSource)=>
+          <BookListView
+            style={{paddingTop:20}}
+            generateActions={()=>genActions2('search')}
+            dataSource={dataSource}
+            onRelease={action('onRelease')}
+            renderRow={(rowData,rowID,sectionID) =>
+              <LayoutableView>
+                      {debugView("row")(rowData,rowID,sectionID)}
+              </LayoutableView>
+                      }
+            renderSectionHeader={debugView("head")}
+          />
+        }
+      </TestSectionListView>
+    )
+  })
   .add('with TestBookListView1', () => {
     return(<TestBookListView1/>)
   })
   .add('with TestBookListView2', () => {
     return(<TestBookListView2/>)
   })
+  .add('with TestBookListView3', () => {
+    return(<TestBookListView3/>)
+  })
+  
