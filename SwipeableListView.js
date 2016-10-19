@@ -17,16 +17,16 @@ class SwipeableListView extends React.Component {
     this.state = {
       dataSource: this.props.dataSource,
     };
-    this.closeable = [];
+    //this.closeable = [];
     this.added = null;
   }
   setNativeProps(props) {
     // for scroll lock
     this.listview.setNativeProps(props);
   }
-  close(sectionID, rowID) {
-    return this.closeable[sectionID][rowID].close();
-  }
+  /* close(sectionID, rowID) {
+   *   return this.closeable[sectionID][rowID].close();
+   * }*/
   changeDataSource(dataSource) {
     function toRowsAndSections(arrays) {
       return arrays.map((rows, sectionIndex) =>
@@ -90,8 +90,8 @@ class SwipeableListView extends React.Component {
           return (
               <LayoutableView
                 ref={(c) => {
-                  this.closeable[sectionID] = this.closeable[sectionID] || [];
-                  this.closeable[sectionID][rowID] = c;
+                    /* this.closeable[sectionID] = this.closeable[sectionID] || [];
+                    this.closeable[sectionID][rowID] = c; */
                 }}
                 transitionEnter={this.rowShouldEnter(sectionID, rowID)}
               >

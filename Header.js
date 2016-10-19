@@ -12,6 +12,7 @@ import {
   // TouchableNativeFeedback
 } from 'react-native';
 const FAIcon = require('react-native-vector-icons/FontAwesome');
+import { emptyFunction } from 'fbjs/lib/emptyFunction';
 
 import { styles } from './styles';
 import { Stylish } from './Stylish';
@@ -49,53 +50,52 @@ import { itemsInfo, TouchableElement } from './common';
  * }*/
 
 function ItemsHeader({
-  onCloseSection, onSelectSection, onQueryChange,
+  onCloseSection, onSelectSection, onChangeQuery,
   close, payload, section, loadingState, children, style
 }) {
   if (!itemsInfo[section]) { return null; }
   // const icon = (selectedSection === null) ? (
   const icon = close ? (
     <FAIcon
-      onPress={onCloseSection}
+      onPress={()=>onCloseSection(section)}
       name="close"
       selector="close"
       size={20}
       style={{ marginRight: 5 }}
     />) : (
-    <FAIcon
-      name={itemsInfo[section].icon}
-      color={itemsInfo[section].backgroundColor}
-      size={20}
-      style={{ marginRight: 5 }}
-    />);
+      <FAIcon
+        name={itemsInfo[section].icon}
+        color={itemsInfo[section].backgroundColor}
+        size={20}
+        style={{ marginRight: 5 }}
+      />);
 
   const content = (section === "search" && close) ? (
     //        autoFocus={true}
-    <View>
-      <TextInput
-        autoCapitalize="none"
-        autoCorrect={false}
-        selector="text-input"
-        onTextChange={onQueryChange}
-        style={styles.searchBarInput}
-      />
-      { loadingState ?
-        <ActivityIndicator
-          animating
-          color="white"
-          size="large"
-          style={styles.spinner}
-        /> : null }
-    </View>
-     ):(
-     <Text>
-       {itemsInfo[section].text}
-     </Text>
-     );
+    <TextInput
+      autoCapitalize="none"
+      autoCorrect={false}
+      selector="text-input"
+      onChangeText={onChangeQuery}
+      style={styles.searchBarInput}
+    />
+  ):(
+    <Text>
+      {itemsInfo[section].text}
+    </Text>
+  );
+
+  const indicator = (section === "search" && close && loadingState) ? (
+    <ActivityIndicator
+      animating
+      color="white"
+      size="large"
+      style={styles.spinner}
+    />) : null
 
   return (
     <TouchableElement
-      onSelectSection={onSelectSection}
+      onPress={()=>onSelectSection(section)}
       selector="section"
       key={section}
       payload={payload}
@@ -103,15 +103,29 @@ function ItemsHeader({
       <View style={style || styles.sectionHeader}>
         {icon}
         {content}
+        {indicator}
       </View>
     </TouchableElement>
   );
 }
 
+ItemsHeader.propTypes = {
+  onCloseSection:React.PropTypes.func,
+  onSelectSection:React.PropTypes.func,
+  onChangeQuery:React.PropTypes.func,
+  //close, payload, section, loadingState
+};
+ItemsHeader.defaultProps = {
+  onCloseSection:emptyFunction,
+  onSelectSection:emptyFunction,
+  onChangeQuery:emptyFunction,
+  //close, payload, section, loadingState
+};
+
 function ItemsFooter({ payload, count, onSelectSection }) {
   return (
     <TouchableElement
-      onPress={onSelectSection}
+      onPress={()=>onSelectSection(section)}
       selector="section"
       payload={payload}
     >
@@ -123,5 +137,14 @@ function ItemsFooter({ payload, count, onSelectSection }) {
     </TouchableElement>
   );
 }
+
+ItemsFooter.propTypes = {
+  onSelectSection:React.PropTypes.func,
+  //close, payload, section, loadingState
+};
+ItemsFooter.defaultProps = {
+  onSelectSection:emptyFunction,
+  //close, payload, section, loadingState
+};
 
 module.exports = { ItemsHeader, ItemsFooter };

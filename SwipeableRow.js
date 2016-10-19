@@ -191,7 +191,7 @@ class _SwipeableRow3 extends React.Component {
       ]));
   }
   close() {
-    console.log("root",this)
+    //console.log("root",this)
     //this.row
     return this.root.close();
   }

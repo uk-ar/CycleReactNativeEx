@@ -33,24 +33,29 @@ storiesOf('ItemsHeader', module)
   .add('with search close', () =>
     <ItemsHeader
       section="search"
+      onCloseSection={action("section close")}
+      onChangeQuery={action('query change')}
       close={true}
       />
   )
   .add('with search', () =>
     <ItemsHeader
       section="search"
+      onSelectSection={action("section select")}
       close={false}
     />
   )
   .add('with liked close', () =>
     <ItemsHeader
       section="liked"
+      onCloseSection={action("section close")}
       close={true}
     />
   )
   .add('with liked', () =>
     <ItemsHeader
       section="liked"
+      onSelectSection={action("section select")}
       close={false}
     />
   )

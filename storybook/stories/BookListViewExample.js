@@ -7,7 +7,8 @@ import {
   View,
   ListView,
   ScrollView,
-  LayoutAnimation
+  LayoutAnimation,
+  UIManager
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import util from 'util'
@@ -922,6 +923,7 @@ class TestBookListView4 extends React.Component {
      *   done:{close:false,loadingState:true,count:3},
      *   done_end:{close:false,loadingState:true,count:3}
      * }*/
+    this.sectionIdentities = Object.keys(this.data)
     this.state = {
       ds: ds.cloneWithRowsAndSections(
         {...this.data,
@@ -935,7 +937,7 @@ class TestBookListView4 extends React.Component {
            done:{close:false,loadingState:true,count:3},
            done_end:{close:false,loadingState:true,count:3}
          }},
-        Object.keys(this.data))
+        this.sectionIdentities)
     };
   }
   updateDataSource(){
@@ -952,8 +954,9 @@ class TestBookListView4 extends React.Component {
            sectionHeaderData:Object
              .keys(this.data)
              .reduce((acc,key) => {
+               console.log()
                acc[key]={
-                 close:false,loadingState:true,
+                 close:this.sectionIdentities.length === 2,loadingState:true,
                  count:key.endsWith('_end') ?
                        Object.keys(this.data[key.slice(0,-4)]).length :
                        Object.keys(this.data[key]).length
@@ -961,16 +964,16 @@ class TestBookListView4 extends React.Component {
                return acc
              },{})
           },
-          Object.keys(this.data))}, ()=>
+          this.sectionIdentities)}, ()=>
           resolve()
       ))
   }
   render(){
-    console.log(this.state.ds)
+    //console.log(this.state.ds)
     return(
       <View
         style={{flex:1,paddingTop:20}}>
-        <BookListView3
+        <BookListView
           ref={ c => this.listview=c }
           style={{paddingTop:20}}
           generateActions={(rowData,sectionID)=>genActions2(sectionID)}
@@ -997,15 +1000,43 @@ class TestBookListView4 extends React.Component {
           renderSectionHeader={(sectionData, sectionID) => {
               //const { close, loadingState } = sectionData;
               // close or not
-              console.log("he",sectionData)
+              /* onSelectSection={action("section select")}
+              onCloseSection={action("section close")}
+               */
+              //console.log("rend sec header",sectionData)
               return (
                 <ItemsHeader
+                   onSelectSection={(section)=>{
+                       UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+                       LayoutAnimation.easeInEaseOut();
+                       this.listview.scrollTo({y:0,animated:false})
+                       this.sectionIdentities = [section,`${section}_end`]
+                       this.updateDataSource()
+                       //LayoutAnimation!!
+                       /* Promise.all(
+                       Object.keys(this.data).filter(elem =>
+                       (elem !== section) && (elem !== `${section}_end`)
+                       ).map(elem=>{
+                       return this.listview.closeSection(elem)
+                       })
+                       ).then(()=>{
+                          //this.listview.scrollTo({y:0,animated:true})
+                       this.sectionIdentities = [section,`${section}_end`]
+                       this.updateDataSource()
+                       this.listview.scrollTo({y:0,animated:true})
+                       }) */
+                     }}
+                   onCloseSection={(section)=>{
+                       //need scroll
+                       this.sectionIdentities = Object.keys(this.data)
+                       this.updateDataSource()
+                     }}
                    section={sectionID}
                    {...sectionData}
                          />)
             }}
           renderSectionFooter={(sectionData, sectionID) => {
-              console.log("fo",sectionData)
+              //console.log("fo",sectionData)
               return (
                 <ItemsFooter
                    {...sectionData}
