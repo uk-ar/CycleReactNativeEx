@@ -58,11 +58,38 @@ function withDebug(MyComponent){
             children={this.props.children}
           />
         </View>
-        )
+      )
+      //render(children)
       //              {...this.props.data[this.state.index]}
     }
   }
 }
+
+//function withDebug2(MyComponent){
+  class Counter extends React.Component {
+    constructor(props) {
+      super(props);
+      //this.state = { index:0 }
+      //this.root
+      this.index = 0
+    }
+    render(){
+      return (
+        <View>
+          <Text onPress={()=>{
+              this.index = this.index + 1
+              this.props.onPress && this.props.onPress()
+            }}>
+            pressMe
+          </Text>
+          {this.props.children(this.index,func)}
+        </View>
+      )
+      //render(children)
+      //              {...this.props.data[this.state.index]}
+    }
+  }
+//}
 
 class TestListView extends React.Component {
   constructor(props) {

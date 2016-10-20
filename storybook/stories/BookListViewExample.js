@@ -982,7 +982,7 @@ class TestBookListView4 extends React.Component {
               //{listener},          // Optional async listener
             )}
           ref={ c => this.listview=c }
-          style={{paddingTop:20}}
+          style={{paddingTop:20,backgroundColor:"black"}}
           generateActions={(rowData,sectionID)=>genActions2(sectionID)}
           dataSource={this.state.ds}
           onSwipeEnd={({rowData,sectionID,rowID,action,...rest}) =>{

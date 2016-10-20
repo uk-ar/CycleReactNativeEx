@@ -19,9 +19,9 @@ import {withDebug} from './common';
 const CloseableViewDebug = withDebug(CloseableView)
 
 storiesOf('CloseableView', module)
-/* .addDecorator(getStory => (
- *   <CenterView>{getStory()}</CenterView>
- * ))*/
+  .addDecorator(getStory => (
+    <CenterView>{getStory()}</CenterView>
+  ))
   .add('with close props', () => (
     <CloseableViewDebug
       data={[{close:"true"},
@@ -76,6 +76,31 @@ storiesOf('CloseableView', module)
  *   overflow: 'hidden',
  *   alignItems: 'stretch'
  * }]}*/
+
+class TestLayoutableView extends React.Component {
+  //swipe and reoder
+  // press to replace
+  render() {
+    <View>
+      <Text onPress={()=>{
+        }}>
+        pressMe
+      </Text>
+      <LayoutableView
+        style={{backgroundColor:"green"}}
+        transitionEnter={false}
+      >
+        <Text style={{height:50,backgroundColor:"red"}}>
+          foo
+        </Text>
+      </LayoutableView>
+      <View
+        style={{
+          height:50,
+          backgroundColor:"yellow"}} />
+    </View>
+  }
+}
 storiesOf('LayoutableView', module)
 /* .addDecorator(getStory => (
  *   <CenterView>{getStory()}</CenterView>
@@ -133,11 +158,12 @@ storiesOf('LayoutableView', module)
     </View>
     </View>
   ))
-  .add('with disable', () => (
+  .add('with disable by transitionEnter', () => (
     <View>
       <LayoutableView
         style={{backgroundColor:"green"}}
-        disable={true}>
+        transitionEnter={false}
+      >
         <Text style={{height:50,backgroundColor:"red"}}>
           foo
         </Text>
@@ -148,6 +174,6 @@ storiesOf('LayoutableView', module)
           backgroundColor:"yellow"}} />
     </View>
   ))
-/* .add('with appear', () => (
- *   <Appear />
- * ))*/
+  .add('with toggle', () => (
+    <TestLayoutableView />
+  ))

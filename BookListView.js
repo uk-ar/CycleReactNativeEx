@@ -100,6 +100,7 @@ class BookListView1 extends React.Component {
     // TODO:lock on swipe
     return (
       <ListView
+        removeClippedSubviews={false}
         {...props}
         renderSectionHeader={(rowData, sectionID, rowID, highlightRow) => {
             return (
@@ -120,6 +121,7 @@ class BookListView1 extends React.Component {
             const num = Math.min(Object.keys(rowData[sectionID]).length,2)
             //Wrapper View for prevent layout destruction
             //removeClippedSubviews={false} seems no mean
+            //                style={{maxHeight: 100 * num}}
             return (
               <CloseableView
                  ref={c => this.rows[sectionID] = c}
@@ -127,7 +129,7 @@ class BookListView1 extends React.Component {
                 <SwipeableListView
                 enableEmptySections={true}
                 scrollEnabled={false}
-                style={{maxHeight: 100 * num}}
+                removeClippedSubviews={false}
                 onSwipeEnd={onSwipeEnd}
                 onSwipeStart={onSwipeStart}
                 renderRow={renderRow}

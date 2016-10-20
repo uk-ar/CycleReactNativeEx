@@ -38,7 +38,7 @@ class CloseableView extends React.Component {
                 //console.log("finish open")
                 resolve();
               });
-        });        
+        });
       });
     });
   }
@@ -71,16 +71,18 @@ class CloseableView extends React.Component {
    * }*/
   render() {
     const {animationConfig,style,...props} = this.props
+    console.log("cl",this,this.props.close,this.state.close,this.style)
     return (
       <Stylish.View
+        ref={c => (this.outer = c)}
+        collapsable={false}
         style={[this.style,
                 { overflow: 'hidden'}]}
         animationConfig={animationConfig}
-        ref={c => this.outer = c}
       >
         <View
+          ref={c => (this.inner = c)}
           collapsable={false}
-          ref={c => this.inner = c}
           {...props}
           style={[style,
                   this.state.close ?
@@ -161,7 +163,7 @@ class LayoutableView extends React.Component {
       <CloseableView
         ref={ c => this.closeable = c }
         close={this.state.layouted ? false : true}
-        onLayout={(...args)=>{
+        onLayout={(...args)=> {
             if(!this.state.layouted){
               this.setState({layouted:true})
             }
