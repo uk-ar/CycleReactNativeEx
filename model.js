@@ -96,16 +96,17 @@ function model(actions) {
   // update with animation when selectedSection$ changed
   const books$ =
     Rx.Observable.combineLatest(
-      actions.searchedBooksStatus$
+      actions.searchedBooksStatus$//.do(i => console.log('searched books'))
       // searchedBooks$//.do(i => console.log('searched books'))
       ,
-      actions.savedBooksStatus$// .do(i => console.log('saved books'))
+      actions.savedBooksStatus$//.do(i => console.log('saved books',i))
       ,
       genItems)
-      .debounce(1)// ms sync searchedBooksStatus$ & savedBooksStatus$
+      //.debounce(1)// Millisecond
+  //sync searchedBooksStatus$ & savedBooksStatus$
   /* .do(i=>console.log("items:",JSON.stringify(i)))
    * .distinctUntilChanged(x => JSON.stringify(x),(a,b)=>a!==b) */
-      // .do(i=>console.log("items:",i))
+      .do(i=>console.log("items:",i))
       .shareReplay();
 
   const limit = 2;
@@ -135,30 +136,32 @@ function model(actions) {
           selectedSection ?
           [selectedSection, `${selectedSection}_end`] :
           Object.keys(books);
-        const rowIdentities =
-          sectionIdentities.map((sectionID) => {
-            return selectedSection ?
-                   Object.keys(books[sectionID]) :
-                   Object.keys(books[sectionID]).slice(0, limit || undefined);
-          });
+        /* const rowIdentities =
+         *   sectionIdentities.map((sectionID) => {
+         *     return selectedSection ?
+         *            Object.keys(books[sectionID]) :
+         *            Object.keys(books[sectionID]).slice(0, limit || undefined);
+         *   });*/
         // Object.keys(items).filter(i => i !== 'sections');
         return ({
           dataBlob: { ...books, sections },
           sectionIdentities,
-          rowIdentities
+          //rowIdentities
         });
       })
       .scan(
-        (datasource, { dataBlob, sectionIdentities, rowIdentities }) => {
+        (datasource, { dataBlob, sectionIdentities }) => {
+        //  (datasource, { dataBlob, sectionIdentities, rowIdentities }) => {          
           return datasource.cloneWithRowsAndSections(
-            dataBlob, sectionIdentities, rowIdentities);
+            //dataBlob, sectionIdentities, rowIdentities);
+            dataBlob, sectionIdentities);
         }, new ListView.DataSource({
           rowHasChanged: (r1, r2) => r1 !== r2,
           sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
           getSectionHeaderData: (dataBlob, sectionID) =>
             dataBlob.sections[sectionID]
-        }));
-      // .do(i => console.log('datasource:', i));
+        }))
+     .do(i => console.log('datasource:', i));
       // .subscribe()
 
       // .do(i => console.log('rowIDs?:', i));

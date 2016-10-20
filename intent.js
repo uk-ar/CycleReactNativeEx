@@ -50,13 +50,26 @@ const initialBooks = mockbooks;
 
 function intent(RN, HTTP) {
   // Actions
-  const release$ = RN.select('listview')
-                     .events('release')
-                     // .do((...args) => console.log('foo0:', ...args))
-                     .map(([book, key, action]) => [book, action.target])
-                     // .do((...args) => console.log('foo1:', ...args))
-                     .filter(([_, target]) => target !== null);
-                     // .do((...args) => console.log('foo2:', ...args));
+  const release$ = RN
+    .select('listview')
+  //.events('swipeEnd')
+    .events('release')
+    .do((args) => console.log('foo0:', args))
+  //.map(([{rowData:book,action}]) => [book, action.target])
+    .map(([book, action, closeAnimation]) => [book, action.target, closeAnimation])
+    .filter(([_, target, closeAnimation]) => target !== null)
+  /* .map(([book, action, closeAnimation]) =>
+   *   new Promise((resolve,reject)=>
+   *     closeAnimation.start().then(() => Promise.resolve([book, action]))
+   *   )
+   * )*/
+  /* .map(([book, action, closeAnimation]) =>
+   *   closeAnimation.start().then(() => Promise.resolve([book, action]))
+   * )
+   * .switch()*/
+  //map is better?
+    //.do(([book, action, closeAnimation]) => closeAnimation.start())//map is better?
+    .do((args) => console.log('foo2:', args));
 
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')

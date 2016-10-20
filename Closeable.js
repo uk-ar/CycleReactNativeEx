@@ -38,21 +38,7 @@ class CloseableView extends React.Component {
                 //console.log("finish open")
                 resolve();
               });
-        });
-        /* this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
-         * this.setState({ close: false }, () => { // widen
-         *   this.outer.animate(
-         *     { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }]},
-         *     { height      , opacity: 0.1, transform: [{ scale: 0.1 }]})
-         *       .then(()=>
-         *         this.outer.animate(
-         *           {opacity: 0.1, transform: [{ scale: 0.1 }]},
-         *           {opacity:   1, transform: [{ scale:   1 }]}))
-         *       .then(() => {
-         *         //console.log("finish open")
-         *         resolve();
-         *       });*/
-        //});
+        });        
       });
     });
   }

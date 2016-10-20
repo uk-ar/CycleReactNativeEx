@@ -93,82 +93,87 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
   // <BookListView
   //        key={selectedSection}
   return (
-      <Touchable.BookListView
+    <Touchable.BookListView
+      selector="listview"      
         style={{
           paddingHorizontal: 3,
-          // height:100,
           flex: 1,
           backgroundColor: '#1A237E', // indigo 900
         }}
-        removeClippedSubviews={false}
-        selector="listview"
         dataSource={dataSource}
         ref={(c) => {
           this.listview = c;
-            // c.scrollTo({x:0,y:100,animated:false})
         }}
         directionalLockEnabled
         enableEmptySections
         generateActions={(rowData, sectionID, rowID) =>
           genActions2(sectionID)}
+      onSwipeEnd={({rowData,sectionID,rowID,action,...rest}) =>{
+          if(action.target == null) { return }
+          this.listview
+              .close(sectionID,rowID)
+              .then(()=>{
+                const s = {...this.data[sectionID]}
+                delete s[rowID]
+                this.data = {...this.data,[sectionID]:s}
+                return this.updateDataSource()
+              })
+              .then(()=>{
+                this.data = {
+                  ...this.data,
+                  [action.target]:{[rowID]:rowData,...this.data[action.target]}
+                }
+                this.updateDataSource()
+              })
+        }}
         renderRow={(rowData, sectionID, rowID) => {
-            // console.log('row:', rowData, sectionID, rowID);
-            //              <LayoutableView disable={rowData.appear ? false : true}>
-            //              <LayoutableView disable={true}>
-          return (
-              <LayoutableView
-                key={rowID}
-                disable={rowData.appear ? false : true}
-              >
-                <BookRow1
-                  selector="bookcell"
-                  bucket={sectionID}
-                  onSwipeEnd={() => console.log(sectionID, rowData)}
-                >
-                  <Text
-                    style={{ backgroundColor: materialColor.grey['50'] }}
-                  >Foo</Text>
-                           {/* <BookCell
-                           book={rowData}
-                           style={{ backgroundColor: materialColor.grey['50'] }}
-                           /> */}
-                </BookRow1>
-              </LayoutableView>
+            return (
+              <BookCell
+              book={rowData}
+              style={{ backgroundColor: materialColor.grey['50'] }}
+                    />
             );
-        }}
-        renderSectionFooter={(sectionData, sectionID) => {
-            // console.log('footer', sectionData, sectionID);
-          const { section, count } = sectionData;
-          return (
-              <ItemsFooter
-                {...sectionData}
-                key={selectedSection}
-                payload={[section, this.listview]}
-              />);
-        }}
+          }}
         renderSectionHeader={(sectionData, sectionID) => {
-          // console.log('header', sectionData, sectionID, this.listview, this);// ,
-          const { close, loadingState } = sectionData;
-            // close or not
-          return (sectionID === 'search') ?
-                 <SearchHeader
-              {...sectionData}
-              payload={[sectionID, this.listview]}
-            /> :
-            <Text
-              style={{ color: 'white' }}
-              onPress={() => {
-                console.log('listview', this.listview);
-              }}
-            >
-              bar
-            </Text>;
-            /* <ItemsHeader
-            {...sectionData}
-            section={sectionID}
-            payload={[sectionID,this.listview]}
-            /> */
-        }}
+            return (
+              <ItemsHeader
+                   onSelectSection={(section)=>{
+                       if(this.sectionIdentities.length === 2){ return }
+                       this.positions.push(this._scrollY.__getValue())
+                       //TODO:
+                       //1. scroll to section header with animation
+                       // (need expand view in android)
+                       //2. save section header position
+                       this.listview.scrollTo({y:0,animated:false})
+                       this.sectionIdentities = [section,`${section}_end`]
+                       this.updateDataSource()
+                     }}
+                   onCloseSection={(section)=>{
+                       //TODO:
+                       //1. scroll to section header with animation
+                       //this.listview.scrollTo({y:0,animated:true})
+                       this.sectionIdentities = Object.keys(this.data)
+                       this.updateDataSource().then(()=>{
+                         //TODO:
+                         //2. scroll to section header with no animation
+                         //2. scroll to original position with animation
+                         let pos = this.positions.pop()
+                         setTimeout(()=>
+                           this.listview.scrollTo({y:pos,
+                                                   animated:false}))
+                       })
+                     }}
+                   section={sectionID}
+                   {...sectionData}
+                   />)
+          }}
+        renderSectionFooter={(sectionData, sectionID) => {
+            //console.log("fo",sectionData)
+            return (
+              <ItemsFooter
+                   {...sectionData}
+                   />)
+          }}
       />
     );
 }

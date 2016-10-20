@@ -939,6 +939,8 @@ class TestBookListView4 extends React.Component {
          }},
         this.sectionIdentities)
     };
+    this._scrollY = new Animated.Value(0)
+    this.positions = []
   }
   updateDataSource(){
     /* Object.keys(this.data).forEach( key =>{
@@ -970,10 +972,15 @@ class TestBookListView4 extends React.Component {
   }
   render(){
     //console.log(this.state.ds)
+    //{action("scroll")}
     return(
       <View
         style={{flex:1,paddingTop:20}}>
         <BookListView
+          onScroll={Animated.event(
+              [{nativeEvent: {contentOffset: {y: this._scrollY}}}],
+              //{listener},          // Optional async listener
+            )}
           ref={ c => this.listview=c }
           style={{paddingTop:20}}
           generateActions={(rowData,sectionID)=>genActions2(sectionID)}
@@ -1007,29 +1014,30 @@ class TestBookListView4 extends React.Component {
               return (
                 <ItemsHeader
                    onSelectSection={(section)=>{
-                       UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
-                       LayoutAnimation.easeInEaseOut();
+                       if(this.sectionIdentities.length === 2){ return }
+                       this.positions.push(this._scrollY.__getValue())
+                       //TODO:
+                       //1. scroll to section header with animation
+                       // (need expand view in android)
+                       //2. save section header position
                        this.listview.scrollTo({y:0,animated:false})
                        this.sectionIdentities = [section,`${section}_end`]
                        this.updateDataSource()
-                       //LayoutAnimation!!
-                       /* Promise.all(
-                       Object.keys(this.data).filter(elem =>
-                       (elem !== section) && (elem !== `${section}_end`)
-                       ).map(elem=>{
-                       return this.listview.closeSection(elem)
-                       })
-                       ).then(()=>{
-                          //this.listview.scrollTo({y:0,animated:true})
-                       this.sectionIdentities = [section,`${section}_end`]
-                       this.updateDataSource()
-                       this.listview.scrollTo({y:0,animated:true})
-                       }) */
                      }}
                    onCloseSection={(section)=>{
-                       //need scroll
+                       //TODO:
+                       //1. scroll to section header with animation
+                       //this.listview.scrollTo({y:0,animated:true})
                        this.sectionIdentities = Object.keys(this.data)
-                       this.updateDataSource()
+                       this.updateDataSource().then(()=>{
+                         //TODO:
+                         //2. scroll to section header with no animation
+                         //2. scroll to original position with animation
+                         let pos = this.positions.pop()
+                         setTimeout(()=>
+                           this.listview.scrollTo({y:pos,
+                                                   animated:false}))
+                       })
                      }}
                    section={sectionID}
                    {...sectionData}

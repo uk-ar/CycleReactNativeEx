@@ -7,11 +7,12 @@ import {
   ScrollView,
   findNodeHandle,
   TouchableHighlight,
+  StyleSheet,
 } from 'react-native';
 
 import util from 'util';
 import { compose, withHandlers } from 'recompose';
-import emptyfunction from 'fbjs/lib/emptyFunction';
+import emptyFunction from 'fbjs/lib/emptyFunction';
 
 import Dimensions from 'Dimensions';
 const {
@@ -118,6 +119,7 @@ class BookListView1 extends React.Component {
               });
             const num = Math.min(Object.keys(rowData[sectionID]).length,2)
             //Wrapper View for prevent layout destruction
+            //removeClippedSubviews={false} seems no mean
             return (
               <CloseableView
                  ref={c => this.rows[sectionID] = c}
@@ -130,8 +132,12 @@ class BookListView1 extends React.Component {
                 onSwipeStart={onSwipeStart}
                 renderRow={renderRow}
                 renderSectionHeader={(sectionData,sectionID) =>
-                  //workround for android
-                  <View style={{height:1}}/>
+                  //workround for android to fix entering animations
+                  //                    style={{height:StyleSheet.hairlineWidth}}
+                  //collapsable={false} seems no mean
+                  <View
+                    style={{height:1}}
+                    />
                                     }
                 dataSource={this.dataSources[sectionID]
                                 .cloneWithRowsAndSections(rowData)}
@@ -200,29 +206,61 @@ class BookListView extends React.Component {
   close(sectionID, rowID) {
     return this.listview.close(sectionID, rowID);//BookListView2
   }
-  closeSection(sectionID) {
-    return this.listview.closeSection(sectionID)//BookListView1
-  }
-  scrollTo(obj){
-    return this.listview.scrollTo(obj)
-  }
+  /* closeSection(sectionID) {
+   *   return this.listview.closeSection(sectionID)//BookListView1
+   * }*/
+  /* scrollTo(obj){
+   *   return this.listview.scrollTo(obj)
+   * }*/
   render() {
     const { renderSectionHeader,
             renderSectionFooter,
+            //TODO:separate
+            onRelease,
+            onSwipeEnd,
             ...props } = this.props;
     // console.log("sw re",this.props.dataSource)
     return (
       <BookListView2
         ref={c => (this.listview = c)}
+        {...props}
         renderSectionHeader={(sectionData, sectionID) => {
             return sectionID.endsWith('_end') ?
                    renderSectionFooter(sectionData, sectionID) :
                    renderSectionHeader(sectionData, sectionID);
           }}
-        {...props}
+        onSwipeEnd={({gestureState, rowData, sectionID, rowID, highlightRow, action}) => {
+            onSwipeEnd({gestureState, rowData, sectionID, rowID, highlightRow, action})
+            //onRelease(rowData,action)
+            /* closeAnimation={
+            start:()=>{
+            return this.listview
+            .close(sectionID, rowID)
+            //.then(()=> Promise.resolve())
+            //return promise
+            }
+            }
+               onRelease(rowData,action,closeAnimation) */
+            /* if(action.target === null){ return }
+            this.listview
+            .close(sectionID, rowID)
+            .then(()=>onRelease(rowData,action)) */
+          }}
       />);
   }
 }
+
+BookListView.propTypes = {
+  ...ListView.propTypes,
+  renderSectionFooter: React.PropTypes.func,
+  onRelease: React.PropTypes.func,
+  //onSwipeEnd: React.PropTypes.func,
+};
+BookListView.defaultProps = {
+  ...ListView.defaultProps,
+  onRelease:emptyFunction,
+  //onSwipeEnd:emptyFunction,
+};
 
 class BookListView_old extends React.Component {
   setNativeProps(props) {
@@ -298,16 +336,5 @@ class BookListView_old extends React.Component {
      *          props.renderSectionHeader(sectionData, sectionID);*/
   }
 }
-
-BookListView.propTypes = {
-  ...ListView.propTypes,
-  renderSectionFooter: React.PropTypes.func,
-  onRelease: React.PropTypes.func,
-};
-BookListView.defaultProps = {
-  ...ListView.defaultProps,
-  // onRelease:emptyFunction,
-  onRelease() {},
-};
 
 module.exports = { BookListView, BookListView1, BookListView2 };
