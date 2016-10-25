@@ -135,6 +135,8 @@ class TestSectionListView extends React.Component {
       sectionHeaderHasChanged: (s1, s2) => s1 !== s2
     })
     this.data = {
+      /* s1:{r1:"r1"},
+       * s2:{r3:"r1"},*/
       s1:{r1:"r1",r2:"r2",r6:"r6"},
       s2:{r3:"r1",r4:"r2",r5:"r3"},
     };

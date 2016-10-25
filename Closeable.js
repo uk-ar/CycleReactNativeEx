@@ -16,26 +16,34 @@ class CloseableView extends React.Component {
   // TODO:High Order Component can remove inner view
   constructor(props) {
     super(props);
-    this.state = { close: this.props.close };
-    this.style = this.props.close ? { height: 0.01 } : { height: null };
+    this.state = {
+      close: this.props.close,
+      //style: this.props.close ? { height: 0.01 } : { height: null };
+    };
+    this.initialStyle =
+      this.props.close ? { height: 0.01 } : { height: null };
   }
   open() {
     //keys=['height', 'opacity', 'transform']
     return new Promise((resolve, reject) => {
-      //console.log("start open")
+      console.log("start open")
       this.inner.measure((x, y, width, height) => {
         // TODO:filter Props
-        this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
+        //this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
         //this.style = { height };
         //this.style = { opacity: 1, transform: [{ scale: 1 }] };
-        this.setState({ close: false }, () => { // widen
+        this.setState({
+          close: false,//relative
+          //style: { height, opacity: 1, transform: [{ scale: 1 }] }
+        }, () => { // widen
           this.outer.animate(
-            { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] }
+            { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] },
+            { height, opacity: 1, transform: [{ scale: 1 }] },
             //{ height: 0.01 }
             //{ opacity: 0.1, transform: [{ scale: 0.1 }]}
-            , this.style)
+            )
               .then(() => {
-                //console.log("finish open")
+                console.log("finish open")
                 resolve();
               });
         });
@@ -44,15 +52,18 @@ class CloseableView extends React.Component {
   }
   close() {
     return new Promise((resolve, reject) => {
-      //console.log("start close")
+      console.log("start close")
       this.inner.measure((x, y, width, height) => {
-        //console.log("measure close",x, y, width, height)
-        this.style = { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] };
+        console.log("measure close",x, y, width, height)
+        //this.style = ;
         this.outer.animate(
-          { height, opacity: 1, transform: [{ scale: 1 }] }, this.style)
+          { height, opacity: 1, transform: [{ scale: 1 }] },
+          { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] }
+          //this.style
+        )
             .then(() => {
-              this.setState({ close: true });// shrink
-              //console.log("finish closed")
+              this.setState({ close: true });// shrink//absolute
+              console.log("finish closed")
               resolve();
             });
       });
@@ -72,11 +83,13 @@ class CloseableView extends React.Component {
   render() {
     const {animationConfig,style,...props} = this.props
     console.log("cl",this,this.props.close,this.state.close,this.style)
-    return (
+    const content = (
       <Stylish.View
         ref={c => (this.outer = c)}
         collapsable={false}
-        style={[this.style,
+      style={[//this.style,
+              this.initialStyle,
+              //this.state.close ? { height: 0.01 } : { height: null },
                 { overflow: 'hidden'}]}
         animationConfig={animationConfig}
       >
@@ -85,11 +98,13 @@ class CloseableView extends React.Component {
           collapsable={false}
           {...props}
           style={[style,
-                  this.state.close ?
+                  this.state.close ? // to measure height
                   { position: 'absolute' } : null]}
         />
       </Stylish.View>
     );
+    this.initialStyle = null;
+    return content;
   }
 }
 // willRecieveProps

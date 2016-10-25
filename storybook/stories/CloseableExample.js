@@ -5,7 +5,8 @@ import {
   PanResponder,
   Animated,
   View,
-  ScrollView
+  ScrollView,
+  ListView
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 
@@ -15,7 +16,7 @@ import Welcome from './Welcome';
 import { CloseableView, LayoutableView } from '../../Closeable';
 import { Stylish } from '../../Stylish';
 
-import {withDebug} from './common';
+import {TestSectionListView,debugView,withDebug,TestListView} from './common';
 const CloseableViewDebug = withDebug(CloseableView)
 
 storiesOf('CloseableView', module)
@@ -177,3 +178,97 @@ storiesOf('LayoutableView', module)
   .add('with toggle', () => (
     <TestLayoutableView />
   ))
+  .add('Scrollview & transitionEnter', () => (
+    <ScrollView
+      style={{marginTop:20}}
+    >
+      <Text onPress={()=>{
+          this.l.close()
+        }}>
+        press to close
+      </Text>
+      <LayoutableView
+        style={{backgroundColor:"green"}}
+        transitionEnter={true}
+        ref={c => this.l = c}
+      >
+        <Text style={{height:50,backgroundColor:"red"}}>
+          foo
+        </Text>
+      </LayoutableView>
+      <View
+        style={{
+          height:50,
+          backgroundColor:"yellow"}} />
+    </ScrollView>
+  ))
+  .add('ListView & transitionEnter', () => (
+    <View
+      style={{marginTop:20}}
+    >
+      <Text onPress={()=>{
+          this.l.close()
+        }}>
+        press to close
+      </Text>
+    <TestListView>
+      {(dataSource)=>
+        <ListView
+          style={{paddingTop:20,flex:1}}
+          dataSource={dataSource}
+          renderRow={(rowData,rowID,sectionID) =>
+            <LayoutableView
+                    transitionEnter={true}
+                    ref={c => this.l = c}
+                        >
+              <View>
+                    {debugView("row")(rowData,rowID,sectionID)}
+              </View>
+            </LayoutableView>
+                    }
+        />
+      }
+    </TestListView>
+    <View
+      style={{
+        height:50,
+        backgroundColor:"yellow"}} />
+    </View>
+  ))
+  .add('section ListView & transitionEnter', () => {
+
+    return (<View
+            style={{marginTop:20}}
+    >
+      <Text onPress={()=>{
+          this["r1"].close()
+        }}>
+        press to close
+      </Text>
+      <TestSectionListView>
+        {(dataSource)=>
+          <ListView
+            style={{flex:1}}
+            dataSource={dataSource}
+            renderRow={(rowData,sectionID,rowID) =>
+              <LayoutableView
+                    transitionEnter={true}
+                    ref={c => this[rowID] = c}
+                        >
+                <View>
+                        {debugView("row")(rowData,rowID,sectionID)}
+                </View>
+              </LayoutableView>
+                      }
+            renderSectionHeader={(rowData,sectionID) =>
+              debugView("section")(rowData,sectionID)
+                                }
+          />
+        }
+      </TestSectionListView>
+      <View
+        style={{
+          height:50,
+          backgroundColor:"yellow"}} />
+    </View>)
+  })

@@ -58,7 +58,7 @@ function withState2(RowComponent) {
       this.onSwipeEnd = this.onSwipeEnd.bind(this)
     }
     close() {
-      return this.row.close();
+      return this.row.close();//_SwipeableRow3
     }
     onSwipeEnd(gestureState){
       //const fn = ;//TODO:default

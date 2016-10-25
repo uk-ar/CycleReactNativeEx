@@ -156,11 +156,11 @@ class BookListView2 extends React.Component {
   close(sectionID, rowID) {
     // console.log("sw cl",sectionID,rowID,this.listview,this.props.dataSource)
     //return this.listview.close(sectionID, rowID);
-    return this.rows[sectionID][rowID].close()
+    return this.rows[sectionID][rowID].close()//SwipeableRow3
   }
   closeSection(sectionID) {
     //return this.listviews[sectionID].close(sectionID, rowID);
-    return this.listview.closeSection(sectionID)
+    return this.listview.closeSection(sectionID)//BookListView1
   }
   scrollTo(obj){
     return this.listview.scrollTo(obj)
@@ -176,7 +176,7 @@ class BookListView2 extends React.Component {
         renderRow={(rowData, sectionID, rowID, highlightRow) => {
             //layoutableView > SwipeableRow3 > props.render
             //layoutableView && SwipeableRow3
-          return (
+            return (
             <SwipeableRow3
               ref={c => {
                   this.rows[sectionID] = this.rows[sectionID] || {}
@@ -197,7 +197,8 @@ class BookListView2 extends React.Component {
             }}
           >
             {renderRow(rowData, sectionID, rowID, highlightRow)}
-          </SwipeableRow3>);
+            </SwipeableRow3>
+            );
         }}
         {...props}
       />);
