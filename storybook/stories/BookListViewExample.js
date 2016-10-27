@@ -13,6 +13,7 @@ import {
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import util from 'util'
 import _ from 'lodash'
+import {hello} from 'react-native-stylish'
 
 import Button from './Button';
 import CenterView from './CenterView';
@@ -263,7 +264,8 @@ class NestedListView3 extends React.Component {
     const dataSource = this.state.ds
     const i = Math.random()
     return(
-      <View>
+      <View
+        style={{paddingTop:20}}>
         <Text
           onPress={()=>{
               const i = Math.random()
@@ -274,7 +276,7 @@ class NestedListView3 extends React.Component {
               }
               this.updateDataSource()
             }}>
-          pressMe
+          press to add
         </Text>
         <ListView
           removeClippedSubviews={false}
@@ -855,7 +857,7 @@ class TestBookListView3 extends React.Component {
     return(
       <View
         style={{flex:1,paddingTop:20}}>
-        <BookListView3
+        <BookListView2
           ref={ c => this.listview=c }
           style={{paddingTop:20}}
           generateActions={(rowData,sectionID)=>genActions2(sectionID)}
@@ -990,6 +992,7 @@ class TestBookListView4 extends React.Component {
               this.listview
                   .close(sectionID,rowID)
                   .then(()=>{
+                    //delete
                     const s = {...this.data[sectionID]}
                     delete s[rowID]
                     this.data = {...this.data,[sectionID]:s}

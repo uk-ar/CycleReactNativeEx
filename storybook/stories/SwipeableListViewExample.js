@@ -154,7 +154,7 @@ class TestSectionSwipeableListView extends React.Component {
           press to remove last
         </Text>
         <SwipeableListView
-          ref={ c => this.listview=c }
+          ref={ c => this.listview = c }
           style={{paddingTop:20,borderColor:"red",borderWidth:3}}
           generateActions={()=>genActions2('search')}
           dataSource={this.state.ds}

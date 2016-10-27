@@ -14,7 +14,9 @@ import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
 import { CloseableView, LayoutableView } from '../../Closeable';
+import { BookListView } from '../../BookListView';
 import { Stylish } from '../../Stylish';
+import { genActions2 } from '../../Action';
 
 import {TestSectionListView,debugView,withDebug,TestListView} from './common';
 const CloseableViewDebug = withDebug(CloseableView)
@@ -241,24 +243,27 @@ storiesOf('LayoutableView', module)
             style={{marginTop:20}}
     >
       <Text onPress={()=>{
-          this["r1"].close()
+        //this["r1"].close()
+        this.listview.close("s1","r1")
         }}>
         press to close
       </Text>
       <TestSectionListView>
         {(dataSource)=>
-          <ListView
+          <BookListView
             style={{flex:1}}
+            ref={c => this.listview = c}
             dataSource={dataSource}
+            generateActions={()=>genActions2('search')}
             renderRow={(rowData,sectionID,rowID) =>
+              <View>
               <LayoutableView
                     transitionEnter={true}
                     ref={c => this[rowID] = c}
                         >
-                <View>
                         {debugView("row")(rowData,rowID,sectionID)}
-                </View>
               </LayoutableView>
+              </View>
                       }
             renderSectionHeader={(rowData,sectionID) =>
               debugView("section")(rowData,sectionID)

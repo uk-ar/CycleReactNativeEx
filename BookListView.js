@@ -122,9 +122,9 @@ class BookListView1 extends React.Component {
             //Wrapper View for prevent layout destruction
             //removeClippedSubviews={false} seems no mean
             //                style={{maxHeight: 100 * num}}
+            //                 ref={c => this.rows[sectionID] = c}
             return (
               <CloseableView
-                 ref={c => this.rows[sectionID] = c}
                   >
                 <SwipeableListView
                 enableEmptySections={true}

@@ -21,7 +21,7 @@ class CloseableView extends React.Component {
       //style: this.props.close ? { height: 0.01 } : { height: null };
     };
     this.initialStyle =
-      this.props.close ? { height: 0.01 } : { height: null };
+      this.props.close ? { height: 1 } : { height: null };
   }
   open() {
     //keys=['height', 'opacity', 'transform']
@@ -54,7 +54,7 @@ class CloseableView extends React.Component {
     return new Promise((resolve, reject) => {
       console.log("start close")
       this.inner.measure((x, y, width, height) => {
-        console.log("measure close",x, y, width, height)
+        console.log("measure close",x, y, width, height,this,this.inner)
         //this.style = ;
         this.outer.animate(
           { height, opacity: 1, transform: [{ scale: 1 }] },
@@ -66,6 +66,17 @@ class CloseableView extends React.Component {
               console.log("finish closed")
               resolve();
             });
+        /* this.setState({close:true},()=>{
+         *   this.outer.animate(
+         *     { height, opacity: 1, transform: [{ scale: 1 }] },
+         *     { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] }
+         *     //this.style
+         *   )
+         *       .then(() => {
+         *         this.setState({ close: true });// shrink//absolute
+         *         console.log("finish closed")
+         *         resolve();
+         *       });*/
       });
     });
   }
@@ -82,7 +93,7 @@ class CloseableView extends React.Component {
    * }*/
   render() {
     const {animationConfig,style,...props} = this.props
-    console.log("cl",this,this.props.close,this.state.close,this.style)
+    //console.log("cl",this,this.props.close,this.state.close,this.style)
     const content = (
       <Stylish.View
         ref={c => (this.outer = c)}

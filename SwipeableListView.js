@@ -91,9 +91,10 @@ class SwipeableListView extends React.Component {
               <LayoutableView
                 ref={(c) => {
                     /* this.closeable[sectionID] = this.closeable[sectionID] || [];
-                    this.closeable[sectionID][rowID] = c; */
+                       this.closeable[sectionID][rowID] = c; */
+                    //transitionEnter={this.rowShouldEnter(sectionID, rowID)}
                 }}
-                transitionEnter={this.rowShouldEnter(sectionID, rowID)}
+                transitionEnter={true}
               >
                   {renderRow(rowData, sectionID, rowID, highlightRow)}
               </LayoutableView>
