@@ -26,7 +26,7 @@ class CloseableView extends React.Component {
   open() {
     //keys=['height', 'opacity', 'transform']
     return new Promise((resolve, reject) => {
-      console.log("start open")
+      //console.log("start open")
       this.inner.measure((x, y, width, height) => {
         // TODO:filter Props
         //this.style = { height, opacity: 1, transform: [{ scale: 1 }] };
@@ -43,7 +43,7 @@ class CloseableView extends React.Component {
             //{ opacity: 0.1, transform: [{ scale: 0.1 }]}
             )
               .then(() => {
-                console.log("finish open")
+                //console.log("finish open")
                 resolve();
               });
         });
@@ -52,9 +52,9 @@ class CloseableView extends React.Component {
   }
   close() {
     return new Promise((resolve, reject) => {
-      console.log("start close")
+      //console.log("start close")
       this.inner.measure((x, y, width, height) => {
-        console.log("measure close",x, y, width, height,this,this.inner)
+        //console.log("measure close",x, y, width, height,this,this.inner)
         //this.style = ;
         this.outer.animate(
           { height, opacity: 1, transform: [{ scale: 1 }] },
@@ -63,7 +63,7 @@ class CloseableView extends React.Component {
         )
             .then(() => {
               this.setState({ close: true });// shrink//absolute
-              console.log("finish closed")
+              //console.log("finish closed")
               resolve();
             });
         /* this.setState({close:true},()=>{

@@ -58,10 +58,10 @@ class BookListView1 extends React.Component {
     // for Touchable
     this.listview.setNativeProps(props);
   }
-  /* close(sectionID, rowID) {
-   *   // console.log("close",sectionID,rowID,this.listviews,this.dataSources)
-   *   return this.listviews[sectionID].close(sectionID, rowID);
-   * }*/
+  close(sectionID, rowID) {
+    // console.log("close",sectionID,rowID,this.listviews,this.dataSources)
+    return this.listviews[sectionID].close(sectionID, rowID);
+  }
   closeSection(sectionID) {
     //return this.listviews[sectionID].close(sectionID, rowID);
     return Promise.all([

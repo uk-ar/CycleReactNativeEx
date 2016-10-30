@@ -13,7 +13,8 @@ import {
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import util from 'util'
 import _ from 'lodash'
-import {hello} from 'react-native-stylish'
+//import {hello} from 'react-native-stylish'
+import materialColor from 'material-colors';
 
 import Button from './Button';
 import CenterView from './CenterView';
@@ -977,14 +978,14 @@ class TestBookListView4 extends React.Component {
     //{action("scroll")}
     return(
       <View
-        style={{flex:1,paddingTop:20}}>
+        style={{flex:1}}>
         <BookListView
           onScroll={Animated.event(
               [{nativeEvent: {contentOffset: {y: this._scrollY}}}],
               //{listener},          // Optional async listener
             )}
           ref={ c => this.listview=c }
-          style={{paddingTop:20,backgroundColor:"black"}}
+          style={{backgroundColor:"black"}}
           generateActions={(rowData,sectionID)=>genActions2(sectionID)}
           dataSource={this.state.ds}
           onSwipeEnd={({rowData,sectionID,rowID,action,...rest}) =>{
@@ -1006,7 +1007,22 @@ class TestBookListView4 extends React.Component {
                     this.updateDataSource()
                   })
             }}
-          renderRow={debugView("row")}
+          renderRow={()=>{
+              let book ={ title: 'ぐりとぐらの絵本7冊セット', author: '',
+              thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/2147/9784834032147.jpg?_ex=200x200',
+              libraryStatus: {
+                exist: false,
+                rentable: false,
+                reserveUrl: '',
+              },
+              isbn: '9784834032147',
+              active: true,
+            }
+            return (<BookCell
+              book={book}
+              style={{ backgroundColor: materialColor.grey['50'] }}
+                    />)
+                    }}
           renderSectionHeader={(sectionData, sectionID) => {
               //const { close, loadingState } = sectionData;
               // close or not

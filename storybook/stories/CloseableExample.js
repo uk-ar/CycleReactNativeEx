@@ -81,27 +81,32 @@ storiesOf('CloseableView', module)
  * }]}*/
 
 class TestLayoutableView extends React.Component {
-  //swipe and reoder
-  // press to replace
   render() {
-    <View>
+    return (
+      <View
+        style={{marginTop:20}}>
       <Text onPress={()=>{
+          //console.log("foo")
+          this.closeable.close()
         }}>
         pressMe
       </Text>
-      <LayoutableView
-        style={{backgroundColor:"green"}}
-        transitionEnter={false}
-      >
-        <Text style={{height:50,backgroundColor:"red"}}>
-          foo
-        </Text>
-      </LayoutableView>
+      <CloseableView
+        ref={c => this.closeable = c}>
+        <LayoutableView
+          style={{backgroundColor:"green"}}
+          transitionEnter={true}
+        >
+          <Text style={{height:50,backgroundColor:"red"}}>
+            foo
+          </Text>
+        </LayoutableView>
+      </CloseableView>
       <View
         style={{
           height:50,
           backgroundColor:"yellow"}} />
-    </View>
+      </View>)
   }
 }
 storiesOf('LayoutableView', module)

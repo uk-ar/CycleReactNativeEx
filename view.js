@@ -93,8 +93,8 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
   // <BookListView
   //        key={selectedSection}
   return (
-    <Touchable.BookListView
-      selector="listview"      
+    <BookListView
+      selector="listview"
         style={{
           paddingHorizontal: 3,
           flex: 1,
