@@ -18,10 +18,10 @@ class CloseableView extends React.Component {
     super(props);
     this.state = {
       close: this.props.close,
-      //style: this.props.close ? { height: 0.01 } : { height: null };
+      style: this.props.close ? { height: 0.01 } : { height: null }
     };
-    this.initialStyle =
-      this.props.close ? { height: 1 } : { height: null };
+    /* this.initialStyle =
+     *   this.props.close ? { height: 1 } : { height: null };*/
   }
   open() {
     //keys=['height', 'opacity', 'transform']
@@ -43,6 +43,9 @@ class CloseableView extends React.Component {
             //{ opacity: 0.1, transform: [{ scale: 0.1 }]}
             )
               .then(() => {
+                this.setState({
+                  style: { height: null }
+                })
                 //console.log("finish open")
                 resolve();
               });
@@ -62,7 +65,10 @@ class CloseableView extends React.Component {
           //this.style
         )
             .then(() => {
-              this.setState({ close: true });// shrink//absolute
+              this.setState({
+                close: true,// shrink//absolute
+                style: { height: 0.01 }
+              });
               //console.log("finish closed")
               resolve();
             });
@@ -92,14 +98,15 @@ class CloseableView extends React.Component {
    *   console.log('didmount');
    * }*/
   render() {
-    const {animationConfig,style,...props} = this.props
+    const { animationConfig, style, close, ...props } = this.props
     //console.log("cl",this,this.props.close,this.state.close,this.style)
     const content = (
       <Stylish.View
         ref={c => (this.outer = c)}
         collapsable={false}
       style={[//this.style,
-              this.initialStyle,
+          //this.initialStyle,
+          this.state.style,
               //this.state.close ? { height: 0.01 } : { height: null },
                 { overflow: 'hidden'}]}
         animationConfig={animationConfig}
@@ -209,6 +216,7 @@ LayoutableView.propTypes = {
 
 LayoutableView.defaultProps = {
   ...View.defaultProps,
+  //transitionEnter: true,
 };
 
 module.exports = { CloseableView, LayoutableView };

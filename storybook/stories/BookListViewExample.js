@@ -1007,7 +1007,8 @@ class TestBookListView4 extends React.Component {
                     this.updateDataSource()
                   })
             }}
-          renderRow={()=>{
+          renderRow={(rowData,sectionID,rowID)=>{
+              return debugView("row")(rowData,sectionID,rowID)
               let book ={ title: 'ぐりとぐらの絵本7冊セット', author: '',
               thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/2147/9784834032147.jpg?_ex=200x200',
               libraryStatus: {
@@ -1017,7 +1018,7 @@ class TestBookListView4 extends React.Component {
               },
               isbn: '9784834032147',
               active: true,
-            }
+              }
             return (<BookCell
               book={book}
               style={{ backgroundColor: materialColor.grey['50'] }}

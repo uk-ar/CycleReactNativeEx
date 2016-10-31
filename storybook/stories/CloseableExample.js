@@ -87,14 +87,14 @@ class TestLayoutableView extends React.Component {
         style={{marginTop:20}}>
       <Text onPress={()=>{
           //console.log("foo")
-          this.closeable.close()
+          this.closeable1.close()
+          this.closeable2.close()
         }}>
         pressMe
       </Text>
       <CloseableView
-        ref={c => this.closeable = c}>
+        ref={c => this.closeable1 = c}>
         <LayoutableView
-          style={{backgroundColor:"green"}}
           transitionEnter={true}
         >
           <Text style={{height:50,backgroundColor:"red"}}>
@@ -102,6 +102,16 @@ class TestLayoutableView extends React.Component {
           </Text>
         </LayoutableView>
       </CloseableView>
+      <LayoutableView
+        transitionEnter={true}
+      >
+        <CloseableView
+          ref={c => this.closeable2 = c}>
+          <Text style={{height:50,backgroundColor:"green"}}>
+            foo
+          </Text>
+        </CloseableView>
+      </LayoutableView>
       <View
         style={{
           height:50,
@@ -128,7 +138,7 @@ storiesOf('LayoutableView', module)
   ))
   .add('with scroll', () => (
     <ScrollView>
-      <LayoutableView>
+      <LayoutableView transitionEnter={true}>
         <Text style={{height:50,backgroundColor:"red"}}>
           foo
         </Text>
@@ -139,14 +149,14 @@ storiesOf('LayoutableView', module)
           backgroundColor:"yellow"}} />
     </ScrollView>
   ))
-  .add('with center', () => (
+  .add('with center & defaultProps', () => (
     <View
       style={{
         justifyContent:"center",
         flex:1,
       }}>
       <View>
-      <LayoutableView>
+        <LayoutableView>
         <View
           style={{
             //alignItems:"center",
