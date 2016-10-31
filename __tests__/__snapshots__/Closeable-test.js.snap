@@ -1,0 +1,148 @@
+exports[`Closeable tests animate correctly by open() 1`] = `
+<View
+  collapsable={false}
+  style={
+    Object {
+      "height": 0.01,
+      "overflow": "hidden",
+    }
+  }>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        undefined,
+        Object {
+          "position": "absolute",
+        },
+      ]
+    } />
+</View>
+`;
+
+exports[`Closeable tests animate correctly by props change 1`] = `
+<View
+  collapsable={false}
+  style={
+    Object {
+      "height": 0.01,
+      "overflow": "hidden",
+    }
+  }>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        undefined,
+        Object {
+          "position": "absolute",
+        },
+      ]
+    } />
+</View>
+`;
+
+exports[`Closeable tests renders 1 CloseableView component 1`] = `
+<View
+  collapsable={false}
+  style={
+    Object {
+      "height": null,
+      "overflow": "hidden",
+    }
+  }>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        undefined,
+        null,
+      ]
+    } />
+</View>
+`;
+
+exports[`Closeable tests renders children when passed in 1`] = `
+<View
+  collapsable={false}
+  style={
+    Object {
+      "height": null,
+      "overflow": "hidden",
+    }
+  }>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        undefined,
+        null,
+      ]
+    }>
+    <View />
+  </View>
+</View>
+`;
+
+exports[`Closeable tests renders onPress to be called 1`] = `
+<View
+  collapsable={false}
+  style={
+    Object {
+      "height": null,
+      "overflow": "hidden",
+    }
+  }>
+  <View
+    collapsable={false}
+    onPress={[Function]}
+    style={
+      Array [
+        undefined,
+        null,
+      ]
+    } />
+</View>
+`;
+
+exports[`Closeable tests with close props false 1`] = `
+<View
+  collapsable={false}
+  style={
+    Object {
+      "height": null,
+      "overflow": "hidden",
+    }
+  }>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        undefined,
+        null,
+      ]
+    } />
+</View>
+`;
+
+exports[`Closeable tests with close props true 1`] = `
+<View
+  collapsable={false}
+  style={
+    Object {
+      "height": 0.01,
+      "overflow": "hidden",
+    }
+  }>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        undefined,
+        Object {
+          "position": "absolute",
+        },
+      ]
+    } />
+</View>
+`;
