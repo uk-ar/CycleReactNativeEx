@@ -112,19 +112,20 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
           if(action.target == null) { return }
           this.listview
               .close(sectionID,rowID)
-              .then(()=>{
-                const s = {...this.data[sectionID]}
-                delete s[rowID]
-                this.data = {...this.data,[sectionID]:s}
-                return this.updateDataSource()
-              })
-              .then(()=>{
-                this.data = {
-                  ...this.data,
-                  [action.target]:{[rowID]:rowData,...this.data[action.target]}
-                }
-                this.updateDataSource()
-              })
+          //TODO: handle data in intent.js
+              /*.then(()=>{
+          const s = {...this.data[sectionID]}
+          delete s[rowID]
+          this.data = {...this.data,[sectionID]:s}
+          return this.updateDataSource()
+          })
+          .then(()=>{
+          this.data = {
+          ...this.data,
+          [action.target]:{[rowID]:rowData,...this.data[action.target]}
+          }
+          this.updateDataSource()
+          }) */
         }}
         renderRow={(rowData, sectionID, rowID) => {
             return (

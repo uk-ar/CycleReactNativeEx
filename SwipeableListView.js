@@ -12,12 +12,13 @@ import Stylish from './Stylish';
 
 // class for ref
 class SwipeableListView extends React.Component {
+  //auto animation
   constructor(props) {
     super(props);
     this.state = {
       dataSource: this.props.dataSource,
     };
-    //this.closeable = [];
+    this.closeable = [];
     this.added = null;
   }
   setNativeProps(props) {
@@ -90,8 +91,8 @@ class SwipeableListView extends React.Component {
           return (
               <LayoutableView
                 ref={(c) => {
-                    /* this.closeable[sectionID] = this.closeable[sectionID] || [];
-                       this.closeable[sectionID][rowID] = c; */
+                    this.closeable[sectionID] = this.closeable[sectionID] || [];
+                    this.closeable[sectionID][rowID] = c;
                     //                transitionEnter={true}
                   }}
                     transitionEnter={this.rowShouldEnter(sectionID, rowID)}

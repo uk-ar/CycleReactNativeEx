@@ -51,6 +51,7 @@ class MeasureableView extends React.Component {
 }
 
 function withState2(RowComponent) {
+  //handle actions
   return class extends React.Component {
     constructor(props) {
       super(props);

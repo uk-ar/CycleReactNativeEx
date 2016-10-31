@@ -46,6 +46,7 @@ function debugRenderRow(rowData, sectionID, columnID) {
 const EnhancedListView = SwipeableListView;
 
 class BookListView1 extends React.Component {
+  //nested listview
   constructor(props) {
     super(props);
     this.dataSources = {};
@@ -153,8 +154,9 @@ class BookListView1 extends React.Component {
 }
 
 class BookListView2 extends React.Component {
+  //enable scroll lock
   close(sectionID, rowID) {
-    // console.log("sw cl",sectionID,rowID,this.listview,this.props.dataSource)
+    //console.log("sw cl",sectionID,rowID,this.listview,this.props.dataSource)
     //return this.listview.close(sectionID, rowID);
     return this.rows[sectionID][rowID].close()//SwipeableRow3
   }
@@ -206,6 +208,7 @@ class BookListView2 extends React.Component {
 }
 
 class BookListView extends React.Component {
+  //add section footer
   close(sectionID, rowID) {
     return this.listview.close(sectionID, rowID);//BookListView2
   }
