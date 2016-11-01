@@ -7,7 +7,8 @@ import {
   StyleSheet
 } from 'react-native';
 
-import Stylish from './Stylish';
+import Stylish from 'react-native-stylish';
+
 import { MeasureableView } from './SwipeableRow';
 const ReactTransitionGroup = require('react-addons-transition-group');
 

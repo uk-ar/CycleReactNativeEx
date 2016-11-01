@@ -9,14 +9,12 @@ import {
   ListView,
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
+import Stylish from 'react-native-stylish';
 
 import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
-import Stylish from '../../Stylish';
-//import Stylish from 'react-native-stylish';
-//import {hello} from 'react-native-stylish'
 
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 

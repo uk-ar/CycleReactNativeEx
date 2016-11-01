@@ -69,7 +69,8 @@ import { BookListView } from './BookListView';
 import { ItemsFooter, ItemsHeader } from './Header';
 
 import { LayoutableView } from './Closeable';
-import { Stylish } from './Stylish';
+import Stylish from 'react-native-stylish';
+
 Touchable.BookListView = Touchable.createCycleComponent(
   BookListView);
 

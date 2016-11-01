@@ -15,8 +15,6 @@ const FAIcon = require('react-native-vector-icons/FontAwesome');
 import { emptyFunction } from 'fbjs/lib/emptyFunction';
 
 import { styles } from './styles';
-import { Stylish } from './Stylish';
-import { CloseableView } from './Closeable';
 import { itemsInfo, TouchableElement } from './common';
 
 /* function SearchHeader({ close, loadingState, ...props }) {

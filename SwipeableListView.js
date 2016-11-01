@@ -8,7 +8,7 @@ import {
 import { _SwipeableRow3, SwipeableRow3 } from './SwipeableRow';
 import emptyFunction from 'fbjs/lib/emptyFunction';
 import { LayoutableView, CloseableView } from './Closeable';
-import Stylish from './Stylish';
+import Stylish from 'react-native-stylish';
 
 // class for ref
 class _SwipeableListView extends React.Component {

@@ -12,7 +12,8 @@ import {
 import cloneReferencedElement from 'react-clone-referenced-element';
 import emptyFunction from 'fbjs/lib/emptyFunction';
 
-import Stylish from './Stylish';
+import Stylish from 'react-native-stylish';
+
 import { CloseableView,LayoutableView } from './Closeable';
 import { Action } from './Action';
 

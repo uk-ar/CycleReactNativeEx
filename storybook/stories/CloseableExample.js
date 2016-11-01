@@ -10,12 +10,13 @@ import {
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 
+import Stylish from 'react-native-stylish';
+
 import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
 import { CloseableView, LayoutableView } from '../../Closeable';
 import { BookListView } from '../../BookListView';
-import { Stylish } from '../../Stylish';
 import { genActions2 } from '../../Action';
 
 import {TestSectionListView,debugView,withDebug,TestListView} from './common';

@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import ReactTransitionGroup from 'react-addons-transition-group';
+import Stylish from 'react-native-stylish';
 
 import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
-import { Stylish} from '../../Stylish';
 import {withDebug,VerticalCenterView,TestListView,debugView} from './common'
 
 class ScrollPositionView extends React.Component {
