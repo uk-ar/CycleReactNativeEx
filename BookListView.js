@@ -51,9 +51,9 @@ class BookListView1 extends React.Component {
     super(props);
     this.dataSources = {};
     this.dataSource = this.props.dataSource
-    //this.listviews = {};
-    this.sections = {};
-    this.rows = {}
+    this.listviews = {};
+    //this.sections = {};
+    //this.rows = {};
   }
   setNativeProps(props) {
     // for Touchable
@@ -63,17 +63,17 @@ class BookListView1 extends React.Component {
     // console.log("close",sectionID,rowID,this.listviews,this.dataSources)
     return this.listviews[sectionID].close(sectionID, rowID);
   }
-  closeSection(sectionID) {
-    //return this.listviews[sectionID].close(sectionID, rowID);
-    return Promise.all([
-      this.sections[sectionID].close(),
-      this.rows[sectionID].close()
-      ]
-    )
-  }
-  scrollTo(obj){
-    return this.listview.scrollTo(obj)
-  }
+  /* closeSection(sectionID) {
+   *   //return this.listviews[sectionID].close(sectionID, rowID);
+   *   return Promise.all([
+   *     this.sections[sectionID].close(),
+   *     this.rows[sectionID].close()
+   *     ]
+   *   )
+   * }*/
+  /* scrollTo(obj){
+   *   return this.listview.scrollTo(obj)
+   * }*/
   render() {
     const {
       renderRow,
@@ -81,6 +81,7 @@ class BookListView1 extends React.Component {
       onSwipeEnd,
       onSwipeStart,
       renderSectionHeader,
+      generateActions,
       // TODO: onSwipeStart?
       ...props } = this.props;
     //console.log("r",Object.keys(dataSource._dataBlob),{...dataSource._dataBlob})
@@ -104,10 +105,10 @@ class BookListView1 extends React.Component {
         removeClippedSubviews={false}
         {...props}
         renderSectionHeader={(rowData, sectionID, rowID, highlightRow) => {
+            //ref={c => this.sections[sectionID] = c}
             return (
               <CloseableView
-                ref={c => this.sections[sectionID] = c}
-                    >
+                            >
                 {renderSectionHeader(rowData, sectionID, rowID, highlightRow)}
               </CloseableView>)
           }}
@@ -128,12 +129,14 @@ class BookListView1 extends React.Component {
               <CloseableView
                   >
                 <SwipeableListView
+                  ref={c => this.listviews[sectionID] = c}
                 enableEmptySections={true}
                 scrollEnabled={false}
                 removeClippedSubviews={false}
                 onSwipeEnd={onSwipeEnd}
                 onSwipeStart={onSwipeStart}
                 renderRow={renderRow}
+                generateActions={generateActions}
                 renderSectionHeader={(sectionData,sectionID) =>
                   //workround for android to fix entering animations
                   //                    style={{height:StyleSheet.hairlineWidth}}
@@ -153,64 +156,12 @@ class BookListView1 extends React.Component {
   }
 }
 
-class BookListView2 extends React.Component {
-  //enable scroll lock
-  close(sectionID, rowID) {
-    //console.log("sw cl",sectionID,rowID,this.listview,this.props.dataSource)
-    //return this.listview.close(sectionID, rowID);
-    return this.rows[sectionID][rowID].close()//SwipeableRow3
-  }
-  closeSection(sectionID) {
-    //return this.listviews[sectionID].close(sectionID, rowID);
-    return this.listview.closeSection(sectionID)//BookListView1
-  }
-  scrollTo(obj){
-    return this.listview.scrollTo(obj)
-  }
-  render() {
-    const { renderRow, generateActions,
-            onSwipeStart, onSwipeEnd, ...props } = this.props;
-    // console.log("sw re",this.props.dataSource)
-    this.rows = this.rows || {}
-    return (
-      <BookListView1
-        ref={c => (this.listview = c)}
-        renderRow={(rowData, sectionID, rowID, highlightRow) => {
-            //layoutableView > SwipeableRow3 > props.render
-            //layoutableView && SwipeableRow3
-            return (
-            <SwipeableRow3
-              ref={c => {
-                  this.rows[sectionID] = this.rows[sectionID] || {}
-                  this.rows[sectionID][rowID] = c
-                }}
-            {...generateActions(rowData, sectionID, rowID, highlightRow)}
-            onSwipeStart={({ gestureState, action }) => {
-              this.listview.setNativeProps({ scrollEnabled: false });
-              onSwipeStart && onSwipeStart(
-                  { gestureState, rowData, sectionID, rowID, highlightRow, action });
-                // this.row1.getCurrentAction() not working
-            }}
-            onSwipeEnd={({ gestureState, action }) => {
-                // console.log("swlv",gestureState,action)
-              this.listview.setNativeProps({ scrollEnabled: true });
-              onSwipeEnd && onSwipeEnd(
-                  { gestureState, rowData, sectionID, rowID, highlightRow, action });
-            }}
-          >
-            {renderRow(rowData, sectionID, rowID, highlightRow)}
-            </SwipeableRow3>
-            );
-        }}
-        {...props}
-      />);
-  }
-}
-
 class BookListView extends React.Component {
   //add section footer
   close(sectionID, rowID) {
-    return this.listview.close(sectionID, rowID);//BookListView2
+    return this.listview.close(sectionID, rowID);//BookListView1
+    //wrapping renderRow can not work, because of actions
+    //return this.rows[sectionID][rowID].close();
   }
   /* closeSection(sectionID) {
    *   return this.listview.closeSection(sectionID)//BookListView1
@@ -225,9 +176,10 @@ class BookListView extends React.Component {
             onRelease,
             onSwipeEnd,
             ...props } = this.props;
+    this.rows = this.rows || {}
     // console.log("sw re",this.props.dataSource)
     return (
-      <BookListView2
+      <BookListView1
         ref={c => (this.listview = c)}
         {...props}
         renderSectionHeader={(sectionData, sectionID) => {
@@ -343,4 +295,4 @@ class BookListView_old extends React.Component {
   }
 }
 
-module.exports = { BookListView, BookListView1, BookListView2 };
+module.exports = { BookListView, BookListView1 };
