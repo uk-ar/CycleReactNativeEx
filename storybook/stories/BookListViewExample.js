@@ -989,23 +989,18 @@ class TestBookListView4 extends React.Component {
           generateActions={(rowData,sectionID)=>genActions2(sectionID)}
           dataSource={this.state.ds}
           onSwipeEnd={({rowData,sectionID,rowID,action,...rest}) =>{
-              if(action.target == null) { return }
-              this.listview
-                  .close(sectionID,rowID)
-                  .then(()=>{
-                    //delete
-                    const s = {...this.data[sectionID]}
-                    delete s[rowID]
-                    this.data = {...this.data,[sectionID]:s}
-                    return this.updateDataSource()
-                  })
-                  .then(()=>{
-                    this.data = {
-                      ...this.data,
-                      [action.target]:{[rowID]:rowData,...this.data[action.target]}
-                    }
-                    this.updateDataSource()
-                  })
+              //console.log("foo")
+              //action("swipe end")({rowData,sectionID,rowID,action,...rest})
+              const s = {...this.data[sectionID]}
+              delete s[rowID]
+              this.data = {...this.data,[sectionID]:s}
+              this.updateDataSource().then(()=>{
+                this.data = {
+                  ...this.data,
+                  [action.target]:{[rowID]:rowData,...this.data[action.target]}
+                }
+                this.updateDataSource()
+              })
             }}
           renderRow={(rowData,sectionID,rowID)=>{
               return debugView("row")(rowData,sectionID,rowID)

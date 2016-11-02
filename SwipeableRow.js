@@ -66,23 +66,24 @@ function withState2(RowComponent) {
       //const fn = ;//TODO:default
       const gestureStateSave = {...gestureState}; // save value for async
       this.setState({ lock: true }, () => {
-        let promise;
+        //let promise;
         if (this.row.getCurrentActions().state.index === 0) {
-          promise = this.row.swipeToFlat(gestureStateSave.vx)
-                        .then(() => this.setState({ lock: false }, () =>
-                          Promise.resolve()))
-        } else if (0 < gestureStateSave.dx) {
-          promise = this.row.swipeToMax(gestureStateSave.vx)
-                        //.then(() => this.row.close())
+          this.row.swipeToFlat(gestureStateSave.vx)
+              .then(() => this.setState({ lock: false }))
         } else {
-          promise = this.row.swipeToMin(gestureStateSave.vx)
-                        //.then(() => this.row.close())
+          let promise
+          if (0 < gestureStateSave.dx) {
+            promise = this.row.swipeToMax(gestureStateSave.vx)
+          } else {
+            promise = this.row.swipeToMin(gestureStateSave.vx)
+          }
+          promise
+            .then(() => this.row.close())
+            .then(() => this.props.onSwipeEnd({
+              gestureState:gestureStateSave,
+              action:this.row.getCurrentAction()}));
         }
         //console.log("on",gestureStateSave,this.row.getCurrentAction())
-        promise
-          .then(() => this.props.onSwipeEnd({
-            gestureState:gestureStateSave,
-            action:this.row.getCurrentAction()}));
       });
     }
     render() {
@@ -143,7 +144,10 @@ class _SwipeableRow3 extends React.Component {
       ]), // for performance
       onPanResponderRelease: (evt, gestureState) => {
         onSwipeEnd && onSwipeEnd(gestureState);
-      }
+      },
+      onPanResponderTerminate: (evt, gestureState) => {
+        onSwipeEnd && onSwipeEnd(gestureState);
+      },
     });
     this.panX.addListener(({ value }) => {
       if (0 < value && this.state.positiveSwipe != true) {

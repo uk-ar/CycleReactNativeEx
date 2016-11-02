@@ -8,6 +8,7 @@ import {
   View,
   NavigationExperimental,
   TextInput,
+  Animated,
   ScrollView,
   LayoutAnimation,
   ActivityIndicator,
@@ -67,15 +68,25 @@ Touchable.BookRow1 = Touchable.createCycleComponent(
 import { genActions2 } from './Action';
 import { BookListView } from './BookListView';
 import { ItemsFooter, ItemsHeader } from './Header';
+Touchable.ItemsHeader = Touchable.createCycleComponent(ItemsHeader);
 
 import { LayoutableView } from './Closeable';
 import Stylish from 'react-native-stylish';
 
-Touchable.BookListView = Touchable.createCycleComponent(
-  BookListView);
+Touchable.BookListView = Touchable.createCycleComponent(BookListView);
 
-function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, selectedSection }) {
-  // TODO:keep query text & scroll position
+//function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, selectedSection }) {
+class MainView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.positions = []
+    this._scrollY = new Animated.Value(0);
+  }
+  render() {
+    const { items, sectionIDs, rowIDs, dataSource,
+            onSelectSection, onCloseSection, onRelease,
+            booksLoadingState, selectedSection } = this.props;
+    // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
   // TODO: transition to detail view
   // console.log('render main', { items, sectionIDs, rowIDs, booksLoadingState, selectedSection });
@@ -92,10 +103,10 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
   // props.animations.start()
   // scroll
   // <BookListView
-  //        key={selectedSection}
+    //        key={selectedSection}
+    //      selector="listview"
   return (
     <BookListView
-      selector="listview"
         style={{
           paddingHorizontal: 3,
           flex: 1,
@@ -109,10 +120,11 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
         enableEmptySections
         generateActions={(rowData, sectionID, rowID) =>
           genActions2(sectionID)}
-      onSwipeEnd={({rowData,sectionID,rowID,action,...rest}) =>{
-          if(action.target == null) { return }
-          this.listview
-              .close(sectionID,rowID)
+    onSwipeEnd={({rowData,sectionID,rowID,action,...rest}) =>{
+      onRelease(rowData,action)
+        /* if(action.target == null) { return }
+         *   this.listview
+         *       .close(sectionID,rowID)*/
           //TODO: handle data in intent.js
               /*.then(()=>{
           const s = {...this.data[sectionID]}
@@ -135,39 +147,47 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
               style={{ backgroundColor: materialColor.grey['50'] }}
                     />
             );
-          }}
-        renderSectionHeader={(sectionData, sectionID) => {
+        }}
+    onScroll={Animated.event(
+      [{nativeEvent: {contentOffset: {y: this._scrollY}}}],
+      //{listener},          // Optional async listener
+    )}
+    renderSectionHeader={(sectionData, sectionID) => {
+      //call upper onSelectSection after scroll
             return (
               <ItemsHeader
-                   onSelectSection={(section)=>{
-                       if(this.sectionIdentities.length === 2){ return }
-                       this.positions.push(this._scrollY.__getValue())
-                       //TODO:
-                       //1. scroll to section header with animation
-                       // (need expand view in android)
-                       //2. save section header position
-                       this.listview.scrollTo({y:0,animated:false})
-                       this.sectionIdentities = [section,`${section}_end`]
-                       this.updateDataSource()
-                     }}
-                   onCloseSection={(section)=>{
-                       //TODO:
-                       //1. scroll to section header with animation
-                       //this.listview.scrollTo({y:0,animated:true})
-                       this.sectionIdentities = Object.keys(this.data)
-                       this.updateDataSource().then(()=>{
-                         //TODO:
-                         //2. scroll to section header with no animation
-                         //2. scroll to original position with animation
-                         let pos = this.positions.pop()
-                         setTimeout(()=>
-                           this.listview.scrollTo({y:pos,
-                                                   animated:false}))
-                       })
-                     }}
-                   section={sectionID}
-                   {...sectionData}
-                   />)
+                selector="section"
+                section={sectionID}
+              {...sectionData}
+                onSelectSection={(section)=>{
+                    if(dataSource.sectionIdentities.length === 2){ return }
+                    this.positions.push(this._scrollY.__getValue())
+                    //TODO:
+                    //1. scroll to section header with animation
+                    // (need expand view in android)
+                    //2. save section header position
+                    this.listview.scrollTo({y:0,animated:false})
+                    onSelectSection(section)
+                    //this.sectionIdentities = [section,`${section}_end`]
+                    //this.updateDataSource()
+                  }}
+                onCloseSection={()=>{
+                    //TODO:
+                    //1. scroll to section header with animation
+                    //this.listview.scrollTo({y:0,animated:true})
+                    //this.sectionIdentities = Object.keys(this.data)
+                    onCloseSection()
+                    let pos = this.positions.pop()
+                    setTimeout(()=>
+                      this.listview.scrollTo({y:pos,
+                                              animated:false}))
+                    /* this.updateDataSource().then(()=>{
+                    //TODO:
+                    //2. scroll to section header with no animation
+                    //2. scroll to original position with animation
+                    }) */
+                  }}
+              />)
           }}
         renderSectionFooter={(sectionData, sectionID) => {
             //console.log("fo",sectionData)
@@ -176,16 +196,58 @@ function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, se
                    {...sectionData}
                    />)
           }}
-      />
+    />
+     /* onSelectSection={(section)=>{
+         if(dataSource.sectionIdentities.length === 2){ return }
+         this.positions.push(this._scrollY.__getValue())
+         //TODO:
+         //1. scroll to section header with animation
+         // (need expand view in android)
+         //2. save section header position
+         this.listview.scrollTo({y:0,animated:false})
+         this.sectionIdentities = [section,`${section}_end`]
+         //this.updateDataSource()
+         }}
+        onCloseSection={(section)=>{
+         //TODO:
+         //1. scroll to section header with animation
+         //this.listview.scrollTo({y:0,animated:true})
+         this.sectionIdentities = Object.keys(this.data)
+         this.updateDataSource().then(()=>{
+         //TODO:
+         //2. scroll to section header with no animation
+         //2. scroll to original position with animation
+         let pos = this.positions.pop()
+         setTimeout(()=>
+         this.listview.scrollTo({y:pos,
+         animated:false}))
+         })
+         }} */
     );
+  }
 }
+
+MainView.propTypes = {
+  onSelectSection: React.PropTypes.func,
+  onCloseSection: React.PropTypes.func,
+  onRelease: React.PropTypes.func
+};
+/* MainView.defaultProps = {
+ *   onRelease:emptyFunction,
+ * };*/
+Touchable.MainView = Touchable.createCycleComponent(
+  MainView);
 
 function view(model) {
   /* NavigationExperimental.Transitioner calls twice when layout changed in
      android. But NavigationExperimental.CardStack cannot re-render by model
      change.So we should add random key or force update*/
   // http://stackoverflow.com/a/35004739
-  return <MainView {...model} />;
+  //return <MainView {...model} />;
+  return <Touchable.MainView
+           selector="main"
+           {...model}
+         />;
   /* const navigationState = NavigationStateUtils.replaceAtIndex(
    *   model.navigationState, // navigationState
    *   model.navigationState.index, // index

@@ -51,13 +51,14 @@ const initialBooks = mockbooks;
 function intent(RN, HTTP) {
   // Actions
   const release$ = RN
-    .select('listview')
+  //.select('listview')
+    .select('main')
   //.events('swipeEnd')
     .events('release')
     .do((args) => console.log('foo0:', args))
   //.map(([{rowData:book,action}]) => [book, action.target])
-    .map(([book, action, closeAnimation]) => [book, action.target, closeAnimation])
-    .filter(([_, target, closeAnimation]) => target !== null)
+    //.map(([book, action, closeAnimation]) => [book, action.target, closeAnimation])
+    //.filter(([_, target, closeAnimation]) => target !== null)
   /* .map(([book, action, closeAnimation]) =>
    *   new Promise((resolve,reject)=>
    *     closeAnimation.start().then(() => Promise.resolve([book, action]))
@@ -272,7 +273,7 @@ function intent(RN, HTTP) {
         }
       } // ).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
       )
-      // .do((books)=> console.log("books:",books))
+      //.do((books)=> console.log("books:",books))
       .shareReplay();
 
   savedBooks$.do((books) => {
@@ -364,17 +365,24 @@ function intent(RN, HTTP) {
   const changeSection$ =
     Rx.Observable
       .merge(
-        RN.select('section')
-          .events('press')// section,this.listview
-        // .do(i => console.log('section selected0:%O', i,this))
+        RN.select('main')
+          //.events('press')// section,this.listview
+          .events('selectSection')
+          //.do(i => console.log('section selected0:%O', i))
           .shareReplay(),
-        RN.select('close')
-          .events('press').map(([_, listview]) => [null, listview])
+        RN.select('main')
+          .events('closeSection')
+          //.do(i => console.log('close selected0:%O', i))
+        /* RN.select('close')
+         *   .events('press').map(([_, listview]) => [null, listview])*/
           .shareReplay()
       )
-      // .do(i => console.log('bar', i))
-      .distinctUntilChanged(([section, listview]) => section)
-      // .do(i => console.log('foo', i))
+  // .do(i => console.log('bar', i))
+      .distinctUntilChanged()
+      .map(([i])=>i)
+      //.distinctUntilChanged(([section, listview]) => section)
+  // .do(i => console.log('foo', i))
+      //.do(i => console.log('change section1:%O', i))
       .shareReplay();
 
   const scrollListView$ =
@@ -413,18 +421,19 @@ function intent(RN, HTTP) {
       // .distinctUntilChanged()
 
   const selectedSection$ =
-    Rx.Observable.merge(
-      scrollToSection$.map(([section, y]) => section).do(log('toSec')),
-      RN.select('close')
-          .events('press').map(() => null)
-          .filter(i => i === null) // section->null
-          .do(log('toNull'))
-    )
-  // .distinctUntilChanged(x => x, (a,b) => a !== b )
-      .distinctUntilChanged()
-
+    /* Rx.Observable.merge(
+     *   scrollToSection$.map(([section, y]) => section).do(log('toSec')),
+     *   RN.select('close')
+     *       .events('press').map(() => null)
+     *       .filter(i => i === null) // section->null
+     *       .do(log('toNull'))
+     * )
+       // .distinctUntilChanged(x => x, (a,b) => a !== b )
+     *   .distinctUntilChanged()
+     */
+    changeSection$
       .startWith(null)
-      .do(i => console.log('section selected1:%O', i))
+      //.do(i => console.log('section selected1:%O', i))
       .shareReplay();
 
   const booksLoadingState$ =

@@ -106,7 +106,7 @@ function model(actions) {
   //sync searchedBooksStatus$ & savedBooksStatus$
   /* .do(i=>console.log("items:",JSON.stringify(i)))
    * .distinctUntilChanged(x => JSON.stringify(x),(a,b)=>a!==b) */
-      .do(i=>console.log("items:",i))
+      //.do(i=>console.log("items:",i))
       .shareReplay();
 
   const limit = 2;
@@ -115,9 +115,9 @@ function model(actions) {
     Rx.Observable.combineLatest(
       books$// .do(i => console.log('books', i))
       ,
-      actions.selectedSection$.do(i => console.log('selectedSection', i))
+      actions.selectedSection$//.do(i => console.log('selectedSection', i))
       ,
-      actions.booksLoadingState$.do(i => console.log('booksLoadingState', i))
+      actions.booksLoadingState$//.do(i => console.log('booksLoadingState', i))
       ,
       (books, selectedSection, booksLoadingState) => {
         const sections = {
@@ -151,7 +151,7 @@ function model(actions) {
       })
       .scan(
         (datasource, { dataBlob, sectionIdentities }) => {
-        //  (datasource, { dataBlob, sectionIdentities, rowIdentities }) => {          
+        //  (datasource, { dataBlob, sectionIdentities, rowIdentities }) => {
           return datasource.cloneWithRowsAndSections(
             //dataBlob, sectionIdentities, rowIdentities);
             dataBlob, sectionIdentities);
@@ -161,7 +161,7 @@ function model(actions) {
           getSectionHeaderData: (dataBlob, sectionID) =>
             dataBlob.sections[sectionID]
         }))
-     .do(i => console.log('datasource:', i));
+      //.do(i => console.log('datasource:', i));
       // .subscribe()
 
       // .do(i => console.log('rowIDs?:', i));
@@ -194,7 +194,7 @@ function model(actions) {
        *               LayoutAnimation.Types.easeInEaseOut,
        *               LayoutAnimation.Properties.opacity))),*/
       // actions.selectedSection$,
-      actions.selectedSection$.do(i => LayoutAnimation.easeInEaseOut()),
+      actions.selectedSection$,//.do(i => LayoutAnimation.easeInEaseOut()),
       /* actions.selectedSection$.do(i =>
        *   LayoutAnimation.configureNext(
        *     LayoutAnimation

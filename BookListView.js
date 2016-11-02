@@ -71,9 +71,9 @@ class BookListView1 extends React.Component {
    *     ]
    *   )
    * }*/
-  /* scrollTo(obj){
-   *   return this.listview.scrollTo(obj)
-   * }*/
+  scrollTo(obj){
+    return this.listview.scrollTo(obj)
+  }
   render() {
     const {
       renderRow,
@@ -158,17 +158,18 @@ class BookListView1 extends React.Component {
 
 class BookListView extends React.Component {
   //add section footer
-  close(sectionID, rowID) {
-    return this.listview.close(sectionID, rowID);//BookListView1
-    //wrapping renderRow can not work, because of actions
-    //return this.rows[sectionID][rowID].close();
-  }
+  /* close(sectionID, rowID) {
+   *   return this.listview.close(sectionID, rowID);//BookListView1
+   *   //wrapping renderRow can not work, because of actions
+   *   //return this.rows[sectionID][rowID].close();
+   * }*/
   /* closeSection(sectionID) {
    *   return this.listview.closeSection(sectionID)//BookListView1
    * }*/
-  /* scrollTo(obj){
-   *   return this.listview.scrollTo(obj)
-   * }*/
+  scrollTo(obj){
+    //used by section selected
+    return this.listview.scrollTo(obj)
+  }
   render() {
     const { renderSectionHeader,
             renderSectionFooter,
@@ -187,8 +188,8 @@ class BookListView extends React.Component {
                    renderSectionFooter(sectionData, sectionID) :
                    renderSectionHeader(sectionData, sectionID);
           }}
-        onSwipeEnd={({gestureState, rowData, sectionID, rowID, highlightRow, action}) => {
-            onSwipeEnd({gestureState, rowData, sectionID, rowID, highlightRow, action})
+        onSwipeEnd={(args) => {
+            onSwipeEnd(args)
             //onRelease(rowData,action)
             /* closeAnimation={
             start:()=>{
