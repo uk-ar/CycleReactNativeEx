@@ -24,9 +24,9 @@ class CloseableView extends React.Component {
     /* this.initialStyle =
      *   this.props.close ? { height: 1 } : { height: null };*/
   }
-  open() {
+  open(onComplete) {
     //keys=['height', 'opacity', 'transform']
-    return new Promise((resolve, reject) => {
+    //return new Promise((resolve, reject) => {
       //console.log("start open")
       this.inner.measure((x, y, width, height) => {
         // TODO:filter Props
@@ -42,37 +42,37 @@ class CloseableView extends React.Component {
             { height, opacity: 1, transform: [{ scale: 1 }] },
             //{ height: 0.01 }
             //{ opacity: 0.1, transform: [{ scale: 0.1 }]}
+            () => {
+              this.setState({
+                style: { height: null }
+              },onComplete)
+            }
             )
-              .then(() => {
-                this.setState({
-                  style: { height: null }
-                })
-                //console.log("finish open")
-                resolve();
-              });
         });
       });
-    });
+    //});
   }
-  close() {
-    return new Promise((resolve, reject) => {
+  close(onComplete) {
+    //return new Promise((resolve, reject) => {
       //console.log("start close")
       this.inner.measure((x, y, width, height) => {
         //console.log("measure close",x, y, width, height,this,this.inner)
         //this.style = ;
         this.outer.animate(
           { height, opacity: 1, transform: [{ scale: 1 }] },
-          { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] }
+          { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] },
           //this.style
+          () => {
+            this.setState({
+              close: true,// shrink//absolute
+              style: { height: 0.01 }
+            },onComplete);
+            //console.log("finish closed")
+            //resolve();
+          }
         )
-            .then(() => {
-              this.setState({
-                close: true,// shrink//absolute
-                style: { height: 0.01 }
-              });
-              //console.log("finish closed")
-              resolve();
-            });
+            //.then()
+            //.catch(() => { throw new Error("foo") })
         /* this.setState({close:true},()=>{
          *   this.outer.animate(
          *     { height, opacity: 1, transform: [{ scale: 1 }] },
@@ -85,7 +85,7 @@ class CloseableView extends React.Component {
          *         resolve();
          *       });*/
       });
-    });
+    //});
   }
   toggle() {
     return (this.state.close ? this.open() : this.close());
@@ -182,27 +182,29 @@ class LayoutableView extends React.Component {
       layouted: props.transitionEnter ? false : true
     };
   }
-  close(){
-    return this.closeable.close()
+  close(onComplete){
+    return this.closeable.close(onComplete)
   }
-  open(){
-    return this.closeable.open()
+  open(onComplete){
+    return this.closeable.open(onComplete)
   }
   render(){
     //this.props.data.length
     const { transitionEnter, onLayout, ...props } = this.props
     //const {transform,...otherStyle} = this.state.style
     //animationConfig={{delay:1000,duration:1000}}
+    /* onLayout={(...args)=> {
+     *   if(!this.state.layouted){
+     *     this.setState({layouted:true})
+     *   }
+     *   //onLayout(...args)
+     * }}*/
     return (
       <CloseableView
         ref={ c => this.closeable = c }
         close={this.state.layouted ? false : true}
-        onLayout={(...args)=> {
-            if(!this.state.layouted){
-              this.setState({layouted:true})
-            }
-            //onLayout(...args)
-          }}
+        onLayout={this.state.layouted ? null : ()=>
+          this.setState({layouted:true})}
         {...props}
       />
     )

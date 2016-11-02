@@ -149,7 +149,7 @@ class SwipeableListView extends React.Component {
                 // this.row1.getCurrentAction() not working
               }}
             onSwipeEnd={({ gestureState, action }) => {
-                // console.log("swlv",gestureState,action)
+                //console.log("swlv",gestureState,action)
                 this.listview.setNativeProps({ scrollEnabled: true });
                 onSwipeEnd && onSwipeEnd(
                   { gestureState, rowData, sectionID, rowID, highlightRow, action });

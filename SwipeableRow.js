@@ -6,6 +6,7 @@ import {
   Animated,
   PanResponder,
   Dimensions,
+  InteractionManager,
   Text,
 } from 'react-native';
 
@@ -59,8 +60,8 @@ function withState2(RowComponent) {
       this.state = { ...this.state, lock: false };
       this.onSwipeEnd = this.onSwipeEnd.bind(this)
     }
-    close() {
-      return this.row.close();//_SwipeableRow3
+    close(onComplete) {
+      return this.row.close(onComplete);//_SwipeableRow3
     }
     onSwipeEnd(gestureState){
       //const fn = ;//TODO:default
@@ -68,20 +69,36 @@ function withState2(RowComponent) {
       this.setState({ lock: true }, () => {
         //let promise;
         if (this.row.getCurrentActions().state.index === 0) {
-          this.row.swipeToFlat(gestureStateSave.vx)
-              .then(() => this.setState({ lock: false }))
+          this.row.swipeToFlat(gestureStateSave.vx,()=>
+            this.setState({ lock: false })
+          )
+          /* .then(() => )
+           * .catch(() => { throw new Error("foo") })*/
         } else {
           let promise
+          let fn = () =>
+            this.row
+                .close(()=>{
+                  this.props.onSwipeEnd({
+                    gestureState:gestureStateSave,
+                    action:this.row.getCurrentAction()})
+                })
+          /* .then()
+           * .catch(() => { throw new Error("foo?") })*/
           if (0 < gestureStateSave.dx) {
-            promise = this.row.swipeToMax(gestureStateSave.vx)
+            this.row.swipeToMax(gestureStateSave.vx,fn)
           } else {
-            promise = this.row.swipeToMin(gestureStateSave.vx)
+            this.row.swipeToMin(gestureStateSave.vx,fn)
           }
-          promise
-            .then(() => this.row.close())
-            .then(() => this.props.onSwipeEnd({
-              gestureState:gestureStateSave,
-              action:this.row.getCurrentAction()}));
+          /* promise
+           *   .then(() => this.row.close())
+           *   .then(() => {
+           *     console.log("gecua",this.row.getCurrentAction())
+           *     this.props.onSwipeEnd({
+           *       gestureState:gestureStateSave,
+           *       action:this.row.getCurrentAction()})
+           *   })
+           *   .catch(() => { throw new Error("foo?") })*/
         }
         //console.log("on",gestureStateSave,this.row.getCurrentAction())
       });
@@ -158,21 +175,25 @@ class _SwipeableRow3 extends React.Component {
     });
     this.getCurrentActions = this.getCurrentActions.bind(this)
     this.getCurrentAction = this.getCurrentAction.bind(this)
+    this.swipeTo = this.swipeTo.bind(this)
     this.close = this.close.bind(this)
   }
-  swipeTo(anim) {
-    return new Promise((resolve, reject) => {
-      anim.start(() => resolve());
-    });
+  swipeTo(anim, fn) {
+    //return new Promise((resolve, reject) => {
+    InteractionManager.runAfterInteractions(() => {
+      anim.start(fn);
+    })
+    //})
   }
-  swipeToFlat(velocity) {
+  swipeToFlat(velocity,fn) {
     return this.swipeTo(
       Animated.spring(this.panX, {
         toValue: 0.01,
         tension: 400, // default 40
-        velocity }));
+        velocity
+      }), fn);
   }
-  swipeToMax(velocity) {
+  swipeToMax(velocity,fn) {
     return this.swipeTo(
       Animated.parallel([
         Animated.decay(this.panX, {
@@ -183,9 +204,9 @@ class _SwipeableRow3 extends React.Component {
         /* ,
          * Animated.spring(this.panX, {
          *   toValue: width })*/
-      ]));
+      ]), fn);
   }
-  swipeToMin(velocity) {
+  swipeToMin(velocity,fn) {
     return this.swipeTo(
       Animated.parallel([
         Animated.decay(this.panX, {
@@ -194,12 +215,12 @@ class _SwipeableRow3 extends React.Component {
         }),
         Animated.timing(this.panX, {
           toValue: -width * 2 })
-      ]));
+      ]), fn);
   }
-  close() {
+  close(onComplete) {
     //console.log("root",this)
     //this.row
-    return this.root.close();
+    return this.root.close(onComplete);
   }
   getCurrentActions() {
     //console.log("actions",this.row,this.state.positiveSwipe, this.leftActions ,this.rightActions)

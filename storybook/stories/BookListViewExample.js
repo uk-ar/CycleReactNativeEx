@@ -1082,8 +1082,8 @@ storiesOf('BookListView', module)
         style={{paddingTop:20,backgroundColor:"blue"}}
         generateActions={()=>genActions2('search')}
         dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
-        renderRow={(rowData) => <Text>row:{rowData}</Text>}
-        renderSectionHeader={(rowData) => <Text>sec:{rowData}</Text>}
+        renderRow={(rowData) => <Text>row</Text>}
+        renderSectionHeader={(rowData) => <Text>sec</Text>}
       />
     )
   })

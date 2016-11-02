@@ -228,36 +228,36 @@ class BookListView_old extends React.Component {
   }
   // class because refs & methods
   scrollTo(...args) {
-    return new Promise((resolve, reject) => {
-      this.scrollview.scrollTo(...args);
-      setTimeout(() => resolve(), 100); // TODO:onScrollEndAnimation
-    });
+    /* return new Promise((resolve, reject) => {
+     *   this.scrollview.scrollTo(...args);
+     *   setTimeout(() => resolve(), 100); // TODO:onScrollEndAnimation
+     * });*/
   }
   scrollToSectionHeader(sectionID) {
     console.log('liked3', this);// 211
-    return new Promise((resolve, reject) => {
-      // return resolve([sectionID, 0]);
-      console.log('scrosec:', height, this, this.scrollview.getInnerViewNode());
-      RCTUIManager.measure(this.scrollview.getInnerViewNode(), (...data) =>
-        { console.log('inn:', data); });
-      /* this.scrollview.getInnerViewNode().measure(
+    /* return new Promise((resolve, reject) => {
+     *   // return resolve([sectionID, 0]);
+     *   console.log('scrosec:', height, this, this.scrollview.getInnerViewNode());
+     *   RCTUIManager.measure(this.scrollview.getInnerViewNode(), (...data) =>
+     *     { console.log('inn:', data); });
+       * this.scrollview.getInnerViewNode().measure(
        *   (x, y, width, height)=>console.log("in",(x, y, width, height))
-       * )*/
-      this.sections[sectionID]
-          .measureLayout(
-            findNodeHandle(this.scrollview),
-            (x, y, width, height) => {
-              // support scroll max
-              // sec:687, max 256
-              // totalheight:916
-              // dim heigjt 683
-              console.log('liked4', x, y, width, height);// 232 691
-              this.scrollview.scrollTo({ x: 0, y, animated: true });
-              // this.scrollview.scrollTo({ x: 0, y: 200, animated: true });
-              setTimeout(() => resolve([sectionID, y]), 1000);
-              // TODO:onScrollEndAnimation
-            });
-    });
+         * )
+    *   this.sections[sectionID]
+    *       .measureLayout(
+      *         findNodeHandle(this.scrollview),
+      *         (x, y, width, height) => {
+        *           // support scroll max
+        *           // sec:687, max 256
+        *           // totalheight:916
+        *           // dim heigjt 683
+        *           console.log('liked4', x, y, width, height);// 232 691
+        *           this.scrollview.scrollTo({ x: 0, y, animated: true });
+        *           // this.scrollview.scrollTo({ x: 0, y: 200, animated: true });
+        *           setTimeout(() => resolve([sectionID, y]), 1000);
+        *           // TODO:onScrollEndAnimation
+        *         });
+    * });*/
   }
   render() {
     this.sections = this.sections || {};// refs
