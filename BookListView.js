@@ -176,6 +176,7 @@ class BookListView extends React.Component {
             //TODO:separate
             onRelease,
             onSwipeEnd,
+            onSwipeStart,
             ...props } = this.props;
     this.rows = this.rows || {}
     // console.log("sw re",this.props.dataSource)
@@ -188,7 +189,12 @@ class BookListView extends React.Component {
                    renderSectionFooter(sectionData, sectionID) :
                    renderSectionHeader(sectionData, sectionID);
           }}
+        onSwipeStart={(args)=>{
+            this.listview.setNativeProps({ scrollEnabled: true });
+            onSwipeStart(args);
+          }}
         onSwipeEnd={(args) => {
+            this.listview.setNativeProps({ scrollEnabled: false });
             onSwipeEnd(args)
             //onRelease(rowData,action)
             /* closeAnimation={
@@ -212,13 +218,15 @@ class BookListView extends React.Component {
 BookListView.propTypes = {
   ...ListView.propTypes,
   renderSectionFooter: React.PropTypes.func,
-  onRelease: React.PropTypes.func,
-  //onSwipeEnd: React.PropTypes.func,
+  //onRelease: React.PropTypes.func,
+  onSwipeEnd: React.PropTypes.func,
+  onSwipeStart: React.PropTypes.func,
 };
 BookListView.defaultProps = {
   ...ListView.defaultProps,
-  onRelease:emptyFunction,
-  //onSwipeEnd:emptyFunction,
+  //onRelease:emptyFunction,
+  onSwipeEnd:emptyFunction,
+  onSwipeStart: emptyFunction,
 };
 
 class BookListView_old extends React.Component {
