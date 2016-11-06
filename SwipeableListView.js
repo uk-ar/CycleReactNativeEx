@@ -2,7 +2,8 @@ import React from 'react';
 
 import {
   ListView,
-  View
+  View,
+  Easing
 } from 'react-native';
 
 import { _SwipeableRow3, SwipeableRow3 } from './SwipeableRow';
@@ -141,6 +142,7 @@ class SwipeableListView extends React.Component {
                   this.rows[sectionID] = this.rows[sectionID] || {}
                   this.rows[sectionID][rowID] = c
                 }}
+                animationConfig={{easing:Easing.inOut(Easing.quad)}}
             {...generateActions(rowData, sectionID, rowID, highlightRow)}
             onSwipeStart={({ gestureState, action }) => {
                 this.listview.setNativeProps({ scrollEnabled: false });
