@@ -61,7 +61,7 @@ describe('Closeable tests', () => {
     );
     const inst = tree.getInstance();
     const callback = jest.fn();
-    const foo = inst.open().then(callback);
+    const foo = inst.open(callback)
     jest.runAllTimers();
     //expect(callback).toBeCalled();
     expect(tree.toJSON()).toMatchSnapshot();
