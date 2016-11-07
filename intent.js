@@ -56,6 +56,7 @@ function intent(RN, HTTP) {
   //.events('swipeEnd')
     .events('release')
     .do((args) => console.log('foo0:', args))
+    .map(([book, action]) => [book, action.target])
   //.map(([{rowData:book,action}]) => [book, action.target])
     //.map(([book, action, closeAnimation]) => [book, action.target, closeAnimation])
     //.filter(([_, target, closeAnimation]) => target !== null)
@@ -455,8 +456,10 @@ function intent(RN, HTTP) {
     // .do((books)=>LayoutAnimation.easeInEaseOut())//there is bug in iOS
     // Will be fixed in RN 0.28?
     // ref: https://github.com/facebook/react-native/pull/7942
-    goToBookView$: RN.select('cell').events('press')
-                     .do(i => console.log('cell press:%O', i)),
+    goToBookView$: RN.select('main').events('selectCell')
+                     .do(i => console.log('cell press:%O', i))
+                     .map(([book])=> book)
+                     .shareReplay(),
     back$: Rx.Observable
              .merge(RN.navigateBack(),
                     )

@@ -73,8 +73,6 @@ Touchable.ItemsHeader = Touchable.createCycleComponent(ItemsHeader);
 import { LayoutableView } from './Closeable';
 import Stylish from 'react-native-stylish';
 
-Touchable.BookListView = Touchable.createCycleComponent(BookListView);
-
 //function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, selectedSection }) {
 class MainView extends React.Component {
   constructor(props) {
@@ -85,6 +83,7 @@ class MainView extends React.Component {
   render() {
     const { items, sectionIDs, rowIDs, dataSource,
             onSelectSection, onCloseSection, onRelease,
+            onSelectCell,
             booksLoadingState, selectedSection } = this.props;
     // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
@@ -143,6 +142,9 @@ class MainView extends React.Component {
         renderRow={(rowData, sectionID, rowID) => {
             return (
               <BookCell
+                onPress={()=>{
+                    onSelectCell(rowData)
+                  }}
               book={rowData}
               style={{ backgroundColor: materialColor.grey['50'] }}
                     />
@@ -230,7 +232,8 @@ class MainView extends React.Component {
 MainView.propTypes = {
   onSelectSection: React.PropTypes.func,
   onCloseSection: React.PropTypes.func,
-  onRelease: React.PropTypes.func
+  onRelease: React.PropTypes.func,
+  onSelectCell: React.PropTypes.func
 };
 /* MainView.defaultProps = {
  *   onRelease:emptyFunction,
@@ -244,10 +247,10 @@ function view(model) {
      change.So we should add random key or force update*/
   // http://stackoverflow.com/a/35004739
   //return <MainView {...model} />;
-  return <Touchable.MainView
-           selector="main"
-           {...model}
-         />;
+  /* return <Touchable.MainView
+   *          selector="main"
+   *          {...model}
+   *        />;*/
   /* const navigationState = NavigationStateUtils.replaceAtIndex(
    *   model.navigationState, // navigationState
    *   model.navigationState.index, // index
@@ -266,13 +269,13 @@ function view(model) {
       style={{ flex: 1 }}
       navigationState={navigationState}
       onNavigate={onNavigateBack}
-      renderOverlay={(navigationProps) => {
+      renderHeader={(navigationProps) => {
           // console.log("np:",navigationProps);
         const style = null;
-        if (navigationProps.scene.route.key === 'Main') {
-          // style = { opacity: 0 }; // cannot touch close button
-          return null;
-        }//
+          if (navigationProps.scene.route.key === 'Main') {
+            // style = { opacity: 0 }; // cannot touch close button
+            return null;
+          }// 
         return (
             <NavigationExperimental.Header
               {...navigationProps}
@@ -297,15 +300,22 @@ function view(model) {
           // return (MainView(model))
             return (
               <MyCard navigationProps={navigationProps}>
-                {MainView(model)}
+                <Touchable.MainView
+                  selector="main"
+                  {...model}
+                  />
               </MyCard>
             );
           case 'Book Detail':
             // return (MainView(model))
+            //console.log(model)
             return (
-              <View style={{ marginTop: 64, backgroundColor: 'red' }}>
-                <Text>book detail</Text>
-              </View>
+              <MyCard navigationProps={navigationProps}>
+                <View style={{ marginTop: 64, backgroundColor: 'red' }}>
+                  <Text>book detail</Text>
+                  <Text>{model.selectedBook.title}</Text>
+                </View>  
+              </MyCard>
             );
           default:
             console.error('Unexpected view', navigationProps,

@@ -144,10 +144,13 @@ class _SwipeableRow3 extends React.Component {
     const { onSwipeStart, onSwipeEnd, ...otherProps } = props;
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => false,
+      //for select cell
       onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
       onMoveShouldSetPanResponder: isSwipeHorizontal,
       onMoveShouldSetPanResponderCapture: isSwipeHorizontal,
-
+      //no effect
+      //onShouldBlockNativeResponder: (evt, gestureState) => false,
+      
       onPanResponderGrant: (evt, gestureState) => {
         onSwipeStart && onSwipeStart(gestureState);
       },
