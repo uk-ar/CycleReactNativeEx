@@ -11,7 +11,8 @@ import {
   // TouchableHighlight,
   // TouchableNativeFeedback
 } from 'react-native';
-const FAIcon = require('react-native-vector-icons/FontAwesome');
+//const FAIcon = require('react-native-vector-icons/FontAwesome');
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { emptyFunction } from 'fbjs/lib/emptyFunction';
 
 import { styles } from './styles';
@@ -54,14 +55,14 @@ function ItemsHeader({
   if (!itemsInfo[section]) { return null; }
   // const icon = (selectedSection === null) ? (
   const icon = close ? (
-    <FAIcon
+    <Icon
       onPress={()=>onCloseSection(section)}
       name="close"
       selector="close"
       size={20}
       style={{ marginRight: 5 }}
     />) : (
-      <FAIcon
+      <Icon
         name={itemsInfo[section].icon}
         color={itemsInfo[section].backgroundColor}
         size={20}
