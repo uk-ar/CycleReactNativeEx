@@ -6,3 +6,9 @@ machine:
     - npm install -g npm@3
   timezone:
     Asia/Tokyo # Set the timezone
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - ./deploy_to_production.sh
