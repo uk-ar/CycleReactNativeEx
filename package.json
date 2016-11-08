@@ -27,7 +27,7 @@
     "react": "^15.3.2",
     "react-addons-transition-group": "^15.3.2",
     "react-clone-referenced-element": "^1.0.1",
-    "react-native": "^0.36.1",
+    "react-native": "^0.37.0",
     "react-native-search-bar": "^2.16.0",
     "react-native-stylish": "^0.1.0",
     "react-native-vector-icons": "^3.0.0",
@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@kadira/react-native-storybook": "^2.1.6",
-    "@kadira/storybook": "^2.28.1",
+    "@kadira/storybook": "^2.29.4",
     "apphubdeploy": "^0.0.8",
     "babel-cli": "^6.14.0",
     "babel-core": "^6.14.0",

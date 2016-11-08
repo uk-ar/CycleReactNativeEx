@@ -298,15 +298,15 @@ function view(model) {
         switch (key) {
           case 'Main':
             // return (MainView(model))
-            return (<Touchable.MainView
-                  selector="main"
-                  style={{
-                    paddingHorizontal: 3,
-                    flex: 1,
-                    backgroundColor: '#1A237E', // indigo 900
-                  }}
-                  {...model}
-                  />)
+            /* return (<Touchable.MainView
+            selector="main"
+            style={{
+            paddingHorizontal: 3,
+            flex: 1,
+            backgroundColor: '#1A237E', // indigo 900
+            }}
+            {...model}
+            />) */
             return (
               <MyCard
                 navigationProps={navigationProps}
