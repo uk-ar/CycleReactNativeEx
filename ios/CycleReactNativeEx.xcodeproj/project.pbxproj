@@ -23,6 +23,8 @@
 		140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		2472CF68475D4F3F9C71A10C /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 97427407C08347BA8A292B26 /* Octicons.ttf */; };
+		4F6D685A1DD2230C00E38E07 /* libAppHub.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D684D1DD1ED3500E38E07 /* libAppHub.a */; };
+		4F6D685C1DD2231D00E38E07 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D685B1DD2231D00E38E07 /* SystemConfiguration.framework */; };
 		509A4BAEB144476A8B1E23BC /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CACEC261FB0E4303B41D6B69 /* Zocial.ttf */; };
 		57BCBD93C056475088A476C8 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CD07FEB4BE0344BCBD2A2BF1 /* Ionicons.ttf */; };
 		5D2A31F924524C8EB7DE2B0B /* libRNSearchBar.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D404547F442B4F0F860349C9 /* libRNSearchBar.a */; };
@@ -245,6 +247,7 @@
 		44B2D23AD3F746428222C2E5 /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		4EE87B51D7154340B3813127 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		4F6D68501DD2225A00E38E07 /* AppHub.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AppHub.xcodeproj; path = ../node_modules/apphub/AppHub/AppHub.xcodeproj; sourceTree = "<group>"; };
+		4F6D685B1DD2231D00E38E07 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		7183EC54A4904BAEB239BDF4 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
@@ -275,6 +278,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F6D685C1DD2231D00E38E07 /* SystemConfiguration.framework in Frameworks */,
+				4F6D685A1DD2230C00E38E07 /* libAppHub.a in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
 				00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */,
@@ -521,6 +526,7 @@
 		EA637F0E051E45C0874829EC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4F6D685B1DD2231D00E38E07 /* SystemConfiguration.framework */,
 				AFF116BF78ED45C49FDCE52E /* libc++.tbd */,
 				44B2D23AD3F746428222C2E5 /* libz.tbd */,
 			);

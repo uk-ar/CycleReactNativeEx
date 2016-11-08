@@ -314,6 +314,14 @@ apphub:
     plist "^1.2.0"
     yargs "^3.31.0"
 
+apphubdeploy:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/apphubdeploy/-/apphubdeploy-0.0.8.tgz#a0038d9aabc9c8cb370d694853da6c59ec87ce85"
+  dependencies:
+    commander "^2.9.0"
+    open "0.0.5"
+    readline-sync "^1.4.1"
+
 aproba@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-1.0.4.tgz#2713680775e7614c8ba186c065d4e2e52d1072c0"
@@ -5779,6 +5787,10 @@ onetime@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/onetime/-/onetime-1.1.0.tgz#a1f7838f8314c516f05ecefcbc4ccfe04b4ed789"
 
+open@0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/open/-/open-0.0.5.tgz#42c3e18ec95466b6bf0dc42f3a2945c3f0cad8fc"
+
 opn@^3.0.2:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/opn/-/opn-3.0.3.tgz#b6d99e7399f78d65c3baaffef1fb288e9b85243a"
@@ -6721,6 +6733,10 @@ readdirp@^2.0.0:
     minimatch "^3.0.2"
     readable-stream "^2.0.2"
     set-immediate-shim "^1.0.1"
+
+readline-sync@^1.4.1:
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/readline-sync/-/readline-sync-1.4.5.tgz#c70d2b1473ecabc1e4d533cbaf3e8249fb77e992"
 
 readline2@^1.0.1:
   version "1.0.1"

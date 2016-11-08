@@ -50,7 +50,9 @@ function MyCard({ children, navigationProps }) {
     // NavigationExperimental.Card is static view?
     // ref: https://github.com/facebook/react-native/issues/7720
     // key={'View:' + navigationProps.scene.navigationState.key}
+    //      style={{ marginTop: 64, backgroundColor: 'red' }}
     <NavigationExperimental.Card
+      style={{ paddingTop: 20, backgroundColor: 'yellow' }}
       {...navigationProps}
       renderScene={() => children}
       onNavigate={onNavigateBack}
@@ -104,9 +106,10 @@ class MainView extends React.Component {
   // <BookListView
     //        key={selectedSection}
     //      selector="listview"
+    //      style={{ marginTop: 64, backgroundColor: 'red' }}
   return (
     <BookListView
-        style={{
+    style={{
           paddingHorizontal: 3,
           flex: 1,
           backgroundColor: '#1A237E', // indigo 900
@@ -275,7 +278,7 @@ function view(model) {
           if (navigationProps.scene.route.key === 'Main') {
             // style = { opacity: 0 }; // cannot touch close button
             return null;
-          }// 
+          }//
         return (
             <NavigationExperimental.Header
               {...navigationProps}
@@ -314,7 +317,7 @@ function view(model) {
                 <View style={{ marginTop: 64, backgroundColor: 'red' }}>
                   <Text>book detail</Text>
                   <Text>{model.selectedBook.title}</Text>
-                </View>  
+                </View>
               </MyCard>
             );
           default:
