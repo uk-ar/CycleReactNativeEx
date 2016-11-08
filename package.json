@@ -29,7 +29,7 @@
     "react-clone-referenced-element": "^1.0.1",
     "react-native": "^0.37.0",
     "react-native-search-bar": "^2.16.0",
-    "react-native-stylish": "^0.1.0",
+    "react-native-stylish": "git+http://github.com/uk-ar/react-native-stylish.git",
     "react-native-vector-icons": "^3.0.0",
     "realm": "0.14.3",
     "recompose": "^0.20.2",
