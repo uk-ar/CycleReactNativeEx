@@ -8,6 +8,7 @@ import {
   View,
   NavigationExperimental,
   TextInput,
+  StatusBar,
   Animated,
   ScrollView,
   LayoutAnimation,
@@ -42,7 +43,7 @@ function onNavigateBack(action) {
 // }
 }
 
-function MyCard({ children, navigationProps }) {
+function MyCard({ children, navigationProps, style }) {
   return (
     //      onNavigate={onNavigateBack}
     // NavigationExperimental.Card is not deplicated.
@@ -52,7 +53,7 @@ function MyCard({ children, navigationProps }) {
     // key={'View:' + navigationProps.scene.navigationState.key}
     //      style={{ marginTop: 64, backgroundColor: 'red' }}
     <NavigationExperimental.Card
-      style={{ paddingTop: 20, backgroundColor: 'yellow' }}
+      style={style}
       {...navigationProps}
       renderScene={() => children}
       onNavigate={onNavigateBack}
@@ -75,17 +76,17 @@ Touchable.ItemsHeader = Touchable.createCycleComponent(ItemsHeader);
 import { LayoutableView } from './Closeable';
 import Stylish from 'react-native-stylish';
 
-//function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, selectedSection }) {
+// function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, selectedSection }) {
 class MainView extends React.Component {
   constructor(props) {
     super(props);
-    this.positions = []
+    this.positions = [];
     this._scrollY = new Animated.Value(0);
   }
   render() {
     const { items, sectionIDs, rowIDs, dataSource,
             onSelectSection, onCloseSection, onRelease,
-            onSelectCell,
+            onSelectCell, style,
             booksLoadingState, selectedSection } = this.props;
     // TODO:keep query text & scroll position
   // console.log('s b', savedBooks);
@@ -107,13 +108,9 @@ class MainView extends React.Component {
     //        key={selectedSection}
     //      selector="listview"
     //      style={{ marginTop: 64, backgroundColor: 'red' }}
-  return (
-    <BookListView
-    style={{
-          paddingHorizontal: 3,
-          flex: 1,
-          backgroundColor: '#1A237E', // indigo 900
-        }}
+    return (
+      <BookListView
+        style={style}
         dataSource={dataSource}
         ref={(c) => {
           this.listview = c;
@@ -122,13 +119,13 @@ class MainView extends React.Component {
         enableEmptySections
         generateActions={(rowData, sectionID, rowID) =>
           genActions2(sectionID)}
-    onSwipeEnd={({rowData,sectionID,rowID,action,...rest}) =>{
-      onRelease(rowData,action)
+        onSwipeEnd={({ rowData, sectionID, rowID, action, ...rest }) => {
+          onRelease(rowData, action);
         /* if(action.target == null) { return }
          *   this.listview
          *       .close(sectionID,rowID)*/
-          //TODO: handle data in intent.js
-              /*.then(()=>{
+          // TODO: handle data in intent.js
+              /* .then(()=>{
           const s = {...this.data[sectionID]}
           delete s[rowID]
           this.data = {...this.data,[sectionID]:s}
@@ -142,66 +139,66 @@ class MainView extends React.Component {
           this.updateDataSource()
           }) */
         }}
-        renderRow={(rowData, sectionID, rowID) => {
-            return (
-              <BookCell
-                onPress={()=>{
-                    onSelectCell(rowData)
-                  }}
-              book={rowData}
-              style={{ backgroundColor: materialColor.grey['50'] }}
-                    />
-            );
-        }}
-    onScroll={Animated.event(
-      [{nativeEvent: {contentOffset: {y: this._scrollY}}}],
+        renderRow={(rowData, sectionID, rowID) =>
+             (
+               <BookCell
+                 onPress={() => {
+                   onSelectCell(rowData);
+                 }}
+                 book={rowData}
+                 style={{ backgroundColor: materialColor.grey['50'] }}
+               />
+            )
+        }
+        onScroll={Animated.event(
+      [{ nativeEvent: { contentOffset: { y: this._scrollY } } }],
       //{listener},          // Optional async listener
     )}
-    renderSectionHeader={(sectionData, sectionID) => {
-      //call upper onSelectSection after scroll
-            return (
-              <ItemsHeader
-                selector="section"
-                section={sectionID}
-              {...sectionData}
-                onSelectSection={(section)=>{
-                    if(dataSource.sectionIdentities.length === 2){ return }
-                    this.positions.push(this._scrollY.__getValue())
-                    //TODO:
-                    //1. scroll to section header with animation
+        renderSectionHeader={(sectionData, sectionID) =>
+      // call upper onSelectSection after scroll
+             (
+               <ItemsHeader
+                 selector="section"
+                 section={sectionID}
+                 {...sectionData}
+                 onSelectSection={(section) => {
+                   if (dataSource.sectionIdentities.length === 2) { return; }
+                   this.positions.push(this._scrollY.__getValue());
+                    // TODO:
+                    // 1. scroll to section header with animation
                     // (need expand view in android)
-                    //2. save section header position
-                    this.listview.scrollTo({y:0,animated:false})
-                    onSelectSection(section)
-                    //this.sectionIdentities = [section,`${section}_end`]
-                    //this.updateDataSource()
-                  }}
-                onCloseSection={()=>{
-                    //TODO:
-                    //1. scroll to section header with animation
-                    //this.listview.scrollTo({y:0,animated:true})
-                    //this.sectionIdentities = Object.keys(this.data)
-                    onCloseSection()
-                    let pos = this.positions.pop()
-                    setTimeout(()=>
-                      this.listview.scrollTo({y:pos,
-                                              animated:false}))
+                    // 2. save section header position
+                   this.listview.scrollTo({ y: 0, animated: false });
+                   onSelectSection(section);
+                    // this.sectionIdentities = [section,`${section}_end`]
+                    // this.updateDataSource()
+                 }}
+                 onCloseSection={() => {
+                    // TODO:
+                    // 1. scroll to section header with animation
+                    // this.listview.scrollTo({y:0,animated:true})
+                    // this.sectionIdentities = Object.keys(this.data)
+                   onCloseSection();
+                   const pos = this.positions.pop();
+                   setTimeout(() =>
+                      this.listview.scrollTo({ y: pos,
+                        animated: false }));
                     /* this.updateDataSource().then(()=>{
                     //TODO:
                     //2. scroll to section header with no animation
                     //2. scroll to original position with animation
                     }) */
-                  }}
-              />)
-          }}
-        renderSectionFooter={(sectionData, sectionID) => {
-            //console.log("fo",sectionData)
-            return (
-              <ItemsFooter
-                   {...sectionData}
-                   />)
-          }}
-    />
+                 }}
+               />)
+          }
+        renderSectionFooter={(sectionData, sectionID) =>
+            // console.log("fo",sectionData)
+             (
+               <ItemsFooter
+                 {...sectionData}
+               />)
+          }
+      />
      /* onSelectSection={(section)=>{
          if(dataSource.sectionIdentities.length === 2){ return }
          this.positions.push(this._scrollY.__getValue())
@@ -249,7 +246,7 @@ function view(model) {
      android. But NavigationExperimental.CardStack cannot re-render by model
      change.So we should add random key or force update*/
   // http://stackoverflow.com/a/35004739
-  //return <MainView {...model} />;
+  // return <MainView {...model} />;
   /* return <Touchable.MainView
    *          selector="main"
    *          {...model}
@@ -275,23 +272,23 @@ function view(model) {
       renderHeader={(navigationProps) => {
           // console.log("np:",navigationProps);
         const style = null;
-          if (navigationProps.scene.route.key === 'Main') {
+        if (navigationProps.scene.route.key === 'Main') {
             // style = { opacity: 0 }; // cannot touch close button
-            return null;
-          }//
+          return null;
+        }//
         return (
-            <NavigationExperimental.Header
-              {...navigationProps}
-              onNavigateBack={onNavigateBack}
-              style={style}
-              renderTitleComponent={(props) => {
-                return (
-                <NavigationExperimental.Header.Title>
+          <NavigationExperimental.Header
+            {...navigationProps}
+            onNavigateBack={onNavigateBack}
+            style={style}
+            renderTitleComponent={props =>
+                 (
+                   <NavigationExperimental.Header.Title>
                                foo
                 </NavigationExperimental.Header.Title>
-              );
-              }}
-            />);
+              )
+              }
+          />);
           // return (<Text>overlay</Text>)
       }}
       renderScene={(navigationProps) => {
@@ -302,18 +299,35 @@ function view(model) {
           case 'Main':
           // return (MainView(model))
             return (
-              <MyCard navigationProps={navigationProps}>
+              <MyCard
+                navigationProps={navigationProps}
+                style={{ paddingTop: 20, backgroundColor: '#1A237E' }}
+              >
+                <StatusBar
+                  barStyle="light-content"
+                />
                 <Touchable.MainView
                   selector="main"
+                  style={{
+                    paddingHorizontal: 3,
+                    flex: 1,
+                    backgroundColor: '#1A237E', // indigo 900
+                  }}
                   {...model}
-                  />
+                />
               </MyCard>
             );
           case 'Book Detail':
             // return (MainView(model))
-            //console.log(model)
+            // console.log(model)
             return (
-              <MyCard navigationProps={navigationProps}>
+              <MyCard
+                navigationProps={navigationProps}
+                style={{ paddingTop: 20, backgroundColor: 'yellow' }}
+              >
+                <StatusBar
+                  barStyle="light-content"
+                />
                 <View style={{ marginTop: 64, backgroundColor: 'red' }}>
                   <Text>book detail</Text>
                   <Text>{model.selectedBook.title}</Text>

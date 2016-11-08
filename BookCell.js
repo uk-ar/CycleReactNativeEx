@@ -69,24 +69,28 @@ function BookCell({ book, style, onPress, ...props }) {
       >
         <Image
           source={{ uri: book.thumbnail || undefined
-            /* Image source cannot accpet null */ }}
+            /* Image source cannot accept null */ }}
           resizeMode="contain"
           style={[styles.cellImage]}
         />
-        <View style={[{ flexDirection: 'column',
-                        flex: 1,
+        <View
+style={[{ flexDirection: 'column',
+          flex: 1,
                         //backgroundColor:"red",
-          }]}>
-          <View style={[{ padding: 10, justifyContent: 'center' },
-            ]}>
+        }]}
+        >
+          <View
+style={[{ padding: 10, justifyContent: 'center' },
+          ]}
+          >
             <View style={{ flexDirection: 'row' }}>
               { book.bucket ?
                 <FAIcon
                   name={itemsInfo[book.bucket].icon} size={20}
                   style={{ marginRight: 5,
-                           color: itemsInfo[book.bucket].backgroundColor }}
+                    color: itemsInfo[book.bucket].backgroundColor }}
                 /> : null }
-                <Text style={styles.bookTitle} numberOfLines={1}>
+              <Text style={styles.bookTitle} numberOfLines={1}>
                   {book.title}
                 </Text>
             </View>
@@ -96,12 +100,14 @@ function BookCell({ book, style, onPress, ...props }) {
             <LibraryStatus libraryStatus={book.libraryStatus} />
           </View>
           <View style={{ flex: 1 }} />
-          <View style={{ height: StyleSheet.hairlineWidth,
-                         backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                         marginRight: 10,
-                         marginBottom: PixelRatio.get(),
+          <View
+style={{ height: StyleSheet.hairlineWidth,
+            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+            marginRight: 10,
+            marginBottom: PixelRatio.get(),
                          //separator
-          }} />
+          }}
+          />
         </View>
       </View>
     </TouchableElement>

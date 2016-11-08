@@ -55,20 +55,20 @@ function genActions2(bucket) {
     text: null, backgroundColor: materialColor.grey[300], close: false, target: null };
   const leftActions = [
     { ...getProps(bucket, 'liked'),
-     ...nop,
-     style: { justifyContent: 'flex-end' } },
+      ...nop,
+      style: { justifyContent: 'flex-end' } },
     { ...getProps(bucket, 'liked'),
-     style: { width: width / 2 } },
+      style: { width: width / 2 } },
     { ...getProps(bucket, 'borrowed'),
-     style: { width } }
+      style: { width } }
   ];
   const rightActions = [
     { ...getProps(bucket, 'done'),
-     ...nop,
-     style: { flexDirection: 'row-reverse',
-            justifyContent: 'flex-end' } },
+      ...nop,
+      style: { flexDirection: 'row-reverse',
+        justifyContent: 'flex-end' } },
     { ...getProps(bucket, 'done'),
-     style: { flexDirection: 'row-reverse' } }
+      style: { flexDirection: 'row-reverse' } }
   ];
   return { leftActions, rightActions };
 }

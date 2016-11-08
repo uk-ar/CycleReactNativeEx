@@ -13,13 +13,13 @@ import Stylish from 'react-native-stylish';
 
 // class for ref
 class _SwipeableListView extends React.Component {
-  //auto entering animation when element add
+  // auto entering animation when element add
   constructor(props) {
     super(props);
     this.state = {
       dataSource: this.props.dataSource,
     };
-    //this.closeable = [];
+    // this.closeable = [];
     this.added = null;
   }
   setNativeProps(props) {
@@ -88,31 +88,31 @@ class _SwipeableListView extends React.Component {
       <ListView
         dataSource={this.state.dataSource}
         ref={c => (this.listview = c)}
-        renderRow={(rowData, sectionID, rowID, highlightRow) => {
-          return (
-              <LayoutableView
-                ref={(c) => {
+        renderRow={(rowData, sectionID, rowID, highlightRow) =>
+           (
+             <LayoutableView
+               ref={(c) => {
                     /* this.closeable[sectionID] = this.closeable[sectionID] || [];
                     this.closeable[sectionID][rowID] = c; */
                     //                transitionEnter={true}
-                  }}
-                    transitionEnter={this.rowShouldEnter(sectionID, rowID)}
-              >
-                  {renderRow(rowData, sectionID, rowID, highlightRow)}
-              </LayoutableView>
-            );
-        }}
+               }}
+               transitionEnter={this.rowShouldEnter(sectionID, rowID)}
+             >
+               {renderRow(rowData, sectionID, rowID, highlightRow)}
+             </LayoutableView>
+            )
+        }
         {...props}
       />);
   }
 }
 
 class SwipeableListView extends React.Component {
-  //enable scroll lock
+  // enable scroll lock
   close(sectionID, rowID) {
-    //console.log("sw cl",sectionID,rowID,this.listview,this.props.dataSource)
-    //return this.listview.close(sectionID, rowID);
-    return this.rows[sectionID][rowID].close()//SwipeableRow3
+    // console.log("sw cl",sectionID,rowID,this.listview,this.props.dataSource)
+    // return this.listview.close(sectionID, rowID);
+    return this.rows[sectionID][rowID].close();// SwipeableRow3
   }
   /* closeSection(sectionID) {
    *   //return this.listviews[sectionID].close(sectionID, rowID);
@@ -129,48 +129,48 @@ class SwipeableListView extends React.Component {
     const { renderRow, generateActions,
             onSwipeStart, onSwipeEnd, ...props } = this.props;
     // console.log("sw re",this.props.dataSource)
-    this.rows = this.rows || {}
+    this.rows = this.rows || {};
     return (
       <_SwipeableListView
         ref={c => (this.listview = c)}
-        renderRow={(rowData, sectionID, rowID, highlightRow) => {
-            //layoutableView > SwipeableRow3 > props.render
-            //layoutableView && SwipeableRow3
-            return (
-              <SwipeableRow3
-              ref={c => {
-                  this.rows[sectionID] = this.rows[sectionID] || {}
-                  this.rows[sectionID][rowID] = c
-                }}
-                animationConfig={{easing:Easing.inOut(Easing.quad)}}
-            {...generateActions(rowData, sectionID, rowID, highlightRow)}
-            onSwipeStart={({ gestureState, action }) => {
-                this.listview.setNativeProps({ scrollEnabled: false });
-                onSwipeStart && onSwipeStart(
+        renderRow={(rowData, sectionID, rowID, highlightRow) =>
+            // layoutableView > SwipeableRow3 > props.render
+            // layoutableView && SwipeableRow3
+             (
+               <SwipeableRow3
+                 ref={(c) => {
+                   this.rows[sectionID] = this.rows[sectionID] || {};
+                   this.rows[sectionID][rowID] = c;
+                 }}
+                 animationConfig={{ easing: Easing.inOut(Easing.quad) }}
+                 {...generateActions(rowData, sectionID, rowID, highlightRow)}
+                 onSwipeStart={({ gestureState, action }) => {
+                   this.listview.setNativeProps({ scrollEnabled: false });
+                   onSwipeStart && onSwipeStart(
                   { gestureState, rowData, sectionID, rowID, highlightRow, action });
                 // this.row1.getCurrentAction() not working
-              }}
-            onSwipeEnd={({ gestureState, action }) => {
-                //console.log("swlv",gestureState,action)
-                this.listview.setNativeProps({ scrollEnabled: true });
-                onSwipeEnd && onSwipeEnd(
+                 }}
+                 onSwipeEnd={({ gestureState, action }) => {
+                // console.log("swlv",gestureState,action)
+                   this.listview.setNativeProps({ scrollEnabled: true });
+                   onSwipeEnd && onSwipeEnd(
                   { gestureState, rowData, sectionID, rowID, highlightRow, action });
-              }}
-                       >
-                       {renderRow(rowData, sectionID, rowID, highlightRow)}
-              </SwipeableRow3>
-            );
-          }}
+                 }}
+               >
+                 {renderRow(rowData, sectionID, rowID, highlightRow)}
+               </SwipeableRow3>
+            )
+          }
         {...props}
       />);
   }
 }
 
-//const SwipeableListView = createStylishComponent(_SwipeableListView)
+// const SwipeableListView = createStylishComponent(_SwipeableListView)
 
 SwipeableListView.propTypes = {
   ...ListView.propTypes,
-  //generateActions: React.PropTypes.func.isRequired,
+  // generateActions: React.PropTypes.func.isRequired,
   onSwipeStart: React.PropTypes.func,
   onSwipeEnd: React.PropTypes.func,
 };

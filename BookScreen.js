@@ -46,7 +46,8 @@ const BookScreen = React.createClass({
             // title={route.movie.title}
             // title = "book"
         />
-        <WebView url={this.props.url}
+        <WebView
+          url={this.props.url}
           domStorageEnabled
           startInLoadingState
           javaScriptEnabled

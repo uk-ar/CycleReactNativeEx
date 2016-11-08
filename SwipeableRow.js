@@ -15,7 +15,7 @@ import emptyFunction from 'fbjs/lib/emptyFunction';
 
 import Stylish from 'react-native-stylish';
 
-import { CloseableView,LayoutableView } from './Closeable';
+import { CloseableView, LayoutableView } from './Closeable';
 import { Action } from './Action';
 
 const {
@@ -53,42 +53,42 @@ class MeasureableView extends React.Component {
 }
 
 function withState2(RowComponent) {
-  //handle actions
+  // handle actions
   return class extends React.Component {
     constructor(props) {
       super(props);
       this.state = { ...this.state, lock: false };
-      this.onSwipeEnd = this.onSwipeEnd.bind(this)
+      this.onSwipeEnd = this.onSwipeEnd.bind(this);
     }
     close(onComplete) {
-      return this.row.close(onComplete);//_SwipeableRow3
+      return this.row.close(onComplete);// _SwipeableRow3
     }
-    onSwipeEnd(gestureState){
-      //const fn = ;//TODO:default
-      const gestureStateSave = {...gestureState}; // save value for async
+    onSwipeEnd(gestureState) {
+      // const fn = ;//TODO:default
+      const gestureStateSave = { ...gestureState }; // save value for async
       this.setState({ lock: true }, () => {
-        //let promise;
+        // let promise;
         if (this.row.getCurrentActions().state.index === 0) {
-          this.row.swipeToFlat(gestureStateSave.vx,()=>
+          this.row.swipeToFlat(gestureStateSave.vx, () =>
             this.setState({ lock: false })
-          )
+          );
           /* .then(() => )
            * .catch(() => { throw new Error("foo") })*/
         } else {
-          let promise
-          let fn = () =>
+          let promise;
+          const fn = () =>
             this.row
-                .close(()=>{
+                .close(() => {
                   this.props.onSwipeEnd({
-                    gestureState:gestureStateSave,
-                    action:this.row.getCurrentAction()})
-                })
+                    gestureState: gestureStateSave,
+                    action: this.row.getCurrentAction() });
+                });
           /* .then()
            * .catch(() => { throw new Error("foo?") })*/
-          if (0 < gestureStateSave.dx) {
-            this.row.swipeToMax(gestureStateSave.vx,fn)
+          if (gestureStateSave.dx > 0) {
+            this.row.swipeToMax(gestureStateSave.vx, fn);
           } else {
-            this.row.swipeToMin(gestureStateSave.vx,fn)
+            this.row.swipeToMin(gestureStateSave.vx, fn);
           }
           /* promise
            *   .then(() => this.row.close())
@@ -100,7 +100,7 @@ function withState2(RowComponent) {
            *   })
            *   .catch(() => { throw new Error("foo?") })*/
         }
-        //console.log("on",gestureStateSave,this.row.getCurrentAction())
+        // console.log("on",gestureStateSave,this.row.getCurrentAction())
       });
     }
     render() {
@@ -113,12 +113,12 @@ function withState2(RowComponent) {
             <SwipeableActions
               actions={actions}
               lock={this.state.lock}
-              style={{flex:1}}
+              style={{ flex: 1 }}
             />
           }
           onSwipeEnd={this.onSwipeEnd}
-          onSwipeStart={(gestureState)=>
-            onSwipeStart({gestureState,action:this.row.getCurrentAction()})}
+          onSwipeStart={gestureState =>
+            onSwipeStart({ gestureState, action: this.row.getCurrentAction() })}
         />
       );
     }
@@ -144,13 +144,13 @@ class _SwipeableRow3 extends React.Component {
     const { onSwipeStart, onSwipeEnd, ...otherProps } = props;
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => false,
-      //for select cell
+      // for select cell
       onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
       onMoveShouldSetPanResponder: isSwipeHorizontal,
       onMoveShouldSetPanResponderCapture: isSwipeHorizontal,
-      //no effect
-      //onShouldBlockNativeResponder: (evt, gestureState) => false,
-      
+      // no effect
+      // onShouldBlockNativeResponder: (evt, gestureState) => false,
+
       onPanResponderGrant: (evt, gestureState) => {
         onSwipeStart && onSwipeStart(gestureState);
       },
@@ -170,25 +170,25 @@ class _SwipeableRow3 extends React.Component {
       },
     });
     this.panX.addListener(({ value }) => {
-      if (0 < value && this.state.positiveSwipe != true) {
+      if (value > 0 && this.state.positiveSwipe != true) {
         this.setState({ positiveSwipe: true });
       } else if (value <= 0 && this.state.positiveSwipe != false) {
         this.setState({ positiveSwipe: false });
       }
     });
-    this.getCurrentActions = this.getCurrentActions.bind(this)
-    this.getCurrentAction = this.getCurrentAction.bind(this)
-    this.swipeTo = this.swipeTo.bind(this)
-    this.close = this.close.bind(this)
+    this.getCurrentActions = this.getCurrentActions.bind(this);
+    this.getCurrentAction = this.getCurrentAction.bind(this);
+    this.swipeTo = this.swipeTo.bind(this);
+    this.close = this.close.bind(this);
   }
   swipeTo(anim, fn) {
-    //return new Promise((resolve, reject) => {
+    // return new Promise((resolve, reject) => {
     InteractionManager.runAfterInteractions(() => {
       anim.start(fn);
-    })
-    //})
+    });
+    // })
   }
-  swipeToFlat(velocity,fn) {
+  swipeToFlat(velocity, fn) {
     return this.swipeTo(
       Animated.spring(this.panX, {
         toValue: 0.01,
@@ -196,7 +196,7 @@ class _SwipeableRow3 extends React.Component {
         velocity
       }), fn);
   }
-  swipeToMax(velocity,fn) {
+  swipeToMax(velocity, fn) {
     return this.swipeTo(
       Animated.parallel([
         Animated.decay(this.panX, {
@@ -209,7 +209,7 @@ class _SwipeableRow3 extends React.Component {
          *   toValue: width })*/
       ]), fn);
   }
-  swipeToMin(velocity,fn) {
+  swipeToMin(velocity, fn) {
     return this.swipeTo(
       Animated.parallel([
         Animated.decay(this.panX, {
@@ -221,23 +221,23 @@ class _SwipeableRow3 extends React.Component {
       ]), fn);
   }
   close(onComplete) {
-    //console.log("root",this)
-    //this.row
+    // console.log("root",this)
+    // this.row
     return this.root.close(onComplete);
   }
   getCurrentActions() {
-    //console.log("actions",this.row,this.state.positiveSwipe, this.leftActions ,this.rightActions)
+    // console.log("actions",this.row,this.state.positiveSwipe, this.leftActions ,this.rightActions)
     return this.state.positiveSwipe ? this.leftActions : this.rightActions;
   }
   getCurrentAction() {
-    const actions = this.getCurrentActions()
-    return actions.props.actions[actions.state.index]
+    const actions = this.getCurrentActions();
+    return actions.props.actions[actions.state.index];
   }
   render() {
     const { onSwipeStart, onSwipeEnd,
             leftActions, rightActions, renderActions,
             children, style, ...props } = this.props;
-    //const leftActionsElement = cloneReferencedElement(
+    // const leftActionsElement = cloneReferencedElement(
     const leftActionsElement = React.cloneElement(
       renderActions(leftActions), {
         ref: c => (this.leftActions = c)
@@ -336,9 +336,9 @@ class SwipeableActions extends React.Component {
         ref={c => (this.root = c)}
         {...props}
         style={[style,
-                { backgroundColor: currentAction.backgroundColor,
-                  overflow: 'hidden' }
-          ]}
+          { backgroundColor: currentAction.backgroundColor,
+            overflow: 'hidden' }
+        ]}
         onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
           const index = calcIndex(width, this.thresholds);
           if (this.state.index !== index && !this.props.lock) {
@@ -352,20 +352,20 @@ class SwipeableActions extends React.Component {
   }
 }
 SwipeableRow3.propTypes = {
-  ...View.propTypes,//  ...Closable.propTypes,
-  onSwipeStart:React.PropTypes.func,
-  onSwipeEnd:React.PropTypes.func,
-  leftActions:React.PropTypes.array.isRequired,
-  rightActions:React.PropTypes.array.isRequired,
-  renderActions:React.PropTypes.func,
+  ...View.propTypes, //  ...Closable.propTypes,
+  onSwipeStart: React.PropTypes.func,
+  onSwipeEnd: React.PropTypes.func,
+  leftActions: React.PropTypes.array.isRequired,
+  rightActions: React.PropTypes.array.isRequired,
+  renderActions: React.PropTypes.func,
 };
 
 SwipeableRow3.defaultProps = {
   ...View.defaultProps,
-  onSwipeStart:emptyFunction,
-  onSwipeEnd:emptyFunction,
-  leftActions:[],
-  rightActions:[],
+  onSwipeStart: emptyFunction,
+  onSwipeEnd: emptyFunction,
+  leftActions: [],
+  rightActions: [],
 };
 
 // scroll view base

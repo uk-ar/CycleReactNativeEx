@@ -96,17 +96,17 @@ function model(actions) {
   // update with animation when selectedSection$ changed
   const books$ =
     Rx.Observable.combineLatest(
-      actions.searchedBooksStatus$//.do(i => console.log('searched books'))
+      actions.searchedBooksStatus$// .do(i => console.log('searched books'))
       // searchedBooks$//.do(i => console.log('searched books'))
       ,
-      actions.savedBooksStatus$//.do(i => console.log('saved books',i))
+      actions.savedBooksStatus$// .do(i => console.log('saved books',i))
       ,
       genItems)
-      //.debounce(1)// Millisecond
-  //sync searchedBooksStatus$ & savedBooksStatus$
+      // .debounce(1)// Millisecond
+  // sync searchedBooksStatus$ & savedBooksStatus$
   /* .do(i=>console.log("items:",JSON.stringify(i)))
    * .distinctUntilChanged(x => JSON.stringify(x),(a,b)=>a!==b) */
-      //.do(i=>console.log("items:",i))
+      // .do(i=>console.log("items:",i))
       .shareReplay();
 
   const limit = 2;
@@ -115,20 +115,20 @@ function model(actions) {
     Rx.Observable.combineLatest(
       books$// .do(i => console.log('books', i))
       ,
-      actions.selectedSection$//.do(i => console.log('selectedSection', i))
+      actions.selectedSection$// .do(i => console.log('selectedSection', i))
       ,
-      actions.booksLoadingState$//.do(i => console.log('booksLoadingState', i))
+      actions.booksLoadingState$// .do(i => console.log('booksLoadingState', i))
       ,
       (books, selectedSection, booksLoadingState) => {
         const sections = {
           search: { close: selectedSection, loadingState: booksLoadingState },
           search_end: { count: Object.keys(books.search).length,
-                        section: 'search' },
+            section: 'search' },
           liked: { close: selectedSection, loadingState: booksLoadingState },
           liked_end: { count: Object.keys(books.liked).length, section: 'like' },
           borrowed: { close: selectedSection, loadingState: booksLoadingState },
           borrowed_end: { count: Object.keys(books.borrowed).length,
-                        section: 'borrowed' },
+            section: 'borrowed' },
           done: { close: selectedSection, loadingState: booksLoadingState },
           done_end: { count: Object.keys(books.done).length, section: 'done' }
         };
@@ -150,18 +150,18 @@ function model(actions) {
         });
       })
       .scan(
-        (datasource, { dataBlob, sectionIdentities }) => {
+        (datasource, { dataBlob, sectionIdentities }) =>
         //  (datasource, { dataBlob, sectionIdentities, rowIdentities }) => {
-          return datasource.cloneWithRowsAndSections(
-            //dataBlob, sectionIdentities, rowIdentities);
-            dataBlob, sectionIdentities);
-        }, new ListView.DataSource({
+           datasource.cloneWithRowsAndSections(
+            // dataBlob, sectionIdentities, rowIdentities);
+            dataBlob, sectionIdentities)
+        , new ListView.DataSource({
           rowHasChanged: (r1, r2) => r1 !== r2,
           sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
           getSectionHeaderData: (dataBlob, sectionID) =>
             dataBlob.sections[sectionID]
-        }))
-      //.do(i => console.log('datasource:', i));
+        }));
+      // .do(i => console.log('datasource:', i));
       // .subscribe()
 
       // .do(i => console.log('rowIDs?:', i));
@@ -194,7 +194,7 @@ function model(actions) {
        *               LayoutAnimation.Types.easeInEaseOut,
        *               LayoutAnimation.Properties.opacity))),*/
       // actions.selectedSection$,
-      actions.selectedSection$,//.do(i => LayoutAnimation.easeInEaseOut()),
+      actions.selectedSection$, // .do(i => LayoutAnimation.easeInEaseOut()),
       /* actions.selectedSection$.do(i =>
        *   LayoutAnimation.configureNext(
        *     LayoutAnimation

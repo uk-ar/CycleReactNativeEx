@@ -11,7 +11,7 @@ import {
   // TouchableHighlight,
   // TouchableNativeFeedback
 } from 'react-native';
-//const FAIcon = require('react-native-vector-icons/FontAwesome');
+// const FAIcon = require('react-native-vector-icons/FontAwesome');
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { emptyFunction } from 'fbjs/lib/emptyFunction';
 
@@ -56,20 +56,20 @@ function ItemsHeader({
   // const icon = (selectedSection === null) ? (
   const icon = close ? (
     <Icon
-      onPress={()=>onCloseSection(section)}
+      onPress={() => onCloseSection(section)}
       name="close"
       selector="close"
       size={20}
       style={{ marginRight: 5 }}
     />) : (
-      <Icon
-        name={itemsInfo[section].icon}
-        color={itemsInfo[section].backgroundColor}
-        size={20}
-        style={{ marginRight: 5 }}
-      />);
+    <Icon
+      name={itemsInfo[section].icon}
+      color={itemsInfo[section].backgroundColor}
+      size={20}
+      style={{ marginRight: 5 }}
+    />);
 
-  const content = (section === "search" && close) ? (
+  const content = (section === 'search' && close) ? (
     //        autoFocus={true}
     <TextInput
       autoCapitalize="none"
@@ -78,23 +78,23 @@ function ItemsHeader({
       onChangeText={onChangeQuery}
       style={styles.searchBarInput}
     />
-  ):(
-    <Text>
-      {itemsInfo[section].text}
-    </Text>
+  ) : (
+  <Text>
+    {itemsInfo[section].text}
+  </Text>
   );
 
-  const indicator = (section === "search" && close && loadingState) ? (
+  const indicator = (section === 'search' && close && loadingState) ? (
     <ActivityIndicator
       animating
       color="white"
       size="large"
       style={styles.spinner}
-    />) : null
+    />) : null;
 
   return (
     <TouchableElement
-      onPress={()=>onSelectSection(section)}
+      onPress={() => onSelectSection(section)}
       selector="section"
       key={section}
       payload={payload}
@@ -109,22 +109,22 @@ function ItemsHeader({
 }
 
 ItemsHeader.propTypes = {
-  onCloseSection:React.PropTypes.func,
-  onSelectSection:React.PropTypes.func,
-  onChangeQuery:React.PropTypes.func,
+  onCloseSection: React.PropTypes.func,
+  onSelectSection: React.PropTypes.func,
+  onChangeQuery: React.PropTypes.func,
   //close, payload, section, loadingState
 };
 ItemsHeader.defaultProps = {
-  onCloseSection:emptyFunction,
-  onSelectSection:emptyFunction,
-  onChangeQuery:emptyFunction,
+  onCloseSection: emptyFunction,
+  onSelectSection: emptyFunction,
+  onChangeQuery: emptyFunction,
   //close, payload, section, loadingState
 };
 
 function ItemsFooter({ payload, count, onSelectSection }) {
   return (
     <TouchableElement
-      onPress={()=>onSelectSection(section)}
+      onPress={() => onSelectSection(section)}
       selector="section"
       payload={payload}
     >
@@ -138,11 +138,11 @@ function ItemsFooter({ payload, count, onSelectSection }) {
 }
 
 ItemsFooter.propTypes = {
-  onSelectSection:React.PropTypes.func,
+  onSelectSection: React.PropTypes.func,
   //close, payload, section, loadingState
 };
 ItemsFooter.defaultProps = {
-  onSelectSection:emptyFunction,
+  onSelectSection: emptyFunction,
   //close, payload, section, loadingState
 };
 

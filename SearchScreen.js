@@ -44,13 +44,14 @@ const GiftedNavigator = React.createClass({
   render() {
     if (Platform.OS === 'android') {
       return (
-        <Navigator {...this.props}
+        <Navigator
+          {...this.props}
           ref="nav"
           configureScene={() => Navigator.SceneConfigs.FadeAndroid}
-          renderScene={(route, navigator, component) => {
+          renderScene={(route, navigator, component) =>
               // console.log("nav this:%O", this)
-            return React.createElement(route.component, route.passProps);
-          }}
+             React.createElement(route.component, route.passProps)
+          }
 
         />);
     } else {
@@ -88,49 +89,54 @@ const BookListView = React.createClass({
     };
     return (
       <View>
-      <ListView
-        ref="listview"
-        items={this.props.dataSource}
-        renderRow={(movie, sectionID, rowID, highlightRowFunc) => {
+        <ListView
+          ref="listview"
+          items={this.props.dataSource}
+          renderRow={(movie, sectionID, rowID, highlightRowFunc) =>
               // actions$={this.props.actions$}
               // need to intercept renderRow?
               // error on already defined
               // selector="bookcell"
               // <Touchable.TouchableOpacity selector="list"> //ng
               // <TouchableOpacity selector="list"> //ok
-          return (
-                  <BookCell book={movie}
-                    sectionID={sectionID}
-                    rowID={rowID}
-                    onLike={this.props.onLike}
-                    onDone={this.props.onDone}
-                    onInbox={this.props.onInbox}
-                  />
-              );
-        }}
+           (
+             <BookCell
+               book={movie}
+               sectionID={sectionID}
+               rowID={rowID}
+               onLike={this.props.onLike}
+               onDone={this.props.onDone}
+               onInbox={this.props.onInbox}
+             />
+              )
+        }
 
-        enableEmptySections
-        automaticallyAdjustContentInsets={false}
-        keyboardDismissMode="on-drag"
-        keyboardShouldPersistTaps
-        showsVerticalScrollIndicator={false}
-      />
-            <View style={[styles.row,
-                            { justifyContent: 'space-between',
-                              alignItems: 'center' }]}>
-              <Touchable.FAIcon name="filter"
-                selector="filter"
-                size={25}
-                color="#007AFF"
-                style={{ marginHorizontal: 8 }}
-              />
-              <Touchable.FAIcon name="sort"
-                selector="sort"
-                size={25}
-                color="#007AFF"
-                style={{ marginHorizontal: 8 }}
-              />
-            </View>
+          enableEmptySections
+          automaticallyAdjustContentInsets={false}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps
+          showsVerticalScrollIndicator={false}
+        />
+        <View
+          style={[styles.row,
+            { justifyContent: 'space-between',
+              alignItems: 'center' }]}
+        >
+          <Touchable.FAIcon
+            name="filter"
+            selector="filter"
+            size={25}
+            color="#007AFF"
+            style={{ marginHorizontal: 8 }}
+          />
+          <Touchable.FAIcon
+            name="sort"
+            selector="sort"
+            size={25}
+            color="#007AFF"
+            style={{ marginHorizontal: 8 }}
+          />
+        </View>
       </View>
     );
   },
@@ -150,7 +156,8 @@ const BookListView = React.createClass({
 const InBoxScreen = React.createClass({
   render() {
     return (
-      <View style={styles.container}
+      <View
+        style={styles.container}
         key="InBoxScreen"
       >
         {}
