@@ -313,3 +313,33 @@ storiesOf('View', module)
       }
     </TestListView>
   ))
+
+class LinkingView extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  componentDidMount(){
+    let url = Linking.getInitialURL().then((url) => {
+      if (url) {
+        console.log('Initial url is: ' + url);
+      }
+    }).catch(err => console.error('An error occurred', err));
+  }
+  render(){
+    //this.props.data.length
+    return (
+        <View
+          ref={c=>this.in=c}
+          style={{
+            width:100,height:100,
+            backgroundColor:"green",
+          }} />
+    )
+  }
+}
+
+storiesOf('Linking', module)
+  .add('view ', () => (
+    <LinkingView/>
+  ))
+

@@ -188,11 +188,11 @@ class BookListView extends React.Component {
                    renderSectionHeader(sectionData, sectionID)
           }
         onSwipeStart={(args) => {
-          this.listview.setNativeProps({ scrollEnabled: true });
+            this.listview.setNativeProps({ scrollEnabled: false });
           onSwipeStart(args);
         }}
         onSwipeEnd={(args) => {
-          this.listview.setNativeProps({ scrollEnabled: false });
+          this.listview.setNativeProps({ scrollEnabled: true });
           onSwipeEnd(args);
             // onRelease(rowData,action)
             /* closeAnimation={

@@ -6,6 +6,7 @@
     "start": "./node_modules/react-native/packager/packager.sh start --reset-cache",
     "postinstall": "cd node_modules/@cycle/react-native && rm -rf lib ./-p && npm run compile-lib && cd ../../../ && find ./node_modules/@cycle -type f| grep /.babelrc | xargs rm -f",
     "test": "jest --verbose",
+    "flow_check": "flow check || exit 0",
     "watch": "jest --verbose --watch",
     "storybook": "storybook start -p 7007"
   },
@@ -58,6 +59,7 @@
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.6.0",
     "eslint-plugin-react-native": "^2.0.0",
+    "flow-bin": "^0.34.0",
     "jest": "^17.0.0",
     "jest-cli": "^17.0.0",
     "jest-react-native": "^16.1.0",
