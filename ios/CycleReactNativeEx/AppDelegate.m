@@ -25,6 +25,7 @@
   } else {
     //jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
     AHBuild *build = [[AppHub buildManager] currentBuild];
+    [AppHub buildManager].cellularDownloadsEnabled = YES;
     jsCodeLocation = [build.bundle URLForResource:@"main"
                                   withExtension:@"jsbundle"];
   }
