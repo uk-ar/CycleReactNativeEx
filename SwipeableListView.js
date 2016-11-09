@@ -49,16 +49,16 @@ class _SwipeableListView extends React.Component {
     /* console.log("ds:",
      *             this.state.dataSource.rowIdentities,dataSource.rowIdentities)*/
 
-    const removed =
-      toRowsAndSections(
-        difference(this.state.dataSource.rowIdentities,
-                   dataSource.rowIdentities))
-        .map(({ sectionIndex, rowIndex }) =>
-          ({ section: this.state.dataSource
-                        .sectionIdentities[sectionIndex],
-            row: this.state.dataSource
-                    .rowIdentities[sectionIndex][rowIndex] }));
-
+    /* const removed =
+     *   toRowsAndSections(
+     *     difference(this.state.dataSource.rowIdentities,
+     *                dataSource.rowIdentities))
+     *     .map(({ sectionIndex, rowIndex }) =>
+     *       ({ section: this.state.dataSource
+     *                     .sectionIdentities[sectionIndex],
+     *         row: this.state.dataSource
+     *                 .rowIdentities[sectionIndex][rowIndex] }));
+     */
     this.added = difference(dataSource.rowIdentities,
                             this.state.dataSource.rowIdentities);
 

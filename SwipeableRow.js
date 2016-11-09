@@ -183,9 +183,7 @@ class _SwipeableRow3 extends React.Component {
   }
   swipeTo(anim, fn) {
     // return new Promise((resolve, reject) => {
-    InteractionManager.runAfterInteractions(() => {
-      anim.start(fn);
-    });
+    anim.start(()=>InteractionManager.runAfterInteractions(fn));
     // })
   }
   swipeToFlat(velocity, fn) {
