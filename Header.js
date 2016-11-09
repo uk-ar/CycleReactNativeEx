@@ -55,53 +55,67 @@ function ItemsHeader({
   if (!itemsInfo[section]) { return null; }
   // const icon = (selectedSection === null) ? (
   const icon = close ? (
-    <Icon
+    <TouchableElement
       onPress={() => onCloseSection(section)}
-      name="close"
-      selector="close"
-      size={20}
-      style={{ marginRight: 5 }}
-    />) : (
-    <Icon
-      name={itemsInfo[section].icon}
-      color={itemsInfo[section].backgroundColor}
-      size={20}
-      style={{ marginRight: 5 }}
-    />);
-
-  const content = (section === 'search' && close) ? (
-    <TextInput
-      autoFocus={true}
-      selector="text-input"
-      onChangeText={onChangeQuery}
-      style={styles.searchBarInput}
-    />
+    >
+      <Icon
+        name="close"
+        selector="close"
+        size={20}
+        style={{ margin:5, marginRight: 5}}
+      />
+    </TouchableElement>
   ) : (
-  <Text>
-    {itemsInfo[section].text}
-  </Text>
+      <Icon
+        name={itemsInfo[section].icon}
+        color={itemsInfo[section].backgroundColor}
+        size={20}
+        style={{ margin:5, marginRight: 5 }}
+      />
   );
 
-  const indicator = (section === 'search' && close && loadingState) ? (
-    <ActivityIndicator
-      animating
-      color="white"
-      size="large"
-      style={styles.spinner}
-    />) : null;
+  const content = (section === 'search' && close) ? (
+    <View
+      style={styles.sectionHeader}
+      key={section}>
+      {icon}
+      <TextInput
+        autoFocus={true}
+        selector="text-input"
+        onChangeText={onChangeQuery}
+        style={styles.searchBarInput}
+      />
+      { loadingState ? (
+          <ActivityIndicator
+            animating
+            color="white"
+            size="large"
+            style={styles.spinner}
+          />) : null
+      }
+    </View>
+  ) : (
+    <View
+      style={styles.sectionHeader}
+      key={section}>
+      {icon}
+      <Text>
+        {itemsInfo[section].text}
+      </Text>
+    </View>
+  );
 
   return (
     <View style={style}>
-      <TouchableElement
-        onPress={() => onSelectSection(section)}
-        key={section}
-      >
-        <View style={styles.sectionHeader}>
-          {icon}
-          {content}
-          {indicator}
-        </View>
-      </TouchableElement>
+      {close ?
+       content : (
+         <TouchableElement
+           onPress={() => onSelectSection(section)}
+           key={section}
+         >
+           {content}
+         </TouchableElement>)
+      }
     </View>
   );
 }

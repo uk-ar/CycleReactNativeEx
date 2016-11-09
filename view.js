@@ -161,6 +161,7 @@ class MainView extends React.Component {
                  style={{backgroundColor:style.backgroundColor}}
                  selector="section"
                  section={sectionID}
+                 key={sectionID}
                  {...sectionData}
                  onSelectSection={(section) => {
                    if (dataSource.sectionIdentities.length === 2) { return; }
