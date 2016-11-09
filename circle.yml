@@ -3,9 +3,19 @@ machine:
   node:
     version: 6.3.0
   post:
-    - npm install -g npm@3
+    - curl -o- -L https://yarnpkg.com/install.sh | bash
   timezone:
     Asia/Tokyo # Set the timezone
+
+dependencies:
+  cache_directories:
+    - "~/.yarn-cache"
+
+  pre:
+    - yarn --version
+
+  override:
+    - yarn install
 
 deployment:
   production:
