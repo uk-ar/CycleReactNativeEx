@@ -70,10 +70,8 @@ function ItemsHeader({
     />);
 
   const content = (section === 'search' && close) ? (
-    //        autoFocus={true}
     <TextInput
-      autoCapitalize="none"
-      autoCorrect={false}
+      autoFocus={true}
       selector="text-input"
       onChangeText={onChangeQuery}
       style={styles.searchBarInput}
@@ -95,9 +93,7 @@ function ItemsHeader({
   return (
     <TouchableElement
       onPress={() => onSelectSection(section)}
-      selector="section"
       key={section}
-      payload={payload}
     >
       <View style={style || styles.sectionHeader}>
         {icon}
@@ -121,12 +117,10 @@ ItemsHeader.defaultProps = {
   //close, payload, section, loadingState
 };
 
-function ItemsFooter({ payload, count, onSelectSection }) {
+function ItemsFooter({ count, onSelectSection }) {
   return (
     <TouchableElement
       onPress={() => onSelectSection(section)}
-      selector="section"
-      payload={payload}
     >
       <View style={styles.sectionFooter}>
         <Text>
@@ -138,6 +132,7 @@ function ItemsFooter({ payload, count, onSelectSection }) {
 }
 
 ItemsFooter.propTypes = {
+  count: React.PropTypes.number,
   onSelectSection: React.PropTypes.func,
   //close, payload, section, loadingState
 };
