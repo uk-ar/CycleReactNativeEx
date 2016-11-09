@@ -91,16 +91,18 @@ function ItemsHeader({
     />) : null;
 
   return (
-    <TouchableElement
-      onPress={() => onSelectSection(section)}
-      key={section}
-    >
-      <View style={style || styles.sectionHeader}>
-        {icon}
-        {content}
-        {indicator}
-      </View>
-    </TouchableElement>
+    <View style={style}>
+      <TouchableElement
+        onPress={() => onSelectSection(section)}
+        key={section}
+      >
+        <View style={styles.sectionHeader}>
+          {icon}
+          {content}
+          {indicator}
+        </View>
+      </TouchableElement>
+    </View>
   );
 }
 

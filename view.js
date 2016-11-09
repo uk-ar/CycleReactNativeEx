@@ -158,6 +158,7 @@ class MainView extends React.Component {
       // call upper onSelectSection after scroll
              (
                <ItemsHeader
+                 style={{backgroundColor:style.backgroundColor}}
                  selector="section"
                  section={sectionID}
                  {...sectionData}
@@ -314,6 +315,7 @@ function view(model) {
               >
                 <StatusBar
                   barStyle="light-content"
+                  networkActivityIndicatorVisible={true}
                 />
                 <Touchable.MainView
                   selector="main"
