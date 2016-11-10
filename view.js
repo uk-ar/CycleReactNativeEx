@@ -5,7 +5,7 @@ import materialColor from 'material-colors';
 import {
   Platform,
   Text,
-  View,
+  WebView,
   NavigationExperimental,
   TextInput,
   StatusBar,
@@ -264,7 +264,9 @@ function view(model) {
             );
           case 'Book Detail':
             // return (MainView(model))
-            // console.log(model)
+            console.log(model.selectedBook)
+            let {selectedBook:{libraryStatus:{reserveUrl:url}}} = model;
+            url = url || 'https://github.com/facebook/react-native'
             return (
               <MyCard
                 navigationProps={navigationProps}
@@ -280,15 +282,14 @@ function view(model) {
             renderTitleComponent={props =>
               (
                 <NavigationExperimental.Header.Title>
-                  foo
+                                 foo
                 </NavigationExperimental.Header.Title>
               )
                                  }
                                  />
-                <View style={{ marginTop: 64, backgroundColor: 'red' }}>
-                  <Text>book detail</Text>
-                  <Text>{model.selectedBook.title}</Text>
-                </View>
+                <WebView
+        source={{uri: url}}
+              />
               </MyCard>
             );
           default:
