@@ -71,7 +71,8 @@ function intent(RN, HTTP) {
    * .switch()*/
   // map is better?
     // .do(([book, action, closeAnimation]) => closeAnimation.start())//map is better?
-    .do(args => console.log('foo2:', args));
+    //.do(args => console.log('foo2:', args))
+    .shareReplay()
 
   const changeQuery$ = RN.select('text-input')
                          .events('changeText')
@@ -219,35 +220,12 @@ function intent(RN, HTTP) {
   }
 
   const changeBucket$ =
-    release$
-      // .do(i => console.log('release:', i))
-      // .filter(([book, bucket, bookRow]) => bucket !== null)
-  // TODO:change to isbn
-  /* .map(([book, bucket]) => (
-   *   { type: 'replace',
-   *     book,
-   *     bucket,
-   *   }))*/
-  /* .map(([isbn, bucket]) => (
-   *   { type: 'replace',
-   *     isbn,
-   *     bucket,
-   *   }))*/
-  /* .flatMap(([book, bucket, bookRow]) =>
-   *   bookRow.close().then(()=>[book, bucket, bookRow])
-   *   )*/
-  /* .map(([book, bucket]) => {
-   *   return ({ type: 'replace', book, bucket});
-   * })*/
-      .flatMap(([book, bucket]) =>
-        [{ type: 'remove', book },
-         // bookRow.close(),
-         { type: 'add', book, bucket }])
-  /* .map(([book, bucket]) => (
-   *   { type: 'replace',
-   *     book: Object.assign(
-   *       {}, book, { bucket, modifyDate: new Date(Date.now()) }) }))*/
-      // .do(i => console.log('rel:%O', i))
+    Rx.Observable
+      .merge(
+        release$.map(([book, bucket])=>({ type: 'remove', book })),
+        release$.map(([book, bucket])=>({ type: 'add', book, bucket }))
+                .delay(1)//100 ms for re-render
+      )
       .shareReplay();
 
   // [{isbn:,mod},{isbn:,mod}]
@@ -274,7 +252,7 @@ function intent(RN, HTTP) {
         }
       } // ).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
       )
-      // .do((books)=> console.log("books:",books))
+      //.do((books)=> console.log("books:",books))
       .shareReplay();
 
   savedBooks$.do((books) => {

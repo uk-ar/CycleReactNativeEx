@@ -89,7 +89,7 @@ class MainView extends React.Component {
             onSelectCell, style,
             booksLoadingState, selectedSection } = this.props;
     // TODO:keep query text & scroll position
-  // console.log('s b', savedBooks);
+    console.log('ds change', dataSource._dataBlob);
   // TODO: transition to detail view
   // console.log('render main', { items, sectionIDs, rowIDs, booksLoadingState, selectedSection });
   // console.log("render main");
@@ -261,6 +261,7 @@ function view(model) {
    *     id: Math.random(),
    *   } // route
    * );*/
+  console.log('view');
   const navigationState = model.navigationState;
   // return MainView(model);
   // return <MainView  {...model}/>;

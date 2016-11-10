@@ -106,7 +106,6 @@ function model(actions) {
   // sync searchedBooksStatus$ & savedBooksStatus$
   /* .do(i=>console.log("items:",JSON.stringify(i)))
    * .distinctUntilChanged(x => JSON.stringify(x),(a,b)=>a!==b) */
-      // .do(i=>console.log("items:",i))
       .shareReplay();
 
   const limit = 2;
@@ -149,6 +148,7 @@ function model(actions) {
           //rowIdentities
         });
       })
+      //.do(i=>console.log("items:",i.dataBlob))
       .scan(
         (datasource, { dataBlob, sectionIdentities }) =>
         //  (datasource, { dataBlob, sectionIdentities, rowIdentities }) => {
@@ -160,7 +160,8 @@ function model(actions) {
           sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
           getSectionHeaderData: (dataBlob, sectionID) =>
             dataBlob.sections[sectionID]
-        }));
+        }))
+      //.do(i=>console.log("items2:",i._dataBlob))
       // .do(i => console.log('datasource:', i));
       // .subscribe()
 
@@ -204,7 +205,7 @@ function model(actions) {
       // counts$,
       // actions.savedBooks$,
       actions.booksLoadingState$.startWith(false).distinctUntilChanged(),
-      navigationState$.distinctUntilChanged(),
+      navigationState$.distinctUntilChanged(),//.do(i=>console.log("nav",i)),
       selectedBook$.startWith(null).distinctUntilChanged(),
       // LayoutAnimation treate listview as different
       // Rx.Observable.interval(1000).do(i=>console.log("int",i)),
