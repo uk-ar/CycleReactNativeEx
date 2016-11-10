@@ -20,6 +20,7 @@ import {
 import NavigationStateUtils from 'NavigationStateUtils';
 import Touchable from '@cycle/react-native/src/Touchable';
 import { styles } from './styles';
+import emptyFunction from 'fbjs/lib/emptyFunction';
 
 const FAIcon = require('react-native-vector-icons/FontAwesome');
 
@@ -41,7 +42,7 @@ function onNavigateBack(action) {
   const backActionHandler = getBackHandler();
   // if (action.type === 'back' || action.type === 'BackAction') {
   backActionHandler.send();
-// }
+  // }
 }
 
 function MyCard({ children, navigationProps, style }) {
@@ -59,7 +60,7 @@ function MyCard({ children, navigationProps, style }) {
       renderScene={() => children}
       onNavigate={onNavigateBack}
     />
-    );
+  );
 }
 
 import { BookCell } from './BookCell';
@@ -86,118 +87,118 @@ class MainView extends React.Component {
   render() {
     const { items, sectionIDs, rowIDs, dataSource,
             onSelectSection, onCloseSection, onRelease,
-            onSelectCell, style,
+            onSelectCell, style, onChangeQuery,
             booksLoadingState, selectedSection } = this.props;
     // TODO:keep query text & scroll position
-    console.log('ds change', dataSource._dataBlob);
-  // TODO: transition to detail view
-  // console.log('render main', { items, sectionIDs, rowIDs, booksLoadingState, selectedSection });
-  /* LayoutAnimation.configureNext(
-   *   LayoutAnimation.create(1000,
-   *                          LayoutAnimation.Types.easeInEaseOut,
-   *                          LayoutAnimation.Properties.opacity))*/
-  // items={items}
-  //        key={selectedSection}
-  // props.animations.start()
+    //console.log('ds change', dataSource._dataBlob);
+    // TODO: transition to detail view
+    // console.log('render main', { items, sectionIDs, rowIDs, booksLoadingState, selectedSection });
+    /* LayoutAnimation.configureNext(
+     *   LayoutAnimation.create(1000,
+     *                          LayoutAnimation.Types.easeInEaseOut,
+     *                          LayoutAnimation.Properties.opacity))*/
+    // items={items}
+    //        key={selectedSection}
+    // props.animations.start()
     //      style={{ marginTop: 64, backgroundColor: 'red' }}
     return (
       <BookListView
         style={style}
         dataSource={dataSource}
         ref={(c) => {
-          this.listview = c;
-        }}
+            this.listview = c;
+          }}
         directionalLockEnabled
         enableEmptySections
         generateActions={(rowData, sectionID, rowID) =>
           genActions2(sectionID)}
         onSwipeEnd={({ rowData, sectionID, rowID, action, ...rest }) => {
-          onRelease(rowData, action);
-        /* if(action.target == null) { return }
-         *   this.listview
-         *       .close(sectionID,rowID)*/
-          // TODO: handle data in intent.js
-              /* .then(()=>{
-          const s = {...this.data[sectionID]}
-          delete s[rowID]
-          this.data = {...this.data,[sectionID]:s}
-          return this.updateDataSource()
-          })
-          .then(()=>{
-          this.data = {
-          ...this.data,
-          [action.target]:{[rowID]:rowData,...this.data[action.target]}
-          }
-          this.updateDataSource()
-          }) */
-        }}
+            onRelease(rowData, action);
+            /* if(action.target == null) { return }
+             *   this.listview
+             *       .close(sectionID,rowID)*/
+            // TODO: handle data in intent.js
+            /* .then(()=>{
+               const s = {...this.data[sectionID]}
+               delete s[rowID]
+               this.data = {...this.data,[sectionID]:s}
+               return this.updateDataSource()
+               })
+               .then(()=>{
+               this.data = {
+               ...this.data,
+               [action.target]:{[rowID]:rowData,...this.data[action.target]}
+               }
+               this.updateDataSource()
+               }) */
+          }}
         renderRow={(rowData, sectionID, rowID) =>
-             (
-               <BookCell
+          (
+            <BookCell
                  onPress={() => {
-                   onSelectCell(rowData);
-                 }}
+                     onSelectCell(rowData);
+                   }}
                  book={rowData}
                  style={{
                    backgroundColor: materialColor.grey['50']}}
-               />
-             )
+                       />
+          )
           /* style={{
            *   ...StyleSheet.absoluteFillObject,
            *   backgroundColor: materialColor.grey['50'],
            *   //margin: 10,
            * }}*/
-        }
+                  }
         onScroll={Animated.event(
-      [{ nativeEvent: { contentOffset: { y: this._scrollY } } }],
-      //{listener},          // Optional async listener
-    )}
+            [{ nativeEvent: { contentOffset: { y: this._scrollY } } }],
+            //{listener},          // Optional async listener
+          )}
         renderSectionHeader={(sectionData, sectionID) =>
-      // call upper onSelectSection after scroll
-             (
-               <ItemsHeader
+          // call upper onSelectSection after scroll
+          (
+            <ItemsHeader
                  style={{backgroundColor:style.backgroundColor}}
-                 selector="section"
+                 onChangeQuery={onChangeQuery}
                  section={sectionID}
                  key={sectionID}
                  {...sectionData}
                  onSelectSection={(section) => {
-                   if (dataSource.sectionIdentities.length === 2) { return; }
-                   this.positions.push(this._scrollY.__getValue());
-                    // TODO:
-                    // 1. scroll to section header with animation
-                    // (need expand view in android)
-                    // 2. save section header position
-                   this.listview.scrollTo({ y: 0, animated: false });
-                   onSelectSection(section);
-                    // this.sectionIdentities = [section,`${section}_end`]
-                    // this.updateDataSource()
-                 }}
+                     if (dataSource.sectionIdentities.length === 2) { return; }
+                     this.positions.push(this._scrollY.__getValue());
+                     // TODO:
+                     // 1. scroll to section header with animation
+                     // (need expand view in android)
+                     // 2. save section header position
+                     this.listview.scrollTo({ y: 0, animated: false });
+                     onSelectSection(section);
+                     // this.sectionIdentities = [section,`${section}_end`]
+                     // this.updateDataSource()
+                   }}
                  onCloseSection={() => {
-                    // TODO:
-                    // 1. scroll to section header with animation
-                    // this.listview.scrollTo({y:0,animated:true})
-                    // this.sectionIdentities = Object.keys(this.data)
-                   onCloseSection();
-                   const pos = this.positions.pop();
-                   setTimeout(() =>
-                      this.listview.scrollTo({ y: pos,
-                        animated: false }));
-                    /* this.updateDataSource().then(()=>{
-                    //TODO:
-                    //2. scroll to section header with no animation
-                    //2. scroll to original position with animation
-                    }) */
-                 }}
-               />)
-          }
+                     // TODO:
+                     // 1. scroll to section header with animation
+                     // this.listview.scrollTo({y:0,animated:true})
+                     // this.sectionIdentities = Object.keys(this.data)
+                     onCloseSection();
+                     const pos = this.positions.pop();
+                     setTimeout(() =>
+                       this.listview.scrollTo({ y: pos,
+                                                animated: false }));
+                     /* this.updateDataSource().then(()=>{
+                        //TODO:
+                        //2. scroll to section header with no animation
+                        //2. scroll to original position with animation
+                        }) */
+                   }}
+                                />)
+                            }
         renderSectionFooter={(sectionData, sectionID) =>
-            // console.log("fo",sectionData)
-             (
-               <ItemsFooter
+          // console.log("fo",sectionData)
+          (
+            <ItemsFooter
                  {...sectionData}
-               />)
-          }
+                 />)
+                            }
       />
     );
   }
@@ -207,16 +208,18 @@ MainView.propTypes = {
   onSelectSection: React.PropTypes.func,
   onCloseSection: React.PropTypes.func,
   onRelease: React.PropTypes.func,
-  onSelectCell: React.PropTypes.func
+  onSelectCell: React.PropTypes.func,
+  onChangeQuery: React.PropTypes.func
 };
-/* MainView.defaultProps = {
- *   onRelease:emptyFunction,
- * };*/
+MainView.defaultProps = {
+  //onRelease:
+  onChangeQuery:emptyFunction
+};
 Touchable.MainView = Touchable.createCycleComponent(
   MainView);
 
 function view(model) {
-  console.log('view');
+  //console.log('view');
   const navigationState = model.navigationState;
   // return <MainView  {...model}/>;
   // console.log('mynav', navigationState, onNavigateBack);
@@ -227,7 +230,7 @@ function view(model) {
       navigationState={navigationState}
       onNavigate={onNavigateBack}
       renderScene={(navigationProps) => {
-        console.log('MyNav:renderScene', navigationProps);
+          //console.log('MyNav:renderScene', navigationProps);
       // const key = navigationProps.scene.navigationState.key;
         const key = navigationProps.scene.route.key;
         switch (key) {
@@ -264,7 +267,7 @@ function view(model) {
             );
           case 'Book Detail':
             // return (MainView(model))
-            console.log(model.selectedBook)
+            //console.log(model.selectedBook)
             let {selectedBook:{libraryStatus:{reserveUrl:url}}} = model;
             url = url || 'https://github.com/facebook/react-native'
             return (

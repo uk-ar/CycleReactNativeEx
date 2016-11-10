@@ -74,10 +74,13 @@ function intent(RN, HTTP) {
     //.do(args => console.log('foo2:', args))
     .shareReplay()
 
-  const changeQuery$ = RN.select('text-input')
-                         .events('changeText')
-                         .map(([text]) => text);
-                         // .do(i => console.log('search text change:%O', i));
+  const changeQuery$ = RN
+  /* .select('text-input')
+   * .events('changeText')*/
+    .select('main')
+    .events('changeQuery')
+    .map(([text]) => text);
+  // .do(i => console.log('search text change:%O', i));
 
   const requestSearchedBooks$ =
     changeQuery$.debounce(500)
