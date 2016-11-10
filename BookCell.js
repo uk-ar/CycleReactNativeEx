@@ -74,13 +74,13 @@ function BookCell({ book, style, onPress, ...props }) {
           style={[styles.cellImage]}
         />
         <View
-style={[{ flexDirection: 'column',
+          style={[{ flexDirection: 'column',
           flex: 1,
                         //backgroundColor:"red",
         }]}
         >
           <View
-style={[{ padding: 10, justifyContent: 'center' },
+            style={[{ padding: 10, justifyContent: 'center' },
           ]}
           >
             <View style={{ flexDirection: 'row' }}>

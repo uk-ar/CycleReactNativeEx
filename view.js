@@ -10,6 +10,7 @@ import {
   TextInput,
   StatusBar,
   Animated,
+  StyleSheet,
   ScrollView,
   LayoutAnimation,
   ActivityIndicator,
@@ -76,7 +77,6 @@ Touchable.ItemsHeader = Touchable.createCycleComponent(ItemsHeader);
 import { LayoutableView } from './Closeable';
 import Stylish from 'react-native-stylish';
 
-// function MainView({ items, sectionIDs, rowIDs, dataSource, booksLoadingState, selectedSection }) {
 class MainView extends React.Component {
   constructor(props) {
     super(props);
@@ -92,21 +92,13 @@ class MainView extends React.Component {
     console.log('ds change', dataSource._dataBlob);
   // TODO: transition to detail view
   // console.log('render main', { items, sectionIDs, rowIDs, booksLoadingState, selectedSection });
-  // console.log("render main");
   /* LayoutAnimation.configureNext(
    *   LayoutAnimation.create(1000,
    *                          LayoutAnimation.Types.easeInEaseOut,
    *                          LayoutAnimation.Properties.opacity))*/
-  // let header = <Header />;
-  // const header = null;
-  // console.log('render main2', items);
   // items={items}
   //        key={selectedSection}
   // props.animations.start()
-  // scroll
-  // <BookListView
-    //        key={selectedSection}
-    //      selector="listview"
     //      style={{ marginTop: 64, backgroundColor: 'red' }}
     return (
       <BookListView
@@ -146,9 +138,15 @@ class MainView extends React.Component {
                    onSelectCell(rowData);
                  }}
                  book={rowData}
-                 style={{ backgroundColor: materialColor.grey['50'] }}
+                 style={{
+                   backgroundColor: materialColor.grey['50']}}
                />
-            )
+             )
+          /* style={{
+           *   ...StyleSheet.absoluteFillObject,
+           *   backgroundColor: materialColor.grey['50'],
+           *   //margin: 10,
+           * }}*/
         }
         onScroll={Animated.event(
       [{ nativeEvent: { contentOffset: { y: this._scrollY } } }],
@@ -201,32 +199,6 @@ class MainView extends React.Component {
                />)
           }
       />
-     /* onSelectSection={(section)=>{
-         if(dataSource.sectionIdentities.length === 2){ return }
-         this.positions.push(this._scrollY.__getValue())
-         //TODO:
-         //1. scroll to section header with animation
-         // (need expand view in android)
-         //2. save section header position
-         this.listview.scrollTo({y:0,animated:false})
-         this.sectionIdentities = [section,`${section}_end`]
-         //this.updateDataSource()
-         }}
-        onCloseSection={(section)=>{
-         //TODO:
-         //1. scroll to section header with animation
-         //this.listview.scrollTo({y:0,animated:true})
-         this.sectionIdentities = Object.keys(this.data)
-         this.updateDataSource().then(()=>{
-         //TODO:
-         //2. scroll to section header with no animation
-         //2. scroll to original position with animation
-         let pos = this.positions.pop()
-         setTimeout(()=>
-         this.listview.scrollTo({y:pos,
-         animated:false}))
-         })
-         }} */
     );
   }
 }
@@ -244,26 +216,8 @@ Touchable.MainView = Touchable.createCycleComponent(
   MainView);
 
 function view(model) {
-  /* NavigationExperimental.Transitioner calls twice when layout changed in
-     android. But NavigationExperimental.CardStack cannot re-render by model
-     change.So we should add random key or force update*/
-  // http://stackoverflow.com/a/35004739
-  // return <MainView {...model} />;
-  /* return <Touchable.MainView
-   *          selector="main"
-   *          {...model}
-   *        />;*/
-  /* const navigationState = NavigationStateUtils.replaceAtIndex(
-   *   model.navigationState, // navigationState
-   *   model.navigationState.index, // index
-   *   {
-   *     ...model.navigationState.routes[model.navigationState.index],
-   *     id: Math.random(),
-   *   } // route
-   * );*/
   console.log('view');
   const navigationState = model.navigationState;
-  // return MainView(model);
   // return <MainView  {...model}/>;
   // console.log('mynav', navigationState, onNavigateBack);
   return (
@@ -272,28 +226,6 @@ function view(model) {
       style={{ flex: 1 }}
       navigationState={navigationState}
       onNavigate={onNavigateBack}
-      renderHeader={(navigationProps) => {
-          // console.log("np:",navigationProps);
-        const style = null;
-        if (navigationProps.scene.route.key === 'Main') {
-            // style = { opacity: 0 }; // cannot touch close button
-          return null;
-        }//
-        return (
-          <NavigationExperimental.Header
-            {...navigationProps}
-            onNavigateBack={onNavigateBack}
-            style={style}
-            renderTitleComponent={props =>
-                 (
-                   <NavigationExperimental.Header.Title>
-                               foo
-                </NavigationExperimental.Header.Title>
-              )
-              }
-          />);
-          // return (<Text>overlay</Text>)
-      }}
       renderScene={(navigationProps) => {
         console.log('MyNav:renderScene', navigationProps);
       // const key = navigationProps.scene.navigationState.key;
@@ -336,11 +268,23 @@ function view(model) {
             return (
               <MyCard
                 navigationProps={navigationProps}
-                style={{ paddingTop: 20, backgroundColor: 'yellow' }}
-              >
+                style={{backgroundColor: 'yellow' }}
+                      >
                 <StatusBar
-                  barStyle="light-content"
-                />
+                  animated={true}
+                  barStyle='dark-content'
+                            />
+                <NavigationExperimental.Header
+            {...navigationProps}
+            onNavigateBack={onNavigateBack}
+            renderTitleComponent={props =>
+              (
+                <NavigationExperimental.Header.Title>
+                  foo
+                </NavigationExperimental.Header.Title>
+              )
+                                 }
+                                 />
                 <View style={{ marginTop: 64, backgroundColor: 'red' }}>
                   <Text>book detail</Text>
                   <Text>{model.selectedBook.title}</Text>
@@ -357,14 +301,5 @@ function view(model) {
 
     />);
 }
-/* renderOverlay={(props)=>{
-   return (
-   //NavigationExperimental.Header is not deplicated, but no examples.
-   <NavigationExperimental.Header
-   {...props}
-   />
-   )
-   }}
- */
 
 module.exports = view;
