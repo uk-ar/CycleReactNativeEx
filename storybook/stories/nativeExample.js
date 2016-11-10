@@ -6,7 +6,8 @@ import {
   Animated,
   View,
   ScrollView,
-  ListView
+  ListView,
+  Linking
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import ReactTransitionGroup from 'react-addons-transition-group';
@@ -322,8 +323,17 @@ class LinkingView extends React.Component {
     let url = Linking.getInitialURL().then((url) => {
       if (url) {
         console.log('Initial url is: ' + url);
+      }else{
+        console.log('no url');
       }
     }).catch(err => console.error('An error occurred', err));
+    Linking.addEventListener('url', this._handleOpenURL);
+  }
+  componentWillUnmount() {
+    Linking.removeEventListener('url', this._handleOpenURL);
+  }
+  _handleOpenURL(event) {
+    console.log("shareotu",event.url);
   }
   render(){
     //this.props.data.length
@@ -333,7 +343,13 @@ class LinkingView extends React.Component {
           style={{
             width:100,height:100,
             backgroundColor:"green",
-          }} />
+          }}>
+          <Text onPress={()=>{
+              Linking.openURL("http://www.google.co.jp").catch(err => console.error('An error occurred', err));
+            }}>
+            press to open url
+          </Text>
+      </View>
     )
   }
 }
@@ -342,4 +358,3 @@ storiesOf('Linking', module)
   .add('view ', () => (
     <LinkingView/>
   ))
-
