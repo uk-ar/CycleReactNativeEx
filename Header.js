@@ -8,6 +8,7 @@ import {
   ScrollView,
   LayoutAnimation,
   ActivityIndicator,
+  TouchableOpacity,
   // TouchableHighlight,
   // TouchableNativeFeedback
 } from 'react-native';
@@ -55,7 +56,7 @@ function ItemsHeader({
   if (!itemsInfo[section]) { return null; }
   // const icon = (selectedSection === null) ? (
   const icon = close ? (
-    <TouchableElement
+    <TouchableOpacity
       onPress={() => onCloseSection(section)}
     >
       <Icon
@@ -64,7 +65,7 @@ function ItemsHeader({
         size={20}
         style={{ margin:5, marginRight: 5}}
       />
-    </TouchableElement>
+    </TouchableOpacity>
   ) : (
       <Icon
         name={itemsInfo[section].icon}
