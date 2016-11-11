@@ -27,6 +27,28 @@
 		444EED4002A0418EA178787A /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7C34D3E49A4BEEB13067E8 /* libz.tbd */; };
 		466E21023BB84F7592BA61A7 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5DA7D51CB6C544EB83E8CE70 /* Octicons.ttf */; };
 		4CC2CD7C20214D98A6E6F1E8 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F01E89B120FB4D9795BDB732 /* libc++.tbd */; };
+		4F121C361DD5155A00479019 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4F121C341DD5155A00479019 /* MainInterface.storyboard */; };
+		4F121C3A1DD5155A00479019 /* CycleReactNativeExShareExt.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4F121C2F1DD5155A00479019 /* CycleReactNativeExShareExt.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4F121C3F1DD5158A00479019 /* CycleReactNativeExShareExt.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F121C3E1DD5158A00479019 /* CycleReactNativeExShareExt.m */; };
+		4F121C661DD51BC800479019 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
+		4F121C6B1DD6677100479019 /* libAppHub.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D68D11DD283AC00E38E07 /* libAppHub.a */; };
+		4F121C6C1DD6677100479019 /* libAppHubTestUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F121C5C1DD5182000479019 /* libAppHubTestUtils.a */; };
+		4F121C6E1DD6677100479019 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
+		4F121C6F1DD6677100479019 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
+		4F121C701DD6677100479019 /* libRCTImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302C01ABCB91800DB3ED1 /* libRCTImage.a */; };
+		4F121C711DD6677100479019 /* libRCTLinking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 78C398B91ACF4ADC00677621 /* libRCTLinking.a */; };
+		4F121C721DD6677100479019 /* libRCTNetwork.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302DC1ABCB9D200DB3ED1 /* libRCTNetwork.a */; };
+		4F121C731DD6677100479019 /* libRCTSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 139105C11AF99BAD00B5F7CC /* libRCTSettings.a */; };
+		4F121C741DD6677100479019 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
+		4F121C751DD6677100479019 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
+		4F121C761DD6677100479019 /* libRCTWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 139FDEF41B06529B00C62182 /* libRCTWebSocket.a */; };
+		4F121C781DD6677100479019 /* libRealmReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D68A31DD277B200E38E07 /* libRealmReact.a */; };
+		4F121C791DD6677100479019 /* libRNSearchBar.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D68A61DD277B200E38E07 /* libRNSearchBar.a */; };
+		4F121C7A1DD6677100479019 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D68A91DD277B200E38E07 /* libRNVectorIcons.a */; };
+		4F121C7D1DD667B300479019 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7C34D3E49A4BEEB13067E8 /* libz.tbd */; };
+		4F121C7E1DD668A300479019 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D69171DD283ED00E38E07 /* SystemConfiguration.framework */; };
+		4F121C7F1DD6693900479019 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F01E89B120FB4D9795BDB732 /* libc++.tbd */; };
+		4F121C801DD6695700479019 /* libReactNativeShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F121C451DD5168F00479019 /* libReactNativeShareExtension.a */; };
 		4F6D68FF1DD283E500E38E07 /* libAppHub.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D68D11DD283AC00E38E07 /* libAppHub.a */; };
 		4F6D69181DD283ED00E38E07 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D69171DD283ED00E38E07 /* SystemConfiguration.framework */; };
 		4FD5DF08C6134631944B2A6C /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38485E051F3D46B58841202D /* libRNVectorIcons.a */; };
@@ -105,6 +127,20 @@
 			proxyType = 2;
 			remoteGlobalIDString = 83CBBA2E1A601D0E00E9B192;
 			remoteInfo = React;
+		};
+		4F121C381DD5155A00479019 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4F121C2E1DD5155A00479019;
+			remoteInfo = CycleReactNativeExShareExt;
+		};
+		4F121C441DD5168F00479019 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4F121C401DD5168E00479019 /* ReactNativeShareExtension.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 41B5DE301D0B505800949BD5;
+			remoteInfo = ReactNativeShareExtension;
 		};
 		4F6D68781DD277B200E38E07 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -227,6 +263,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				4F121C3A1DD5155A00479019 /* CycleReactNativeExShareExt.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -257,6 +294,16 @@
 		1D362CB39458434081779B96 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		29294616E42040068C91F007 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		38485E051F3D46B58841202D /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
+		4F121C2F1DD5155A00479019 /* CycleReactNativeExShareExt.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CycleReactNativeExShareExt.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F121C351DD5155A00479019 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		4F121C371DD5155A00479019 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4F121C3E1DD5158A00479019 /* CycleReactNativeExShareExt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CycleReactNativeExShareExt.m; sourceTree = "<group>"; };
+		4F121C401DD5168E00479019 /* ReactNativeShareExtension.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeShareExtension.xcodeproj; path = "../node_modules/react-native-share-extension/ios/ReactNativeShareExtension.xcodeproj"; sourceTree = "<group>"; };
+		4F121C5C1DD5182000479019 /* libAppHubTestUtils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAppHubTestUtils.a; path = "../../Library/Developer/Xcode/DerivedData/CycleReactNativeEx-frvazbijhwseymglbygqkalzwzca/Build/Products/Debug-iphonesimulator/libAppHubTestUtils.a"; sourceTree = "<group>"; };
+		4F121C5D1DD5182000479019 /* libGCDWebServers.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGCDWebServers.a; path = "../../Library/Developer/Xcode/DerivedData/CycleReactNativeEx-frvazbijhwseymglbygqkalzwzca/Build/Products/Debug-iphonesimulator/libGCDWebServers.a"; sourceTree = "<group>"; };
+		4F121C5E1DD5182000479019 /* libRealmJS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRealmJS.a; path = "../../Library/Developer/Xcode/DerivedData/CycleReactNativeEx-frvazbijhwseymglbygqkalzwzca/Build/Products/Debug-iphonesimulator/libRealmJS.a"; sourceTree = "<group>"; };
+		4F121C5F1DD5182000479019 /* libRealmNode.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libRealmNode.dylib; path = ../node_modules/realm/src/build/Debug/libRealmNode.dylib; sourceTree = "<group>"; };
+		4F121C7B1DD6677200479019 /* libRealmNode.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libRealmNode.dylib; path = ../node_modules/realm/src/build/Debug/libRealmNode.dylib; sourceTree = "<group>"; };
 		4F6D68CA1DD283AC00E38E07 /* AppHub.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AppHub.xcodeproj; path = ../node_modules/apphub/AppHub/AppHub.xcodeproj; sourceTree = "<group>"; };
 		4F6D69171DD283ED00E38E07 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		50D4B74582BC4AAAA404105A /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
@@ -309,6 +356,32 @@
 				335060BA34F54CD9B883F5BC /* libRealmReact.a in Frameworks */,
 				4CC2CD7C20214D98A6E6F1E8 /* libc++.tbd in Frameworks */,
 				444EED4002A0418EA178787A /* libz.tbd in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4F121C2C1DD5155A00479019 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F121C801DD6695700479019 /* libReactNativeShareExtension.a in Frameworks */,
+				4F121C7E1DD668A300479019 /* SystemConfiguration.framework in Frameworks */,
+				4F121C6B1DD6677100479019 /* libAppHub.a in Frameworks */,
+				4F121C661DD51BC800479019 /* libReact.a in Frameworks */,
+				4F121C6E1DD6677100479019 /* libRCTActionSheet.a in Frameworks */,
+				4F121C6F1DD6677100479019 /* libRCTGeolocation.a in Frameworks */,
+				4F121C701DD6677100479019 /* libRCTImage.a in Frameworks */,
+				4F121C711DD6677100479019 /* libRCTLinking.a in Frameworks */,
+				4F121C721DD6677100479019 /* libRCTNetwork.a in Frameworks */,
+				4F121C731DD6677100479019 /* libRCTSettings.a in Frameworks */,
+				4F121C741DD6677100479019 /* libRCTText.a in Frameworks */,
+				4F121C751DD6677100479019 /* libRCTVibration.a in Frameworks */,
+				4F121C761DD6677100479019 /* libRCTWebSocket.a in Frameworks */,
+				4F121C6C1DD6677100479019 /* libAppHubTestUtils.a in Frameworks */,
+				4F121C791DD6677100479019 /* libRNSearchBar.a in Frameworks */,
+				4F121C7A1DD6677100479019 /* libRNVectorIcons.a in Frameworks */,
+				4F121C781DD6677100479019 /* libRealmReact.a in Frameworks */,
+				4F121C7F1DD6693900479019 /* libc++.tbd in Frameworks */,
+				4F121C7D1DD667B300479019 /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,6 +504,24 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		4F121C301DD5155A00479019 /* CycleReactNativeExShareExt */ = {
+			isa = PBXGroup;
+			children = (
+				4F121C341DD5155A00479019 /* MainInterface.storyboard */,
+				4F121C371DD5155A00479019 /* Info.plist */,
+				4F121C3E1DD5158A00479019 /* CycleReactNativeExShareExt.m */,
+			);
+			path = CycleReactNativeExShareExt;
+			sourceTree = "<group>";
+		};
+		4F121C411DD5168E00479019 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4F121C451DD5168F00479019 /* libReactNativeShareExtension.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		4F6D68731DD277B200E38E07 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -485,6 +576,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				4F121C401DD5168E00479019 /* ReactNativeShareExtension.xcodeproj */,
 				4F6D68CA1DD283AC00E38E07 /* AppHub.xcodeproj */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
@@ -519,6 +611,7 @@
 				13B07FAE1A68108700A75B9A /* CycleReactNativeEx */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* CycleReactNativeExTests */,
+				4F121C301DD5155A00479019 /* CycleReactNativeExShareExt */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				D576DA6E14F746D5B61914BC /* Frameworks */,
 				3AC522CC75B24ABCA37142D6 /* Resources */,
@@ -532,6 +625,7 @@
 			children = (
 				13B07F961A680F5B00A75B9A /* CycleReactNativeEx.app */,
 				00E356EE1AD99517003FC87E /* CycleReactNativeExTests.xctest */,
+				4F121C2F1DD5155A00479019 /* CycleReactNativeExShareExt.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -539,6 +633,11 @@
 		D576DA6E14F746D5B61914BC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4F121C7B1DD6677200479019 /* libRealmNode.dylib */,
+				4F121C5C1DD5182000479019 /* libAppHubTestUtils.a */,
+				4F121C5D1DD5182000479019 /* libGCDWebServers.a */,
+				4F121C5E1DD5182000479019 /* libRealmJS.a */,
+				4F121C5F1DD5182000479019 /* libRealmNode.dylib */,
 				4F6D69171DD283ED00E38E07 /* SystemConfiguration.framework */,
 				F01E89B120FB4D9795BDB732 /* libc++.tbd */,
 				FB7C34D3E49A4BEEB13067E8 /* libz.tbd */,
@@ -580,11 +679,29 @@
 			buildRules = (
 			);
 			dependencies = (
+				4F121C391DD5155A00479019 /* PBXTargetDependency */,
 			);
 			name = CycleReactNativeEx;
 			productName = "Hello World";
 			productReference = 13B07F961A680F5B00A75B9A /* CycleReactNativeEx.app */;
 			productType = "com.apple.product-type.application";
+		};
+		4F121C2E1DD5155A00479019 /* CycleReactNativeExShareExt */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4F121C3B1DD5155A00479019 /* Build configuration list for PBXNativeTarget "CycleReactNativeExShareExt" */;
+			buildPhases = (
+				4F121C2B1DD5155A00479019 /* Sources */,
+				4F121C2C1DD5155A00479019 /* Frameworks */,
+				4F121C2D1DD5155A00479019 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CycleReactNativeExShareExt;
+			productName = CycleReactNativeExShareExt;
+			productReference = 4F121C2F1DD5155A00479019 /* CycleReactNativeExShareExt.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -602,6 +719,11 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
+						DevelopmentTeam = RKN738A63T;
+						ProvisioningStyle = Automatic;
+					};
+					4F121C2E1DD5155A00479019 = {
+						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = RKN738A63T;
 						ProvisioningStyle = Automatic;
 					};
@@ -668,6 +790,10 @@
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 				},
 				{
+					ProductGroup = 4F121C411DD5168E00479019 /* Products */;
+					ProjectRef = 4F121C401DD5168E00479019 /* ReactNativeShareExtension.xcodeproj */;
+				},
+				{
 					ProductGroup = 4F6D689F1DD277B200E38E07 /* Products */;
 					ProjectRef = D83CD9FA0C304DD1B2097F8F /* RealmReact.xcodeproj */;
 				},
@@ -684,6 +810,7 @@
 			targets = (
 				13B07F861A680F5B00A75B9A /* CycleReactNativeEx */,
 				00E356ED1AD99517003FC87E /* CycleReactNativeExTests */,
+				4F121C2E1DD5155A00479019 /* CycleReactNativeExShareExt */,
 			);
 		};
 /* End PBXProject section */
@@ -743,6 +870,13 @@
 			fileType = archive.ar;
 			path = libReact.a;
 			remoteRef = 146834031AC3E56700842450 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		4F121C451DD5168F00479019 /* libReactNativeShareExtension.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libReactNativeShareExtension.a;
+			remoteRef = 4F121C441DD5168F00479019 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		4F6D68791DD277B200E38E07 /* libAppHub.a */ = {
@@ -885,6 +1019,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4F121C2D1DD5155A00479019 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F121C361DD5155A00479019 /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -922,6 +1064,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4F121C2B1DD5155A00479019 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F121C3F1DD5158A00479019 /* CycleReactNativeExShareExt.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -929,6 +1079,11 @@
 			isa = PBXTargetDependency;
 			target = 13B07F861A680F5B00A75B9A /* CycleReactNativeEx */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
+		};
+		4F121C391DD5155A00479019 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4F121C2E1DD5155A00479019 /* CycleReactNativeExShareExt */;
+			targetProxy = 4F121C381DD5155A00479019 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -940,6 +1095,14 @@
 			);
 			name = LaunchScreen.xib;
 			path = CycleReactNativeEx;
+			sourceTree = "<group>";
+		};
+		4F121C341DD5155A00479019 /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4F121C351DD5155A00479019 /* Base */,
+			);
+			name = MainInterface.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -1049,6 +1212,54 @@
 			};
 			name = Release;
 		};
+		4F121C3C1DD5155A00479019 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = RKN738A63T;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = CycleReactNativeExShareExt/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				OTHER_LDFLAGS = (
+					"-lc++",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.CycleReactNativeEx.CycleReactNativeExShareExt;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		4F121C3D1DD5155A00479019 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = RKN738A63T;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = CycleReactNativeExShareExt/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				OTHER_LDFLAGS = (
+					"-lc++",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.CycleReactNativeEx.CycleReactNativeExShareExt;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		83CBBA201A601CBA00E9B192 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1091,6 +1302,7 @@
 					"$(SRCROOT)/../node_modules/react-native-search-bar/**",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-share-extension/ios/**",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -1135,6 +1347,7 @@
 					"$(SRCROOT)/../node_modules/react-native-search-bar/**",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-share-extension/ios/**",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -1163,6 +1376,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		4F121C3B1DD5155A00479019 /* Build configuration list for PBXNativeTarget "CycleReactNativeExShareExt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4F121C3C1DD5155A00479019 /* Debug */,
+				4F121C3D1DD5155A00479019 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "CycleReactNativeEx" */ = {
 			isa = XCConfigurationList;
