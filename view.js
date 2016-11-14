@@ -260,6 +260,7 @@ function view(model) {
                     paddingHorizontal: 3,
                     flex: 1,
                     backgroundColor: '#1A237E', // indigo 900
+                    //                  width={width-6}
                   }}
                   {...model}
                 />

@@ -71,26 +71,38 @@ function BookCell({ book, style, onPress, ...props }) {
           source={{ uri: book.thumbnail || undefined
             /* Image source cannot accept null */ }}
           resizeMode="contain"
-          style={[styles.cellImage]}
+          style={
+            styles.cellImage            //left
+                }
         />
         <View
-          style={[{ flexDirection: 'column',
-          flex: 1,
-                        //backgroundColor:"red",
+          style={[{
+              flexDirection: 'column',
+              flex: 1,
+              margin: 10,
+              marginBottom:0,
+              //justifyContent: 'center'
+              //right
+              //backgroundColor:"red",
         }]}
         >
-          <View
-            style={[{ padding: 10, justifyContent: 'center' },
-          ]}
-          >
-            <View style={{ flexDirection: 'row' }}>
+          <View style={{
+            flex: 1,
+            //flexDirection: 'row',
+            //right hight
+          }}>
+            <View style={{
+              //flex: 1,
+              flexDirection: 'row',
+            }}>
               { book.bucket ?
                 <FAIcon
                   name={itemsInfo[book.bucket].icon} size={20}
-                  style={{ marginRight: 5,
+                  style={{
+                    marginRight: 5,
                     color: itemsInfo[book.bucket].backgroundColor }}
                 /> : null }
-              <Text style={styles.bookTitle} numberOfLines={1}>
+                <Text style={styles.bookTitle} numberOfLines={1}>
                   {book.title}
                 </Text>
             </View>
@@ -99,17 +111,15 @@ function BookCell({ book, style, onPress, ...props }) {
             </Text>
             <LibraryStatus libraryStatus={book.libraryStatus} />
           </View>
-          <View style={{ flex: 1 }} />
           <View
-style={{ height: StyleSheet.hairlineWidth,
-            backgroundColor: 'rgba(0, 0, 0, 0.1)',
-            marginRight: 10,
-            marginBottom: PixelRatio.get(),
-                         //separator
-          }}
-          />
+            style={{
+              //right low
+              height: StyleSheet.hairlineWidth,
+              backgroundColor: 'rgba(0, 0, 0, 0.1)',
+              //separator
+            }} />
         </View>
-      </View>
+      </View>        
     </TouchableElement>
   );
 }
