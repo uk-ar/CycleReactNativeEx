@@ -15,9 +15,6 @@ dependencies:
   cache_directories:
     - "~/.yarn-cache"
 
-  pre:
-    - yarn --version
-
   override:
     - yarn install
 
