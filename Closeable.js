@@ -215,6 +215,7 @@ class LayoutableView extends React.Component {
 
 LayoutableView.propTypes = {
   ...View.propTypes, //  ...Closeable.propTypes,
+  transitionEnter:React.PropTypes.bool,
 };
 
 LayoutableView.defaultProps = {

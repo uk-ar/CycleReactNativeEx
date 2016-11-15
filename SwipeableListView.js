@@ -126,7 +126,7 @@ class SwipeableListView extends React.Component {
     this.listview.setNativeProps(props);
   }
   render() {
-    const { renderRow, generateActions,
+    const { renderRow, generateActions,width,
             onSwipeStart, onSwipeEnd, ...props } = this.props;
     // console.log("sw re",this.props.dataSource)
     this.rows = this.rows || {};
@@ -138,6 +138,7 @@ class SwipeableListView extends React.Component {
             // layoutableView && SwipeableRow3
              (
                <SwipeableRow3
+                 width={width}
                  ref={(c) => {
                    this.rows[sectionID] = this.rows[sectionID] || {};
                    this.rows[sectionID][rowID] = c;

@@ -41,12 +41,29 @@ storiesOf('BookRow1', module)
     style={{flexDirection:"row"}}
     >
   */
-  .add('with close props', () => (
+  .add('with width as props', () => (
     <BookRow1
       bucket="liked"
       style={{
         margin:10}}
       width={width-20}
+    >
+      <View
+        style={{flexDirection:"row"}}>
+        <Text>foo</Text>
+        <View
+          style={{flex:1}}/>
+        <Text>bar</Text>
+      </View>
+    </BookRow1>
+  ))
+  .add('with width as style', () => (
+    <BookRow1
+      bucket="liked"
+      style={{
+        //width:width-20,
+        backgroundColor:"red"
+      }}
     >
       <View
         style={{flexDirection:"row"}}>

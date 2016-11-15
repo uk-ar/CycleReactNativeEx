@@ -82,6 +82,7 @@ class BookListView1 extends React.Component {
       onSwipeStart,
       renderSectionHeader,
       generateActions,
+      width,
       // TODO: onSwipeStart?
       ...props } = this.props;
     // console.log("r",Object.keys(dataSource._dataBlob),{...dataSource._dataBlob})
@@ -127,6 +128,7 @@ class BookListView1 extends React.Component {
           return (
             <CloseableView >
               <SwipeableListView
+                width={width}
                 ref={c => this.listviews[sectionID] = c}
                 enableEmptySections
                 scrollEnabled={false}

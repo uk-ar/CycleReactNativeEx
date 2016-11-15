@@ -6,7 +6,8 @@ import {
   Animated,
   View,
   ListView,
-  ScrollView
+  ScrollView,
+  Dimensions
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 
@@ -191,6 +192,10 @@ class TestSectionSwipeableListView extends React.Component {
   }
 }
 
+const {
+  width,
+} = Dimensions.get('window');
+
 storiesOf('SwipeableListView', module)
 /* .addDecorator(getStory => (
  *   <CenterView>{getStory()}</CenterView>
@@ -208,12 +213,21 @@ storiesOf('SwipeableListView', module)
   .add('with book', () => {
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     return(
-      <SwipeableListView
-        style={{paddingTop:20}}
-        generateActions={()=>genActions2('search')}
-        dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
-        renderRow={(rowData) => <Text>{rowData}</Text>}
-      />
+      <View
+        style={{
+          paddingTop:20,
+          paddingHorizontal:5,
+        }}>
+        <SwipeableListView
+          style={{
+            backgroundColor:"yellow"
+          }}
+          width={width-10}
+          generateActions={()=>genActions2('search')}
+          dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
+          renderRow={(rowData) => <Text>{rowData}</Text>}
+        />
+      </View>
     )
   })
   .add('with callback', () => {

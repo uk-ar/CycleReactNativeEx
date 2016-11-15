@@ -119,7 +119,7 @@ function BookCell({ book, style, onPress, ...props }) {
               //separator
             }} />
         </View>
-      </View>        
+      </View>
     </TouchableElement>
   );
 }

@@ -8,7 +8,8 @@ import {
   ListView,
   ScrollView,
   LayoutAnimation,
-  UIManager
+  UIManager,
+  Dimensions
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import util from 'util'
@@ -1071,6 +1072,10 @@ class TestBookListView4 extends React.Component {
   }
 }
 
+const {
+  width,
+} = Dimensions.get('window');
+
 storiesOf('BookListView', module)
 /* .addDecorator(getStory => (
  *   <CenterView>{getStory()}</CenterView>
@@ -1078,13 +1083,20 @@ storiesOf('BookListView', module)
   .add('with book', () => {
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     return(
-      <BookListView
-        style={{paddingTop:20,backgroundColor:"blue"}}
-        generateActions={()=>genActions2('search')}
-        dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
-        renderRow={(rowData) => <Text>row</Text>}
-        renderSectionHeader={(rowData) => <Text>sec</Text>}
-      />
+      <View
+        style={{
+          paddingTop:20,
+          paddingHorizontal:5,
+        }}>
+        <BookListView
+          style={{backgroundColor:"blue"}}
+          width={width-10}
+          generateActions={()=>genActions2('search')}
+          dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
+          renderRow={(rowData) => <Text>row</Text>}
+          renderSectionHeader={(rowData) => <Text>sec</Text>}
+        />
+      </View>
     )
   })
   .add('with callback', () => {

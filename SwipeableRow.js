@@ -260,7 +260,7 @@ class _SwipeableRow3 extends React.Component {
         <Animated.View style={{ width: this.panX }}>
           {leftActionsElement}
         </Animated.View>
-        <View style={{ width }}>
+        <View style={{ width:this.props.width }}>
           {children}
         </View>
         <Animated.View style={{ width: Animated.multiply(this.panX, -1) }}>
@@ -356,6 +356,8 @@ SwipeableRow3.propTypes = {
   leftActions: React.PropTypes.array.isRequired,
   rightActions: React.PropTypes.array.isRequired,
   renderActions: React.PropTypes.func,
+  transitionEnter:React.PropTypes.bool,
+  width:React.PropTypes.number,
 };
 
 SwipeableRow3.defaultProps = {
@@ -364,6 +366,7 @@ SwipeableRow3.defaultProps = {
   onSwipeEnd: emptyFunction,
   leftActions: [],
   rightActions: [],
+  width:SWIPEABLE_MAIN_WIDTH,
 };
 
 // scroll view base
