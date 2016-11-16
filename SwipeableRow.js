@@ -271,6 +271,25 @@ class _SwipeableRow3 extends React.Component {
   }
 }
 const SwipeableRow3 = withState2(_SwipeableRow3);
+SwipeableRow3.propTypes = {
+  ...View.propTypes, //  ...Closable.propTypes,
+  onSwipeStart: React.PropTypes.func,
+  onSwipeEnd: React.PropTypes.func,
+  leftActions: React.PropTypes.array.isRequired,
+  rightActions: React.PropTypes.array.isRequired,
+  renderActions: React.PropTypes.func,
+  transitionEnter:React.PropTypes.bool,
+  width:React.PropTypes.number,
+};
+
+SwipeableRow3.defaultProps = {
+  ...View.defaultProps,
+  onSwipeStart: emptyFunction,
+  onSwipeEnd: emptyFunction,
+  leftActions: [],
+  rightActions: [],
+  width:SWIPEABLE_MAIN_WIDTH,
+};
 
 class SwipeableActions extends React.Component {
   setNativeProps(nativeProps) {
@@ -335,7 +354,8 @@ class SwipeableActions extends React.Component {
         {...props}
         style={[style,
           { backgroundColor: currentAction.backgroundColor,
-            overflow: 'hidden' }
+            overflow: 'hidden'
+          }
         ]}
         onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
           const index = calcIndex(width, this.thresholds);
@@ -349,24 +369,12 @@ class SwipeableActions extends React.Component {
     );
   }
 }
-SwipeableRow3.propTypes = {
-  ...View.propTypes, //  ...Closable.propTypes,
-  onSwipeStart: React.PropTypes.func,
-  onSwipeEnd: React.PropTypes.func,
-  leftActions: React.PropTypes.array.isRequired,
-  rightActions: React.PropTypes.array.isRequired,
-  renderActions: React.PropTypes.func,
-  transitionEnter:React.PropTypes.bool,
-  width:React.PropTypes.number,
+SwipeableActions.propTypes = {
+  lock:React.PropTypes.bool,
+  actions:React.PropTypes.array.isRequired,
 };
 
-SwipeableRow3.defaultProps = {
-  ...View.defaultProps,
-  onSwipeStart: emptyFunction,
-  onSwipeEnd: emptyFunction,
-  leftActions: [],
-  rightActions: [],
-  width:SWIPEABLE_MAIN_WIDTH,
+SwipeableActions.defaultProps = {
 };
 
 // scroll view base

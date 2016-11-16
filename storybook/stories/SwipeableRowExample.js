@@ -178,21 +178,87 @@ class Actions extends React.Component {
 storiesOf('SwipeableActions', module)
   .add('with book', () => (
     //style={{width:100,flexDirection:"row"}}
+    //      actions={[<Text>foo</Text>,<Text>bar</Text>]}
     <SwipeableActions
-      style={{margin:50,height:10,backgroundColor:"red"}}
-      actions={[<Text>foo</Text>,<Text>bar</Text>]}
+      style={{margin:50,height:10,width:50}}
+      actions={[{text:"foo"},{text:"bazz"}]}
     />
-  )).add('with search', () => {
+  )).add('with search text', () => {
     const { leftActions, rightActions } = genActions2('search');
+    console.log("la",leftActions)
     return (
-      <View>
+      <View style={{alignSelf:"center"}}
+      >
         <SwipeableActions
+          style={{height:50,width:10,marginTop:20}}
           actions={leftActions}/>
         <SwipeableActions
+          style={{height:50,width:20}}
+          actions={leftActions}/>
+        <SwipeableActions
+          style={{height:50,width:25}}
+          actions={leftActions}/>
+        <SwipeableActions
+          style={{height:50,width:30}}
+          actions={leftActions}/>
+        <SwipeableActions
+          style={{height:50,width:35}}
+          actions={leftActions}/>
+        <SwipeableActions
+          style={{height:50,width:40}}
+          actions={leftActions}/>
+        <SwipeableActions
+          style={{height:50,width:50}}
+          actions={leftActions}/>
+        <SwipeableActions
+          style={{height:50,width:100}}
+          actions={leftActions}/>
+        <SwipeableActions
+          style={{height:50,width:200}}
+          actions={leftActions}/>
+        <SwipeableActions
+          style={{height:50,width:100}}
           actions={rightActions}/>
       </View>
     )
-  }).add('with liked', () => {
+  })
+  .add('with search reverse', () => {
+    const { leftActions, rightActions } = genActions2('search');
+    console.log("la",leftActions)
+    return (
+      <View style={{alignSelf:"flex-end",alignItems:"flex-end"}}
+      >
+        <SwipeableActions
+          style={{height:50,width:10,marginTop:20}}
+          actions={rightActions}/>
+        <SwipeableActions
+          style={{height:50,width:20}}
+          actions={rightActions}/>
+        <SwipeableActions
+          style={{height:50,width:25}}
+          actions={rightActions}/>
+        <SwipeableActions
+          style={{height:50,width:30}}
+          actions={rightActions}/>
+        <SwipeableActions
+          style={{height:50,width:35}}
+          actions={rightActions}/>
+        <SwipeableActions
+          style={{height:50,width:40}}
+          actions={rightActions}/>
+        <SwipeableActions
+          style={{height:50,width:50}}
+          actions={rightActions}/>
+        <SwipeableActions
+          style={{height:50,width:100}}
+          actions={rightActions}/>
+        <SwipeableActions
+          style={{height:50,width:200}}
+          actions={rightActions}/>
+      </View>
+    )
+  })
+  .add('with liked', () => {
     const { leftActions, rightActions } = genActions2('liked');
     return (
       <View>

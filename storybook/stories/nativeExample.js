@@ -358,3 +358,42 @@ storiesOf('Linking', module)
   .add('view ', () => (
     <LinkingView/>
   ))
+
+storiesOf('Text', module)
+  .add('overflow', () => (
+    //contentContainerStyle=
+    <View style={{
+      paddingTop:20,
+      backgroundColor:"red",
+      width:60,
+      //height:40,
+      //flexDirection:"row",
+      alignSelf:"center",
+      //overflow:"hidden"
+    }}
+    >
+      <View style={{
+        //width:20,
+        //overflow:"hidden",
+        flexDirection:"row",
+      }}>
+        <View style={{
+          right:0,
+          position:"absolute",
+          flexDirection:"row",
+        }}>
+          <Text>long long text1</Text>
+          <Text style={{
+            backgroundColor:"blue",
+            //right:0,
+            //position:"absolute",
+          }}
+          >long long text2</Text>
+        </View>
+        {/* <View style={{
+        height:20,
+        width:20}}
+        ></View> */}
+      </View>
+    </View>
+  ))

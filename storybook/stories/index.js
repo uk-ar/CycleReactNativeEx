@@ -36,5 +36,64 @@ storiesOf('Action', module)
       backgroundColor="#03a9f4"
     />
   ))
+  .add('with liked icon only', () => (
+    <Action
+      icon="heart-o"
+    />
+  ))
+  .add('with some liked icon only', () => (
+    <View style={{padding:20,justifyContent:"center",
+                  height:100,width:100,backgroundColor:"red"}}>
+      <View style={{
+        height:20,width:10,backgroundColor:"blue",
+        flexDirection:"row"
+      }}>
+        <View style={{
+          right:0,
+          position:"absolute",
+          flexDirection:"row",
+        }}>
+          <Action
+            icon="heart-o"
+            style={{
+              backgroundColor:"white",
+              justifyContent:"flex-end"
+            }}
+          />
+        </View>
+      </View>
+      <View style={{
+        height:20,width:10,
+        //backgroundColor:"blue",
+        //flexDirection:"row"
+      }}>
+        <Action
+          icon="heart-o"
+          style={{
+            backgroundColor:"green",
+            justifyContent:"flex-end"
+          }}
+        />
+      </View>
+      <View style={{
+        height:20,width:50,
+        //backgroundColor:"blue",
+        //flexDirection:"row"
+      }}>
+        <Action
+          icon="heart-o"
+          style={{
+            //backgroundColor:"white",
+            //justifyContent:"flex-end"
+            //right:0
+          }}
+        />
+      </View>
+      <Action
+        icon="heart-o"
+        text="読みたい"
+      />
+    </View>
+  ))
 
 import {withDebug} from './common';

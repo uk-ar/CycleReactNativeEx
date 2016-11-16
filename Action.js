@@ -18,30 +18,47 @@ const {
 } = Dimensions.get('window');
 
 // bucket,target->icon,text,backgroundColor,close,target
-function Action({ icon, text, backgroundColor, close, target, style, ...props }) {
-  // backgroundColor,close,target are used from SwipeableActions
+function Action({ icon, text, backgroundColor, target, style, ...props }) {
+  // backgroundColor,target are used from SwipeableActions
+  console.log("pro",style,text,icon)
   return (
     <View
       {...props}
       style={[{
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1, //vertical center
-          //backgroundColor:backgroundColor,//for debug
-      }, style]}
-    >
-      { icon ?
-        <FAIcon
-          name={icon} size={20}
-          style={{ margin: 10 }}
-        /> : null }
-      <View style={{ margin: -2.5 }} />
-      <Text>
-        {text}
-      </Text>
+          flexDirection:"row",
+          alignItems:"center",
+          flex:1, //verticalCenter
+          padding:10,
+        },style]}>
+      <FAIcon
+        name={icon} size={20}
+        style={{
+        }}
+      />
+      {text ?
+       <Text
+         style={{
+           //flex:1
+           margin:5
+         }}
+       >
+         {text}
+       </Text>
+       : null }
     </View>
   );
 }
+
+Action.propTypes = {
+  icon:React.PropTypes.string,
+  text:React.PropTypes.string,
+  backgroundColor:React.PropTypes.string,
+  target:React.PropTypes.string,
+};
+
+Action.defaultProps = {
+  //
+};
 
 function genActions2(bucket) {
   function getProps(self, target) {
