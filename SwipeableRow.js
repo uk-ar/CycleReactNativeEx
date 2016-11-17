@@ -349,13 +349,14 @@ class SwipeableActions extends React.Component {
     const currentAction = actions[this.state.index];
     // onLayout may cause over position
     // but cannot addListener to multiply animatedValue...
+    console.log("st",style)
     return (
       <Stylish.View
         ref={c => (this.root = c)}
         {...props}
         style={[style,
           { backgroundColor: currentAction.backgroundColor,
-            overflow: 'hidden'
+            //overflow: 'hidden'
           }
         ]}
         onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {

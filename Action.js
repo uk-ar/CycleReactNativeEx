@@ -29,6 +29,7 @@ function Action({ icon, text, backgroundColor, target, style, ...props }) {
           alignItems:"center",
           flex:1, //verticalCenter
           padding:10,
+          //justifyContent:"flex-end"
         },style]}>
       <FAIcon
         name={icon} size={20}

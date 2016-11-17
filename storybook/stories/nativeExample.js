@@ -397,3 +397,88 @@ storiesOf('Text', module)
       </View>
     </View>
   ))
+  .add('overflow2 wrap with view', () => (
+    //contentContainerStyle=
+    <View
+      style={{
+        alignSelf:"flex-end",
+        alignItems:"flex-end",
+        marginTop:20,
+      }}
+    >
+      <View style={{
+        height:60,
+        //width:40,
+        //flexDirection:"row",
+        //justifyContent:"flex-end",
+        width:20,
+        //width:40,
+        //width:60,
+      }}>
+        <View
+          style={{
+            overflow:"hidden",
+            flexDirection:"row",
+            justifyContent:"flex-end",
+            backgroundColor:"yellow",
+            flexWrap:"nowrap",
+          }}>
+          <Text style={{
+            //flexBasis:0
+          }}>XYZ</Text>
+          <Text style={{
+            //backgroundColor:"blue",
+            //right:0,
+            //position:"absolute",
+          }}
+          >DDD</Text>
+        </View>
+      </View>
+    </View>
+  ))
+  .add('overflow3 wrap with text', () => (
+    //contentContainerStyle=
+    <View
+      style={{
+        alignSelf:"flex-end",
+        alignItems:"flex-end",
+        marginTop:20,
+      }}
+    >
+      <View style={{
+        height:60,
+        width:40,
+        //flexDirection:"row",
+        //justifyContent:"flex-end",
+        //width:20,
+      }}>
+        <View style={{
+          flexDirection:"row",
+          justifyContent:"flex-end",
+          flexWrap:"nowrap",
+        }}>
+        <Text
+          style={{
+          /* overflow:"hidden",
+          flexDirection:"row",
+             justifyContent:"flex-end", */
+            //textAlign:"right",
+            //writingDirection:"rtl",
+          backgroundColor:"yellow",
+          }}>
+          <Text
+          >
+            XYZ</Text>
+          <Text
+            style={{
+            //backgroundColor:"blue",
+            //right:0,
+            //position:"absolute",
+          }}
+          >DDD</Text>
+        </Text>
+        <View style={{height:20,width:10}}></View>
+        </View>
+      </View>
+    </View>
+  ))
