@@ -14,6 +14,7 @@ import {
   ScrollView,
   LayoutAnimation,
   ActivityIndicator,
+  Dimensions,
   // TouchableHighlight,
   // TouchableNativeFeedback
 } from 'react-native';
@@ -85,9 +86,9 @@ class MainView extends React.Component {
     this._scrollY = new Animated.Value(0);
   }
   render() {
-    const { items, sectionIDs, rowIDs, dataSource,
+    const { items, sectionIDs, rowIDs, books,
             onSelectSection, onCloseSection, onRelease,
-            onSelectCell, style, onChangeQuery,
+            onSelectCell, style, onChangeQuery, width,
             booksLoadingState, selectedSection } = this.props;
     // TODO:keep query text & scroll position
     //console.log('ds change', dataSource._dataBlob);
@@ -104,12 +105,13 @@ class MainView extends React.Component {
     return (
       <BookListView
         style={style}
-        dataSource={dataSource}
+        dataBlob={books}
         ref={(c) => {
             this.listview = c;
           }}
         directionalLockEnabled
         enableEmptySections
+        width={width}
         generateActions={(rowData, sectionID, rowID) =>
           genActions2(sectionID)}
         onSwipeEnd={({ rowData, sectionID, rowID, action, ...rest }) => {
@@ -218,6 +220,10 @@ MainView.defaultProps = {
 Touchable.MainView = Touchable.createCycleComponent(
   MainView);
 
+const {
+  width,
+} = Dimensions.get('window');
+
 function view(model) {
   //console.log('view');
   const navigationState = model.navigationState;
@@ -260,8 +266,8 @@ function view(model) {
                     paddingHorizontal: 3,
                     flex: 1,
                     backgroundColor: '#1A237E', // indigo 900
-                    //                  width={width-6}
                   }}
+                  width={width-6}
                   {...model}
                 />
               </MyCard>

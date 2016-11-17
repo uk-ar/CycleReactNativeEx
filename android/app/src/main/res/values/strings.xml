@@ -12,5 +12,6 @@
 
 
 
-    <string name="app_name">CycleReactNativeEx</string>
+  <string name="app_name">CycleReactNativeEx</string>
+  <string name="title_activity_share">CycleReactNativeExShareExt</string>
 </resources>

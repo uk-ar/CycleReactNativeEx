@@ -50,8 +50,15 @@ class BookListView1 extends React.Component {
   constructor(props) {
     super(props);
     this.dataSources = {};
-    this.dataSource = this.props.dataSource;
-    this.listviews = {};
+    this.dataSource =
+      new ListView.DataSource({
+        rowHasChanged: (r1, r2) => r1 !== r2,
+        sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+        /* getSectionHeaderData: (dataBlob, sectionID) =>
+         *   dataBlob.sections[sectionID]*/
+      })
+    //this.dataSource = this.props.dataSource;
+    //this.listviews = {};
     // this.sections = {};
     // this.rows = {};
   }
@@ -77,7 +84,9 @@ class BookListView1 extends React.Component {
   render() {
     const {
       renderRow,
-      dataSource,
+      //dataSource,
+      dataBlob,
+      selectedSection,
       onSwipeEnd,
       onSwipeStart,
       renderSectionHeader,
@@ -86,19 +95,26 @@ class BookListView1 extends React.Component {
       // TODO: onSwipeStart?
       ...props } = this.props;
     // console.log("r",Object.keys(dataSource._dataBlob),{...dataSource._dataBlob})
+    console.log("dBlob",dataBlob)
+
+    
     const nestedDataSource =
-      dataSource.sectionIdentities
-      // Object.keys(dataSource._dataBlob)//section
-            .reduce((acc, sectionID) => {
-              acc[sectionID] =
-                [{ [sectionID]: dataSource._dataBlob[sectionID] }];
-              return acc;
-            }, { ...dataSource._dataBlob });// keep section data
+      //foreach(dataBlob)
+                             
+      
+      /* dataSource.sectionIdentities
+       * // Object.keys(dataSource._dataBlob)//section
+       *       .reduce((acc, sectionID) => {
+       *         acc[sectionID] =
+       *           [{ [sectionID]: dataSource._dataBlob[sectionID] }];
+       *         return acc;
+       *       }, { ...dataSource._dataBlob });// keep section data*/
     // console.log(nestedDataSource)
     // console.log(this.dataSource._getSectionHeaderData)
     this.dataSource =
-      this.dataSource.cloneWithRowsAndSections(nestedDataSource,
-                                               dataSource.sectionIdentities);
+      this.dataSource.cloneWithRowsAndSections(
+        //nestedDataSource,
+        dataSource.sectionIdentities);
     // console.log("n",nestedDataSource)
     // TODO:lock on swipe
     return (
@@ -129,7 +145,6 @@ class BookListView1 extends React.Component {
             <CloseableView >
               <SwipeableListView
                 width={width}
-                ref={c => this.listviews[sectionID] = c}
                 enableEmptySections
                 scrollEnabled={false}
                 removeClippedSubviews={false}
@@ -179,6 +194,7 @@ class BookListView extends React.Component {
             onSwipeStart,
             ...props } = this.props;
     this.rows = this.rows || {};
+    
     // console.log("sw re",this.props.dataSource)
     return (
       <BookListView1

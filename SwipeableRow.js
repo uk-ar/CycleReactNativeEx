@@ -235,6 +235,7 @@ class _SwipeableRow3 extends React.Component {
     const { onSwipeStart, onSwipeEnd,
             leftActions, rightActions, renderActions,
             children, style, ...props } = this.props;
+    console.log("width",this.props.width,width)
     // const leftActionsElement = cloneReferencedElement(
     const leftActionsElement = React.cloneElement(
       renderActions(leftActions), {

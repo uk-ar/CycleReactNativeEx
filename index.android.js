@@ -17,12 +17,16 @@ import { makeHTTPDriver } from '@cycle/http';
 
 import RxAdapter from '@cycle/rx-adapter';
 // const { makeFetchDriver } = require('@cycle/fetch');
+import { AppRegistry } from 'react-native'
 
 const HTTPDriver = makeHTTPDriver();
 
 const intent = require('./intent');
 const model = require('./model');
 const view = require('./view');
+
+import Share from './share'
+AppRegistry.registerComponent('CycleReactNativeExShareExt', () => Share)
 
 const RNDriver = makeReactNativeDriver('CycleReactNativeEx');
 import Rx from 'rx';
