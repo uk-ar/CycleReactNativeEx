@@ -25,22 +25,26 @@ function Action({ icon, text, backgroundColor, target, style, ...props }) {
     <View
       {...props}
       style={[{
-          flexDirection:"row",
+          //passed
+          flexDirection:"row-reverse",
+
           alignItems:"center",
           flex:1, //verticalCenter
           padding:10,
-          //justifyContent:"flex-end"
+          paddingRight:0,
         },style]}>
       <FAIcon
         name={icon} size={20}
         style={{
+          //margin:5,
         }}
       />
       {text ?
        <Text
          style={{
-           //flex:1
-           margin:5
+           //numberOfLines={1}
+           margin:5,
+           //position:"absolute",
          }}
        >
          {text}
@@ -74,19 +78,27 @@ function genActions2(bucket) {
   const leftActions = [
     { ...getProps(bucket, 'liked'),
       ...nop,
-      style: { justifyContent: 'flex-end' } },
+      style: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end' } },
     { ...getProps(bucket, 'liked'),
-      style: { width: width / 2 } },
+      style: {
+        flexDirection: 'row',
+        width: width / 2 } },
     { ...getProps(bucket, 'borrowed'),
-      style: { width } }
+      style: {
+        flexDirection: 'row',
+        width } }
   ];
   const rightActions = [
     { ...getProps(bucket, 'done'),
       ...nop,
-      style: { flexDirection: 'row-reverse',
+      style: {
+        flexDirection: 'row-reverse',
         justifyContent: 'flex-end' } },
     { ...getProps(bucket, 'done'),
-      style: { flexDirection: 'row-reverse' } }
+      style: {
+        flexDirection: 'row-reverse' } }
   ];
   return { leftActions, rightActions };
 }

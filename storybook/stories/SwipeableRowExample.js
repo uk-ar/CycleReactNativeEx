@@ -226,7 +226,9 @@ storiesOf('SwipeableActions', module)
     const { leftActions, rightActions } = genActions2('search');
     console.log("la",leftActions)
     return (
-      <View style={{alignSelf:"flex-end",alignItems:"flex-end"}}
+      <View style={{alignSelf:"flex-end",alignItems:"flex-end",
+                    padding:20,
+      }}
       >
         <SwipeableActions
           style={{height:50,width:10,marginTop:20}}
@@ -254,6 +256,9 @@ storiesOf('SwipeableActions', module)
           actions={rightActions}/>
         <SwipeableActions
           style={{height:50,width:200}}
+          actions={rightActions}/>
+        <SwipeableActions
+          style={{height:50,width:300}}
           actions={rightActions}/>
       </View>
     )

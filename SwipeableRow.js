@@ -354,8 +354,9 @@ class SwipeableActions extends React.Component {
       <Stylish.View
         ref={c => (this.root = c)}
         {...props}
-        style={[style,
-          { backgroundColor: currentAction.backgroundColor,
+        style={[style, {
+            backgroundColor: currentAction.backgroundColor,
+            //justifyContent:"flex-end",
             //overflow: 'hidden'
           }
         ]}
