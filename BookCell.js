@@ -91,7 +91,10 @@ function BookCell({ book, style, onPress, ...props }) {
             //flexDirection: 'row',
             //right hight
           }}>
-            <View style={{
+            <Text
+              numberOfLines={1}
+              ellipsizeMode={"middle"}
+              style={{
               //flex: 1,
               flexDirection: 'row',
             }}>
@@ -99,13 +102,16 @@ function BookCell({ book, style, onPress, ...props }) {
                 <FAIcon
                   name={itemsInfo[book.bucket].icon} size={20}
                   style={{
-                    marginRight: 5,
+                    //marginRight: 5,
+                    letterSpacing:5,
                     color: itemsInfo[book.bucket].backgroundColor }}
                 /> : null }
-                <Text style={styles.bookTitle} numberOfLines={1}>
+                <Text style={styles.bookTitle}
+                  numberOfLines={1}
+                >
                   {book.title}
                 </Text>
-            </View>
+            </Text>
             <Text style={styles.bookAuthor} numberOfLines={1}>
               {book.author}
             </Text>

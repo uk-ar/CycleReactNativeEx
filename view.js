@@ -263,11 +263,11 @@ function view(model) {
                 <Touchable.MainView
                   selector="main"
                   style={{
-                    paddingHorizontal: 3,
+                    paddingHorizontal: 20,
                     flex: 1,
                     backgroundColor: '#1A237E', // indigo 900
                   }}
-                  width={width-6}
+                  width={width-40}
                   {...model}
                 />
               </MyCard>
