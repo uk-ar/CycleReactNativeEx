@@ -350,7 +350,7 @@ function intent(RN, HTTP) {
         RN.select('main')
           // .events('press')// section,this.listview
           .events('selectSection')
-          // .do(i => console.log('section selected0:%O', i))
+          //.do(i => console.log('section selected0:%O', i))
           .shareReplay(),
         RN.select('main')
           .events('closeSection')

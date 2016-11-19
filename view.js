@@ -90,6 +90,7 @@ class MainView extends React.Component {
             onSelectSection, onCloseSection, onRelease,
             onSelectCell, style, onChangeQuery, width,
             booksLoadingState, selectedSection } = this.props;
+    //console.log("sel",selectedSection)
     // TODO:keep query text & scroll position
     //console.log('ds change', dataSource._dataBlob);
     // TODO: transition to detail view
@@ -109,6 +110,7 @@ class MainView extends React.Component {
         ref={(c) => {
             this.listview = c;
           }}
+        selectedSection={selectedSection}
         directionalLockEnabled
         enableEmptySections
         width={width}
@@ -155,23 +157,26 @@ class MainView extends React.Component {
             [{ nativeEvent: { contentOffset: { y: this._scrollY } } }],
             //{listener},          // Optional async listener
           )}
-        renderSectionHeader={(sectionData, sectionID) =>
-          // call upper onSelectSection after scroll
-          (
+        renderSectionHeader={(sectionData, sectionID) =>{
+            // call upper onSelectSection after scroll
+            //console.log("sec header")
+            return (
             <ItemsHeader
                  style={{backgroundColor:style.backgroundColor}}
                  onChangeQuery={onChangeQuery}
-                 section={sectionID}
+              section={sectionID}
+              close={selectedSection}
                  key={sectionID}
                  {...sectionData}
                  onSelectSection={(section) => {
-                     if (dataSource.sectionIdentities.length === 2) { return; }
+                     //if (dataSource.sectionIdentities.length === 2) { return; }
                      this.positions.push(this._scrollY.__getValue());
                      // TODO:
                      // 1. scroll to section header with animation
                      // (need expand view in android)
                      // 2. save section header position
                      this.listview.scrollTo({ y: 0, animated: false });
+                     //TODO: no need to handle in intent?
                      onSelectSection(section);
                      // this.sectionIdentities = [section,`${section}_end`]
                      // this.updateDataSource()
@@ -192,8 +197,7 @@ class MainView extends React.Component {
                         //2. scroll to original position with animation
                         }) */
                    }}
-                                />)
-                            }
+                                />)}}
         renderSectionFooter={(sectionData, sectionID) =>
           // console.log("fo",sectionData)
           (
@@ -263,11 +267,11 @@ function view(model) {
                 <Touchable.MainView
                   selector="main"
                   style={{
-                    paddingHorizontal: 20,
+                    paddingHorizontal: 3,
                     flex: 1,
                     backgroundColor: '#1A237E', // indigo 900
                   }}
-                  width={width-40}
+                  width={width-6}
                   {...model}
                 />
               </MyCard>

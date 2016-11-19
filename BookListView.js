@@ -109,7 +109,7 @@ class BookListView1 extends React.Component {
       selectedSection ?
       [selectedSection, `${selectedSection}_end`] :
       undefined ;
-
+    //console.log("sec",sectionIdentities)
       //foreach(dataBlob)
       /* dataSource.sectionIdentities
        * // Object.keys(dataSource._dataBlob)//section
@@ -133,7 +133,7 @@ class BookListView1 extends React.Component {
         {...props}
         renderSectionHeader={(rowData, sectionID, rowID, highlightRow) =>{
             // ref={c => this.sections[sectionID] = c}
-            console.log("row",rowData,sectionID,rowID);
+            //console.log("row",rowData,sectionID,rowID);
             return(
               <CloseableView>
                             {renderSectionHeader(rowData, sectionID, rowID, highlightRow)}
@@ -147,7 +147,7 @@ class BookListView1 extends React.Component {
                 rowHasChanged: (r1, r2) => r1 !== r2,
                 sectionHeaderHasChanged: (s1, s2) => s1 !== s2
               });
-            console.log("rend row",rowData);
+            //console.log("rend row",rowData);
             //const num = Math.min(Object.keys(rowData[sectionID]).length, 2);
             // Wrapper View for prevent layout destruction
             // removeClippedSubviews={false} seems no mean
@@ -157,6 +157,7 @@ class BookListView1 extends React.Component {
             <CloseableView >
               <SwipeableListView
                 width={width}
+                enableEnterAnimation={sectionID !== "search"}
                 enableEmptySections
                 scrollEnabled={false}
                 removeClippedSubviews={false}

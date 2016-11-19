@@ -82,6 +82,7 @@ class _SwipeableListView extends React.Component {
   render() {
     const { renderRow, // generateActions,
             // onSwipeStart, onSwipeEnd,
+            enableEnterAnimation,
             dataSource, ...props } = this.props;
     // console.log("ds",this.state.dataSource)
     return (
@@ -96,7 +97,7 @@ class _SwipeableListView extends React.Component {
                     this.closeable[sectionID][rowID] = c; */
                     //                transitionEnter={true}
                }}
-               transitionEnter={this.rowShouldEnter(sectionID, rowID)}
+               transitionEnter={enableEnterAnimation && this.rowShouldEnter(sectionID, rowID)}
              >
                {renderRow(rowData, sectionID, rowID, highlightRow)}
              </LayoutableView>
