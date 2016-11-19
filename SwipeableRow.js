@@ -235,7 +235,7 @@ class _SwipeableRow3 extends React.Component {
     const { onSwipeStart, onSwipeEnd,
             leftActions, rightActions, renderActions,
             children, style, ...props } = this.props;
-    console.log("width",this.props.width,width)
+    //console.log("width",this.props.width,width)
     // const leftActionsElement = cloneReferencedElement(
     const leftActionsElement = React.cloneElement(
       renderActions(leftActions), {
@@ -349,7 +349,7 @@ class SwipeableActions extends React.Component {
     const currentAction = actions[this.state.index];
     // onLayout may cause over position
     // but cannot addListener to multiply animatedValue...
-    console.log("st",style)
+    //console.log("st",style)
     return (
       <Stylish.View
         ref={c => (this.root = c)}

@@ -74,7 +74,7 @@ function model(actions) {
         acc[book.key] = book;
         return acc;
       }, {});
-    }    
+    }
     const obj = booksToObject(savedBooks);
     return {
       search: booksToObject(

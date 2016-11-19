@@ -95,13 +95,22 @@ class BookListView1 extends React.Component {
       // TODO: onSwipeStart?
       ...props } = this.props;
     // console.log("r",Object.keys(dataSource._dataBlob),{...dataSource._dataBlob})
-    console.log("dBlob",dataBlob)
+    //console.log("dBlob",dataBlob)
 
-    
     const nestedDataSource =
+      Object.keys(dataBlob)
+            .reduce((acc,sectionID)=>{
+              acc[sectionID] = [{ [sectionID]: dataBlob[sectionID] }];
+              acc[`${sectionID}_end`] = { count: Object.keys(dataBlob[sectionID]).length };
+              return acc;
+            },{})
+
+    const sectionIdentities =
+      selectedSection ?
+      [selectedSection, `${selectedSection}_end`] :
+      undefined ;
+
       //foreach(dataBlob)
-                             
-      
       /* dataSource.sectionIdentities
        * // Object.keys(dataSource._dataBlob)//section
        *       .reduce((acc, sectionID) => {
@@ -111,23 +120,25 @@ class BookListView1 extends React.Component {
        *       }, { ...dataSource._dataBlob });// keep section data*/
     // console.log(nestedDataSource)
     // console.log(this.dataSource._getSectionHeaderData)
+
     this.dataSource =
       this.dataSource.cloneWithRowsAndSections(
-        //nestedDataSource,
-        dataSource.sectionIdentities);
+        nestedDataSource,
+        sectionIdentities);
     // console.log("n",nestedDataSource)
     // TODO:lock on swipe
     return (
       <ListView
         removeClippedSubviews={false}
         {...props}
-        renderSectionHeader={(rowData, sectionID, rowID, highlightRow) =>
+        renderSectionHeader={(rowData, sectionID, rowID, highlightRow) =>{
             // ref={c => this.sections[sectionID] = c}
-             (
-               <CloseableView >
-                 {renderSectionHeader(rowData, sectionID, rowID, highlightRow)}
+            console.log("row",rowData,sectionID,rowID);
+            return(
+              <CloseableView>
+                            {renderSectionHeader(rowData, sectionID, rowID, highlightRow)}
                </CloseableView>)
-          }
+          }}
         dataSource={this.dataSource}
         ref={c => this.listview = c}
         renderRow={(rowData, sectionID, rowID, highlightRow) => {
@@ -136,7 +147,8 @@ class BookListView1 extends React.Component {
                 rowHasChanged: (r1, r2) => r1 !== r2,
                 sectionHeaderHasChanged: (s1, s2) => s1 !== s2
               });
-          const num = Math.min(Object.keys(rowData[sectionID]).length, 2);
+            console.log("rend row",rowData);
+            //const num = Math.min(Object.keys(rowData[sectionID]).length, 2);
             // Wrapper View for prevent layout destruction
             // removeClippedSubviews={false} seems no mean
             //                style={{maxHeight: 100 * num}}
@@ -194,7 +206,7 @@ class BookListView extends React.Component {
             onSwipeStart,
             ...props } = this.props;
     this.rows = this.rows || {};
-    
+
     // console.log("sw re",this.props.dataSource)
     return (
       <BookListView1
@@ -233,6 +245,7 @@ class BookListView extends React.Component {
 
 BookListView.propTypes = {
   ...ListView.propTypes,
+  dataSource: React.PropTypes.instanceOf(ListView.ListViewDataSource),
   renderSectionFooter: React.PropTypes.func,
   // onRelease: React.PropTypes.func,
   onSwipeEnd: React.PropTypes.func,

@@ -20,7 +20,7 @@ const {
 // bucket,target->icon,text,backgroundColor,close,target
 function Action({ icon, text, backgroundColor, target, style, ...props }) {
   // backgroundColor,target are used from SwipeableActions
-  console.log("pro",style,text,icon)
+  //console.log("pro",style,text,icon)
   return (
     <View
       {...props}
