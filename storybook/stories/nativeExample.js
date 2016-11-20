@@ -7,7 +7,8 @@ import {
   View,
   ScrollView,
   ListView,
-  Linking
+  Linking,
+  Modal,
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import ReactTransitionGroup from 'react-addons-transition-group';
@@ -358,6 +359,60 @@ storiesOf('Linking', module)
   .add('view ', () => (
     <LinkingView/>
   ))
+
+class ModalExample extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state={visible:false}
+  }
+  render(){
+    //this.props.data.length
+    return (
+      <View
+        style={{
+          flex:1,
+          backgroundColor: this.state.visible ?
+                           'rgba(0, 0, 0, 0.5)' : undefined,
+          paddingTop:20,
+        }}>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={this.state.visible}
+        >
+          <View
+            style={{
+              flex:1,
+              justifyContent:"center",
+            }}
+          >
+            <View
+              style={{
+                borderRadius:10,
+              }}
+            >
+          <Text>
+            Modal
+          </Text>
+            </View>
+          </View>
+        </Modal>
+        <Text
+          onPress={()=>{
+              this.setState({visible:true});
+            }}>
+          Open
+        </Text>
+      </View>
+    )
+  }
+}
+
+storiesOf('Modal', module)
+  .add('view ', () => {
+    return (
+      <ModalExample />
+  )})
 
 storiesOf('Text', module)
   .add('overflow', () => (

@@ -693,6 +693,7 @@
 				4F121C2B1DD5155A00479019 /* Sources */,
 				4F121C2C1DD5155A00479019 /* Frameworks */,
 				4F121C2D1DD5155A00479019 /* Resources */,
+				4F121CAE1DE0D7DC00479019 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1038,6 +1039,19 @@
 			inputPaths = (
 			);
 			name = "Bundle React Native code and images";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/packager/react-native-xcode.sh";
+		};
+		4F121CAE1DE0D7DC00479019 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
