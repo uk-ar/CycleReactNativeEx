@@ -7,6 +7,8 @@ const LIBRARY_ID = 'Tokyo_Fuchu';
 
 const CALIL_STATUS_API = `http://api.calil.jp/check?callback=no&appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=${LIBRARY_ID}&format=json&isbn=`;
 
+const APPBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
+const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : 0;
 // mojibake シンプ Q思考
 // NGsearch:ぐらと
 // ああ　あ

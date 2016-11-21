@@ -9,12 +9,15 @@ import {
   ListView,
   Linking,
   Modal,
+  NavigationExperimental,
+  Button,
+  Platform,
+  StyleSheet,
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import Stylish from 'react-native-stylish';
 
-import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
@@ -370,25 +373,27 @@ class ModalExample extends React.Component {
     return (
       <View
         style={{
-          flex:1,
-          backgroundColor: this.state.visible ?
-                           'rgba(0, 0, 0, 0.5)' : undefined,
+          //flex:1,
           paddingTop:20,
         }}>
         <Modal
-          animationType="slide"
+          animationType="fade"
           transparent={true}
           visible={this.state.visible}
         >
           <View
             style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.4)',
               flex:1,
               justifyContent:"center",
             }}
           >
             <View
               style={{
-                borderRadius:10,
+                backgroundColor: 'white',
+                padding:5,
+                margin:10,
+                borderRadius:5,
               }}
             >
           <Text>
@@ -408,11 +413,90 @@ class ModalExample extends React.Component {
   }
 }
 
+class BooksFromURL extends React.Component {
+  componentDidMount(){
+
+  }
+  render(){
+    const {url,...props} = this.props
+
+  }
+}
+
+class ModalExample2 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state={visible:false}
+  }
+  render(){
+    //this.props.data.length
+    console.log("he",NavigationExperimental.Header.HEIGHT,)
+    return (
+      <View
+        style={{
+          //flex:1,
+        }}>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={this.state.visible}
+        >
+          <View
+            style={{
+              //
+              flex:1,
+              //justifyContent:"center",
+              backgroundColor: '#EBEBF1',
+            }}
+          >
+            <View
+              style={{
+                height:NavigationExperimental.Header.HEIGHT,
+                paddingTop:Platform.OS === 'ios' ? 20 : 0,
+                backgroundColor: "#f7f7f8",//copy
+                borderBottomWidth: Platform.OS === 'ios' ? StyleSheet.hairlineWidth : 0,
+                justifyContent:"center",
+                flexDirection:"row",
+              }}>
+              <Button
+                onPress={()=>null}
+                title="Cancel"
+              />
+              <NavigationExperimental.Header.Title>
+                Add to Favorites
+              </NavigationExperimental.Header.Title>
+              <Button
+                onPress={()=>null}
+                title="Save"
+              />
+            </View>
+            <Text>bar</Text>
+            <Text>bar</Text>
+          </View>
+        </Modal>
+        <Text
+          style={{
+            paddingTop:20,
+          }}
+          onPress={()=>{
+              this.setState({visible:true});
+            }}>
+          Open
+        </Text>
+      </View>
+    )
+  }
+}
+
 storiesOf('Modal', module)
   .add('view ', () => {
     return (
       <ModalExample />
-  )})
+    )})
+  .add('view2 ', () => {
+    return (
+      <ModalExample2 />
+    )})
 
 storiesOf('Text', module)
   .add('overflow', () => (

@@ -58,10 +58,3 @@ export default class Share extends Component {
     )
   }
 }
-/* const { type, value } =
- *   await ShareExtension.data()*/
-/* console.log("sh",ShareExtension)
- * ShareExtension.data()
- *               .then(({ type, value })=>
- *                 console.log({ type, value })
- *               )*/
