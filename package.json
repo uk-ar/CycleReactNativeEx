@@ -37,6 +37,7 @@
     "recompose": "^0.20.2",
     "rx": "^4.1.0",
     "whatwg-fetch": "^1.0.0",
+    "xml2js": "^0.4.17",
     "xstream": "^7.0.0"
   },
   "devDependencies": {

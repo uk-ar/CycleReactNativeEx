@@ -58,7 +58,6 @@ function LibraryStatus({ libraryStatus = {}, ...props }) {
 
 function BookCell({ book, style, onPress, ...props }) {
   const TouchableElement = (Platform.OS === 'android') ? TouchableNativeFeedback : TouchableHighlight;
-
   return (
     <TouchableElement
       onPress={onPress}

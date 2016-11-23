@@ -2,6 +2,9 @@ const STORAGE_KEY = '@CycleReactNativeEx:inBox';
 // books search api cannot use query keyword
 const RAKUTEN_SEARCH_API =
 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&booksGenreId=001&applicationId=1088506385229803383&formatVersion=2&keyword=';
+const RAKUTEN_ISBN_API =
+'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&applicationId=1088506385229803383&formatVersion=2&isbnjan=';
+
 
 const LIBRARY_ID = 'Tokyo_Fuchu';
 
@@ -178,6 +181,7 @@ module.exports = {
   itemsInfo,
   STORAGE_KEY,
   RAKUTEN_SEARCH_API,
+  RAKUTEN_ISBN_API,
   LIBRARY_ID,
   CALIL_STATUS_API,
   MOCKED_MOVIES_DATA,

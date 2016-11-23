@@ -13,6 +13,7 @@ import {
   Button,
   Platform,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import ReactTransitionGroup from 'react-addons-transition-group';
@@ -23,6 +24,9 @@ import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 import {withDebug,VerticalCenterView,TestListView,debugView} from './common'
+
+const RAKUTEN_ISBN_API =
+  'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&applicationId=1088506385229803383&formatVersion=2&isbnjan=';
 
 class ScrollPositionView extends React.Component {
   constructor(props) {
@@ -414,12 +418,66 @@ class ModalExample extends React.Component {
 }
 
 class BooksFromURL extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state={
+      isbns: null,
+      dataSource:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+    };
+  }
+  //https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86
   componentDidMount(){
-
+    fetch(this.props.url)
+      .then(response => response.text())
+      .then(text => {
+        let isbns = text.match(/\b978\d{10}\b/g)
+        this.setState({
+          isbns: isbns
+        })
+        return isbns
+      })
+      .then(isbns =>
+        isbns.map(isbn =>
+          fetch('http://www.hanmoto.com/api/book.php?ISBN='+isbn)
+          //fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+isbn)
+          //fetch(RAKUTEN_ISBN_API+isbn)
+          .then(response => response.json())
+          .then(body =>{
+            console.log(body)
+            //let { title, author, isbn, largeImageUrl } = body.Items[0]
+            let { title, authors, largeImageUrl } =
+              body.items[0].volumeInfo
+            console.log("t",{
+              title: title.replace(/^【バーゲン本】/, ''),
+              author: authors[0],
+              isbn,
+              thumbnail: largeImageUrl,
+            });
+          })
+        )
+      )
   }
   render(){
-    const {url,...props} = this.props
-
+    const { url, ...props } = this.props
+    console.log("render",this.state.isbns)
+    if(this.state.isbns === null){
+      return(
+        <ActivityIndicator
+          size="large"
+          style={{
+            //alignItems:'center',
+            //justifyContent:'center',
+            flex:1,
+            height:80}}
+        />)
+    }
+    return (
+      <ListView
+        dataSource={this.state.dataSource.cloneWithRows(this.state.isbns)}
+        renderRow={(rowData) =>
+          <BookCell book={{isbn:rowData}}/>
+                  }
+      />)
   }
 }
 
@@ -496,6 +554,12 @@ storiesOf('Modal', module)
   .add('view2 ', () => {
     return (
       <ModalExample2 />
+    )})
+  .add('books ', () => {
+    return (
+      <BooksFromURL
+        url="https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86"
+      />
     )})
 
 storiesOf('Text', module)
