@@ -56,6 +56,10 @@ function LibraryStatus({ libraryStatus = {}, ...props }) {
   );
 }
 
+function genTempThumbnail(isbn){
+  return `http://www.hanmoto.com/bd/img/${isbn}.jpg`
+}
+
 function BookCell({ book, style, onPress, ...props }) {
   const TouchableElement = (Platform.OS === 'android') ? TouchableNativeFeedback : TouchableHighlight;
   return (
@@ -67,7 +71,8 @@ function BookCell({ book, style, onPress, ...props }) {
         style={[style, styles.row]}
       >
         <Image
-          source={{ uri: book.thumbnail || undefined
+          source={{ uri: book.thumbnail ||
+                         genTempThumbnail(book.isbn) || undefined
             /* Image source cannot accept null */ }}
           resizeMode="contain"
           style={

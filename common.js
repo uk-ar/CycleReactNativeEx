@@ -5,7 +5,6 @@ const RAKUTEN_SEARCH_API =
 const RAKUTEN_ISBN_API =
 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&applicationId=1088506385229803383&formatVersion=2&isbnjan=';
 
-
 const LIBRARY_ID = 'Tokyo_Fuchu';
 
 const CALIL_STATUS_API = `http://api.calil.jp/check?callback=no&appkey=bc3d19b6abbd0af9a59d97fe8b22660f&systemid=${LIBRARY_ID}&format=json&isbn=`;

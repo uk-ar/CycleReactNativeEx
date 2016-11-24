@@ -421,7 +421,7 @@ class BooksFromURL extends React.Component {
   constructor(props) {
     super(props);
     this.state={
-      isbns: null,
+      books: null,
       dataSource:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
     };
   }
@@ -432,34 +432,50 @@ class BooksFromURL extends React.Component {
       .then(text => {
         let isbns = text.match(/\b978\d{10}\b/g)
         this.setState({
-          isbns: isbns
+          books: isbns.map(isbn => ({ isbn }))
         })
         return isbns
       })
-      .then(isbns =>
-        isbns.map(isbn =>
+      .then(isbns =>{
+        //let books = [];
+        isbns.forEach((isbn,index) =>
           //fetch('http://www.hanmoto.com/api/book.php?ISBN='+isbn)
           //fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+isbn)
-          fetch(RAKUTEN_ISBN_API+isbn)
-          .then(response => response.json())
-          .then(body =>{
-            console.log(body)
-            let { title, author, isbn, largeImageUrl } = body.Items[0]
-            //let { title, authors, largeImageUrl } = body.items[0].volumeInfo
-            console.log("t",{
-              title: title.replace(/^【バーゲン本】/, ''),
-              author: author,
-              isbn,
-              thumbnail: largeImageUrl,
-            });
-          })
+          setTimeout(()=>
+            fetch(RAKUTEN_ISBN_API+isbn)
+            //.then(response => response.ok )
+            .then(response => {
+              //console.log(response)
+              return response.json()
+            })
+            .then(body =>{
+              console.log("b",body)
+              let { title, author, isbn, largeImageUrl } = body.Items[0]
+              //let { title, authors, largeImageUrl } = body.items[0].volumeInfo
+              let book = {
+                title: title.replace(/^【バーゲン本】/, ''),
+                author: author,
+                isbn,
+                thumbnail: largeImageUrl,
+              }
+              return book;
+            }).done( book =>{
+              //books[isbn]=res
+              this.setState((prevState)=>{
+                prevState.books[index] = book
+                return {
+                  books:[...prevState.books]
+                }
+              })
+            })
+            ,index*600)
         )
-      )
+      })
   }
   render(){
     const { url, ...props } = this.props
-    console.log("render",this.state.isbns)
-    if(this.state.isbns === null){
+    console.log("render",this.state.books)
+    if(this.state.books === null){
       return(
         <ActivityIndicator
           size="large"
@@ -472,10 +488,11 @@ class BooksFromURL extends React.Component {
     }
     return (
       <ListView
-        dataSource={this.state.dataSource.cloneWithRows(this.state.isbns)}
-        renderRow={(rowData) =>
-          <BookCell book={{isbn:rowData}}/>
-                  }
+        dataSource={this.state.dataSource.cloneWithRows(this.state.books)}
+        renderRow={(rowData) =>{
+            console.log("rd",rowData)
+            return <BookCell book={rowData}/>
+        }}
       />)
   }
 }
