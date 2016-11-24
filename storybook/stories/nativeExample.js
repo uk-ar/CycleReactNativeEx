@@ -438,18 +438,17 @@ class BooksFromURL extends React.Component {
       })
       .then(isbns =>
         isbns.map(isbn =>
-          fetch('http://www.hanmoto.com/api/book.php?ISBN='+isbn)
+          //fetch('http://www.hanmoto.com/api/book.php?ISBN='+isbn)
           //fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+isbn)
-          //fetch(RAKUTEN_ISBN_API+isbn)
+          fetch(RAKUTEN_ISBN_API+isbn)
           .then(response => response.json())
           .then(body =>{
             console.log(body)
-            //let { title, author, isbn, largeImageUrl } = body.Items[0]
-            let { title, authors, largeImageUrl } =
-              body.items[0].volumeInfo
+            let { title, author, isbn, largeImageUrl } = body.Items[0]
+            //let { title, authors, largeImageUrl } = body.items[0].volumeInfo
             console.log("t",{
               title: title.replace(/^【バーゲン本】/, ''),
-              author: authors[0],
+              author: author,
               isbn,
               thumbnail: largeImageUrl,
             });
