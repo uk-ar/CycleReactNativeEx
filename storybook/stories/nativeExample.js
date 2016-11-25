@@ -18,6 +18,7 @@ import {
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import Stylish from 'react-native-stylish';
+import emptyFunction from 'fbjs/lib/emptyFunction';
 
 import CenterView from './CenterView';
 import Welcome from './Welcome';
@@ -81,6 +82,16 @@ class ScrollPositionView extends React.Component {
     );
   }
 }
+storiesOf('Realm', module)
+  .add('contentContainerStyle', () => (
+    //contentContainerStyle=
+    <ScrollView
+      style={{borderWidth:10,borderColor:"red"}/*out*/}
+      contentContainerStyle={{borderWidth:10,borderColor:"green"}/*in*/}
+    >
+      <Text style={{fontSize:96}}>Scroll me plzaaaaaaaaaaaaaaaaaaaa</Text>
+    </ScrollView>
+  ))
 
 storiesOf('Scroll View', module)
   .add('contentContainerStyle', () => (
@@ -427,7 +438,8 @@ class BooksFromURL extends React.Component {
   }
   //https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86
   componentDidMount(){
-    fetch(this.props.url)
+    const { url, onProgress, ...props } = this.props
+    fetch(url)
       .then(response => response.text())
       .then(text => {
         let isbns = text.match(/\b978\d{10}\b/g)
@@ -449,7 +461,7 @@ class BooksFromURL extends React.Component {
               return response.json()
             })
             .then(body =>{
-              console.log("b",body)
+              //console.log("b",body)
               let { title, author, isbn, largeImageUrl } = body.Items[0]
               //let { title, authors, largeImageUrl } = body.items[0].volumeInfo
               let book = {
@@ -462,19 +474,20 @@ class BooksFromURL extends React.Component {
             }).done( book =>{
               //books[isbn]=res
               this.setState((prevState)=>{
+                onProgress(index+1,isbns.length)
                 prevState.books[index] = book
                 return {
                   books:[...prevState.books]
                 }
-              })
+              },)
             })
-            ,index*600)
+            ,index*1000)
         )
       })
   }
   render(){
-    const { url, ...props } = this.props
-    console.log("render",this.state.books)
+    const { url, onProgress, ...props } = this.props
+    //console.log("render",this.state.books)
     if(this.state.books === null){
       return(
         <ActivityIndicator
@@ -488,14 +501,23 @@ class BooksFromURL extends React.Component {
     }
     return (
       <ListView
+        {...props}
         dataSource={this.state.dataSource.cloneWithRows(this.state.books)}
         renderRow={(rowData) =>{
-            console.log("rd",rowData)
+            //console.log("rd",rowData)
             return <BookCell book={rowData}/>
         }}
       />)
   }
 }
+
+BooksFromURL.propTypes = {
+  url: React.PropTypes.string.isRequired,
+  onProgress: React.PropTypes.func,
+};
+BooksFromURL.defaultProps = {
+  onProgress: emptyFunction
+};
 
 class ModalExample2 extends React.Component {
   constructor(props) {
@@ -575,6 +597,7 @@ storiesOf('Modal', module)
     return (
       <BooksFromURL
         url="https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86"
+        onProgress={(i,t)=>console.log(i,t)}
       />
     )})
 

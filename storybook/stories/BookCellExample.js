@@ -5,18 +5,20 @@ import {
   PanResponder,
   Animated,
   View,
-  ScrollView
+  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 
 import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
+import { styles } from '../../styles';
 
-import {BookCell} from '../../BookCell';
+import {BookCell,LibraryStatus,TextWithIndicator} from '../../BookCell';
 
 storiesOf('BookCell', module)
-  .add('with book min', () => (
+  .add('with only isbn', () => (
     <BookCell
       onPress={action('clicked-bookcell')}
       book={{
@@ -24,6 +26,29 @@ storiesOf('BookCell', module)
         isbn: '9784834032147',
       }}
     />
+  ))
+  .add('with libraryStatus', () => (
+    <BookCell
+      onPress={action('clicked-bookcell')}
+      book={{
+        title: 'guri & gura',
+        isbn: '9784834032147',
+      }}
+    >
+      <LibraryStatus libraryStatus={undefined} />
+    </BookCell>
+  ))
+  .add('with only isbn & indicator', () => (
+    <BookCell
+      onPress={action('clicked-bookcell')}
+      book={{
+        isbn: '9784834032147',
+      }}
+    >
+      <TextWithIndicator>
+        タイトル確認中
+      </TextWithIndicator>
+    </BookCell>
   ))
   .add('with book', () => (
     <BookCell

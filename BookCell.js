@@ -16,6 +16,20 @@ import {
 import { styles } from './styles';
 import { itemsInfo } from './common';
 
+function TextWithIndicator({ children }){
+  return(
+    <View style={[styles.row]}>
+      <Text>
+        {children}
+      </Text>
+      <ActivityIndicator
+        size="small"
+        style={{marginLeft:5}}
+      />
+    </View>
+  )
+}
+
 // const LibraryStatusWithLoading = withLoading(LibraryStatus)
 function LibraryStatus({ libraryStatus = {}, ...props }) {
   let text;
@@ -37,14 +51,9 @@ function LibraryStatus({ libraryStatus = {}, ...props }) {
   if (!text) {
     // {!text && ActivityIndicator}
     return (
-      <View style={[styles.row]}>
-        <Text>
-          {'蔵書確認中'}
-        </Text>
-        <ActivityIndicator
-          size="small"
-        />
-      </View>
+      <TextWithIndicator>
+        蔵書確認中
+      </TextWithIndicator>
     );
   }
   return (
@@ -60,7 +69,18 @@ function genTempThumbnail(isbn){
   return `http://www.hanmoto.com/bd/img/${isbn}.jpg`
 }
 
-function BookCell({ book, style, onPress, ...props }) {
+function BookCell({ book, ...props }) {
+  return (
+    book.title ?
+    <BookCell1 book={book} {...props}/> :
+    <BookCell1 book={book} {...props}>
+      <TextWithIndicator>
+        タイトル確認中
+      </TextWithIndicator>
+    </BookCell1>)
+}
+
+function BookCell1({ book, style, onPress, children, ...props }) {
   const TouchableElement = (Platform.OS === 'android') ? TouchableNativeFeedback : TouchableHighlight;
   return (
     <TouchableElement
@@ -119,7 +139,7 @@ function BookCell({ book, style, onPress, ...props }) {
             <Text style={styles.bookAuthor} numberOfLines={1}>
               {book.author}
             </Text>
-            <LibraryStatus libraryStatus={book.libraryStatus} />
+            {children}
           </View>
           <View
             style={{
@@ -134,4 +154,4 @@ function BookCell({ book, style, onPress, ...props }) {
   );
 }
 
-module.exports = { LibraryStatus, BookCell };
+module.exports = { LibraryStatus, BookCell, TextWithIndicator };

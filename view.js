@@ -145,7 +145,9 @@ class MainView extends React.Component {
                  book={rowData}
                  style={{
                    backgroundColor: materialColor.grey['50']}}
-                       />
+                       >
+              <LibraryStatus libraryStatus={rowData.libraryStatus} />
+            </BookCell>
           )
           /* style={{
            *   ...StyleSheet.absoluteFillObject,
