@@ -64,7 +64,10 @@ function MyCard({ children, navigationProps, style }) {
   );
 }
 
-import { BookCell } from './BookCell';
+const Realm = require('realm');
+console.log("p from view",Realm.defaultPath)
+
+import { LibraryStatus, BookCell } from './BookCell';
 import { BookRow1 } from './BookRow';
 Touchable.BookRow1 = Touchable.createCycleComponent(
   BookRow1, {

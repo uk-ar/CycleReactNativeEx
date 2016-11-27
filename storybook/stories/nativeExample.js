@@ -14,6 +14,7 @@ import {
   Platform,
   StyleSheet,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import ReactTransitionGroup from 'react-addons-transition-group';
@@ -82,8 +83,12 @@ class ScrollPositionView extends React.Component {
     );
   }
 }
+
+const Realm = require('realm');
+console.log("p from native Example",Realm.defaultPath)
+
 storiesOf('Realm', module)
-  .add('contentContainerStyle', () => (
+  .add('read', () => (
     //contentContainerStyle=
     <ScrollView
       style={{borderWidth:10,borderColor:"red"}/*out*/}
@@ -519,6 +524,63 @@ BooksFromURL.defaultProps = {
   onProgress: emptyFunction
 };
 
+class BooksSaveView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { progress:"" }
+  }
+  render(){
+    const { url, ...props } = this.props
+    return(
+      <View
+        style={{
+          //
+          flex:1,
+          //justifyContent:"center",
+          backgroundColor: '#EBEBF1',
+        }}
+      >
+        <StatusBar barStyle="dark-content"/>
+        <View
+          style={{
+            height:NavigationExperimental.Header.HEIGHT,
+            paddingTop:Platform.OS === 'ios' ? 20 : 0,
+            backgroundColor: "#f7f7f8",//copy
+            borderBottomWidth: Platform.OS === 'ios' ? StyleSheet.hairlineWidth : 0,
+            justifyContent:"center",
+            flexDirection:"row",
+          }}>
+          <Button
+            onPress={()=>null}
+            title="Cancel"
+          />
+          <NavigationExperimental.Header.Title>
+            Add to Favorites
+          </NavigationExperimental.Header.Title>
+          <Button
+            onPress={()=>null}
+            title="Save"
+          />
+        </View>
+          <Text>
+            { this.state.progress !== "" ?
+              `${this.state.progress}件を処理` :
+              "" }
+          </Text>
+        <BooksFromURL
+          style={{backgroundColor: '#FFFFFF'}}
+          url={url}
+          onProgress={(i,t)=>this.setState({progress:`${i}/${t}`})}
+        />
+      </View>
+    )
+  }
+}
+
+BooksSaveView.propTypes = {
+  url: React.PropTypes.string.isRequired,
+};
+
 class ModalExample2 extends React.Component {
   constructor(props) {
     super(props);
@@ -537,38 +599,7 @@ class ModalExample2 extends React.Component {
           transparent={true}
           visible={this.state.visible}
         >
-          <View
-            style={{
-              //
-              flex:1,
-              //justifyContent:"center",
-              backgroundColor: '#EBEBF1',
-            }}
-          >
-            <View
-              style={{
-                height:NavigationExperimental.Header.HEIGHT,
-                paddingTop:Platform.OS === 'ios' ? 20 : 0,
-                backgroundColor: "#f7f7f8",//copy
-                borderBottomWidth: Platform.OS === 'ios' ? StyleSheet.hairlineWidth : 0,
-                justifyContent:"center",
-                flexDirection:"row",
-              }}>
-              <Button
-                onPress={()=>null}
-                title="Cancel"
-              />
-              <NavigationExperimental.Header.Title>
-                Add to Favorites
-              </NavigationExperimental.Header.Title>
-              <Button
-                onPress={()=>null}
-                title="Save"
-              />
-            </View>
-            <Text>bar</Text>
-            <Text>bar</Text>
-          </View>
+          <BooksSaveView/>
         </Modal>
         <Text
           style={{
@@ -593,11 +624,17 @@ storiesOf('Modal', module)
     return (
       <ModalExample2 />
     )})
-  .add('books ', () => {
+  .add('books from url', () => {
     return (
       <BooksFromURL
+          url="https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86"
+          onProgress={(i,t)=>console.log(i,t)}
+        />
+    )})
+  .add('books save view', () => {
+    return (
+      <BooksSaveView
         url="https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86"
-        onProgress={(i,t)=>console.log(i,t)}
       />
     )})
 
