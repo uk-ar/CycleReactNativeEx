@@ -49,6 +49,7 @@
 		4F121C7E1DD668A300479019 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D69171DD283ED00E38E07 /* SystemConfiguration.framework */; };
 		4F121C7F1DD6693900479019 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F01E89B120FB4D9795BDB732 /* libc++.tbd */; };
 		4F121C801DD6695700479019 /* libReactNativeShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F121C451DD5168F00479019 /* libReactNativeShareExtension.a */; };
+		4F121CB31DEE00BA00479019 /* MySafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F121CB21DEE00BA00479019 /* MySafariViewController.m */; };
 		4F6D68FF1DD283E500E38E07 /* libAppHub.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D68D11DD283AC00E38E07 /* libAppHub.a */; };
 		4F6D69181DD283ED00E38E07 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D69171DD283ED00E38E07 /* SystemConfiguration.framework */; };
 		4FD5DF08C6134631944B2A6C /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38485E051F3D46B58841202D /* libRNVectorIcons.a */; };
@@ -306,6 +307,8 @@
 		4F121C7B1DD6677200479019 /* libRealmNode.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libRealmNode.dylib; path = ../node_modules/realm/src/build/Debug/libRealmNode.dylib; sourceTree = "<group>"; };
 		4F121CAF1DEA2FFD00479019 /* CycleReactNativeEx.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = CycleReactNativeEx.entitlements; path = CycleReactNativeEx/CycleReactNativeEx.entitlements; sourceTree = "<group>"; };
 		4F121CB01DEA305500479019 /* CycleReactNativeExShareExt.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CycleReactNativeExShareExt.entitlements; sourceTree = "<group>"; };
+		4F121CB11DEE00BA00479019 /* MySafariViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MySafariViewController.h; sourceTree = "<group>"; };
+		4F121CB21DEE00BA00479019 /* MySafariViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MySafariViewController.m; sourceTree = "<group>"; };
 		4F6D68CA1DD283AC00E38E07 /* AppHub.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AppHub.xcodeproj; path = ../node_modules/apphub/AppHub/AppHub.xcodeproj; sourceTree = "<group>"; };
 		4F6D69171DD283ED00E38E07 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		50D4B74582BC4AAAA404105A /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
@@ -478,6 +481,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				4F121CB11DEE00BA00479019 /* MySafariViewController.h */,
+				4F121CB21DEE00BA00479019 /* MySafariViewController.m */,
 			);
 			name = CycleReactNativeEx;
 			sourceTree = "<group>";
@@ -1087,6 +1092,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F121CB31DEE00BA00479019 /* MySafariViewController.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);

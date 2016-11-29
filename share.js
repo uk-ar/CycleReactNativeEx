@@ -9,8 +9,33 @@ import {
   TouchableOpacity
 } from 'react-native'
 
-const Realm = require('realm');
-console.log("p from share",Realm.defaultPath)
+import {
+  STORAGE_KEY,
+  RAKUTEN_SEARCH_API,
+  CALIL_STATUS_API,
+  LIBRARY_ID,
+  log,
+  Book,
+  realm,
+} from './common';
+
+const initialBooks = realm.objects('Book')
+                          .sorted('modifyDate', true)// reverse sort
+                          .map((i) => i) // convert result to array
+//.do(i=>console.log("read",i))
+console.log("ib",initialBooks)
+
+/* const initialBooks = realm.objects('Book')
+ *                           .sorted('modifyDate', true)// reverse sort
+ *                           .map((i) => i);// convert result to array
+ * */
+/* MySafariViewController.getAppGroupPath("group.org.reactjs.native.example.CycleReactNativeEx", (error, path) => {
+ *   if (error) {
+ *     console.error(error);
+ *   } else {
+ *     console.log('here:'+path);
+ *   }
+ * });*/
 
 export default class Share extends Component {
   constructor(props, context) {
@@ -52,7 +77,7 @@ export default class Share extends Component {
             <View style={{ borderColor: 'green', borderWidth: 1, backgroundColor: 'white', height: 200, width: 300 }}>
               <TouchableOpacity onPress={this.closing}>
                 <Text>Close</Text>
-                <Text>{Realm.defaultPath}</Text>
+                <Text>{foo}</Text>
                 <Text>type: { this.state.type }</Text>
                 <Text>value: { this.state.value }</Text>
               </TouchableOpacity>
