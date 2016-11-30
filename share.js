@@ -77,7 +77,6 @@ export default class Share extends Component {
             <View style={{ borderColor: 'green', borderWidth: 1, backgroundColor: 'white', height: 200, width: 300 }}>
               <TouchableOpacity onPress={this.closing}>
                 <Text>Close</Text>
-                <Text>{foo}</Text>
                 <Text>type: { this.state.type }</Text>
                 <Text>value: { this.state.value }</Text>
               </TouchableOpacity>

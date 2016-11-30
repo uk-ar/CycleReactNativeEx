@@ -6,9 +6,8 @@
 //  Copyright © 2016年 Facebook. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import <RCTBridge.h>
-#import <SafariServices/SafariServices.h>
+
 //@interface MySafariViewController : UIViewController
 @interface MySafariViewController : NSObject <RCTBridgeModule>
 @end

@@ -147,6 +147,7 @@ import {
   TouchableNativeFeedback,
   Platform,
   TextInput,
+  NativeModules,
 } from 'react-native';
 
 import util from 'util';
@@ -185,7 +186,7 @@ Book.schema = {
     title: { type: 'string', optional: true },
     author: { type: 'string', optional: true },
     // Image raise error when src is null
-    thumbnail: { type: 'string', default: undefined, optional:true },
+    thumbnail: { type: 'string', optional:true },
     modifyDate: 'date',
   },
 };
@@ -202,12 +203,14 @@ const mockbooks = [
 
 const Realm = require('realm');
 
-import { NativeModules } from 'react-native';
-var MySafariViewController = NativeModules.MySafariViewController;
-console.log("my",MySafariViewController.appGroupPath)
+let realm;
+if(Platform.OS === 'ios'){
+  //realm = new Realm({ schema: [Book], path: NativeModules.MySafariViewController.appGroupPath, schemaVersion: 4 });
+  realm = new Realm({ schema: [Book], schemaVersion: 4 });
+} else {
+  realm = new Realm({ schema: [Book], schemaVersion: 4 });
+}
 
-const realm = new Realm({ schema: [Book], path: MySafariViewController.appGroupPath, schemaVersion: 4 });
-//const realm = new Realm({ schema: [Book], schemaVersion: 4 });
 realm.write(() => {
   /* mockbooks.reverse().map((book) => {
    *   realm.create('Book',
