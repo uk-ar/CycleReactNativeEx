@@ -25,6 +25,10 @@
 		207EEBF7B3DD4617B2883C07 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 70FABFEFCDE94A0B88E26F20 /* MaterialIcons.ttf */; };
 		36217FC1D4C74115B10ACB16 /* libRNSearchBar.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 11D6735ED7D24563B93ECA5D /* libRNSearchBar.a */; };
 		4DA777BF87AB4AEE97FA6BA5 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 428EDE001C3141F8B15C4271 /* Zocial.ttf */; };
+		4FD215301DEF79AC00363DD1 /* MySafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FD2152F1DEF79AC00363DD1 /* MySafariViewController.m */; };
+		4FD215381DEF7CAB00363DD1 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4FD215331DEF7CAB00363DD1 /* MainInterface.storyboard */; };
+		4FD215391DEF7CAB00363DD1 /* CycleReactNativeExShareExt.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FD215361DEF7CAB00363DD1 /* CycleReactNativeExShareExt.m */; };
+		4FD2153A1DEF7CAB00363DD1 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4FD215371DEF7CAB00363DD1 /* Info.plist */; };
 		65375D44D0E64E6B8BCCE9BA /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8219D5D517AD4AA18CA404E6 /* SimpleLineIcons.ttf */; };
 		6BE4679904FB48C8B7ACFF0E /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A7E762FA6AD3485B9A9C3973 /* libz.tbd */; };
 		6F19639F743148388AFC33BC /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08BFDE72561D4F98B8DA7740 /* libRNVectorIcons.a */; };
@@ -238,6 +242,13 @@
 		428EDE001C3141F8B15C4271 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		4324E51242CC4C68B0ECC0A8 /* libAppHubTestUtils.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libAppHubTestUtils.a; sourceTree = "<group>"; };
 		44D1946364A7429997C2B506 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
+		4FD2152E1DEF79AC00363DD1 /* MySafariViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MySafariViewController.h; sourceTree = "<group>"; };
+		4FD2152F1DEF79AC00363DD1 /* MySafariViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MySafariViewController.m; sourceTree = "<group>"; };
+		4FD215311DEF7C2400363DD1 /* CycleReactNativeEx.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = CycleReactNativeEx.entitlements; path = CycleReactNativeEx/CycleReactNativeEx.entitlements; sourceTree = "<group>"; };
+		4FD215341DEF7CAB00363DD1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		4FD215351DEF7CAB00363DD1 /* CycleReactNativeExShareExt.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = CycleReactNativeExShareExt.entitlements; sourceTree = "<group>"; };
+		4FD215361DEF7CAB00363DD1 /* CycleReactNativeExShareExt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CycleReactNativeExShareExt.m; sourceTree = "<group>"; };
+		4FD215371DEF7CAB00363DD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		70FABFEFCDE94A0B88E26F20 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		72BAEA435116457A96242881 /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
@@ -373,6 +384,7 @@
 		13B07FAE1A68108700A75B9A /* CycleReactNativeEx */ = {
 			isa = PBXGroup;
 			children = (
+				4FD215311DEF7C2400363DD1 /* CycleReactNativeEx.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -380,6 +392,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				4FD2152E1DEF79AC00363DD1 /* MySafariViewController.h */,
+				4FD2152F1DEF79AC00363DD1 /* MySafariViewController.m */,
 			);
 			name = CycleReactNativeEx;
 			sourceTree = "<group>";
@@ -434,6 +448,17 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		4FD215321DEF7CAB00363DD1 /* CycleReactNativeExShareExt */ = {
+			isa = PBXGroup;
+			children = (
+				4FD215331DEF7CAB00363DD1 /* MainInterface.storyboard */,
+				4FD215351DEF7CAB00363DD1 /* CycleReactNativeExShareExt.entitlements */,
+				4FD215361DEF7CAB00363DD1 /* CycleReactNativeExShareExt.m */,
+				4FD215371DEF7CAB00363DD1 /* Info.plist */,
+			);
+			path = CycleReactNativeExShareExt;
+			sourceTree = "<group>";
+		};
 		78C398B11ACF4ADC00677621 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -486,6 +511,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				4FD215321DEF7CAB00363DD1 /* CycleReactNativeExShareExt */,
 				13B07FAE1A68108700A75B9A /* CycleReactNativeEx */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* CycleReactNativeExTests */,
@@ -573,6 +599,14 @@
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
 						TestTargetID = 13B07F861A680F5B00A75B9A;
+					};
+					13B07F861A680F5B00A75B9A = {
+						DevelopmentTeam = RKN738A63T;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -834,6 +868,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				4FD215381DEF7CAB00363DD1 /* MainInterface.storyboard in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				D06FB01A03214A3B977A325E /* Entypo.ttf in Resources */,
 				74E391643658481BBC50E235 /* EvilIcons.ttf in Resources */,
@@ -844,6 +879,7 @@
 				E8C54FD78BAC47DBAA3239A2 /* Octicons.ttf in Resources */,
 				65375D44D0E64E6B8BCCE9BA /* SimpleLineIcons.ttf in Resources */,
 				4DA777BF87AB4AEE97FA6BA5 /* Zocial.ttf in Resources */,
+				4FD2153A1DEF7CAB00363DD1 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -879,7 +915,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FD215301DEF79AC00363DD1 /* MySafariViewController.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				4FD215391DEF7CAB00363DD1 /* CycleReactNativeExShareExt.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -902,6 +940,14 @@
 			);
 			name = LaunchScreen.xib;
 			path = CycleReactNativeEx;
+			sourceTree = "<group>";
+		};
+		4FD215331DEF7CAB00363DD1 /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4FD215341DEF7CAB00363DD1 /* Base */,
+			);
+			name = MainInterface.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -956,8 +1002,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = CycleReactNativeEx/CycleReactNativeEx.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = RKN738A63T;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -984,7 +1032,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = CycleReactNativeEx/CycleReactNativeEx.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = RKN738A63T;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
