@@ -6543,9 +6543,9 @@ react-native-search-bar@^2.16.0:
   version "2.16.0"
   resolved "https://registry.yarnpkg.com/react-native-search-bar/-/react-native-search-bar-2.16.0.tgz#3081e657d483164ec14781526d1b1354971a5d61"
 
-"react-native-share-extension@git+http://github.com/alinz/react-native-share-extension.git":
+"react-native-share-extension@git+http://github.com/uk-ar/react-native-share-extension.git":
   version "1.0.3"
-  resolved "git+http://github.com/alinz/react-native-share-extension.git#907387ef0339967bde1e3e7ae05a2777ae167373"
+  resolved "git+http://github.com/uk-ar/react-native-share-extension.git#7902842d46aeb72396b45a7dfa2fba6ce4a295d5"
 
 react-native-stylish@^0.3.0:
   version "0.3.0"
