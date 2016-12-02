@@ -205,8 +205,9 @@ const Realm = require('realm');
 
 let realm;
 if(Platform.OS === 'ios'){
-  //realm = new Realm({ schema: [Book], path: NativeModules.MySafariViewController.appGroupPath, schemaVersion: 4 });
-  realm = new Realm({ schema: [Book], schemaVersion: 4 });
+  console.log("nv:",NativeModules.MySafariViewController.appGroupPath)
+  realm = new Realm({ schema: [Book], path: NativeModules.MySafariViewController.appGroupPath + "foo.realm", schemaVersion: 4 });
+  //realm = new Realm({ schema: [Book], schemaVersion: 4 });
 } else {
   realm = new Realm({ schema: [Book], schemaVersion: 4 });
 }

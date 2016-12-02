@@ -52,6 +52,7 @@
 		4F121CB31DEE00BA00479019 /* MySafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F121CB21DEE00BA00479019 /* MySafariViewController.m */; };
 		4F6D68FF1DD283E500E38E07 /* libAppHub.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D68D11DD283AC00E38E07 /* libAppHub.a */; };
 		4F6D69181DD283ED00E38E07 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6D69171DD283ED00E38E07 /* SystemConfiguration.framework */; };
+		4FB809481DF21E73001A2801 /* MySafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F121CB21DEE00BA00479019 /* MySafariViewController.m */; };
 		4FD5DF08C6134631944B2A6C /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38485E051F3D46B58841202D /* libRNVectorIcons.a */; };
 		52F436F61C1744B3B4F97E1D /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 74BE28DB6BFF4CA6B6B40F81 /* MaterialIcons.ttf */; };
 		821C270D8BF341C39D1D8F83 /* libAppHubTestUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C245972E56124D83828A858D /* libAppHubTestUtils.a */; };
@@ -481,8 +482,6 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
-				4F121CB11DEE00BA00479019 /* MySafariViewController.h */,
-				4F121CB21DEE00BA00479019 /* MySafariViewController.m */,
 			);
 			name = CycleReactNativeEx;
 			sourceTree = "<group>";
@@ -617,6 +616,8 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				4F121CB11DEE00BA00479019 /* MySafariViewController.h */,
+				4F121CB21DEE00BA00479019 /* MySafariViewController.m */,
 				13B07FAE1A68108700A75B9A /* CycleReactNativeEx */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* CycleReactNativeExTests */,
@@ -1102,6 +1103,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FB809481DF21E73001A2801 /* MySafariViewController.m in Sources */,
 				4F121C3F1DD5158A00479019 /* CycleReactNativeExShareExt.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
