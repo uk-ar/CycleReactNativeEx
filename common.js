@@ -213,11 +213,11 @@ if(Platform.OS === 'ios'){
 }
 
 realm.write(() => {
-  /* mockbooks.reverse().map((book) => {
-   *   realm.create('Book',
-   *                {...book, modifyDate: new Date(Date.now())},
-   *                true)
-   * })*/
+  mockbooks.reverse().map((book) => {
+    realm.create('Book',
+                 {...book, modifyDate: new Date(Date.now())},
+                 true)
+  })
 });
 /* const initialBooks = realm.objects('Book')
  *                           .sorted('modifyDate', true)// reverse sort

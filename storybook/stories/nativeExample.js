@@ -27,9 +27,6 @@ import {BookCell} from '../../BookCell';
 import {SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 import {withDebug,VerticalCenterView,TestListView,debugView} from './common'
 
-const RAKUTEN_ISBN_API =
-  'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&applicationId=1088506385229803383&formatVersion=2&isbnjan=';
-
 class ScrollPositionView extends React.Component {
   constructor(props) {
     super(props);
@@ -85,7 +82,6 @@ class ScrollPositionView extends React.Component {
 }
 
 const Realm = require('realm');
-console.log("p from native Example",Realm.defaultPath)
 
 storiesOf('Realm', module)
   .add('read', () => (
@@ -433,154 +429,6 @@ class ModalExample extends React.Component {
   }
 }
 
-class BooksFromURL extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state={
-      books: null,
-      dataSource:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-    };
-  }
-  //https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86
-  componentDidMount(){
-    const { url, onProgress, ...props } = this.props
-    fetch(url)
-      .then(response => response.text())
-      .then(text => {
-        let isbns = text.match(/\b978\d{10}\b/g)
-        this.setState({
-          books: isbns.map(isbn => ({ isbn }))
-        })
-        return isbns
-      })
-      .then(isbns =>{
-        //let books = [];
-        isbns.forEach((isbn,index) =>
-          //fetch('http://www.hanmoto.com/api/book.php?ISBN='+isbn)
-          //fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+isbn)
-          setTimeout(()=>
-            fetch(RAKUTEN_ISBN_API+isbn)
-            //.then(response => response.ok )
-            .then(response => {
-              //console.log(response)
-              return response.json()
-            })
-            .then(body =>{
-              //console.log("b",body)
-              let { title, author, isbn, largeImageUrl } = body.Items[0]
-              //let { title, authors, largeImageUrl } = body.items[0].volumeInfo
-              let book = {
-                title: title.replace(/^【バーゲン本】/, ''),
-                author: author,
-                isbn,
-                thumbnail: largeImageUrl,
-              }
-              return book;
-            }).done( book =>{
-              //books[isbn]=res
-              this.setState((prevState)=>{
-                onProgress(index+1,isbns.length)
-                prevState.books[index] = book
-                return {
-                  books:[...prevState.books]
-                }
-              },)
-            })
-            ,index*1000)
-        )
-      })
-  }
-  render(){
-    const { url, onProgress, ...props } = this.props
-    //console.log("render",this.state.books)
-    if(this.state.books === null){
-      return(
-        <ActivityIndicator
-          size="large"
-          style={{
-            //alignItems:'center',
-            //justifyContent:'center',
-            flex:1,
-            height:80}}
-        />)
-    }
-    return (
-      <ListView
-        {...props}
-        dataSource={this.state.dataSource.cloneWithRows(this.state.books)}
-        renderRow={(rowData) =>{
-            //console.log("rd",rowData)
-            return <BookCell book={rowData}/>
-        }}
-      />)
-  }
-}
-
-BooksFromURL.propTypes = {
-  url: React.PropTypes.string.isRequired,
-  onProgress: React.PropTypes.func,
-};
-BooksFromURL.defaultProps = {
-  onProgress: emptyFunction
-};
-
-class BooksSaveView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { progress:"" }
-  }
-  render(){
-    const { url, ...props } = this.props
-    return(
-      <View
-        style={{
-          //
-          flex:1,
-          //justifyContent:"center",
-          backgroundColor: '#EBEBF1',
-        }}
-      >
-        <StatusBar barStyle="dark-content"/>
-        <View
-          style={{
-            height:NavigationExperimental.Header.HEIGHT,
-            paddingTop:Platform.OS === 'ios' ? 20 : 0,
-            backgroundColor: "#f7f7f8",//copy
-            borderBottomWidth: Platform.OS === 'ios' ? StyleSheet.hairlineWidth : 0,
-            justifyContent:"center",
-            flexDirection:"row",
-          }}>
-          <Button
-            onPress={()=>null}
-            title="Cancel"
-          />
-          <NavigationExperimental.Header.Title>
-            Add to Favorites
-          </NavigationExperimental.Header.Title>
-          <Button
-            onPress={()=>null}
-            title="Save"
-          />
-        </View>
-          <Text>
-            { this.state.progress !== "" ?
-              `${this.state.progress}件を処理` :
-              "" }
-          </Text>
-        <BooksFromURL
-          style={{backgroundColor: '#FFFFFF'}}
-          url={url}
-          onProgress={(i,t)=>this.setState({progress:`${i}/${t}`})}
-        />
-      </View>
-    )
-  }
-}
-
-BooksSaveView.propTypes = {
-  url: React.PropTypes.string.isRequired,
-};
-
 class ModalExample2 extends React.Component {
   constructor(props) {
     super(props);
@@ -614,6 +462,8 @@ class ModalExample2 extends React.Component {
     )
   }
 }
+
+import { BooksFromURL,BooksSaveView } from '../../BooksSaveView';
 
 storiesOf('Modal', module)
   .add('view ', () => {

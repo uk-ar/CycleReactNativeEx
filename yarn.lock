@@ -96,9 +96,9 @@
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@kadira/storybook-addons/-/storybook-addons-1.5.0.tgz#f92cd2059282a9b4b8bdac4bef28269f85e40be4"
 
-"@kadira/storybook-channel-postmsg@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@kadira/storybook-channel-postmsg/-/storybook-channel-postmsg-1.1.0.tgz#5ee89e27d2e25a872ddf2cfd9947e1cb931e7b11"
+"@kadira/storybook-channel-postmsg@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@kadira/storybook-channel-postmsg/-/storybook-channel-postmsg-2.0.1.tgz#2a9065bf0647c940b8f9a3a7342a3e12e321af72"
   dependencies:
     "@kadira/storybook-channel" "^1.1.0"
     json-stringify-safe "^5.0.1"
@@ -153,15 +153,15 @@
     react-modal "^1.2.1"
     redux "^3.5.2"
 
-"@kadira/storybook@^2.29.7":
-  version "2.30.0"
-  resolved "https://registry.yarnpkg.com/@kadira/storybook/-/storybook-2.30.0.tgz#5727958a8e74876d2448035e78130713fdf27612"
+"@kadira/storybook@^2.33.1":
+  version "2.33.1"
+  resolved "https://registry.yarnpkg.com/@kadira/storybook/-/storybook-2.33.1.tgz#5d4f02f8dc28d09337046a94ff5f431663dc28d8"
   dependencies:
     "@kadira/react-split-pane" "^1.4.0"
     "@kadira/storybook-addon-actions" "^1.0.2"
     "@kadira/storybook-addon-links" "^1.0.0"
     "@kadira/storybook-addons" "^1.5.0"
-    "@kadira/storybook-channel-postmsg" "^1.1.0"
+    "@kadira/storybook-channel-postmsg" "^2.0.1"
     "@kadira/storybook-ui" "^3.8.0"
     airbnb-js-shims "^1.0.1"
     autoprefixer "^6.3.7"
