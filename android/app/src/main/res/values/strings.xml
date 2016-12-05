@@ -1,17 +1,4 @@
 <resources>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  <string name="app_name">CycleReactNativeEx</string>
-  <string name="title_activity_share">CycleReactNativeExShareExt</string>
+    <string name="app_name">CycleReactNativeEx</string>
+    <string name="title_activity_share">CycleReactNativeExShareExt</string>
 </resources>
