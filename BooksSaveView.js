@@ -12,6 +12,7 @@ import {
   Button,
   ListView,
   ActivityIndicator,
+  Alert,
 } from 'react-native'
 import emptyFunction from 'fbjs/lib/emptyFunction';
 
@@ -42,6 +43,7 @@ class BooksFromURL extends React.Component {
         return isbns
       })
       .then(isbns =>{
+        //console.log("isbns",isbns)
         //let books = [];
         isbns.forEach((isbn,index) =>
           //fetch('http://www.hanmoto.com/api/book.php?ISBN='+isbn)
@@ -79,6 +81,17 @@ class BooksFromURL extends React.Component {
               })},index*1000)
         )
       })
+    /* .catch(error=>{
+     *   //console.log("error",error,url)
+     *   setTimeout(()=>{Alert.alert(
+     *     'Alert',
+     *     "There is no isbn in this page.",
+     *     [
+     *       {text: 'OK', onPress: () => console.log('Should close')},
+     *     ]
+     *   )
+     *   })
+     * })*/
   }
   render(){
     const { url, onProgress, ...props } = this.props
@@ -163,15 +176,24 @@ class BooksSaveView extends React.Component {
             `${this.state.processed}/${this.state.total}件を処理` :
             "" }
         </Text>
-        <BooksFromURL
-          style={{backgroundColor: '#FFFFFF'}}
-          url={url}
-          onProgress={(i,t)=>this.setState({
-              processed:i,
-              total:t
-            })}
-          onComplete={(books)=>this.setState({books})}
-        />
+        {url==='' ?
+         <ActivityIndicator
+           size="large"
+           style={{
+             //alignItems:'center',
+             //justifyContent:'center',
+             flex:1,
+             height:80}}
+         /> :
+         <BooksFromURL
+           style={{backgroundColor: '#FFFFFF'}}
+           url={url}
+           onProgress={(i,t)=>this.setState({
+               processed:i,
+               total:t
+             })}
+           onComplete={(books)=>this.setState({books})}
+         />}
       </View>
     )
   }

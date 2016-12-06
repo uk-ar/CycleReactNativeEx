@@ -75,6 +75,7 @@ export default class Share extends Component {
 
   render() {
     console.log("state",this.state)
+    //https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86
     return (
       <View
         style={{
@@ -86,7 +87,7 @@ export default class Share extends Component {
           visible={this.state.visible}
         >
           <BooksSaveView
-            url="https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86"
+            url={this.state.value}
             onSave={(books)=>{
                 realm.write(() => {
                   books.forEach((book) => {
