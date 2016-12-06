@@ -30,53 +30,55 @@ class BooksFromURL extends React.Component {
   }
   //https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86
   componentDidMount(){
-    const { url, onProgress, ...props } = this.props
+    const { url, onProgress, onComplete, ...props } = this.props;
 
     fetch(url)
-                                              .then(response => response.text())
-                                              .then(text => {
-                                                let isbns = text.match(/\b978\d{10}\b/g)
-                                                this.setState({
-                                                  books: isbns.map(isbn => ({ isbn }))
-                                                })
-                                                return isbns
-                                              })
-                                              .then(isbns =>{
-                                                //let books = [];
-                                                isbns.forEach((isbn,index) =>
-                                                  //fetch('http://www.hanmoto.com/api/book.php?ISBN='+isbn)
-                                                  //fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+isbn)
-                                                  setTimeout(()=>
-                                                    fetch(RAKUTEN_ISBN_API+isbn)
-                                                    //.then(response => response.ok )
-                                                    .then(response => {
-                                                      //console.log(response)
-                                                      return response.json()
-                                                    })
-                                                    .then(body =>{
-                                                      //console.log("b",body)
-                                                      let { title, author, isbn, largeImageUrl } = body.Items[0]
-                                                      //let { title, authors, largeImageUrl } = body.items[0].volumeInfo
-                                                      let book = {
-                                                        title: title.replace(/^【バーゲン本】/, ''),
-                                                        author: author,
-                                                        isbn,
-                                                        thumbnail: largeImageUrl,
-                                                      }
-                                                      return book;
-                                                    }).done( book =>{
-                                                      //books[isbn]=res
-                                                      this.setState((prevState)=>{
-                                                        onProgress(index+1,isbns.length)
-                                                        prevState.books[index] = book
-                                                        return {
-                                                          books:[...prevState.books]
-                                                        }
-                                                      },)
-                                                    })
-                                                            ,index*1000)
-                                                )
-                                              })
+      .then(response => response.text())
+      .then(text => {
+        let isbns = text.match(/\b978\d{10}\b/g)
+        this.setState({
+          books: isbns.map(isbn => ({ isbn }))
+        })
+        return isbns
+      })
+      .then(isbns =>{
+        //let books = [];
+        isbns.forEach((isbn,index) =>
+          //fetch('http://www.hanmoto.com/api/book.php?ISBN='+isbn)
+          //fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+isbn)
+          setTimeout(()=>{
+            fetch(RAKUTEN_ISBN_API+isbn)
+            //.then(response => response.ok )
+              .then(response => {
+                //console.log(response)
+                return response.json()
+              })
+              .then(body =>{
+                //console.log("b",body)
+                let { title, author, isbn, largeImageUrl } = body.Items[0]
+                //let { title, authors, largeImageUrl } = body.items[0].volumeInfo
+                let book = {
+                  title: title.replace(/^【バーゲン本】/, ''),
+                  author: author,
+                  isbn,
+                  thumbnail: largeImageUrl,
+                }
+                return book;
+              }).done( book =>{
+                //books[isbn]=res
+                this.setState((prevState)=>{
+                  prevState.books[index] = book
+                  onProgress(index+1,isbns.length)
+                  if(index+1 === isbns.length){
+                    onComplete(prevState.books);
+                  }
+                  return {
+                    books:[...prevState.books]
+                  }
+                })
+              })},index*1000)
+        )
+      })
   }
   render(){
     const { url, onProgress, ...props } = this.props
@@ -115,10 +117,15 @@ BooksFromURL.defaultProps = {
 class BooksSaveView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { progress:"" }
+    this.state = {
+      processed:0,
+      total:0,
+      books:[],
+    }
   }
   render(){
     const { url, onCancel, onSave, ...props } = this.props
+    //console.log("bool",this.state.books.length !== 0)
     return(
       <View
         style={{
@@ -146,19 +153,24 @@ class BooksSaveView extends React.Component {
             Add to Favorites
           </NavigationExperimental.Header.Title>
           <Button
-            onPress={onSave}
+            onPress={()=>onSave(this.state.books)}
+            disabled={this.state.books.length === 0}
             title="Save"
           />
         </View>
         <Text>
-          { this.state.progress !== "" ?
-            `${this.state.progress}件を処理` :
+          { this.state.total !== 0 ?
+            `${this.state.processed}/${this.state.total}件を処理` :
             "" }
         </Text>
         <BooksFromURL
           style={{backgroundColor: '#FFFFFF'}}
           url={url}
-          onProgress={(i,t)=>this.setState({progress:`${i}/${t}`})}
+          onProgress={(i,t)=>this.setState({
+              processed:i,
+              total:t
+            })}
+          onComplete={(books)=>this.setState({books})}
         />
       </View>
     )
@@ -167,6 +179,12 @@ class BooksSaveView extends React.Component {
 
 BooksSaveView.propTypes = {
   url: React.PropTypes.string.isRequired,
+  onCancel: React.PropTypes.func,
+  onSave: React.PropTypes.func,
+};
+BooksSaveView.defaultProps = {
+  onCancel: emptyFunction,
+  onSave: emptyFunction,
 };
 
 module.exports = { BooksSaveView, BooksFromURL };

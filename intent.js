@@ -9,19 +9,20 @@ import {
   log,
   Book,
   realm,
+  initialBooks,
 } from './common';
 
-const mockbooks = [
-  { title: 'like:SOFT SKILLS', isbn: '9784822251550', bucket: 'liked' },
-  { title: 'like:bukkyou', isbn: '9784480064851', bucket: 'liked' },
-  { title: 'borrow:youji kyouiku keizai this is long long tile for test', isbn: '9784492314630', bucket: 'borrowed' },
-  { title: 'borrow:gabage collection', isbn: '9784798134208', bucket: 'borrowed' },
-  { title: 'done:simpsons', isbn: '9784105393069', bucket: 'done' },
-  { title: 'done:wakuwaku programming', isbn: '9784822285159', bucket: 'done' },
-  { title: 'done:toshi ha saikou no hatumei', isbn: '9784757142794', bucket: 'done' },
-];
-
-const initialBooks = mockbooks;
+/* const mockbooks = [
+ *   { title: 'like:SOFT SKILLS', isbn: '9784822251550', bucket: 'liked' },
+ *   { title: 'like:bukkyou', isbn: '9784480064851', bucket: 'liked' },
+ *   { title: 'borrow:youji kyouiku keizai this is long long tile for test', isbn: '9784492314630', bucket: 'borrowed' },
+ *   { title: 'borrow:gabage collection', isbn: '9784798134208', bucket: 'borrowed' },
+ *   { title: 'done:simpsons', isbn: '9784105393069', bucket: 'done' },
+ *   { title: 'done:wakuwaku programming', isbn: '9784822285159', bucket: 'done' },
+ *   { title: 'done:toshi ha saikou no hatumei', isbn: '9784757142794', bucket: 'done' },
+ * ];
+ * */
+//const initialBooks = mockbooks;
 
 function intent(RN, HTTP) {
   // Actions
@@ -236,7 +237,7 @@ function intent(RN, HTTP) {
   savedBooks$.do((books) => {
     realm.write(() => {
       books.forEach((book) => {
-        //realm.create('Book', book, true);
+        realm.create('Book', book, true);
       });
     });
   }).subscribe();

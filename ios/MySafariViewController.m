@@ -10,7 +10,8 @@ RCT_EXPORT_MODULE()
   NSFileManager *fileManager = [NSFileManager defaultManager];
   NSURL *destURL = [fileManager containerURLForSecurityApplicationGroupIdentifier: @"group.org.reactjs.native.example.CycleReactNativeEx"];
   // TODO:FIX appGroup in xcode.proj when upgrade
-  return @{ @"appGroupPath":[destURL absoluteString] };
+  //return @{ @"appGroupPath":[destURL absoluteString] };
+  return @{ @"appGroupPath":destURL.path };
 }
 
 @end

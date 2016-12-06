@@ -19,11 +19,12 @@ import {
   log,
   Book,
   realm,
+  initialBooks,
 } from './common';
 
-const initialBooks = realm.objects('Book')
-                          .sorted('modifyDate', true)// reverse sort
-                          .map((i) => i) // convert result to array
+/* const initialBooks = realm.objects('Book')
+ *                           .sorted('modifyDate', true)// reverse sort
+ *                           .map((i) => i) // convert result to array*/
 //.do(i=>console.log("read",i))
 console.log("ib",initialBooks)
 
@@ -43,7 +44,7 @@ export default class Share extends Component {
   constructor(props, context) {
     super(props, context)
     this.state = {
-      isOpen: true,
+      visible: true,
       type: '',
       value: ''
     }
@@ -67,11 +68,13 @@ export default class Share extends Component {
 
   closing = () => {
     this.setState({
-      isOpen: false
+      visible: false
     })
+    ShareExtension.close()
   }
 
   render() {
+    console.log("state",this.state)
     return (
       <View
         style={{
@@ -84,17 +87,22 @@ export default class Share extends Component {
         >
           <BooksSaveView
             url="https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86"
+            onSave={(books)=>{
+                realm.write(() => {
+                  books.forEach((book) => {
+                    realm.create('Book',
+                                 {...book, bucket:'liked',
+                                  modifyDate: new Date(Date.now())},
+                                 true)
+                  });
+                });
+                this.closing()
+              }}
+            onCancel={(books)=>{
+                this.closing()
+              }}
           />
         </Modal>
-        <Text
-          style={{
-            paddingTop:20,
-          }}
-          onPress={()=>{
-              this.setState({visible:true});
-            }}>
-          Open
-        </Text>
       </View>
     )
     /* <Modal backdrop={false}
