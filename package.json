@@ -42,7 +42,7 @@
     "xstream": "^9.0.0"
   },
   "devDependencies": {
-    "@kadira/react-native-storybook": "^2.1.7",
+    "@kadira/react-native-storybook": "^2.2.0",
     "@kadira/storybook": "^2.33.1",
     "apphubdeploy": "^0.0.8",
     "babel-cli": "^6.18.0",
