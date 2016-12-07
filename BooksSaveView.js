@@ -36,7 +36,9 @@ class BooksFromURL extends React.Component {
     fetch(url)
       .then(response => response.text())
       .then(text => {
-        let isbns = text.match(/\b978\d{10}\b/g)
+        let isbns = text.match(/978-?\d{10}/g)//remove dup
+                        .filter((x, i, self) => self.indexOf(x) === i)
+
         this.setState({
           books: isbns.map(isbn => ({ isbn }))
         })
