@@ -54,6 +54,7 @@
 		79172707E3024981AC6EE973 /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0DF4B4B26B1E4FEC8EA03C1B /* Entypo.ttf */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		8A356EBE82C8497DB482ED32 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 53890778FAEB41F9A119CD28 /* SimpleLineIcons.ttf */; };
+		905BEBB156294C3881F61A3E /* libRNBackgroundTimer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F6DA4436AEBE4F5D8C91909C /* libRNBackgroundTimer.a */; };
 		A093B9DB1BA8423D8DBB36FB /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7447C7E14F4B44ADBDDD9156 /* EvilIcons.ttf */; };
 		A7134DC3C6E6410AB2E2261C /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AF96F1BBA6B3425AB6C50286 /* Ionicons.ttf */; };
 		A894D768A91C4DD1A99F5D83 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D197EFC98F9C43108997BA0C /* libz.tbd */; };
@@ -126,6 +127,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 83CBBA2E1A601D0E00E9B192;
 			remoteInfo = React;
+		};
+		4F19E5C31DF866F3008C699C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84C7B26AC94E483086B33E05 /* RNBackgroundTimer.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNBackgroundTimer;
 		};
 		4F69D8D21DF5CCC500778D15 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -305,6 +313,7 @@
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		7F712991AEA940D09C220965 /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
+		84C7B26AC94E483086B33E05 /* RNBackgroundTimer.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNBackgroundTimer.xcodeproj; path = "../node_modules/react-native-background-timer/ios/RNBackgroundTimer.xcodeproj"; sourceTree = "<group>"; };
 		9289D57C491043CC81768314 /* ReactNativeShareExtension.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeShareExtension.xcodeproj; path = "../node_modules/react-native-share-extension/ios/ReactNativeShareExtension.xcodeproj"; sourceTree = "<group>"; };
 		93D87E8E2B054323BECF2B21 /* libRealmReact.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRealmReact.a; sourceTree = "<group>"; };
 		AF96F1BBA6B3425AB6C50286 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
@@ -315,6 +324,7 @@
 		E69CE7F96D87441D8E2E5D55 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		E7DAB052B19C44948EDB23F4 /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
 		E7EFF865F28744DE919ACE81 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
+		F6DA4436AEBE4F5D8C91909C /* libRNBackgroundTimer.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNBackgroundTimer.a; sourceTree = "<group>"; };
 		F6E9D4C26A1A475A82165410 /* libAppHubTestUtils.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libAppHubTestUtils.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -348,6 +358,7 @@
 				120FF2DFFC164DDF9C34D0DF /* libRealmReact.a in Frameworks */,
 				1B8650D0907246B39BA07147 /* libc++.tbd in Frameworks */,
 				A894D768A91C4DD1A99F5D83 /* libz.tbd in Frameworks */,
+				905BEBB156294C3881F61A3E /* libRNBackgroundTimer.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -495,6 +506,14 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		4F19E5A81DF866F2008C699C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4F19E5C41DF866F3008C699C /* libRNBackgroundTimer.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		4F69D8C71DF5CCC500778D15 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -575,6 +594,7 @@
 				9289D57C491043CC81768314 /* ReactNativeShareExtension.xcodeproj */,
 				7F712991AEA940D09C220965 /* RNVectorIcons.xcodeproj */,
 				BBE97C4463BA4A50B2045105 /* RealmReact.xcodeproj */,
+				84C7B26AC94E483086B33E05 /* RNBackgroundTimer.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -789,6 +809,10 @@
 					ProjectRef = BBE97C4463BA4A50B2045105 /* RealmReact.xcodeproj */;
 				},
 				{
+					ProductGroup = 4F19E5A81DF866F2008C699C /* Products */;
+					ProjectRef = 84C7B26AC94E483086B33E05 /* RNBackgroundTimer.xcodeproj */;
+				},
+				{
 					ProductGroup = 4F69D8C91DF5CCC500778D15 /* Products */;
 					ProjectRef = 7F712991AEA940D09C220965 /* RNVectorIcons.xcodeproj */;
 				},
@@ -857,6 +881,13 @@
 			fileType = archive.ar;
 			path = libReact.a;
 			remoteRef = 146834031AC3E56700842450 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		4F19E5C41DF866F3008C699C /* libRNBackgroundTimer.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNBackgroundTimer.a;
+			remoteRef = 4F19E5C31DF866F3008C699C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		4F69D8D31DF5CCC500778D15 /* libAppHub.a */ = {
@@ -1120,6 +1151,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CycleReactNativeEx.app/CycleReactNativeEx";
@@ -1136,6 +1168,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1203,6 +1236,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/build/Build/Products/Debug-iphonesimulator",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1232,6 +1266,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/build/Build/Products/Debug-iphonesimulator",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1285,6 +1320,7 @@
 					"$(SRCROOT)/../node_modules/react-native-share-extension/ios",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-background-timer/ios",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -1329,6 +1365,7 @@
 					"$(SRCROOT)/../node_modules/react-native-share-extension/ios",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-background-timer/ios",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;

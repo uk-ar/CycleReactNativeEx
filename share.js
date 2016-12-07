@@ -74,7 +74,7 @@ export default class Share extends Component {
   }
 
   render() {
-    console.log("state",this.state)
+    //console.log("state",this.state)
     //https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86
     //http://www.ehonnavi.net/ehon/18290/%E5%A4%A7%E5%9E%8B%E7%B5%B5%E6%9C%AC%E3%81%90%E3%82%8A%E3%81%A8%E3%81%90%E3%82%89%E3%81%AE%E3%81%88%E3%82%93%E3%81%9D%E3%81%8F/
     return (

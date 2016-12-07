@@ -12,6 +12,14 @@ import {
   initialBooks,
 } from './common';
 
+import {
+  AppState,
+  InteractionManager,
+} from 'react-native'
+
+AppState.addEventListener('change',()=>{
+  console.log("AppState",AppState.currentState)
+})
 /* const mockbooks = [
  *   { title: 'like:SOFT SKILLS', isbn: '9784822251550', bucket: 'liked' },
  *   { title: 'like:bukkyou', isbn: '9784480064851', bucket: 'liked' },
@@ -31,7 +39,7 @@ function intent(RN, HTTP) {
     .select('main')
   // .events('swipeEnd')
     .events('release')
-    .do(args => console.log('foo0:', args))
+    //.do(args => console.log('foo0:', args))
     .map(([book, action]) => [book, action.target])
   // .map(([{rowData:book,action}]) => [book, action.target])
     // .map(([book, action, closeAnimation]) => [book, action.target, closeAnimation])
@@ -235,9 +243,11 @@ function intent(RN, HTTP) {
       .shareReplay();
 
   savedBooks$.do((books) => {
-    realm.write(() => {
-      books.forEach((book) => {
-        realm.create('Book', book, true);
+    InteractionManager.runAfterInteractions(()=>{
+      realm.write(() => {
+        books.forEach((book) => {
+          realm.create('Book', book, true);
+        });
       });
     });
   }).subscribe();
