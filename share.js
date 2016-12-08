@@ -12,15 +12,8 @@ import {
 } from 'react-native'
 
 import {
-  STORAGE_KEY,
-  RAKUTEN_SEARCH_API,
-  CALIL_STATUS_API,
-  LIBRARY_ID,
-  log,
-  Book,
   realm,
-  initialBooks,
-} from './common';
+} from './realmModel.js'
 
 /* const initialBooks = realm.objects('Book')
  *                           .sorted('modifyDate', true)// reverse sort

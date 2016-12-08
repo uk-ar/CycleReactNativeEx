@@ -176,21 +176,6 @@ Touchable.FAIcon = Touchable.createCycleComponent(FAIcon);
 Touchable.TextInput = Touchable.createCycleComponent(TextInput);
 Touchable.TouchableElement = Touchable.createCycleComponent(TouchableElement);
 
-class Book {}
-Book.schema = {
-  name: 'Book',
-  primaryKey: 'isbn',
-  properties: {
-    isbn: 'string',
-    bucket: { type: 'string', optional: true },
-    title: { type: 'string', optional: true },
-    author: { type: 'string', optional: true },
-    // Image raise error when src is null
-    thumbnail: { type: 'string', optional:true },
-    modifyDate: 'date',
-  },
-};
-
 /* const mockbooks = [
  *   { title: 'like:SOFT SKILLS', isbn: '9784822251550', bucket: 'liked' },
  *   { title: 'like:bukkyou', isbn: '9784480064851', bucket: 'liked' },
@@ -201,30 +186,7 @@ Book.schema = {
  *   { title: 'done:toshi ha saikou no hatumei', isbn: '9784757142794', bucket: 'done' },
  * ];*/
 
-const Realm = require('realm');
-
-let realm;
-if(Platform.OS === 'ios'){
-  Realm.defaultPath = NativeModules.MySafariViewController.appGroupPath + "/baz.realm"
-  realm = new Realm({ schema: [Book], schemaVersion: 4 });
-} else {
-  realm = new Realm({ schema: [Book], schemaVersion: 4 });
-}
-
-/* realm.write(() => {
- *   mockbooks.reverse().map((book) => {
- *     realm.create('Book',
- *                  {...book, modifyDate: new Date(Date.now())},
- *                  true)
- *   })
- * });*/
-const initialBooks = realm.objects('Book')
-                          .sorted('modifyDate', true)// reverse sort
-                          .map((i) => i);// convert result to array
-
 module.exports = {
-  initialBooks,
-  Book,
   Touchable,
   itemsInfo,
   STORAGE_KEY,
@@ -235,6 +197,5 @@ module.exports = {
   MOCKED_MOVIES_DATA,
   log,
   TouchableElement,
-  realm,
   //makeEventEmitterDriver,
 };

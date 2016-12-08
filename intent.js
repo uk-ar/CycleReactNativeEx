@@ -7,10 +7,12 @@ import {
   CALIL_STATUS_API,
   LIBRARY_ID,
   log,
-  Book,
+} from './common';
+
+import {
   realm,
   initialBooks,
-} from './common';
+} from './realmModel';
 
 import {
   AppState,
