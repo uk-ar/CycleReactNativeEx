@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 
 import util from 'util';
-import { compose, withHandlers } from 'recompose';
 import emptyFunction from 'fbjs/lib/emptyFunction';
 
 import Dimensions from 'Dimensions';
@@ -20,8 +19,6 @@ const {
 } = Dimensions.get('window');
 
 import { SwipeableListView } from './SwipeableListView';
-import { SwipeableRow3 } from './SwipeableRow';
-import { CloseableView } from './Closeable';
 
 const RCTUIManager = require('NativeModules').UIManager;
 
@@ -89,6 +86,7 @@ class BookListView1 extends React.Component {
       selectedSection,
       onSwipeEnd,
       onSwipeStart,
+      onRelease,
       renderSectionHeader,
       generateActions,
       width,
@@ -129,18 +127,17 @@ class BookListView1 extends React.Component {
     // TODO:lock on swipe
     return (
       <ListView
+        ref={c => this.listview = c}
         removeClippedSubviews={false}
         {...props}
         renderSectionHeader={(rowData, sectionID, rowID, highlightRow) =>{
             // ref={c => this.sections[sectionID] = c}
             //console.log("row",rowData,sectionID,rowID);
             return(
-              <CloseableView>
-                            {renderSectionHeader(rowData, sectionID, rowID, highlightRow)}
-               </CloseableView>)
+              renderSectionHeader(rowData, sectionID, rowID, highlightRow)
+            )
           }}
         dataSource={this.dataSource}
-        ref={c => this.listview = c}
         renderRow={(rowData, sectionID, rowID, highlightRow) => {
           this.dataSources[sectionID] =
               this.dataSources[sectionID] || new ListView.DataSource({
@@ -153,8 +150,8 @@ class BookListView1 extends React.Component {
             // removeClippedSubviews={false} seems no mean
             //                style={{maxHeight: 100 * num}}
             //                 ref={c => this.rows[sectionID] = c}
-          return (
-            <CloseableView >
+            return (
+              //dummy view for insert?
               <SwipeableListView
                 width={width}
                 enableEnterAnimation={sectionID !== "search"}
@@ -163,6 +160,7 @@ class BookListView1 extends React.Component {
                 removeClippedSubviews={false}
                 onSwipeEnd={onSwipeEnd}
                 onSwipeStart={onSwipeStart}
+                onRelease={onRelease}
                 renderRow={renderRow}
                 generateActions={generateActions}
                 renderSectionHeader={(sectionData, sectionID) =>
@@ -175,8 +173,7 @@ class BookListView1 extends React.Component {
                                     }
                 dataSource={this.dataSources[sectionID]
                                 .cloneWithRowsAndSections(rowData)}
-              />
-            </CloseableView>
+                           />
           );
         }}
       />
@@ -221,9 +218,11 @@ class BookListView extends React.Component {
         onSwipeStart={(args) => {
             this.listview.setNativeProps({ scrollEnabled: false });
           onSwipeStart(args);
-        }}
+          }}
+        onRelease={()=>{
+            this.listview.setNativeProps({ scrollEnabled: true });
+          }}
         onSwipeEnd={(args) => {
-          this.listview.setNativeProps({ scrollEnabled: true });
           onSwipeEnd(args);
             // onRelease(rowData,action)
             /* closeAnimation={

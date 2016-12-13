@@ -6,7 +6,7 @@
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
-                <key>NSExceptionDomains</key>
+		<key>NSExceptionDomains</key>
 		<dict>
 			<key>www.ehonnavi.net</key>
 			<dict>

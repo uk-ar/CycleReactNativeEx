@@ -110,7 +110,10 @@ class CloseableView extends React.Component {
           this.state.style,
               // this.state.close ? { height: 0.01 } : { height: null },
                 { overflow: 'hidden' }]}
-        animationConfig={animationConfig}
+        animationConfig={{
+          ...animationConfig,
+          //duration:10000,
+        }}
       >
         <View
           ref={c => (this.inner = c)}

@@ -15,7 +15,7 @@ import emptyFunction from 'fbjs/lib/emptyFunction';
 
 import Stylish from 'react-native-stylish';
 
-import { CloseableView, LayoutableView } from './Closeable';
+import { LayoutableView } from './Closeable';
 import { Action } from './Action';
 
 const {
@@ -68,6 +68,7 @@ function withState2(RowComponent) {
       const gestureStateSave = { ...gestureState }; // save value for async
       this.setState({ lock: true }, () => {
         // let promise;
+        this.props.onRelease();
         if (this.row.getCurrentActions().state.index === 0) {
           this.row.swipeToFlat(gestureStateSave.vx, () =>
             this.setState({ lock: false })
@@ -90,21 +91,12 @@ function withState2(RowComponent) {
           } else {
             this.row.swipeToMin(gestureStateSave.vx, fn);
           }
-          /* promise
-           *   .then(() => this.row.close())
-           *   .then(() => {
-           *     console.log("gecua",this.row.getCurrentAction())
-           *     this.props.onSwipeEnd({
-           *       gestureState:gestureStateSave,
-           *       action:this.row.getCurrentAction()})
-           *   })
-           *   .catch(() => { throw new Error("foo?") })*/
         }
         // console.log("on",gestureStateSave,this.row.getCurrentAction())
       });
     }
     render() {
-      const { onSwipeEnd, onSwipeStart, ...props } = { ...this.props };
+      const { onSwipeEnd, onSwipeStart, onRelease , ...props } = { ...this.props };
       return (
         <RowComponent
           {...props}
@@ -201,10 +193,9 @@ class _SwipeableRow3 extends React.Component {
           velocity
         }),
         Animated.timing(this.panX, {
-          toValue: width * 2 })
-        /* ,
-         * Animated.spring(this.panX, {
-         *   toValue: width })*/
+          toValue: width * 2,
+          //duration:10000
+        })
       ]), fn);
   }
   swipeToMin(velocity, fn) {
@@ -276,6 +267,7 @@ SwipeableRow3.propTypes = {
   ...View.propTypes, //  ...Closable.propTypes,
   onSwipeStart: React.PropTypes.func,
   onSwipeEnd: React.PropTypes.func,
+  onRelease: React.PropTypes.func,
   leftActions: React.PropTypes.array.isRequired,
   rightActions: React.PropTypes.array.isRequired,
   renderActions: React.PropTypes.func,
@@ -287,6 +279,7 @@ SwipeableRow3.defaultProps = {
   ...View.defaultProps,
   onSwipeStart: emptyFunction,
   onSwipeEnd: emptyFunction,
+  onRelease: emptyFunction,
   leftActions: [],
   rightActions: [],
   width:SWIPEABLE_MAIN_WIDTH,
