@@ -267,12 +267,12 @@ function intent(RN, HTTP) {
   }
 
   const mockSearcheBooks = [
-    { title: 'like:SOFT SKILLS', isbn: '9784822251550' },
-    { title: 'borrow:youji kyouiku keizai', isbn: '9784492314630' },
-    { title: 'done:simpsons', isbn: '9784105393069' },
-    { title: 'none:container', isbn: '9784822245641' },
-    { title: 'guri', isbn: '9784834032147' },
-    { title: 'ABC', isbn: '9784828867472' },
+    /* { title: 'like:SOFT SKILLS', isbn: '9784822251550' },
+     * { title: 'borrow:youji kyouiku keizai', isbn: '9784492314630' },
+     * { title: 'done:simpsons', isbn: '9784105393069' },
+     * { title: 'none:container', isbn: '9784822245641' },
+     * { title: 'guri', isbn: '9784834032147' },
+     * { title: 'ABC', isbn: '9784828867472' },*/
   ];
 
   const { booksStatus$: searchedBooksStatus$,

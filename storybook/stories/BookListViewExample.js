@@ -285,7 +285,7 @@ class NestedListView3 extends React.Component {
           ref={c=> this.listview = c}
           dataSource={this.state.ds.getDataSource()}
           renderRow={(rowData,sectionID,rowID) =>{
-              console.log("rerend1",rowData,sectionID,rowID)
+              //console.log("rerend1",rowData,sectionID,rowID)
               //dynamic height cannot works
               //                    style={{maxHeight:200}}
               //const i = Math.random();
@@ -1190,3 +1190,117 @@ storiesOf('BookListView', module)
   .add('with TestBookListView4', () => {
     return(<TestBookListView4/>)
   })
+
+class DelayedListView extends React.Component {
+  constructor(props) {
+    super(props);
+    let dataSource = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      //sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+    })
+    this.state = {
+      dataSource: dataSource.cloneWithRows(
+        this.props.dataBlob,
+        this.props.rowIdentities
+      )
+    }
+  }
+  componentWillReceiveProps(nextProps){
+    function difference(a,b) {
+      /* return a.map(
+       *   (rowIDs, section) => rowIDs.map(row =>
+       *     b[section].indexOf(row) === -1
+       *   ));*/
+      return a.filter(row =>
+        b.indexOf(row) === -1
+      );
+    }
+    callback = () => {
+      this.setState({
+        dataSource: this.state.dataSource
+                        .cloneWithRows(
+                          this.props.dataBlob,
+                          this.props.rowIdentities
+                        )
+      })
+    }
+
+    const added   = difference(this.props.rowIdentities,nextProps.rowIdentities );
+    if(added.length !== 0){
+      this.props.onWillEnter(callback)
+      //console.log("added")
+    }
+    const removed = difference(nextProps.rowIdentities ,this.props.rowIdentities);
+    if(removed.length !== 0){
+      this.props.onWillLeave(callback)
+      //console.log("removed")
+    }
+    //console.log("add:", difference(this.props.rowIdentities,nextProps.rowIdentities))
+    //console.log("remove:", difference(nextProps.rowIdentities,this.props.rowIdentities))
+  }
+  render(){
+    return (
+      this.props.children(this.state.dataSource)
+    )
+  }
+}
+DelayedListView.propTypes = {
+  children: React.PropTypes.func.isRequired,
+  onWillLeave: React.PropTypes.func,
+  onWillEnter: React.PropTypes.func,
+};
+
+DelayedListView.defaultProps = {
+  children: emptyFunction,
+  onWillLeave: (callback) => callback(),
+  onWillEnter: (callback) => callback(),
+};
+
+class BookListView2_test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      toggle:true,
+    };
+  }
+  render(){
+    return (
+      <View>
+        <Text
+          onPress={()=>{
+              this.setState((prevState,props)=>{
+                return {toggle: ! prevState.toggle}
+              })
+            }}>
+          pressMe
+        </Text>
+        <DelayedListView
+          dataBlob={{
+            r1:"a", r2:"b", r3:"c"
+          }}
+          rowIdentities={
+            (this.state.toggle ? ["r2", "r1"] : ["r1","r2","r3"])
+                        }
+        >
+          {(dataSource)=>{
+             return (
+               <ListView
+                 ref={ c => this.listview=c }
+                 dataSource={dataSource}
+                 renderRow={(rowData,sectionID,rowID)=>{
+                     return debugView("row")(rowData,sectionID,rowID)
+                   }}
+               />
+             )
+           }}
+        </DelayedListView>
+      </View>
+    )
+  }
+}
+
+storiesOf('BookListView2', module)
+  .add('BookListView2',() => {
+    return(<BookListView2_test />)
+  })
+

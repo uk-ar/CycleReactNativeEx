@@ -243,6 +243,20 @@ class BookListView extends React.Component {
   }
 }
 
+/* const {
+ *   //renderRow,
+ *   //dataSource,
+ *   dataBlob,
+ *   selectedSection,
+ *   //onSwipeEnd,
+ *   //onSwipeStart,
+ *   //onRelease,
+ *   //renderSectionHeader,
+ *   //generateActions,
+ *   width,
+ *   // TODO: onSwipeStart?
+ *   ...props } = this.props;
+ * */
 BookListView.propTypes = {
   ...ListView.propTypes,
   dataSource: React.PropTypes.instanceOf(ListView.ListViewDataSource),
@@ -250,12 +264,15 @@ BookListView.propTypes = {
   // onRelease: React.PropTypes.func,
   onSwipeEnd: React.PropTypes.func,
   onSwipeStart: React.PropTypes.func,
+  onRelease: React.PropTypes.func,
+  //generateActions: React.PropTypes.func,
 };
 BookListView.defaultProps = {
   ...ListView.defaultProps,
   // onRelease:emptyFunction,
   onSwipeEnd: emptyFunction,
   onSwipeStart: emptyFunction,
+  onRelease: emptyFunction,
 };
 
 class BookListView_old extends React.Component {

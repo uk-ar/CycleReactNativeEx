@@ -102,6 +102,7 @@ class MainView extends React.Component {
     //        key={selectedSection}
     // props.animations.start()
     //      style={{ marginTop: 64, backgroundColor: 'red' }}
+    console.log("b",books)
     return (
       <BookListView
         style={style}

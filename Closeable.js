@@ -112,7 +112,7 @@ class CloseableView extends React.Component {
                 { overflow: 'hidden' }]}
         animationConfig={{
           ...animationConfig,
-          //duration:10000,
+          duration:10000,
         }}
       >
         <View
