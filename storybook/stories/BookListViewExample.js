@@ -16,6 +16,7 @@ import util from 'util'
 import _ from 'lodash'
 //import {hello} from 'react-native-stylish'
 import materialColor from 'material-colors';
+import emptyFunction from 'fbjs/lib/emptyFunction';
 
 import Button from './Button';
 import CenterView from './CenterView';
@@ -1196,7 +1197,6 @@ class DelayedListView extends React.Component {
     super(props);
     let dataSource = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
-      //sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
     })
     this.state = {
       dataSource: dataSource.cloneWithRows(
@@ -1207,10 +1207,6 @@ class DelayedListView extends React.Component {
   }
   componentWillReceiveProps(nextProps){
     function difference(a,b) {
-      /* return a.map(
-       *   (rowIDs, section) => rowIDs.map(row =>
-       *     b[section].indexOf(row) === -1
-       *   ));*/
       return a.filter(row =>
         b.indexOf(row) === -1
       );
@@ -1225,18 +1221,21 @@ class DelayedListView extends React.Component {
       })
     }
 
-    const added   = difference(this.props.rowIdentities,nextProps.rowIdentities );
+    const added = difference(
+      this.props.rowIdentities, nextProps.rowIdentities);
+
     if(added.length !== 0){
       this.props.onWillEnter(callback)
-      //console.log("added")
+      console.log("added")
     }
-    const removed = difference(nextProps.rowIdentities ,this.props.rowIdentities);
+
+    const removed = difference(
+      nextProps.rowIdentities ,this.props.rowIdentities);
+
     if(removed.length !== 0){
       this.props.onWillLeave(callback)
-      //console.log("removed")
+      console.log("removed")
     }
-    //console.log("add:", difference(this.props.rowIdentities,nextProps.rowIdentities))
-    //console.log("remove:", difference(nextProps.rowIdentities,this.props.rowIdentities))
   }
   render(){
     return (
@@ -1257,6 +1256,7 @@ DelayedListView.defaultProps = {
 };
 
 class BookListView2_test extends React.Component {
+  //cannot animate parallel
   constructor(props) {
     super(props);
     this.state = {
@@ -1267,6 +1267,7 @@ class BookListView2_test extends React.Component {
     return (
       <View>
         <Text
+          style={{paddingTop:20}}
           onPress={()=>{
               this.setState((prevState,props)=>{
                 return {toggle: ! prevState.toggle}
@@ -1299,8 +1300,41 @@ class BookListView2_test extends React.Component {
   }
 }
 
+class BookListView3_test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      enabled:[],
+    };
+  }
+  render(){
+    return (
+      <View>
+        <Text
+          style={{paddingTop:20}}
+          onPress={()=>{
+              this.setState((prevState,props)=>{
+                return {toggle: ! prevState.toggle}
+              })
+            }}>
+          pressMe
+        </Text>
+        <ListView
+          ref={ c => this.listview=c }
+          dataSource={dataSource}
+          renderRow={(rowData,sectionID,rowID)=>{
+              return debugView("row")(rowData,sectionID,rowID)
+            }}
+        />
+      </View>
+    )
+  }
+}
+
 storiesOf('BookListView2', module)
   .add('BookListView2',() => {
     return(<BookListView2_test />)
   })
-
+  .add('BookListView3',() => {
+    return(<BookListView3_test />)
+  })
