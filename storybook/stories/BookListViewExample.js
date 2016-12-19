@@ -26,7 +26,7 @@ import {BookCell} from '../../BookCell';
 import {BookRow1} from '../../BookRow';
 import {genActions2,Action} from '../../Action';
 import {BookListView3,BookListView2,BookListView1,BookListView} from '../../BookListView';
-import {LayoutableView} from '../../Closeable';
+import { LayoutableView, CloseableView, CloseableView2 } from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 import {SwipeableListView} from '../../SwipeableListView';
 
@@ -1303,11 +1303,18 @@ class BookListView2_test extends React.Component {
 class BookListView3_test extends React.Component {
   constructor(props) {
     super(props);
+    this.dataSource = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+    })
     this.state = {
-      enabled:[],
-    };
+      toggle:true,
+      /* dataSource: dataSource.cloneWithRows(
+       *   this.props.dataBlob
+       * )*/
+    }
   }
   render(){
+    //console.log("a",this.state.toggle)
     return (
       <View>
         <Text
@@ -1321,11 +1328,241 @@ class BookListView3_test extends React.Component {
         </Text>
         <ListView
           ref={ c => this.listview=c }
-          dataSource={dataSource}
+          dataSource={this.state.toggle ?
+                      this.dataSource.cloneWithRows({
+                        r1:{data:1,enable:true},
+                        r2:{data:2,enable:true},
+                        r3:{data:3,enable:true},
+                      }) :
+                      this.dataSource.cloneWithRows({
+                        r1:{data:1,enable:true},
+                        r2:{data:2,enable:false},
+                        r3:{data:3,enable:true},
+                      })
+                     }
           renderRow={(rowData,sectionID,rowID)=>{
-              return debugView("row")(rowData,sectionID,rowID)
+              //console.log("r:",rowData)
+              return (
+                <LayoutableView
+                    close={!rowData.enable}>
+                          {debugView("row")(rowData,sectionID,rowID)}
+                </LayoutableView>
+              )
             }}
         />
+      </View>
+    )
+  }
+}
+
+class CountableView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      counter:0,
+    }
+  }
+  render(){
+    return(
+      <View>
+        <Text
+          style={{paddingTop:20}}
+          onPress={()=>{
+              this.setState((prevState,props)=>{
+                return {counter: (prevState.counter + 1) % this.props.limit }
+              })
+            }}>
+          pressMe to count
+        </Text>
+        {this.props.children(this.state.counter)}
+      </View>
+    )
+  }
+}
+
+class BookListView4_test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.dataSource = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+    })
+    this.dataBlobs = [
+      {
+        r1:{data:1,enable:true},
+        r2:{data:2,enable:true},
+        r3:{data:3,enable:true},
+      },
+      {
+        r1:{data:1,enable:true},
+        r2:{data:2,enable:false},
+        r3:{data:3,enable:true},
+      },
+      {
+        r1:{data:1,enable:true},
+        r2:{data:2,enable:false},
+        r3:{data:3,enable:false},
+      },
+      {
+        r1:{data:1,enable:true},
+        r2:{data:2,enable:true},
+        r3:{data:3,enable:false},
+      }
+    ]
+  }
+  render(){
+    //console.log("a",this.state.toggle)
+    return (
+      <CountableView limit={4}>
+        {(counter) => {
+           this.dataSource =
+             this.dataSource.cloneWithRows(this.dataBlobs[counter])
+           return (
+             <ListView
+               ref={ c => this.listview=c }
+               dataSource={this.dataSource}
+               renderRow={(rowData,sectionID,rowID)=>{
+                   console.log("r:",rowData)
+                   //rowData
+                   //console.log("c:",counter)
+                   return (
+                     <CloseableView
+                    close={!rowData.enable}>
+                          {debugView("row")(rowData,sectionID,rowID)}
+                     </CloseableView>
+                   )
+                 }}
+           />)
+         }}
+      </CountableView>
+    )
+  }
+}
+
+class ToggleableView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      toggle:true,
+    }
+  }
+  render(){
+    return(
+      <View
+        style={{paddingTop:20}}>
+        <Text>
+          state.toggle is {this.state.toggle ? "true" : "false" }
+        </Text>
+        <Text
+          onPress={()=>{
+              this.setState((prevState,props)=>{
+                return {toggle: ! prevState.toggle }
+              })
+            }}>
+          pressMe to toggle
+        </Text>
+        <Text
+          onPress={()=>{
+              this.setState({toggle: true})
+            }}>
+          pressMe to set true
+        </Text>
+        <Text
+          onPress={()=>{
+              this.setState({toggle: false})
+            }}>
+          pressMe to set false
+        </Text>
+        { this.props.children(this.state.toggle) }
+      </View>
+    )
+  }
+}
+
+class BookListView5_test extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render(){
+    return(
+      <ToggleableView>
+      { (toggle) => {
+        return (
+          <CloseableView
+            close={toggle}>
+            <Text>content</Text>
+            {/* {debugView("row")(this.props)} */}
+          </CloseableView>
+        )
+      }}
+      </ToggleableView>)
+  }
+}
+
+// PureComponent is only effective when no children
+// class MyCloseableView extends React.PureComponent {
+class MyCloseableView extends React.Component {
+  componentWillReceiveProps(nextProps) {
+    if (this.props.close !== nextProps.close) {
+      //this.toggle();
+      //console.log("willRecieveProps::close change")
+    } else if (this.props.children !== nextProps.children){
+      //console.log("willRecieveProps::children change")
+    }
+  }
+  render(){
+    //console.log("my")
+    return (
+      <CloseableView close={false}>
+        {this.props.children}
+      </CloseableView>
+    )
+  }
+}
+
+class BookListView6_test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      toggle:true,
+    }
+    this.animationConfig={duration:3000}
+    this.style={backgroundColor:"red"}
+  }
+
+  render(){
+    return(
+      <View
+        style={{paddingTop:20}}>
+        <Text>
+          state.toggle is {this.state.toggle ? "true" : "false" }
+        </Text>
+        <Text
+          onPress={()=>{
+              this.setState((prevState,props)=>{
+                return {toggle: ! prevState.toggle }
+              })
+            }}>
+          pressMe to toggle
+        </Text>
+        <Text
+          onPress={()=>{
+              this.setState({toggle: true})
+            }}>
+          pressMe to set true
+        </Text>
+        <Text
+          onPress={()=>{
+              this.setState({toggle: false})
+            }}>
+          pressMe to set false
+        </Text>
+        <CloseableView2
+          close={this.state.toggle}
+          animationConfig={this.animationConfig}
+          style={this.style}
+        >
+          {debugView("row")("content")}
+        </CloseableView2>
       </View>
     )
   }
@@ -1337,4 +1574,13 @@ storiesOf('BookListView2', module)
   })
   .add('BookListView3',() => {
     return(<BookListView3_test />)
+  })
+  .add('BookListView4',() => {
+    return(<BookListView4_test />)
+  })
+  .add('BookListView5',() => {
+    return(<BookListView5_test />)
+  })
+  .add('BookListView6',() => {
+    return(<BookListView6_test />)
   })

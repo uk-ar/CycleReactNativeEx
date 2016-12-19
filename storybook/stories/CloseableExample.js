@@ -73,6 +73,22 @@ storiesOf('CloseableView', module)
           backgroundColor:"yellow"}} />
     </ScrollView>
   ))
+  .add('multiple set', () => (
+    <ScrollView style={{marginTop:20}}>
+      <CloseableViewDebug
+        data={[{style:{height:100,backgroundColor:"red"},close:true}]}
+        onPress={(props,self)=>{
+            self.toggle();
+            //console.log(self);
+            //self.animateTo({height:20,backgroundColor:"red"})
+          }}/>
+      <View
+        style={{
+          height:50,
+          backgroundColor:"yellow"}} />
+    </ScrollView>
+  ))
+//input close open
 /* style={[style, {
  *   flexDirection: 'row',
  *   justifyContent: this.state.positiveSwipe ?

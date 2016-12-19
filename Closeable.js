@@ -4,7 +4,8 @@ import {
   View,
   // TouchableHighlight,
   // TouchableNativeFeedback
-  StyleSheet
+  StyleSheet,
+  Animated,
 } from 'react-native';
 
 import Stylish from 'react-native-stylish';
@@ -19,10 +20,8 @@ class CloseableView extends React.Component {
     super(props);
     this.state = {
       close: this.props.close,
-      style: this.props.close ? { height: 0.01 } : { height: null }
+      style: this.props.close ? { height: 1 } : { height: null }
     };
-    /* this.initialStyle =
-     *   this.props.close ? { height: 1 } : { height: null };*/
   }
   open(onComplete) {
     // keys=['height', 'opacity', 'transform']
@@ -38,9 +37,9 @@ class CloseableView extends React.Component {
           //style: { height, opacity: 1, transform: [{ scale: 1 }] }
       }, () => { // widen
         this.outer.animate(
-            { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] },
+            { height: 1, opacity: 0.1, transform: [{ scale: 0.1 }] },
             { height, opacity: 1, transform: [{ scale: 1 }] },
-            // { height: 0.01 }
+            // { height: 1 }
             // { opacity: 0.1, transform: [{ scale: 0.1 }]}
             () => {
               this.setState({
@@ -60,32 +59,17 @@ class CloseableView extends React.Component {
         // this.style = ;
       this.outer.animate(
           { height, opacity: 1, transform: [{ scale: 1 }] },
-          { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] },
+          { height: 1, opacity: 0.1, transform: [{ scale: 0.1 }] },
           // this.style
-          () => {
+        () => {
+          //console.log("close fin")
             this.setState({
               close: true, // shrink//absolute
-              style: { height: 0.01 }
+              //style: { height: 1 }
             }, onComplete);
-            // console.log("finish closed")
-            // resolve();
           }
         );
-            // .then()
-            // .catch(() => { throw new Error("foo") })
-        /* this.setState({close:true},()=>{
-         *   this.outer.animate(
-         *     { height, opacity: 1, transform: [{ scale: 1 }] },
-         *     { height: 0.01, opacity: 0.1, transform: [{ scale: 0.1 }] }
-         *     //this.style
-         *   )
-         *       .then(() => {
-         *         this.setState({ close: true });// shrink//absolute
-         *         console.log("finish closed")
-         *         resolve();
-         *       });*/
     });
-    // });
   }
   toggle() {
     return (this.state.close ? this.open() : this.close());
@@ -93,14 +77,13 @@ class CloseableView extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.close !== nextProps.close) {
       this.toggle();
+      //console.log("willRecieveProps::close change")
     }
   }
-  /* componentDidMount() {
-   *   console.log('didmount');
-   * }*/
   render() {
     const { animationConfig, style, close, ...props } = this.props;
-    // console.log("cl",this,this.props.close,this.state.close,this.style)
+    //console.log("cl",this,this.props.close,this.state.close,this.style)
+    //console.log("cl",this.props)
     const content = (
       <Stylish.View
         ref={c => (this.outer = c)}
@@ -108,11 +91,11 @@ class CloseableView extends React.Component {
         style={[// this.style,
           // this.initialStyle,
           this.state.style,
-              // this.state.close ? { height: 0.01 } : { height: null },
+              this.state.close ? { height: 1 } : { height: null },
                 { overflow: 'hidden' }]}
         animationConfig={{
           ...animationConfig,
-          duration:10000,
+          duration:3000,
         }}
       >
         <View
@@ -120,38 +103,62 @@ class CloseableView extends React.Component {
           collapsable={false}
           {...props}
           style={[style,
-            this.state.close ? // to measure height
-                  { position: 'absolute' } : null]}
+                  this.state.close ? // to measure height
+                  { position: 'absolute' } : null
+            ]}
         />
       </Stylish.View>
     );
-    this.initialStyle = null;
     return content;
   }
 }
-// willRecieveProps
-// withPropsWillChange("key",(old,new)=>)
-// {key1:,key2:}
-// [key1,key2],func
-// props to state
-function willRecieveProps(key, fn) {
-  // console.log("p:",key,Object.keys(key))
-  return WrappedComponent =>
-     class extends WrappedComponent {
-       render() {
-        // console.log("iiHOC",this.props,this.state)
-         return super.render();
-       }
-       componentWillReceiveProps(nextProps) {
-         super.componentWillReceiveProps(nextProps);
-        // this.close.bind(this)();
-         fn(this);
-        /* if(this.props[key] !== nextProps[key]){
-         *   fn.bind(this)(this.props[key],nextProps[key]);
-         * }*/
-       }
+
+class CloseableView2 extends React.Component {
+  constructor(props) {
+    super(props);
+    //this.counter = new Animated.Value(0);
+    /* this.style = {
+     *   close:{overflow:"hidden",height:0.01},
+     *   open: {overflow:"hidden",height:100}
+     * }*/
+    this.state = {
+      close: props.close
     }
-  ;
+    this.height={
+      close:0.01,
+      open:100
+    }
+    this.style = {
+      overflow:"hidden",
+      height:new Animated.Value(100)
+      /* height:new Animated.Value(
+       *   this.state.close ? this.height.close : this.height.open )*/
+    }
+  }
+  componentWillReceiveProps(nextProps){
+    if (this.props.close !== nextProps.close) {
+      //this.toggle();
+      this.setState({close:nextProps.close})
+      /* this.style.height.setValue(
+       *   this.state.close ? this.height.close : this.height.open)*/
+      Animated.timing(
+        this.style.height,
+        {toValue: this.state.close ? this.height.close : this.height.open}
+      ).start();
+    }
+  }
+  render(){
+    //console.log("rend")
+    //<View style={this.state.close ? this.style.close : this.style.open}>
+    return(
+      <Animated.View style={this.style}>
+        <View
+          ref={c => (this.inner = c)}>
+          {this.props.children}
+        </View>
+      </Animated.View>
+    )
+  }
 }
 
 function makeLayoutableComponent(BaseComponent) {
@@ -226,4 +233,4 @@ LayoutableView.defaultProps = {
   //transitionEnter: true,
 };
 
-module.exports = { CloseableView, LayoutableView };
+module.exports = { CloseableView, LayoutableView, CloseableView2 };
