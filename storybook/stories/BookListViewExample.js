@@ -1417,21 +1417,41 @@ class BookListView4_test extends React.Component {
            this.dataSource =
              this.dataSource.cloneWithRows(this.dataBlobs[counter])
            return (
-             <ListView
-               ref={ c => this.listview=c }
-               dataSource={this.dataSource}
-               renderRow={(rowData,sectionID,rowID)=>{
-                   console.log("r:",rowData)
-                   //rowData
-                   //console.log("c:",counter)
-                   return (
-                     <CloseableView
+             <View>
+               <ListView
+                 ref={ c => this.listview=c }
+                 dataSource={this.dataSource}
+                 renderRow={
+                   (rowData,sectionID,rowID)=>{
+                     console.log("r:",rowData)
+                     //rowData
+                     //console.log("c:",counter)
+                     return (
+                       <CloseableView2
                     close={!rowData.enable}>
                           {debugView("row")(rowData,sectionID,rowID)}
-                     </CloseableView>
-                   )
-                 }}
-           />)
+                       </CloseableView2>
+                     )
+                   }}
+               />
+                       <Text>foo</Text>
+                       <ListView
+                         ref={ c => this.listview=c }
+                         dataSource={this.dataSource}
+                         renderRow={(rowData,sectionID,rowID)=>{
+                             console.log("r:",rowData)
+                             //rowData
+                             //console.log("c:",counter)
+                             return (
+                               <CloseableView2
+                    close={rowData.enable}>
+                          {debugView("row")(rowData,sectionID,rowID)}
+                               </CloseableView2>
+                             )
+                           }}
+                       />
+             </View>
+           )
          }}
       </CountableView>
     )
@@ -1558,11 +1578,20 @@ class BookListView6_test extends React.Component {
         </Text>
         <CloseableView2
           close={this.state.toggle}
-          animationConfig={this.animationConfig}
-          style={this.style}
         >
           {debugView("row")("content")}
         </CloseableView2>
+        <Text>
+          next
+        </Text>
+        <CloseableView2
+          close={!this.state.toggle}
+        >
+          {debugView("row")("content2")}
+        </CloseableView2>
+        <Text>
+          next2
+        </Text>
       </View>
     )
   }

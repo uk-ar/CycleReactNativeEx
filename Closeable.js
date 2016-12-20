@@ -113,49 +113,86 @@ class CloseableView extends React.Component {
   }
 }
 
+function interpolateStyle(seed,from,to){
+  let style =
+    Object.keys(to)
+          .filter(key =>
+            (typeof to[key] === 'number' ||
+             key.toLowerCase().endsWith('color')) && from[key]
+          ).map(key =>
+            ({key:key,
+              value:seed.interpolate({
+                inputRange:[0,1],
+                outputRange:[from[key],to[key]]
+              })
+            })).reduce((acc,{key:key,value:value})=> {
+              acc[key]=value
+              return acc
+            },{})
+  const transform = to.transform.map((obj) => {
+    return Object
+      .keys(obj)
+      .filter(key =>
+        (typeof obj[key] === 'number' ||
+         key.toLowerCase().endsWith('color')) && from.transform[0][key]
+      ).reduce((acc, key) => {
+        acc[key] = seed.interpolate({
+          inputRange: [0, 1],
+          outputRange: [from.transform[0][key], obj[key]],
+        });
+        return acc;
+      }, {});
+  })
+  return {...to,...style,transform:transform}
+}
+
 class CloseableView2 extends React.Component {
   constructor(props) {
     super(props);
-    //this.counter = new Animated.Value(0);
-    /* this.style = {
-     *   close:{overflow:"hidden",height:0.01},
-     *   open: {overflow:"hidden",height:100}
-     * }*/
+    this.seed = new Animated.Value(props.close ? 0 : 1)
+    let style = interpolateStyle(
+      this.seed,
+      {overflow:"scroll",opacity: 0.1,transform:[{scale:0.1}]},
+      {overflow:"scroll",opacity: 1,  transform:[{scale:1  }]}
+    )
     this.state = {
-      close: props.close
-    }
-    this.height={
-      close:0.01,
-      open:100
-    }
-    this.style = {
-      overflow:"hidden",
-      height:new Animated.Value(100)
-      /* height:new Animated.Value(
-       *   this.state.close ? this.height.close : this.height.open )*/
+      style: style
     }
   }
   componentWillReceiveProps(nextProps){
     if (this.props.close !== nextProps.close) {
-      //this.toggle();
-      this.setState({close:nextProps.close})
-      /* this.style.height.setValue(
-       *   this.state.close ? this.height.close : this.height.open)*/
       Animated.timing(
-        this.style.height,
-        {toValue: this.state.close ? this.height.close : this.height.open}
+        this.seed, {
+          toValue: nextProps.close ? 0 : 1,
+          useNativeDriver:false,//cannot mix height
+        }
       ).start();
+      //this.seed.setValue(nextProps.close ? 0 : 1)
     }
   }
   render(){
-    //console.log("rend")
-    //<View style={this.state.close ? this.style.close : this.style.open}>
+    console.log("rend",this.state.style)
+    //removeClippedSubviews is for android
     return(
-      <Animated.View style={this.style}>
-        <View
-          ref={c => (this.inner = c)}>
-          {this.props.children}
-        </View>
+      <Animated.View
+      removeClippedSubviews={true}
+      style={this.state.style}
+      >
+      <View
+      onLayout={
+        this.state.style.height ? null :
+        ({nativeEvent: { layout: {x, y, width, height}}})=>
+          this.setState({
+            style: {
+              ...this.state.style,
+              height:this.seed.interpolate({
+                inputRange:[0,1],
+                outputRange:[0.1,height]
+              }),
+            }})}
+      >
+      {this.props.children}
+      </View>
       </Animated.View>
     )
   }
