@@ -259,7 +259,7 @@ class BookListView extends React.Component {
  * */
 BookListView.propTypes = {
   ...ListView.propTypes,
-  dataSource: React.PropTypes.instanceOf(ListView.ListViewDataSource),
+  dataSource: React.PropTypes.instanceOf(ListView.DataSource),
   renderSectionFooter: React.PropTypes.func,
   // onRelease: React.PropTypes.func,
   onSwipeEnd: React.PropTypes.func,

@@ -145,7 +145,7 @@ function interpolateStyle(seed,from,to){
   })
   return {...to,...style,transform:transform}
 }
-
+//class Enterable
 class CloseableView2 extends React.Component {
   constructor(props) {
     super(props);
@@ -171,28 +171,31 @@ class CloseableView2 extends React.Component {
     }
   }
   render(){
-    console.log("rend",this.state.style)
+    //console.log("rend",this.state.style)
     //removeClippedSubviews is for android
     return(
       <Animated.View
-      removeClippedSubviews={true}
-      style={this.state.style}
+        removeClippedSubviews={true}
+        style={this.state.style}
       >
-      <View
-      onLayout={
-        this.state.style.height ? null :
-        ({nativeEvent: { layout: {x, y, width, height}}})=>
-          this.setState({
-            style: {
-              ...this.state.style,
-              height:this.seed.interpolate({
-                inputRange:[0,1],
-                outputRange:[0.1,height]
-              }),
-            }})}
-      >
-      {this.props.children}
-      </View>
+        <View
+          onLayout={
+            this.state.style.height ? null :
+                    ({nativeEvent: { layout: {x, y, width, height}}}) => {
+                      this.setState({
+                        style: {
+                          ...this.state.style,
+                          height:this.seed.interpolate({
+                            inputRange:[0,1],
+                            outputRange:[0.1,height]
+                          }),
+                        }});
+                      //layouted: props.transitionEnter ? false : true
+                    }
+                   }
+        >
+          {this.props.children}
+        </View>
       </Animated.View>
     )
   }

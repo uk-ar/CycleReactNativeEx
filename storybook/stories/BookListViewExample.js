@@ -9,7 +9,8 @@ import {
   ScrollView,
   LayoutAnimation,
   UIManager,
-  Dimensions
+  Dimensions,
+  Easing,
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import util from 'util'
@@ -1423,7 +1424,7 @@ class BookListView4_test extends React.Component {
                  dataSource={this.dataSource}
                  renderRow={
                    (rowData,sectionID,rowID)=>{
-                     console.log("r:",rowData)
+                     //console.log("r:",rowData)
                      //rowData
                      //console.log("c:",counter)
                      return (
@@ -1434,22 +1435,21 @@ class BookListView4_test extends React.Component {
                      )
                    }}
                />
-                       <Text>foo</Text>
-                       <ListView
-                         ref={ c => this.listview=c }
-                         dataSource={this.dataSource}
-                         renderRow={(rowData,sectionID,rowID)=>{
-                             console.log("r:",rowData)
-                             //rowData
-                             //console.log("c:",counter)
-                             return (
-                               <CloseableView2
+               <Text>foo</Text>
+               <ListView
+                 ref={ c => this.listview=c }
+                 dataSource={this.dataSource}
+                 renderRow={(rowData,sectionID,rowID)=>{
+                     //rowData
+                     //console.log("c:",counter)
+                     return (
+                       <CloseableView2
                     close={rowData.enable}>
                           {debugView("row")(rowData,sectionID,rowID)}
-                               </CloseableView2>
-                             )
-                           }}
-                       />
+                       </CloseableView2>
+                     )
+                   }}
+               />
              </View>
            )
          }}
@@ -1597,6 +1597,65 @@ class BookListView6_test extends React.Component {
   }
 }
 
+class BookListView7_test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.dataSource = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+    })
+    this.dataBlob = {
+        r1:{data:1,enable:true},
+        r2:{data:2,enable:false},
+        r3:{data:3,enable:true},
+      }
+  }
+  render(){
+    //console.log("a",this.state.toggle)
+    this.dataSource = this.dataSource.cloneWithRows(this.dataBlob)
+    let generateActions= ()=>genActions2('search')
+    return (
+      <View
+        style={{paddingTop:20}}>
+        <ListView
+          dataSource={this.dataSource}
+          renderRow={
+            (rowData,sectionID,rowID, highlightRow)=>{
+              //console.log("r:",rowData)
+              //rowData
+              //console.log("c:",counter)
+              return (
+                <CloseableView2
+                    close={!rowData.enable}>
+                  <SwipeableRow3
+                 width={width}
+                 animationConfig={{ easing: Easing.inOut(Easing.quad) }}
+                 {...generateActions(rowData, sectionID, rowID, highlightRow)}
+                                                                >
+                  {debugView("row")(rowData,sectionID,rowID)}
+                  </SwipeableRow3>
+                </CloseableView2>
+              )
+            }}
+        />
+        <Text>foo</Text>
+        <ListView
+          dataSource={this.dataSource}
+          renderRow={(rowData,sectionID,rowID)=>{
+              //rowData
+              //console.log("c:",counter)
+              return (
+                <CloseableView2
+                    close={rowData.enable}>
+                          {debugView("row")(rowData,sectionID,rowID)}
+                </CloseableView2>
+              )
+            }}
+        />
+      </View>
+    )
+  }
+}
+
 storiesOf('BookListView2', module)
   .add('BookListView2',() => {
     return(<BookListView2_test />)
@@ -1612,4 +1671,7 @@ storiesOf('BookListView2', module)
   })
   .add('BookListView6',() => {
     return(<BookListView6_test />)
+  })
+  .add('BookListView7',() => {
+    return(<BookListView7_test />)
   })
