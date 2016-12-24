@@ -22,7 +22,7 @@
     "@cycle/rx-run": "^7.0.1",
     "apphub": "^0.5.1",
     "isbn": "^0.4.0",
-    "lodash": "^4.16.5",
+    "lodash": "^4.17.3",
     "material-colors": "^1.1.1",
     "react": "^15.4.1",
     "react-addons-transition-group": "^15.4.1",
