@@ -1597,6 +1597,69 @@ class BookListView6_test extends React.Component {
   }
 }
 
+class PanResponderView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.panX = new Animated.Value(0.01);
+    function isSwipeHorizontal(evt, gestureState) {
+      return Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
+          && Math.abs(gestureState.dx) > 10;
+    }
+    const { onSwipeStart, onSwipeEnd, ...otherProps } = props;
+    this.panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => false,
+      // for select cell
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
+      onMoveShouldSetPanResponder: isSwipeHorizontal,
+      onMoveShouldSetPanResponderCapture: isSwipeHorizontal,
+      // no effect
+      // onShouldBlockNativeResponder: (evt, gestureState) => false,
+      onPanResponderGrant: (evt, gestureState) => {
+        onSwipeStart(gestureState);
+      },
+      onPanResponderMove: Animated.event([
+        null,                // raw event arg ignored
+        { dx: this.panX },    // gestureState arg
+      ]), // for performance
+      onPanResponderRelease: (evt, gestureState) => {
+        onSwipeEnd(gestureState);
+      },
+      onPanResponderTerminate: (evt, gestureState) => {
+        onSwipeEnd(gestureState);
+      },
+    });
+  }
+  render(){
+    const { onSwipeStart, onSwipeEnd, children, style, ...otherProps } = this.props;
+    return(
+      <View
+        {...this.panResponder.panHandlers}
+        {...otherProps}
+        style={[style, {
+            flexDirection: 'row',
+            /* justifyContent: this.state.positiveSwipe ?
+             *                   'flex-start' : 'flex-end',*/
+            overflow: 'hidden',
+            alignItems: 'stretch'
+          }]}
+      >
+        {this.props.children(this.panX)}
+      </View>
+    )
+  }
+}
+PanResponderView.propTypes = {
+  ...View.propTypes, //  ...Closable.propTypes,
+  onSwipeStart: React.PropTypes.func,
+  onSwipeEnd: React.PropTypes.func,
+};
+
+PanResponderView.defaultProps = {
+  ...View.defaultProps,
+  onSwipeStart: emptyFunction,
+  onSwipeEnd: emptyFunction,
+};
+
 class BookListView7_test extends React.Component {
   constructor(props) {
     super(props);
@@ -1626,13 +1689,14 @@ class BookListView7_test extends React.Component {
               return (
                 <CloseableView2
                     close={!rowData.enable}>
-                  <SwipeableRow3
-                 width={width}
-                 animationConfig={{ easing: Easing.inOut(Easing.quad) }}
-                 {...generateActions(rowData, sectionID, rowID, highlightRow)}
-                                                                >
-                  {debugView("row")(rowData,sectionID,rowID)}
-                  </SwipeableRow3>
+                  <PanResponderView
+                     onSwipeEnd={()=>console.log("swiped")}>
+                          {(dx)=>
+                            <Animated.View style={{width:dx}}>
+                          {debugView("row")(rowData,sectionID,rowID)}
+                            </Animated.View>
+                          }
+                  </PanResponderView>
                 </CloseableView2>
               )
             }}
