@@ -1663,24 +1663,32 @@ PanResponderView.defaultProps = {
 class BookListView7_test extends React.Component {
   constructor(props) {
     super(props);
-    this.dataSource = new ListView.DataSource({
+    const dataSource = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
     })
     this.dataBlob = {
-        r1:{data:1,enable:true},
-        r2:{data:2,enable:false},
-        r3:{data:3,enable:true},
-      }
+      r1:{data:1,enable:true},
+      r2:{data:2,enable:false},
+      r3:{data:3,enable:true},
+    }
+    this.state = {
+      dataSource: dataSource.cloneWithRows(this.dataBlob)
+    }
+  }
+  updateDataSource(){
+    this.setState({
+      dataSource:this.state.dataSource.cloneWithRows(this.dataBlob)
+    })
   }
   render(){
-    //console.log("a",this.state.toggle)
-    this.dataSource = this.dataSource.cloneWithRows(this.dataBlob)
+    //console.log("a",this.state.dataSource)
+    //this.dataBlob = this.dataBlob.cloneWithRows(this.dataBlob)
     let generateActions= ()=>genActions2('search')
     return (
       <View
         style={{paddingTop:20}}>
         <ListView
-          dataSource={this.dataSource}
+          dataSource={this.state.dataSource}
           renderRow={
             (rowData,sectionID,rowID, highlightRow)=>{
               //console.log("r:",rowData)
@@ -1690,7 +1698,18 @@ class BookListView7_test extends React.Component {
                 <CloseableView2
                     close={!rowData.enable}>
                   <PanResponderView
-                     onSwipeEnd={()=>console.log("swiped")}>
+                     onSwipeEnd={()=>{
+                         /* this.dataBlob = {
+                             r1:{data:1,enable:true},
+                             r2:{data:2,enable:false},
+                             r3:{data:3,enable:false},
+                            } */
+                         //console.log("swiped",rowID,this.dataBlob[rowID].enable,rowData)
+                         let newRowData = {...rowData, enable:false}
+                         this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
+                         //console.log("swiped",this.dataBlob)
+                         this.updateDataSource()
+                       }}>
                           {(dx)=>
                             <Animated.View style={{width:dx}}>
                           {debugView("row")(rowData,sectionID,rowID)}
@@ -1703,7 +1722,7 @@ class BookListView7_test extends React.Component {
         />
         <Text>foo</Text>
         <ListView
-          dataSource={this.dataSource}
+          dataSource={this.state.dataSource}
           renderRow={(rowData,sectionID,rowID)=>{
               //rowData
               //console.log("c:",counter)
