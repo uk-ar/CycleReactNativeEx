@@ -1078,6 +1078,8 @@ const {
   width,
 } = Dimensions.get('window');
 
+var {width:WIDTH} = Dimensions.get('window');
+
 storiesOf('BookListView', module)
 /* .addDecorator(getStory => (
  *   <CenterView>{getStory()}</CenterView>
@@ -1622,10 +1624,10 @@ class PanResponderView extends React.Component {
         { dx: this.panX },    // gestureState arg
       ]), // for performance
       onPanResponderRelease: (evt, gestureState) => {
-        onSwipeEnd(gestureState);
+        onSwipeEnd(gestureState,this.panX);
       },
       onPanResponderTerminate: (evt, gestureState) => {
-        onSwipeEnd(gestureState);
+        onSwipeEnd(gestureState,this.panX);
       },
     });
   }
@@ -1660,6 +1662,245 @@ PanResponderView.defaultProps = {
   onSwipeEnd: emptyFunction,
 };
 
+class PanResponderView2 extends React.Component {
+  constructor(props) {
+    super(props);
+    //this.panX = new Animated.Value(0.01);
+    function isSwipeHorizontal(evt, gestureState) {
+      return Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
+          && Math.abs(gestureState.dx) > 10;
+    }
+    const { onSwipeMove, onSwipeStart, onSwipeEnd, onSwipeDirectionChange,
+            ...otherProps } = props;
+    let positiveSwipe = true;
+    this.panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => false,
+      // for select cell
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
+      onMoveShouldSetPanResponder: isSwipeHorizontal,
+      onMoveShouldSetPanResponderCapture: isSwipeHorizontal,
+      // no effect
+      // onShouldBlockNativeResponder: (evt, gestureState) => false,
+      onPanResponderGrant: (evt, gestureState) => {
+        onSwipeStart(gestureState);
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        onSwipeMove(gestureState);
+        if(0 < gestureState.dx && !positiveSwipe){
+          positiveSwipe = true;
+          onSwipeDirectionChange(true);
+        }else if(gestureState.dx <= 0 && positiveSwipe){
+          positiveSwipe = false;
+          onSwipeDirectionChange(false);
+        }
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        onSwipeEnd(gestureState);
+      },
+      onPanResponderTerminate: (evt, gestureState) => {
+        onSwipeEnd(gestureState);
+      },
+    });
+    /* this.panX.addListener(({ value }) => {
+     *   if (value > 0 && this.state.positiveSwipe != true) {
+     *     this.setState({ positiveSwipe: true });
+     *   } else if (value <= 0 && this.state.positiveSwipe != false) {
+     *     this.setState({ positiveSwipe: false });
+     *   }
+     * }*/
+  }
+  render(){
+    const { onSwipeMove, onSwipeStart, onSwipeEnd, onSwipeDirectionChange,
+            ...otherProps } = this.props;
+    return(
+      <View
+        {...this.panResponder.panHandlers}
+        {...otherProps}
+      />
+    )
+  }
+}
+PanResponderView2.propTypes = {
+  ...View.propTypes, //  ...Closable.propTypes,
+  onSwipeStart: React.PropTypes.func,
+  onSwipeEnd: React.PropTypes.func,
+  onSwipeMove: React.PropTypes.func,
+  onSwipeDirectionChange: React.PropTypes.func,
+};
+PanResponderView2.defaultProps = {
+  ...View.defaultProps,
+  onSwipeStart: emptyFunction,
+  onSwipeEnd: emptyFunction,
+  onSwipeMove: emptyFunction,
+  onSwipeDirectionChange: emptyFunction,
+};
+
+class ExpandableView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      index:0,
+    }
+    this.thresholds = [50];
+  }
+  render(){
+    function calcIndex(value, thresholds) {
+      let index = thresholds.findIndex((elem, i) =>
+        value < elem
+      );
+      if (index === -1) { index = thresholds.length; }
+      return index;
+    }
+    const { onIndexChage, //width,
+            renderElement,
+            ...props } = this.props;//  ...Closable.propTypes,
+    //        style={[style, { width: -10 }]}
+    // console.log("c",calcIndex(0,[30,50,80]))
+    //style={{ position: 'absolute', left:0, right:0, top:0, bottom:0 }}
+    return(
+      <View
+        onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
+            //console.log("onL",this.state.index,this.thresholds,width)
+            const nextIndex = calcIndex(width, this.thresholds);
+            if (nextIndex !== this.state.index) {
+              this.setState({index:nextIndex},()=>onIndexChage(nextIndex))
+            }
+          }}
+        {...props}
+      >
+        {/* <View
+            style={{width:201}}
+            onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
+            console.log("onL",this.state.index,this.thresholds,width)
+            }}
+            > */}
+          {renderElement(this.state.index)}
+        {/* </View> */}
+      </View>
+    )
+  }
+}
+
+ExpandableView.propTypes = {
+  ...View.propTypes,
+  onIndexChage: React.PropTypes.func,
+  renderElement: React.PropTypes.func,
+  //width: React.PropTypes.instanceOf(Animated.Value),
+};
+ExpandableView.defaultProps = {
+  ...View.defaultProps,
+  onIndexChage: emptyFunction,
+  renderElement: emptyFunction,
+};
+
+Animated.ExpandableView=Animated.createAnimatedComponent(ExpandableView);
+
+class SwipeableRow4 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      //index:0,
+      positiveSwipe: true
+    }
+    this.panX = new Animated.Value(0.01);
+    this.index = 0;
+  }
+  render(){
+    const { onClose, //width,
+            rowData,sectionID,rowID,
+            ...props } = this.props;//  ...Closable.propTypes,
+    //        style={[style, { width: -10 }]}
+    return (
+      <CloseableView2
+        close={!rowData.enable}>
+        <PanResponderView2
+          style={{
+            flexDirection: 'row',
+            justifyContent: this.state.positiveSwipe ?
+                            'flex-start' : 'flex-end',
+            overflow: 'hidden',
+            alignItems: 'stretch',
+            width:WIDTH,
+          }}
+          onSwipeMove={Animated.event([
+              {dx:this.panX}
+            ])}
+          onSwipeDirectionChange={(pos)=>{
+              console.log("pos",pos)
+              this.setState({positiveSwipe:pos})
+            }}
+          onSwipeEnd={(gestureState)=>{
+              //console.log("swiped",rowID,this.dataBlob[rowID].enable,rowData)
+              const animations={
+                left: {toValue:-WIDTH, duration:300},
+                right:{toValue: WIDTH, duration:300},
+              }
+
+              if(this.index === 0){
+                Animated.timing(this.panX,
+                                {toValue:0,duration:300})
+                        .start()
+              }else{
+                //TODO:index lock
+                Animated.timing(this.panX,
+                                this.state.positiveSwipe ?
+                                {toValue: WIDTH, duration:300} :
+                                {toValue:-WIDTH, duration:300}
+                                )
+                        .start(onClose)
+              }
+              /* .start(()=>
+                  //upper level
+                  this.updateDataSource()
+                  ) */
+            }}>
+          <Animated.ExpandableView
+            style={{width:this.panX}}
+            onIndexChage={(i)=>{
+                this.index = i;
+                console.log("ch1:",i,this.index)
+              }}
+            renderElement={(i)=>
+                <View style={{width:200}}>
+                   {debugView("left")(i,rowData,sectionID,rowID)}
+                </View>
+            }
+          />
+          <Animated.View>
+            <View style={{width:WIDTH}}>
+              {debugView("main")(rowData,sectionID,rowID)}
+            </View>
+          </Animated.View>
+          <Animated.ExpandableView
+            style={{width:Animated.multiply(this.panX, -1)}}
+            onIndexChage={(i)=>{
+              console.log("ch2:",i)
+              this.index = i;
+              }}
+            renderElement={(i)=>
+                <View style={{width:200}}>
+                            {debugView("left")(i,rowData,sectionID,rowID)}
+              </View>}
+          />
+        </PanResponderView2>
+      </CloseableView2>
+    )
+  }
+}
+
+SwipeableRow4.propTypes = {
+  ...View.propTypes,
+  rowData:  React.PropTypes.object.isRequired,
+  sectionID:React.PropTypes.string.isRequired,
+  rowID:    React.PropTypes.string.isRequired,
+  onClose:  React.PropTypes.func.isRequired,
+};
+SwipeableRow4.defaultProps = {
+  ...View.defaultProps,
+  onClose: emptyFunction,
+};
+
+
 class BookListView7_test extends React.Component {
   constructor(props) {
     super(props);
@@ -1672,7 +1913,7 @@ class BookListView7_test extends React.Component {
       r3:{data:3,enable:true},
     }
     this.state = {
-      dataSource: dataSource.cloneWithRows(this.dataBlob)
+      dataSource: dataSource.cloneWithRows(this.dataBlob),
     }
   }
   updateDataSource(){
@@ -1689,35 +1930,22 @@ class BookListView7_test extends React.Component {
         style={{paddingTop:20}}>
         <ListView
           dataSource={this.state.dataSource}
+          scrollEnabled={false}
           renderRow={
             (rowData,sectionID,rowID, highlightRow)=>{
               //console.log("r:",rowData)
               //rowData
-              //console.log("c:",counter)
+              //console.log("c:",this.state.alignLeft)
               return (
-                <CloseableView2
-                    close={!rowData.enable}>
-                  <PanResponderView
-                     onSwipeEnd={()=>{
-                         /* this.dataBlob = {
-                             r1:{data:1,enable:true},
-                             r2:{data:2,enable:false},
-                             r3:{data:3,enable:false},
-                            } */
-                         //console.log("swiped",rowID,this.dataBlob[rowID].enable,rowData)
-                         let newRowData = {...rowData, enable:false}
-                         this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
-                         //console.log("swiped",this.dataBlob)
-                         this.updateDataSource()
-                       }}>
-                          {(dx)=>
-                            <Animated.View style={{width:dx}}>
-                          {debugView("row")(rowData,sectionID,rowID)}
-                            </Animated.View>
-                          }
-                  </PanResponderView>
-                </CloseableView2>
-              )
+                <SwipeableRow4
+                    onClose={()=>{
+                        let newRowData = {...rowData, enable:false}
+                        this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
+                        this.updateDataSource();
+                        console.log("onclose")
+                      }}
+                    {...{rowData,sectionID,rowID, highlightRow}}
+                />)
             }}
         />
         <Text>foo</Text>
