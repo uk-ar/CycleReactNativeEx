@@ -31,7 +31,9 @@ import { LayoutableView, CloseableView, CloseableView2 } from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 import {SwipeableListView} from '../../SwipeableListView';
 
-import {withDebug,VerticalCenterView,TestListView,TestSectionListView,debugView} from './common'
+import {
+  withDebug,VerticalCenterView,TestListView,TestSectionListView,debugView,DebugView2,
+} from './common'
 import { ItemsHeader, ItemsFooter } from '../../Header';
 class NestedListViewDataSource {
   constructor(params: Object) {
@@ -1771,8 +1773,12 @@ class ExpandableView extends React.Component {
         {...props}
       >
         <View style={{
+          position:"absolute",
+          top:0,
+          bottom:0,
+          //alignItems:"stretch",//not working
+          alignItems:"center",
           overflow:"scroll",
-          //position:"absolute",
           flexDirection:"row"
         }}>
           <View
@@ -1858,7 +1864,9 @@ class SwipeableRow4 extends React.Component {
               width:this.panX.interpolate({
                 inputRange: [0  , 0.1, 1],
                 outputRange:[0.1, 0.1, 1],
-              })
+              }),
+              backgroundColor:"red",
+              alignItems:"stretch"
             }}
             onIndexChage={(i)=>{
                 this.index = i;
@@ -1868,9 +1876,13 @@ class SwipeableRow4 extends React.Component {
                 switch (i){
                   case 0:
                     return(
-                      <View>
-                          {debugView("left")(i,rowData,sectionID,rowID)}
-                      </View>
+                      <DebugView2 style={{
+                        height:null,
+                        //alignSelf:"center"
+                      }}/>
+                      /* <View style={{alignItems:"stretch"}}>
+                          {debugView2("left")(i,rowData,sectionID,rowID)}
+                          </View> */
                     )
                   case 1:
                     return(
@@ -1908,7 +1920,10 @@ class SwipeableRow4 extends React.Component {
               }}
             renderElement={(i)=>{
                 return (
-                  <View style={{height:200}}>
+                  <View style={{
+                    //position:"absolute",
+                    height:200
+                  }}>
                           {debugView("right")(i,rowData,sectionID,rowID)}
                 </View>)
               }}

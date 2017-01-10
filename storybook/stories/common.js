@@ -193,4 +193,14 @@ function debugView(string) {
   }
 }
 
-module.exports = {withDebug,VerticalCenterView,TestListView,debugView,TestSectionListView}
+function DebugView2(props){
+  return (
+    <View style={[{
+      height: 100, borderWidth:3, borderColor:"yellow", backgroundColor:"green"
+    },props.style]}>
+      <Text>{util.inspect(props)}</Text>
+    </View>);
+  //{props.name}:
+}
+
+module.exports = {withDebug,VerticalCenterView,TestListView,debugView,TestSectionListView,DebugView2}
