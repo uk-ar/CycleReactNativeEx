@@ -1744,8 +1744,7 @@ class ExpandableView extends React.Component {
       index:0,
     }
     this.thresholds = [];
-  }
-  render(){
+    this.panX = new Animated.Value(0.1);
     function calcIndex(value, thresholds) {
       let index = thresholds.findIndex((elem, i) =>
         value < elem
@@ -1753,6 +1752,14 @@ class ExpandableView extends React.Component {
       if (index === -1) { index = thresholds.length; }
       return index;
     }
+    this.panX.addListener(({value:width})=>{
+      const nextIndex = calcIndex(width, this.thresholds);
+      if (nextIndex !== this.state.index && !this.props.indexLock) {
+        this.setState({index:nextIndex},()=>this.props.onIndexChage(nextIndex))
+      }
+    })
+  }
+  render(){
     const { onIndexChage, //width,
             renderElement, indexLock,
             ...props } = this.props;//  ...Closable.propTypes,
@@ -1761,21 +1768,29 @@ class ExpandableView extends React.Component {
     //style={{ position: 'absolute', left:0, right:0, top:0, bottom:0 }}
     //        style={{overflow:"scroll"}}
     //        style={[this.props.style,{overflow:"scroll"}]}
+    /* onSwipeMove={Animated.event([
+     *   {dx:this.panX}
+     * ])}*/
+    /* {({ nativeEvent: { layout: { x, y, width, height } } }) => {
+     *   //console.log("onL0",this.state.index,this.thresholds,width,height)
+     *   const nextIndex = calcIndex(width, this.thresholds);
+     *   if (nextIndex !== this.state.index && !indexLock) {
+     *     this.setState({index:nextIndex},()=>onIndexChage(nextIndex))
+     *   }
+     * }}*/
+    //this.style = { opacity: 1, transform: [{ scale: 1 }] };
     return(
       <View
-        onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
-            //console.log("onL0",this.state.index,this.thresholds,width,height)
-            const nextIndex = calcIndex(width, this.thresholds);
-            if (nextIndex !== this.state.index && !indexLock) {
-              this.setState({index:nextIndex},()=>onIndexChage(nextIndex))
-            }
-          }}
+        onLayout={Animated.event([
+            { nativeEvent: { layout: { width:this.panX } } }
+          ])}
         {...props}
       >
         <View style={{
           position:"absolute",
           top:0,
           bottom:0,
+          //left:-10,
           //alignItems:"stretch",//not working
           alignItems:"center",
           overflow:"scroll",
