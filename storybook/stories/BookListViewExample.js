@@ -1742,8 +1742,9 @@ class ExpandableView extends React.Component {
     super(props);
     this.state = {
       index:0,
+      thresholds:[],
     }
-    this.thresholds = [];
+    //this.thresholds =
     this.panX = new Animated.Value(0.1);
     function calcIndex(value, thresholds) {
       let index = thresholds.findIndex((elem, i) =>
@@ -1753,7 +1754,7 @@ class ExpandableView extends React.Component {
       return index;
     }
     this.panX.addListener(({value:width})=>{
-      const nextIndex = calcIndex(width, this.thresholds);
+      const nextIndex = calcIndex(width, this.state.thresholds);
       if (nextIndex !== this.state.index && !this.props.indexLock) {
         this.setState({index:nextIndex},()=>this.props.onIndexChage(nextIndex))
       }
@@ -1763,22 +1764,9 @@ class ExpandableView extends React.Component {
     const { onIndexChage, //width,
             renderElement, indexLock,
             ...props } = this.props;//  ...Closable.propTypes,
-    //        style={[style, { width: -10 }]}
-    // console.log("c",calcIndex(0,[30,50,80]))
-    //style={{ position: 'absolute', left:0, right:0, top:0, bottom:0 }}
-    //        style={{overflow:"scroll"}}
-    //        style={[this.props.style,{overflow:"scroll"}]}
-    /* onSwipeMove={Animated.event([
-     *   {dx:this.panX}
-     * ])}*/
-    /* {({ nativeEvent: { layout: { x, y, width, height } } }) => {
-     *   //console.log("onL0",this.state.index,this.thresholds,width,height)
-     *   const nextIndex = calcIndex(width, this.thresholds);
-     *   if (nextIndex !== this.state.index && !indexLock) {
-     *     this.setState({index:nextIndex},()=>onIndexChage(nextIndex))
-     *   }
-     * }}*/
     //this.style = { opacity: 1, transform: [{ scale: 1 }] };
+    //console.log("panx",this.panX)
+    const offset =  this.state.thresholds[0];
     return(
       <View
         onLayout={Animated.event([
@@ -1786,27 +1774,50 @@ class ExpandableView extends React.Component {
           ])}
         {...props}
       >
-        <View style={{
+        <Animated.View style={{
           position:"absolute",
           top:0,
           bottom:0,
+          /* left: this.state.thresholds[0] ?
+           *       Animated.add(this.panX,-this.state.thresholds[0]) : 0,*/
+          //this.panX : 0,
+          /* .interpolate({
+           *   inputRange: [0.1, 1],
+           *   outputRange:[ -this.state.thresholds[0]+0.1, 0.1],
+           * })*/
+          //Animated.multiply(this.panX, -1) : 0,
+          /* transform: [{ translateX: this.state.thresholds[0] ?
+           *                           Animated.add(this.panX,-this.state.thresholds[0])
+           *                         : 0, }],//same as left*/
           //left:-10,
           //alignItems:"stretch",//not working
           alignItems:"center",
           overflow:"scroll",
           flexDirection:"row"
         }}>
-          <View
+          <Animated.View
             onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
-                //console.log("onL1",this.state.index,this.thresholds,width,height)
-                if(!this.thresholds[this.state.index]){
-                  this.thresholds[this.state.index] = width;
+                //console.log("onL1",this.state.index,this.state.thresholds,width,height)
+                if(!this.state.thresholds[this.state.index]){
+                  this.setState((prevState,props)=>{
+                    let thresholds = [...this.state.thresholds]
+                    thresholds[this.state.index] = width;
+                    return {thresholds:thresholds}
+                  })
                 }
-              }}
+            }}
+            style={{
+              left:offset ?
+                   this.panX
+                       .interpolate({
+                         inputRange: [ 0        , offset, offset+0.1],
+                         outputRange:[ -offset  , 0     , 0 ],
+                       }) : 0,
+            }}
           >
             {renderElement(this.state.index)}
-          </View>
-        </View>
+          </Animated.View>
+        </Animated.View>
       </View>
     )
   }
@@ -1885,7 +1896,7 @@ class SwipeableRow4 extends React.Component {
                 inputRange: [0  , 0.1, 1],
                 outputRange:[0.1, 0.1, 1],
               }),
-              backgroundColor:"red",
+              //backgroundColor:"red",
               alignItems:"stretch"
             }}
             indexLock={this.state.releasing}
