@@ -184,6 +184,7 @@ class TestSectionListView extends React.Component {
 }
 
 function debugView(string) {
+  //TODO:string,args
   return function (props){
     return (
       <View style={{ height: 100, borderWidth:3, borderColor:"yellow", backgroundColor:"green" }}>
