@@ -1754,7 +1754,7 @@ class ExpandableView extends React.Component {
       return index;
     }
     const { onIndexChage, //width,
-            renderElement,
+            renderElement, indexLock,
             ...props } = this.props;//  ...Closable.propTypes,
     //        style={[style, { width: -10 }]}
     // console.log("c",calcIndex(0,[30,50,80]))
@@ -1766,7 +1766,7 @@ class ExpandableView extends React.Component {
         onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
             //console.log("onL0",this.state.index,this.thresholds,width,height)
             const nextIndex = calcIndex(width, this.thresholds);
-            if (nextIndex !== this.state.index) {
+            if (nextIndex !== this.state.index && !indexLock) {
               this.setState({index:nextIndex},()=>onIndexChage(nextIndex))
             }
           }}
@@ -1783,7 +1783,7 @@ class ExpandableView extends React.Component {
         }}>
           <View
             onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
-                console.log("onL1",this.state.index,this.thresholds,width,height)
+                //console.log("onL1",this.state.index,this.thresholds,width,height)
                 if(!this.thresholds[this.state.index]){
                   this.thresholds[this.state.index] = width;
                 }
@@ -1801,12 +1801,14 @@ ExpandableView.propTypes = {
   ...View.propTypes,
   onIndexChage: React.PropTypes.func,
   renderElement: React.PropTypes.func,
+  indexLock: React.PropTypes.bool,
   //width: React.PropTypes.instanceOf(Animated.Value),
 };
 ExpandableView.defaultProps = {
   ...View.defaultProps,
   onIndexChage: emptyFunction,
   renderElement: emptyFunction,
+  indexLock: false,
 };
 
 Animated.ExpandableView=Animated.createAnimatedComponent(ExpandableView);
@@ -1816,14 +1818,15 @@ class SwipeableRow4 extends React.Component {
     super(props);
     this.state = {
       //index:0,
-      positiveSwipe: true
+      positiveSwipe: true,
+      releasing:false,
     }
     this.panX = new Animated.Value(0.1);
     this.index = 0;
   }
   render(){
     const { onClose, //width,
-            rowData,sectionID,rowID,
+            rowData, sectionID, rowID,
             ...props } = this.props;//  ...Closable.propTypes,
     //        style={[style, { width: -10 }]}
     return (
@@ -1851,12 +1854,13 @@ class SwipeableRow4 extends React.Component {
                         .start()
               }else{
                 //TODO:index lock
-                Animated.timing(this.panX,
-                                this.state.positiveSwipe ?
-                                {toValue: WIDTH, duration:300} :
-                                {toValue:-WIDTH, duration:300}
-                                )
-                        .start(onClose)
+                this.setState({releasing:true},()=>
+                  Animated.timing(this.panX,
+                                  this.state.positiveSwipe ?
+                                  {toValue: WIDTH, duration:300} :
+                                  {toValue:-WIDTH, duration:300})
+                          .start(onClose)
+                )
               }
             }}>
           <Animated.ExpandableView
@@ -1868,36 +1872,39 @@ class SwipeableRow4 extends React.Component {
               backgroundColor:"red",
               alignItems:"stretch"
             }}
+            indexLock={this.state.releasing}
             onIndexChage={(i)=>{
                 this.index = i;
                 console.log("ch1:",i,this.index)
+                //console.log("index change")
+                //same timing as renderElement? -> no
               }}
             renderElement={(i)=>{
+                //console.log("render elem")
                 switch (i){
                   case 0:
                     return(
-                      <DebugView2 style={{
-                        height:null,
-                        //alignSelf:"center"
-                      }}/>
-                      /* <View style={{alignItems:"stretch"}}>
-                          {debugView2("left")(i,rowData,sectionID,rowID)}
-                          </View> */
+                      /* <DebugView2 style={{
+                          height:null,
+                          //alignSelf:"center"
+                          }}/> */
+                      <View>
+                          {debugView("left")(i,rowData,sectionID,rowID)}
+                      </View>
                     )
                   case 1:
                     return(
-                      <View style={{width:100}}>
+                      <View style={{width:WIDTH/2}}>
                           {debugView("left")(i,rowData,sectionID,rowID)}
                       </View>
                     )
                   default:
                     return(
-                      <View style={{width:200}}>
+                      <View style={{width:WIDTH*2}}>
                                   {debugView("left")(i,rowData,sectionID,rowID)}
                       </View>
                     )
                 }
-
               }
             }
           />
@@ -1914,6 +1921,7 @@ class SwipeableRow4 extends React.Component {
                 outputRange:[0.1, 0.1, 1],
               })
             }}
+            indexLock={this.state.releasing}
             onIndexChage={(i)=>{
                 console.log("ch2:",i)
                 this.index = i;
