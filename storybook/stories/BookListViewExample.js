@@ -1827,6 +1827,7 @@ class SwipeableRow4 extends React.Component {
   render(){
     const { onClose, //width,
             rowData, sectionID, rowID,
+            children,
             ...props } = this.props;//  ...Closable.propTypes,
     //        style={[style, { width: -10 }]}
     return (
@@ -1908,12 +1909,9 @@ class SwipeableRow4 extends React.Component {
               }
             }
           />
-          <CloseableView2
-            close={!rowData.enable}>
-            <View style={{width:WIDTH}}>
-              {debugView("main")(rowData,sectionID,rowID)}
-            </View>
-          </CloseableView2>
+          <View style={{width:WIDTH}}>
+            {children}
+          </View>
           <Animated.ExpandableView
             style={{
               width:Animated.multiply(this.panX, -1).interpolate({
@@ -1998,7 +1996,13 @@ class BookListView7_test extends React.Component {
                         console.log("onclose")
                       }}
                     {...{rowData,sectionID,rowID, highlightRow}}
-                />)
+                                                  >
+                  <CloseableView2
+                    close={!rowData.enable}>
+                    {debugView("main")(rowData,sectionID,rowID)}
+                  </CloseableView2>
+                </SwipeableRow4>
+              )
             }}
         />
         <Text>foo</Text>
