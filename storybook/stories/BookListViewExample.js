@@ -1744,7 +1744,6 @@ class ExpandableView extends React.Component {
       index:0,
       thresholds:[],
     }
-    //this.thresholds =
     this.panX = new Animated.Value(0.1);
     function calcIndex(value, thresholds) {
       let index = thresholds.findIndex((elem, i) =>
@@ -1761,17 +1760,27 @@ class ExpandableView extends React.Component {
     })
   }
   render(){
-    const { onIndexChage, //width,
-            renderElement, indexLock, //enterFromLeft,
+    const { onIndexChage,
+            renderElement, indexLock, enterFromLeft,
             ...props } = this.props;//  ...Closable.propTypes,
     //console.log("panx",this.panX)
     const offset =  this.state.thresholds[0];
-    const translateX = offset ?
-                       this.panX
-                           .interpolate({
-                             inputRange: [ 0        , offset, offset+0.1],
-                             outputRange:[ -offset  , 0     , 0 ],
-                           }) : 0
+    /* const translateX = !offset ? 0 :
+     *                    this.panX
+     *                        .interpolate(
+     *                          enterFromLeft ? {
+     *                            inputRange: [ 0        , offset, offset+0.1],
+     *                            outputRange:[ -offset  , 0     , 0 ],
+     *                          } : {
+     *                            inputRange: [ 0        , offset , offset*2],
+     *                            outputRange:[ 0        , 0      , offset],
+     *                          }
+     *                        )*/
+    //const start = true;
+    const justifyContent =
+      (enterFromLeft && this.state.index == 0 ) ? "flex-end" :
+      (!enterFromLeft && this.state.index !== 0 ) ? "flex-end" :
+      "flex-start"
     return(
       <View
         onLayout={Animated.event([
@@ -1779,15 +1788,19 @@ class ExpandableView extends React.Component {
           ])}
         {...props}
       >
-        <Animated.View style={{
+        <Animated.View style={[{
           position:"absolute",
           top:0,
           bottom:0,
+          right:0,
+          left:0,
           //alignItems:"stretch",//not working
           //alignItems:"center",flex:1
           overflow: "scroll",
-          flexDirection: "row"
-        }}>
+          flexDirection: "row",
+          //justifyContent: justifyContent,
+          backgroundColor:"blue"
+        }]}>
           <Animated.View
             onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
                 //console.log("onL1",this.state.index,this.state.thresholds,width,height)
@@ -1800,11 +1813,12 @@ class ExpandableView extends React.Component {
                 }
               }}
             style={{
-              left: translateX ,
+              //left: translateX
             }}
           >
             {renderElement(this.state.index)}
           </Animated.View>
+          <View style={{flex:1}}/>
         </Animated.View>
       </View>
     )
@@ -1816,7 +1830,7 @@ ExpandableView.propTypes = {
   onIndexChage: React.PropTypes.func,
   renderElement: React.PropTypes.func,
   indexLock: React.PropTypes.bool,
-  //enterFromLeft: React.PropTypes.bool,
+  enterFromLeft: React.PropTypes.bool,
   //width: React.PropTypes.instanceOf(Animated.Value),
 };
 ExpandableView.defaultProps = {
@@ -1824,10 +1838,36 @@ ExpandableView.defaultProps = {
   onIndexChage: emptyFunction,
   renderElement: emptyFunction,
   indexLock: false,
-  //enterFromLeft: true,
+  enterFromLeft: true,
 };
 
 Animated.ExpandableView=Animated.createAnimatedComponent(ExpandableView);
+
+function Action2({ index, left, ...props }) {
+  styles=[
+    { },//justifyContent:"flex-end"
+    { width:WIDTH/2 },
+    { width:WIDTH },
+  ]
+  return(
+    <View
+      style={[
+        styles[index],
+        /* left ?
+            {alignItems:"flex-start"}:
+            {alignItems:"flex-end"} */
+        /* left ?
+            {flexDirection:"row"}:
+            {flexDirection:"row-reverse"} */
+      ]}
+      {...props}
+    >
+      <Text>foo:{index}</Text>
+      {/* {debugView("left")(index)} */}
+      {/* <View style={{flex:1,backgroundColor:"blue"}}/> */}
+    </View>
+  )
+}
 
 class SwipeableRow4 extends React.Component {
   constructor(props) {
@@ -1886,8 +1926,10 @@ class SwipeableRow4 extends React.Component {
                 inputRange: [0  , 0.1, 1],
                 outputRange:[0.1, 0.1, 1],
               }),
+              justifyContent: this.state.positiveSwipe ?
+                              'flex-start' : 'flex-end',
               //backgroundColor:"red",
-              alignItems:"stretch"
+              //alignItems:"stretch"
             }}
             enterFromLeft={true}
             indexLock={this.state.releasing}
@@ -1897,34 +1939,9 @@ class SwipeableRow4 extends React.Component {
                 //console.log("index change")
                 //same timing as renderElement? -> no
               }}
-            renderElement={(i)=>{
-                //console.log("render elem")
-                switch (i){
-                  case 0:
-                    return(
-                      /* <DebugView2 style={{
-                          height:null,
-                          //alignSelf:"center"
-                          }}/> */
-                      <View>
-                          {debugView("left")(i,rowData,sectionID,rowID)}
-                      </View>
-                    )
-                  case 1:
-                    return(
-                      <View style={{width:WIDTH/2}}>
-                          {debugView("left")(i,rowData,sectionID,rowID)}
-                      </View>
-                    )
-                  default:
-                    return(
-                      <View style={{width:WIDTH*2}}>
-                                  {debugView("left")(i,rowData,sectionID,rowID)}
-                      </View>
-                    )
-                }
+            renderElement={(i)=>
+              <Action2 index={i} left={true}/>
               }
-            }
           />
           <View style={{width:WIDTH}}>
             {children}
@@ -1934,7 +1951,9 @@ class SwipeableRow4 extends React.Component {
               width:Animated.multiply(this.panX, -1).interpolate({
                 inputRange: [0  , 0.1, 1],
                 outputRange:[0.1, 0.1, 1],
-              })
+              }),
+              justifyContent: this.state.positiveSwipe ?
+                              'flex-start' : 'flex-end',
             }}
             enterFromLeft={false}
             indexLock={this.state.releasing}
@@ -1942,26 +1961,9 @@ class SwipeableRow4 extends React.Component {
                 console.log("ch2:",i)
                 this.index = i;
               }}
-            renderElement={(i)=>{
-                switch (i){
-                  case 0:
-                    return (
-                      <View style={{
-                        //position:"absolute",
-                        height:200
-                      }}>
-                                  {debugView("right")(i,rowData,sectionID,rowID)}
-                      </View>)
-                  default:
-                    return (
-                      <View style={{
-                        //position:"absolute",
-                        width:WIDTH
-                      }}>
-                                  {debugView("right")(i,rowData,sectionID,rowID)}
-                      </View>)
-                }
-              }}
+            renderElement={(i)=>
+              <Action2 index={i} left={false}/>
+                          }
           />
         </PanResponderView2>
     )
@@ -1974,10 +1976,14 @@ SwipeableRow4.propTypes = {
   sectionID:React.PropTypes.string.isRequired,
   rowID:    React.PropTypes.string.isRequired,
   onClose:  React.PropTypes.func.isRequired,
+  renderLeftAction: React.PropTypes.func.isRequired,
+  renderRightAction: React.PropTypes.func.isRequired,
 };
 SwipeableRow4.defaultProps = {
   ...View.defaultProps,
   onClose: emptyFunction,
+  renderLeftAction: emptyFunction,
+  renderRightAction: emptyFunction,
 };
 
 
