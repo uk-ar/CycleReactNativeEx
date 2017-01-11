@@ -1762,11 +1762,16 @@ class ExpandableView extends React.Component {
   }
   render(){
     const { onIndexChage, //width,
-            renderElement, indexLock,
+            renderElement, indexLock, //enterFromLeft,
             ...props } = this.props;//  ...Closable.propTypes,
-    //this.style = { opacity: 1, transform: [{ scale: 1 }] };
     //console.log("panx",this.panX)
     const offset =  this.state.thresholds[0];
+    const translateX = offset ?
+                       this.panX
+                           .interpolate({
+                             inputRange: [ 0        , offset, offset+0.1],
+                             outputRange:[ -offset  , 0     , 0 ],
+                           }) : 0
     return(
       <View
         onLayout={Animated.event([
@@ -1778,22 +1783,10 @@ class ExpandableView extends React.Component {
           position:"absolute",
           top:0,
           bottom:0,
-          /* left: this.state.thresholds[0] ?
-           *       Animated.add(this.panX,-this.state.thresholds[0]) : 0,*/
-          //this.panX : 0,
-          /* .interpolate({
-           *   inputRange: [0.1, 1],
-           *   outputRange:[ -this.state.thresholds[0]+0.1, 0.1],
-           * })*/
-          //Animated.multiply(this.panX, -1) : 0,
-          /* transform: [{ translateX: this.state.thresholds[0] ?
-           *                           Animated.add(this.panX,-this.state.thresholds[0])
-           *                         : 0, }],//same as left*/
-          //left:-10,
           //alignItems:"stretch",//not working
-          alignItems:"center",
-          overflow:"scroll",
-          flexDirection:"row"
+          //alignItems:"center",flex:1
+          overflow: "scroll",
+          flexDirection: "row"
         }}>
           <Animated.View
             onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
@@ -1805,14 +1798,9 @@ class ExpandableView extends React.Component {
                     return {thresholds:thresholds}
                   })
                 }
-            }}
+              }}
             style={{
-              left:offset ?
-                   this.panX
-                       .interpolate({
-                         inputRange: [ 0        , offset, offset+0.1],
-                         outputRange:[ -offset  , 0     , 0 ],
-                       }) : 0,
+              left: translateX ,
             }}
           >
             {renderElement(this.state.index)}
@@ -1828,6 +1816,7 @@ ExpandableView.propTypes = {
   onIndexChage: React.PropTypes.func,
   renderElement: React.PropTypes.func,
   indexLock: React.PropTypes.bool,
+  //enterFromLeft: React.PropTypes.bool,
   //width: React.PropTypes.instanceOf(Animated.Value),
 };
 ExpandableView.defaultProps = {
@@ -1835,6 +1824,7 @@ ExpandableView.defaultProps = {
   onIndexChage: emptyFunction,
   renderElement: emptyFunction,
   indexLock: false,
+  //enterFromLeft: true,
 };
 
 Animated.ExpandableView=Animated.createAnimatedComponent(ExpandableView);
@@ -1899,6 +1889,7 @@ class SwipeableRow4 extends React.Component {
               //backgroundColor:"red",
               alignItems:"stretch"
             }}
+            enterFromLeft={true}
             indexLock={this.state.releasing}
             onIndexChage={(i)=>{
                 this.index = i;
@@ -1945,19 +1936,31 @@ class SwipeableRow4 extends React.Component {
                 outputRange:[0.1, 0.1, 1],
               })
             }}
+            enterFromLeft={false}
             indexLock={this.state.releasing}
             onIndexChage={(i)=>{
                 console.log("ch2:",i)
                 this.index = i;
               }}
             renderElement={(i)=>{
-                return (
-                  <View style={{
-                    //position:"absolute",
-                    height:200
-                  }}>
-                          {debugView("right")(i,rowData,sectionID,rowID)}
-                </View>)
+                switch (i){
+                  case 0:
+                    return (
+                      <View style={{
+                        //position:"absolute",
+                        height:200
+                      }}>
+                                  {debugView("right")(i,rowData,sectionID,rowID)}
+                      </View>)
+                  default:
+                    return (
+                      <View style={{
+                        //position:"absolute",
+                        width:WIDTH
+                      }}>
+                                  {debugView("right")(i,rowData,sectionID,rowID)}
+                      </View>)
+                }
               }}
           />
         </PanResponderView2>
