@@ -1788,22 +1788,23 @@ class ExpandableView extends React.Component {
           ])}
         {...props}
       >
-        <Animated.View style={[{
-          position:"absolute",
-          top:0,
-          bottom:0,
-          right:0,
-          left:0,
+      <Animated.View style={[{
+        //absolute is for closeable height
+        position:"absolute",
+        top:0,
+        bottom:0,
+        right:0,
+        left:0,
           //alignItems:"stretch",//not working
           //alignItems:"center",flex:1
           overflow: "scroll",
           flexDirection: "row",
-          //justifyContent: justifyContent,
-          backgroundColor:"blue"
+          justifyContent:justifyContent,
+          //backgroundColor:"blue"
         }]}>
           <Animated.View
             onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
-                //console.log("onL1",this.state.index,this.state.thresholds,width,height)
+                console.log("onL1",this.state.index,this.state.thresholds,width,height)
                 if(!this.state.thresholds[this.state.index]){
                   this.setState((prevState,props)=>{
                     let thresholds = [...this.state.thresholds]
@@ -1818,7 +1819,6 @@ class ExpandableView extends React.Component {
           >
             {renderElement(this.state.index)}
           </Animated.View>
-          <View style={{flex:1}}/>
         </Animated.View>
       </View>
     )
@@ -1862,7 +1862,9 @@ function Action2({ index, left, ...props }) {
       ]}
       {...props}
     >
-      <Text>foo:{index}</Text>
+      <Text style={{
+        backgroundColor:"red",
+        textAlign:left ? "left" : "right"}}>foo:{index}</Text>
       {/* {debugView("left")(index)} */}
       {/* <View style={{flex:1,backgroundColor:"blue"}}/> */}
     </View>
