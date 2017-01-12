@@ -1765,22 +1765,6 @@ class ExpandableView extends React.Component {
             ...props } = this.props;//  ...Closable.propTypes,
     //console.log("panx",this.panX)
     const offset =  this.state.thresholds[0];
-    /* const translateX = !offset ? 0 :
-     *                    this.panX
-     *                        .interpolate(
-     *                          enterFromLeft ? {
-     *                            inputRange: [ 0        , offset, offset+0.1],
-     *                            outputRange:[ -offset  , 0     , 0 ],
-     *                          } : {
-     *                            inputRange: [ 0        , offset , offset*2],
-     *                            outputRange:[ 0        , 0      , offset],
-     *                          }
-     *                        )*/
-    //const start = true;
-    const justifyContent =
-      (enterFromLeft && this.state.index == 0 ) ? "flex-end" :
-      (!enterFromLeft && this.state.index !== 0 ) ? "flex-end" :
-      "flex-start"
     return(
       <View
         onLayout={Animated.event([
@@ -1789,17 +1773,12 @@ class ExpandableView extends React.Component {
         {...props}
       >
       <Animated.View style={[{
-        //absolute is for closeable height
-        position:"absolute",
-        top:0,
-        bottom:0,
-        right:0,
-        left:0,
           //alignItems:"stretch",//not working
           //alignItems:"center",flex:1
+          flex:1,
           overflow: "scroll",
-          flexDirection: "row",
-          justifyContent:justifyContent,
+          flexDirection: enterFromLeft ? "row" : "row-reverse",
+          justifyContent: this.state.index === 0 ? "flex-end" : "flex-start"
           //backgroundColor:"blue"
         }]}>
           <Animated.View
@@ -1853,20 +1832,16 @@ function Action2({ index, left, ...props }) {
     <View
       style={[
         styles[index],
-        /* left ?
-            {alignItems:"flex-start"}:
-            {alignItems:"flex-end"} */
-        /* left ?
-            {flexDirection:"row"}:
-            {flexDirection:"row-reverse"} */
+        {flex:1}
       ]}
       {...props}
     >
-      <Text style={{
-        backgroundColor:"red",
-        textAlign:left ? "left" : "right"}}>foo:{index}</Text>
-      {/* {debugView("left")(index)} */}
-      {/* <View style={{flex:1,backgroundColor:"blue"}}/> */}
+    <View style={{flex:1}}/>
+    <Text style={{
+      backgroundColor:"red",
+      textAlign:left?"left":"right",
+    }}>foo:{index}</Text>
+        <View style={{flex:1}}/>
     </View>
   )
 }
@@ -2025,7 +2000,9 @@ class BookListView7_test extends React.Component {
               //rowData
               //console.log("c:",this.state.alignLeft)
               return (
-                <SwipeableRow4
+                <CloseableView2
+                    close={!rowData.enable}>
+                  <SwipeableRow4
                     onClose={()=>{
                         let newRowData = {...rowData, enable:false}
                         this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
@@ -2034,11 +2011,9 @@ class BookListView7_test extends React.Component {
                       }}
                     {...{rowData,sectionID,rowID, highlightRow}}
                                                   >
-                  <CloseableView2
-                    close={!rowData.enable}>
                     {debugView("main")(rowData,sectionID,rowID)}
-                  </CloseableView2>
-                </SwipeableRow4>
+                  </SwipeableRow4>
+                </CloseableView2>
               )
             }}
         />
