@@ -1783,7 +1783,7 @@ class ExpandableView extends React.Component {
         }]}>
           <Animated.View
             onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
-                console.log("onL1",this.state.index,this.state.thresholds,width,height)
+                //console.log("onL1",this.state.index,this.state.thresholds,width,height)
                 if(!this.state.thresholds[this.state.index]){
                   this.setState((prevState,props)=>{
                     let thresholds = [...this.state.thresholds]
@@ -1796,7 +1796,7 @@ class ExpandableView extends React.Component {
               //left: translateX
             }}
           >
-            {renderElement(this.state.index)}
+            { renderElement(this.state.index) }
           </Animated.View>
         </Animated.View>
       </View>
@@ -1823,25 +1823,26 @@ ExpandableView.defaultProps = {
 Animated.ExpandableView=Animated.createAnimatedComponent(ExpandableView);
 
 function Action2({ index, left, ...props }) {
-  styles=[
-    { },//justifyContent:"flex-end"
-    { width:WIDTH/2 },
-    { width:WIDTH },
+  const styles=[
+    { flex :1},//vertical Center
+    { flex :1, width:WIDTH/2 }, //justifyContent:"flex-end"
+    { flex :1, width:WIDTH },
+  ]
+  const actionProps=[
+    {text:null ,icon:"a"},
+    {text:"ほげ",icon:"a"},
+    {text:"ふが",icon:"b"},
   ]
   return(
     <View
-      style={[
-        styles[index],
-        {flex:1}
-      ]}
+      style={styles[index]}
       {...props}
     >
-    <View style={{flex:1}}/>
-    <Text style={{
-      backgroundColor:"red",
-      textAlign:left?"left":"right",
-    }}>foo:{index}</Text>
-        <View style={{flex:1}}/>
+      <View style={{flex:1}}/>
+      <Text style={{
+        textAlign:left ? "left" : "right",
+      }}>{actionProps[index].icon}:{actionProps[index].text}</Text>
+      <View style={{flex:1}}/>
     </View>
   )
 }
@@ -1852,14 +1853,14 @@ class SwipeableRow4 extends React.Component {
     this.state = {
       //index:0,
       positiveSwipe: true,
-      releasing:false,
+      releasing: false,
     }
     this.panX = new Animated.Value(0.1);
     this.index = 0;
   }
   render(){
     const { onClose, //width,
-            rowData, sectionID, rowID,
+            renderLeftAction, renderRightAction,
             children,
             ...props } = this.props;//  ...Closable.propTypes,
     //        style={[style, { width: -10 }]}
@@ -1877,7 +1878,7 @@ class SwipeableRow4 extends React.Component {
               {dx:this.panX}
             ])}
           onSwipeDirectionChange={(pos)=>{
-              console.log("pos",pos)
+              //console.log("pos",pos)
               this.setState({positiveSwipe:pos})
             }}
           onSwipeEnd={(gestureState)=>{
@@ -1912,13 +1913,11 @@ class SwipeableRow4 extends React.Component {
             indexLock={this.state.releasing}
             onIndexChage={(i)=>{
                 this.index = i;
-                console.log("ch1:",i,this.index)
+                //console.log("ch1:",i,this.index)
                 //console.log("index change")
                 //same timing as renderElement? -> no
               }}
-            renderElement={(i)=>
-              <Action2 index={i} left={true}/>
-              }
+            renderElement={renderLeftAction}
           />
           <View style={{width:WIDTH}}>
             {children}
@@ -1935,12 +1934,10 @@ class SwipeableRow4 extends React.Component {
             enterFromLeft={false}
             indexLock={this.state.releasing}
             onIndexChage={(i)=>{
-                console.log("ch2:",i)
+                //console.log("ch2:",i)
                 this.index = i;
               }}
-            renderElement={(i)=>
-              <Action2 index={i} left={false}/>
-                          }
+            renderElement={renderRightAction}
           />
         </PanResponderView2>
     )
@@ -1949,9 +1946,6 @@ class SwipeableRow4 extends React.Component {
 
 SwipeableRow4.propTypes = {
   ...View.propTypes,
-  rowData:  React.PropTypes.object.isRequired,
-  sectionID:React.PropTypes.string.isRequired,
-  rowID:    React.PropTypes.string.isRequired,
   onClose:  React.PropTypes.func.isRequired,
   renderLeftAction: React.PropTypes.func.isRequired,
   renderRightAction: React.PropTypes.func.isRequired,
@@ -2009,7 +2003,12 @@ class BookListView7_test extends React.Component {
                         this.updateDataSource();
                         console.log("onclose")
                       }}
-                    {...{rowData,sectionID,rowID, highlightRow}}
+                    renderLeftAction={(i)=>
+                      <Action2 index={i} left={true}/>
+                                    }
+                    renderRightAction={(i)=>
+                      <Action2 index={i} left={false}/>
+                                    }
                                                   >
                     {debugView("main")(rowData,sectionID,rowID)}
                   </SwipeableRow4>
