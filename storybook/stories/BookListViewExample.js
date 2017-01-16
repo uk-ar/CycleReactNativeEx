@@ -25,7 +25,7 @@ import Welcome from './Welcome';
 
 import {BookCell} from '../../BookCell';
 import {BookRow1} from '../../BookRow';
-import {genActions2,Action} from '../../Action';
+import {genActions2,Action,Action2} from '../../Action';
 import {BookListView3,BookListView2,BookListView1,BookListView} from '../../BookListView';
 import { LayoutableView, CloseableView, CloseableView2 } from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
@@ -1784,7 +1784,9 @@ class ExpandableView extends React.Component {
           <Animated.View
             onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
                 //console.log("onL1",this.state.index,this.state.thresholds,width,height)
-                if(!this.state.thresholds[this.state.index]){
+                if(!this.state.thresholds[this.state.index] &&
+                   (this.state.index === 0 ||
+                    this.state.thresholds[this.state.index-1] !== width)){
                   this.setState((prevState,props)=>{
                     let thresholds = [...this.state.thresholds]
                     thresholds[this.state.index] = width;
@@ -1821,31 +1823,6 @@ ExpandableView.defaultProps = {
 };
 
 Animated.ExpandableView=Animated.createAnimatedComponent(ExpandableView);
-
-function Action2({ index, left, ...props }) {
-  const styles=[
-    { flex :1},//vertical Center
-    { flex :1, width:WIDTH/2 }, //justifyContent:"flex-end"
-    { flex :1, width:WIDTH },
-  ]
-  const actionProps=[
-    {text:null ,icon:"a"},
-    {text:"ほげ",icon:"a"},
-    {text:"ふが",icon:"b"},
-  ]
-  return(
-    <View
-      style={styles[index]}
-      {...props}
-    >
-      <View style={{flex:1}}/>
-      <Text style={{
-        textAlign:left ? "left" : "right",
-      }}>{actionProps[index].icon}:{actionProps[index].text}</Text>
-      <View style={{flex:1}}/>
-    </View>
-  )
-}
 
 class SwipeableRow4 extends React.Component {
   constructor(props) {

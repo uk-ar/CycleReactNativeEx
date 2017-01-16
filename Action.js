@@ -17,6 +17,10 @@ const {
   width,
 } = Dimensions.get('window');
 
+const {
+  width:WIDTH,
+} = Dimensions.get('window');
+
 // bucket,target->icon,text,backgroundColor,close,target
 function Action({ icon, text, backgroundColor, target, style, ...props }) {
   // backgroundColor,target are used from SwipeableActions
@@ -103,4 +107,32 @@ function genActions2(bucket) {
   return { leftActions, rightActions };
 }
 
-module.exports = { Action, genActions2 };
+function Action2({ index, left, ...props }) {
+  const styles=[
+    { },
+    { width:WIDTH/2 }, //justifyContent:"flex-end"
+    { width:WIDTH },
+  ]
+  const actionProps=[
+    {text:null ,icon:"a"},
+    {text:"ほげ",icon:"a"},
+    {text:"ふが",icon:"b"},
+    {text:"ふが",icon:"b"},
+  ]
+  return(
+    <View
+      style={[styles[index],{
+          flex:1,
+          flexDirection: left ? "row" : "row-reverse"
+        }]}
+      {...props}
+    >
+      <Text style={{
+      }}>{actionProps[index].icon}</Text>
+      <Text>
+        {actionProps[index].text}</Text>
+    </View>
+  )
+}
+
+module.exports = { Action, Action2, genActions2 };
