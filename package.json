@@ -34,7 +34,7 @@
     "react-native-share-extension": "git+http://github.com/uk-ar/react-native-share-extension.git",
     "react-native-stylish": "^0.3.0",
     "react-native-vector-icons": "^3.0.0",
-    "realm": "0.14.3",
+    "realm": "0.15.2",
     "recompose": "^0.20.2",
     "rx": "^4.1.0",
     "whatwg-fetch": "^1.0.0",
