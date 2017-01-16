@@ -9,6 +9,7 @@ import {
 import materialColor from 'material-colors';
 
 import _ from 'lodash';
+import Stylish from 'react-native-stylish';
 import { itemsInfo } from './common';
 
 import Dimensions from 'Dimensions';
@@ -26,12 +27,13 @@ function Action({ icon, text, backgroundColor, target, style, ...props }) {
   // backgroundColor,target are used from SwipeableActions
   //console.log("pro",style,text,icon)
   return (
+    //FIXME:backgroundColor must handle upper because of half width action
+    <Stylish.View style={{flex:1,backgroundColor:backgroundColor}}>
     <View
       {...props}
       style={[{
           //passed
           flexDirection:"row-reverse",
-
           alignItems:"center",
           flex:1, //verticalCenter
           padding:10,
@@ -55,6 +57,7 @@ function Action({ icon, text, backgroundColor, target, style, ...props }) {
        </Text>
        : null }
     </View>
+    </Stylish.View>
   );
 }
 
@@ -75,16 +78,17 @@ function genActions2(bucket) {
     if (target === self) {
       ({ icon, text } = { text: '先頭に移動', icon: 'level-up' });
     }
-    return { icon, text, backgroundColor, close: true, target };
+    return { icon, text, backgroundColor, /* close: true, */ target };
   }
   const nop = {
-    text: null, backgroundColor: materialColor.grey[300], close: false, target: null };
+    text: null, backgroundColor: materialColor.grey[300], /* close: false, */ target: null };
   const leftActions = [
     { ...getProps(bucket, 'liked'),
       ...nop,
       style: {
         flexDirection: 'row',
-        justifyContent: 'flex-end' } },
+        //justifyContent: 'flex-end'
+      } },
     { ...getProps(bucket, 'liked'),
       style: {
         flexDirection: 'row',
@@ -92,46 +96,30 @@ function genActions2(bucket) {
     { ...getProps(bucket, 'borrowed'),
       style: {
         flexDirection: 'row',
-        width } }
+        width
+      } }
   ];
   const rightActions = [
     { ...getProps(bucket, 'done'),
       ...nop,
       style: {
         flexDirection: 'row-reverse',
-        justifyContent: 'flex-end' } },
+        //justifyContent: 'flex-end'
+      } },
     { ...getProps(bucket, 'done'),
       style: {
-        flexDirection: 'row-reverse' } }
+        flexDirection: 'row-reverse',
+        width
+      } }
   ];
   return { leftActions, rightActions };
 }
 
 function Action2({ index, left, ...props }) {
-  const styles=[
-    { },
-    { width:WIDTH/2 }, //justifyContent:"flex-end"
-    { width:WIDTH },
-  ]
-  const actionProps=[
-    {text:null ,icon:"a"},
-    {text:"ほげ",icon:"a"},
-    {text:"ふが",icon:"b"},
-    {text:"ふが",icon:"b"},
-  ]
+  const {leftActions,rightActions} = genActions2()
+  const actionProps = left ? leftActions : rightActions
   return(
-    <View
-      style={[styles[index],{
-          flex:1,
-          flexDirection: left ? "row" : "row-reverse"
-        }]}
-      {...props}
-    >
-      <Text style={{
-      }}>{actionProps[index].icon}</Text>
-      <Text>
-        {actionProps[index].text}</Text>
-    </View>
+    <Action {...actionProps[index]}/>
   )
 }
 
