@@ -1764,6 +1764,7 @@ class ExpandableView extends React.Component {
             renderElement, indexLock, enterFromLeft,
             ...props } = this.props;//  ...Closable.propTypes,
     //console.log("panx",this.panX)
+    //console.log("ex")
     const offset =  this.state.thresholds[0];
     return(
       <View
@@ -1834,6 +1835,8 @@ class SwipeableRow4 extends React.Component {
     }
     this.panX = new Animated.Value(0.1);
     this.index = 0;
+    this.leftBackgroundColor;
+    this.rightBackgroundColor;
   }
   render(){
     const { onClose, //width,
@@ -1841,6 +1844,7 @@ class SwipeableRow4 extends React.Component {
             children,
             ...props } = this.props;//  ...Closable.propTypes,
     //        style={[style, { width: -10 }]}
+    console.log("sw4")
     return (
         <PanResponderView2
           style={{
@@ -1876,6 +1880,7 @@ class SwipeableRow4 extends React.Component {
               }
             }}>
           <Animated.ExpandableView
+            key="left"
             style={{
               width:this.panX.interpolate({
                 inputRange: [0  , 0.1, 1],
@@ -1883,6 +1888,7 @@ class SwipeableRow4 extends React.Component {
               }),
               justifyContent: this.state.positiveSwipe ?
                               'flex-start' : 'flex-end',
+              backgroundColor: this.leftBackgroundColor
               //backgroundColor:"red",
               //alignItems:"stretch"
             }}
@@ -1894,12 +1900,16 @@ class SwipeableRow4 extends React.Component {
                 //console.log("index change")
                 //same timing as renderElement? -> no
               }}
-            renderElement={renderLeftAction}
+            renderElement={(i)=>renderLeftAction(i,(backgroundColor)=>{
+                this.leftBackgroundColor=backgroundColor
+                //console.log("l",this.leftBackgroundColor)
+              })}
           />
           <View style={{width:WIDTH}}>
             {children}
           </View>
           <Animated.ExpandableView
+            key="right"
             style={{
               width:Animated.multiply(this.panX, -1).interpolate({
                 inputRange: [0  , 0.1, 1],
@@ -1907,6 +1917,7 @@ class SwipeableRow4 extends React.Component {
               }),
               justifyContent: this.state.positiveSwipe ?
                               'flex-start' : 'flex-end',
+              backgroundColor: this.rightBackgroundColor
             }}
             enterFromLeft={false}
             indexLock={this.state.releasing}
@@ -1914,7 +1925,10 @@ class SwipeableRow4 extends React.Component {
                 //console.log("ch2:",i)
                 this.index = i;
               }}
-            renderElement={renderRightAction}
+            renderElement={(i)=>renderRightAction(i,(backgroundColor)=>{
+                this.rightBackgroundColor=backgroundColor
+                //console.log("r",this.rightBackgroundColor)
+              })}
           />
         </PanResponderView2>
     )
@@ -1980,13 +1994,15 @@ class BookListView7_test extends React.Component {
                         this.updateDataSource();
                         console.log("onclose")
                       }}
-                    renderLeftAction={(i)=>
-                      <Action2 index={i} left={true}/>
-                                    }
-                    renderRightAction={(i)=>
-                      <Action2 index={i} left={false}/>
-                                    }
-                                                  >
+                    renderLeftAction={(i, onBackgroundColorChange)=>
+                      <Action2 index={i} left={true}
+                               onBackgroundColorChange={onBackgroundColorChange}/>
+                                     }
+                    renderRightAction={(i, onBackgroundColorChange)=>
+                      <Action2 index={i} left={false}
+                               onBackgroundColorChange={onBackgroundColorChange}/>
+                                      }
+                                                       >
                     {debugView("main")(rowData,sectionID,rowID)}
                   </SwipeableRow4>
                 </CloseableView2>

@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 
 import materialColor from 'material-colors';
+import emptyFunction from 'fbjs/lib/emptyFunction';
 
 import _ from 'lodash';
 import Stylish from 'react-native-stylish';
@@ -28,7 +29,6 @@ function Action({ icon, text, backgroundColor, target, style, ...props }) {
   //console.log("pro",style,text,icon)
   return (
     //FIXME:backgroundColor must handle upper because of half width action
-    <Stylish.View style={{flex:1,backgroundColor:backgroundColor}}>
     <View
       {...props}
       style={[{
@@ -57,7 +57,6 @@ function Action({ icon, text, backgroundColor, target, style, ...props }) {
        </Text>
        : null }
     </View>
-    </Stylish.View>
   );
 }
 
@@ -115,12 +114,23 @@ function genActions2(bucket) {
   return { leftActions, rightActions };
 }
 
-function Action2({ index, left, ...props }) {
+function Action2({ index, left, onBackgroundColorChange, ...props }) {
   const {leftActions,rightActions} = genActions2()
   const actionProps = left ? leftActions : rightActions
+  onBackgroundColorChange(actionProps[index].backgroundColor)
   return(
     <Action {...actionProps[index]}/>
   )
 }
+
+Action2.propTypes = {
+  ...View.propTypes,
+  onBackgroundColorChange:  React.PropTypes.func.isRequired,
+  //indexLock: React.PropTypes.bool,
+};
+Action2.defaultProps = {
+  ...View.defaultProps,
+  onBackgroundColorChange: emptyFunction,
+};
 
 module.exports = { Action, Action2, genActions2 };
