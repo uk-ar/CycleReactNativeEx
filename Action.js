@@ -24,11 +24,17 @@ const {
 } = Dimensions.get('window');
 
 // bucket,target->icon,text,backgroundColor,close,target
-function Action({ icon, text, backgroundColor, target, style, ...props }) {
+class Action extends React.PureComponent {
+//function Action({ icon, text, backgroundColor, target, style, ...props }) {
   // backgroundColor,target are used from SwipeableActions
   //console.log("pro",style,text,icon)
+  render(){
+    console.log("act")
+    const { icon, text, backgroundColor, target, style, ...props } = this.props
   return (
     //FIXME:backgroundColor must handle upper because of half width action
+    /* <Stylish.View
+        style={{backgroundColor:backgroundColor}}> */
     <View
       {...props}
       style={[{
@@ -37,7 +43,8 @@ function Action({ icon, text, backgroundColor, target, style, ...props }) {
           alignItems:"center",
           flex:1, //verticalCenter
           padding:10,
-          paddingRight:0,
+        paddingRight:0,
+        backgroundColor:backgroundColor,
         },style]}>
       <FAIcon
         name={icon} size={20}
@@ -57,8 +64,9 @@ function Action({ icon, text, backgroundColor, target, style, ...props }) {
        </Text>
        : null }
     </View>
+    //</Stylish.View>
   );
-}
+}}
 
 Action.propTypes = {
   icon:React.PropTypes.string,
@@ -114,23 +122,25 @@ function genActions2(bucket) {
   return { leftActions, rightActions };
 }
 
-function Action2({ index, left, onBackgroundColorChange, ...props }) {
+function Action2({ index, left, indexLock, ...props }) {
   const {leftActions,rightActions} = genActions2()
   const actionProps = left ? leftActions : rightActions
-  onBackgroundColorChange(actionProps[index].backgroundColor)
+  //onBackgroundColorChange(actionProps[index].backgroundColor)
   return(
-    <Action {...actionProps[index]}/>
+      <Action {...actionProps[index]}
+        style={[actionProps[index].style,
+                indexLock && {width:WIDTH}]}/>
   )
 }
 
 Action2.propTypes = {
   ...View.propTypes,
-  onBackgroundColorChange:  React.PropTypes.func.isRequired,
+  //onBackgroundColorChange:  React.PropTypes.func.isRequired,
   //indexLock: React.PropTypes.bool,
 };
 Action2.defaultProps = {
   ...View.defaultProps,
-  onBackgroundColorChange: emptyFunction,
+  //onBackgroundColorChange: emptyFunction,
 };
 
 module.exports = { Action, Action2, genActions2 };

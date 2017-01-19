@@ -1795,11 +1795,14 @@ class ExpandableView extends React.Component {
                   })
                 }
               }}
-            style={{
-              //left: translateX
-            }}
+            style={{}
+              /* indexLock && {
+                  width: WIDTH,
+                  //backgroundColor:"red"
+                  //left: translateX
+                  } */}
           >
-            { renderElement(this.state.index) }
+            { renderElement(this.state.index,indexLock) }
           </Animated.View>
         </Animated.View>
       </View>
@@ -1832,11 +1835,11 @@ class SwipeableRow4 extends React.Component {
       //index:0,
       positiveSwipe: true,
       releasing: false,
+      leftBackgroundColor: 0,
+      rightBackgroundColor: 0,
     }
     this.panX = new Animated.Value(0.1);
     this.index = 0;
-    this.leftBackgroundColor;
-    this.rightBackgroundColor;
   }
   render(){
     const { onClose, //width,
@@ -1869,7 +1872,6 @@ class SwipeableRow4 extends React.Component {
                                 {toValue:0,duration:300})
                         .start()
               }else{
-                //TODO:index lock
                 this.setState({releasing:true},()=>
                   Animated.timing(this.panX,
                                   this.state.positiveSwipe ?
@@ -1888,7 +1890,7 @@ class SwipeableRow4 extends React.Component {
               }),
               justifyContent: this.state.positiveSwipe ?
                               'flex-start' : 'flex-end',
-              backgroundColor: this.leftBackgroundColor
+              backgroundColor: this.state.leftBackgroundColor
               //backgroundColor:"red",
               //alignItems:"stretch"
             }}
@@ -1900,10 +1902,7 @@ class SwipeableRow4 extends React.Component {
                 //console.log("index change")
                 //same timing as renderElement? -> no
               }}
-            renderElement={(i)=>renderLeftAction(i,(backgroundColor)=>{
-                this.leftBackgroundColor=backgroundColor
-                //console.log("l",this.leftBackgroundColor)
-              })}
+            renderElement={renderLeftAction}
           />
           <View style={{width:WIDTH}}>
             {children}
@@ -1917,7 +1916,7 @@ class SwipeableRow4 extends React.Component {
               }),
               justifyContent: this.state.positiveSwipe ?
                               'flex-start' : 'flex-end',
-              backgroundColor: this.rightBackgroundColor
+              backgroundColor: this.state.rightBackgroundColor
             }}
             enterFromLeft={false}
             indexLock={this.state.releasing}
@@ -1925,10 +1924,7 @@ class SwipeableRow4 extends React.Component {
                 //console.log("ch2:",i)
                 this.index = i;
               }}
-            renderElement={(i)=>renderRightAction(i,(backgroundColor)=>{
-                this.rightBackgroundColor=backgroundColor
-                //console.log("r",this.rightBackgroundColor)
-              })}
+            renderElement={renderRightAction}
           />
         </PanResponderView2>
     )
@@ -1994,13 +1990,13 @@ class BookListView7_test extends React.Component {
                         this.updateDataSource();
                         console.log("onclose")
                       }}
-                    renderLeftAction={(i, onBackgroundColorChange)=>
+                    renderLeftAction={(i, indexLock)=>
                       <Action2 index={i} left={true}
-                               onBackgroundColorChange={onBackgroundColorChange}/>
+                               indexLock={indexLock}/>
                                      }
-                    renderRightAction={(i, onBackgroundColorChange)=>
+                    renderRightAction={(i, indexLock)=>
                       <Action2 index={i} left={false}
-                               onBackgroundColorChange={onBackgroundColorChange}/>
+                               indexLock={indexLock}/>
                                       }
                                                        >
                     {debugView("main")(rowData,sectionID,rowID)}
