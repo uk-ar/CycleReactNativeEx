@@ -37,7 +37,7 @@
     "realm": "0.14.3",
     "recompose": "^0.20.2",
     "rx": "^4.1.0",
-    "whatwg-fetch": "^1.0.0",
+    "whatwg-fetch": "^2.0.2",
     "xml2js": "^0.4.17",
     "xstream": "^9.0.0"
   },
