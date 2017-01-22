@@ -29,7 +29,6 @@ class Action extends React.PureComponent {
   // backgroundColor,target are used from SwipeableActions
   //console.log("pro",style,text,icon)
   render(){
-    console.log("act")
     const { icon, text, backgroundColor, target, style, ...props } = this.props
   return (
     //FIXME:backgroundColor must handle upper because of half width action
@@ -44,7 +43,7 @@ class Action extends React.PureComponent {
           flex:1, //verticalCenter
           padding:10,
         paddingRight:0,
-        backgroundColor:backgroundColor,
+          //backgroundColor:backgroundColor,
         },style]}>
       <FAIcon
         name={icon} size={20}
@@ -122,15 +121,35 @@ function genActions2(bucket) {
   return { leftActions, rightActions };
 }
 
-function Action2({ index, left, indexLock, ...props }) {
-  const {leftActions,rightActions} = genActions2()
-  const actionProps = left ? leftActions : rightActions
-  //onBackgroundColorChange(actionProps[index].backgroundColor)
-  return(
-      <Action {...actionProps[index]}
-        style={[actionProps[index].style,
-                indexLock && {width:WIDTH}]}/>
-  )
+class Action2 extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      //thresholds:[],
+    }
+    const {leftActions,rightActions} = genActions2();
+    //this.leftActions = leftActions;
+    //this.rightActions = rightActions;
+    this.actionProps = props.left ? leftActions : rightActions
+    this.styles = this.actionProps.map((props)=>
+      ({backgroundColor:props.backgroundColor}))
+  }
+  render() {
+    console.log(this.props)
+    const { index, left, indexLock, ...props } = this.props
+    //onBackgroundColorChange(actionProps[index].backgroundColor)
+    console.log("ba",this.actionProps[index].backgroundColor,this.styles)
+    return(
+      <Stylish.View
+        style={this.styles[index]}>
+        <View
+          style={indexLock && {width:WIDTH}}>
+          <Action {...this.actionProps[index]}
+            style={this.actionProps[index].style}/>
+        </View>
+      </Stylish.View>
+    )
+  }
 }
 
 Action2.propTypes = {
