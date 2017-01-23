@@ -32,7 +32,7 @@ import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableR
 import {SwipeableListView} from '../../SwipeableListView';
 
 import {
-  withDebug,VerticalCenterView,TestListView,TestSectionListView,debugView,DebugView2,
+  ToggleableView,withDebug,VerticalCenterView,TestListView,TestSectionListView,debugView,DebugView2,
 } from './common'
 import { ItemsHeader, ItemsFooter } from '../../Header';
 class NestedListViewDataSource {
@@ -1462,63 +1462,23 @@ class BookListView4_test extends React.Component {
   }
 }
 
-class ToggleableView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      toggle:true,
-    }
-  }
-  render(){
-    return(
-      <View
-        style={{paddingTop:20}}>
-        <Text>
-          state.toggle is {this.state.toggle ? "true" : "false" }
-        </Text>
-        <Text
-          onPress={()=>{
-              this.setState((prevState,props)=>{
-                return {toggle: ! prevState.toggle }
-              })
-            }}>
-          pressMe to toggle
-        </Text>
-        <Text
-          onPress={()=>{
-              this.setState({toggle: true})
-            }}>
-          pressMe to set true
-        </Text>
-        <Text
-          onPress={()=>{
-              this.setState({toggle: false})
-            }}>
-          pressMe to set false
-        </Text>
-        { this.props.children(this.state.toggle) }
-      </View>
-    )
-  }
-}
-
 class BookListView5_test extends React.Component {
   constructor(props) {
     super(props);
   }
   render(){
     return(
-      <ToggleableView>
-      { (toggle) => {
-        return (
-          <CloseableView
-            close={toggle}>
-            <Text>content</Text>
-            {/* {debugView("row")(this.props)} */}
-          </CloseableView>
-        )
-      }}
-      </ToggleableView>)
+      <ToggleableView
+        renderChildren={
+          (toggle) => {
+            return (
+              <CloseableView close={toggle}>
+                <Text>content</Text>
+                  {/* {debugView("row")(this.props)} */}
+              </CloseableView>
+            )
+          }}
+      />)
   }
 }
 
@@ -1847,7 +1807,7 @@ class SwipeableRow4 extends React.Component {
             children,
             ...props } = this.props;//  ...Closable.propTypes,
     //        style={[style, { width: -10 }]}
-    console.log("sw4")
+    //console.log("sw4")
     return (
         <PanResponderView2
           style={{

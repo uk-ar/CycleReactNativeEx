@@ -135,7 +135,7 @@ class Action2 extends React.PureComponent {
       ({backgroundColor:props.backgroundColor}))
   }
   render() {
-    console.log(this.props)
+    //console.log(this.props)
     const { index, left, indexLock, ...props } = this.props
     //onBackgroundColorChange(actionProps[index].backgroundColor)
     console.log("ba",this.actionProps[index].backgroundColor,this.styles)

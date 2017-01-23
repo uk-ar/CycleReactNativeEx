@@ -203,4 +203,44 @@ function DebugView2(props){
   //{props.name}:
 }
 
-module.exports = {withDebug,VerticalCenterView,TestListView,debugView,TestSectionListView,DebugView2}
+class ToggleableView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      toggle:true,
+    }
+  }
+  render(){
+    return(
+      <View
+        style={{paddingTop:20}}>
+        <Text>
+          state.toggle is {this.state.toggle ? "true" : "false" }
+        </Text>
+        <Text
+          onPress={()=>{
+              this.setState((prevState,props)=>{
+                return {toggle: ! prevState.toggle }
+              })
+            }}>
+          pressMe to toggle
+        </Text>
+        <Text
+          onPress={()=>{
+              this.setState({toggle: true})
+            }}>
+          pressMe to set true
+        </Text>
+        <Text
+          onPress={()=>{
+              this.setState({toggle: false})
+            }}>
+          pressMe to set false
+        </Text>
+        { this.props.renderChildren(this.state.toggle) }
+      </View>
+    )
+  }
+}
+
+module.exports = {ToggleableView,withDebug,VerticalCenterView,TestListView,debugView,TestSectionListView,DebugView2}

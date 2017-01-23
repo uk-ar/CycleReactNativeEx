@@ -19,7 +19,7 @@ import {BookCell} from '../../BookCell';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 
 
-import {withDebug} from './common';
+import {ToggleableView,withDebug} from './common';
 
 const StylishViewDebug = withDebug(Stylish.View)
 const StylishListViewDebug = withDebug(Stylish.ListView)
@@ -101,3 +101,17 @@ storiesOf('StylishView', module)
       />)
   }
   )
+  .add('with toggle props', () => {
+    state = [{height:10, backgroundColor:"red" },
+             {height:10, backgroundColor:"green" }]
+
+    return (
+      <ToggleableView
+        renderChildren={(toggle)=>{
+            return (<Stylish.View
+            style={toggle ? state[0] : state[1]}
+            animationConfig={{duration:1000}}
+                            />)
+          }}
+      />)
+  })
