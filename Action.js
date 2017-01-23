@@ -32,26 +32,24 @@ class Action extends React.PureComponent {
     const { icon, text, backgroundColor, target, style, ...props } = this.props
   return (
     //FIXME:backgroundColor must handle upper because of half width action
-    /* <Stylish.View
-        style={{backgroundColor:backgroundColor}}> */
+    /* {
+     *   //passed
+     *   flexDirection:"row-reverse",
+     *   alignItems:"center",
+     *   flex:1, //verticalCenter
+     *   padding:10,
+     *   paddingRight:0,
+     *   //backgroundColor:backgroundColor,
+     * },*/
     <View
       {...props}
-      style={[{
-          //passed
-          flexDirection:"row-reverse",
-          alignItems:"center",
-          flex:1, //verticalCenter
-          padding:10,
-        paddingRight:0,
-          //backgroundColor:backgroundColor,
-        },style]}>
+      style={style}>
       <FAIcon
         name={icon} size={20}
         style={{
           //margin:5,
         }}
       />
-      {text ?
        <Text
          style={{
            //numberOfLines={1}
@@ -59,11 +57,9 @@ class Action extends React.PureComponent {
            //position:"absolute",
          }}
        >
-         {text}
+         {text || ""}
        </Text>
-       : null }
     </View>
-    //</Stylish.View>
   );
 }}
 
@@ -131,22 +127,30 @@ class Action2 extends React.PureComponent {
     //this.leftActions = leftActions;
     //this.rightActions = rightActions;
     this.actionProps = props.left ? leftActions : rightActions
-    this.styles = this.actionProps.map((props)=>
+    this.backgroundColors = this.actionProps.map((props)=>
       ({backgroundColor:props.backgroundColor}))
   }
   render() {
     //console.log(this.props)
     const { index, left, indexLock, ...props } = this.props
     //onBackgroundColorChange(actionProps[index].backgroundColor)
-    console.log("ba",this.actionProps[index].backgroundColor,this.styles)
-    return(
+    //console.log("ba",index,this.actionProps[index].backgroundColor,this.styles)
+    return (
       <Stylish.View
-        style={this.styles[index]}>
+        style={[{
+          backgroundColor:this.actionProps[index].backgroundColor,
+          flex:1, //verticalCenter
+          paddingVertical:10,
+          },left ? {paddingLeft:10} : {paddingRight:10}]}
+        animationConfig={{duration:300}}
+      >
+        <View style={{flex:1}}/>
         <View
           style={indexLock && {width:WIDTH}}>
           <Action {...this.actionProps[index]}
             style={this.actionProps[index].style}/>
         </View>
+        <View style={{flex:1}}/>
       </Stylish.View>
     )
   }

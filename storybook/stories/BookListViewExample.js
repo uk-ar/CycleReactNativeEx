@@ -1948,7 +1948,7 @@ class BookListView7_test extends React.Component {
                         let newRowData = {...rowData, enable:false}
                         this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
                         this.updateDataSource();
-                        console.log("onclose")
+                        //console.log("onclose")
                       }}
                     renderLeftAction={(i, indexLock)=>
                       <Action2 index={i} left={true}

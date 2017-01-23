@@ -102,13 +102,16 @@ storiesOf('StylishView', module)
   }
   )
   .add('with toggle props', () => {
-    state = [{height:10, backgroundColor:"red" },
-             {height:10, backgroundColor:"green" }]
+    const state = [{height:10, backgroundColor:"red" },
+                   {height:10, backgroundColor:"green" }]
+    //TODO:flatten config?
+    const config = {duration:1000}
 
     return (
       <ToggleableView
         renderChildren={(toggle)=>{
-            return (<Stylish.View
+            return (
+              <Stylish.View
             style={toggle ? state[0] : state[1]}
             animationConfig={{duration:1000}}
                             />)
