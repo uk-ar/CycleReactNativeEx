@@ -50,10 +50,11 @@ class Action extends React.PureComponent {
           //margin:5,
         }}
       />
+      <View style={{width:5}}></View>
        <Text
          style={{
            //numberOfLines={1}
-           margin:5,
+           alignSelf:"center",
            //position:"absolute",
          }}
        >
