@@ -124,12 +124,10 @@ class Action2 extends React.PureComponent {
     this.state = {
       //thresholds:[],
     }
-    const {leftActions,rightActions} = genActions2();
+    const {leftActions,rightActions} = genActions2(props.bucket);
     //this.leftActions = leftActions;
     //this.rightActions = rightActions;
     this.actionProps = props.left ? leftActions : rightActions
-    this.backgroundColors = this.actionProps.map((props)=>
-      ({backgroundColor:props.backgroundColor}))
   }
   render() {
     //console.log(this.props)

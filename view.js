@@ -5,6 +5,7 @@ import materialColor from 'material-colors';
 import {
   Platform,
   Text,
+  ListView,
   WebView,
   NavigationExperimental,
   TextInput,
@@ -24,6 +25,10 @@ import { styles } from './styles';
 import emptyFunction from 'fbjs/lib/emptyFunction';
 
 const FAIcon = require('react-native-vector-icons/FontAwesome');
+
+import { CloseableView2 } from './Closeable';
+import { SwipeableRow4 } from './SwipeableRow';
+import { Action2 } from './Action';
 
 // TouchableElement = TouchableHighlight;
 Touchable.TouchableElement = Touchable.TouchableHighlight;
@@ -103,6 +108,50 @@ class MainView extends React.Component {
     // props.animations.start()
     //      style={{ marginTop: 64, backgroundColor: 'red' }}
     console.log("b",books)
+    this.dataBlob = {
+      r1:{data:1,enable:true},
+      r2:{data:2,enable:false},
+      r3:{data:3,enable:true},
+    }
+    const dataSource = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+    })
+    
+    return(
+      <ListView
+        dataSource={dataSource.cloneWithRows(this.dataBlob)}
+        scrollEnabled={false}
+        renderRow={
+          (rowData,sectionID,rowID, highlightRow)=>{
+            //console.log("r:",rowData)
+            //rowData
+            //console.log("c:",this.state.alignLeft)
+            return (
+              <CloseableView2
+                    close={!rowData.enable}>
+                <SwipeableRow4
+                    onClose={()=>{
+                        let newRowData = {...rowData, enable:false}
+                        this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
+                        this.updateDataSource();
+                        //console.log("onclose")
+                      }}
+                    renderLeftAction={(i, indexLock)=>
+                      <Action2 index={i} left={true}
+                               indexLock={indexLock}/>
+                                     }
+                    renderRightAction={(i, indexLock)=>
+                      <Action2 index={i} left={false}
+                               indexLock={indexLock}/>
+                                      }
+                                         >
+                      <Text> foo </Text>
+                </SwipeableRow4>
+              </CloseableView2>
+            )
+          }}
+      />
+    )
     return (
       <BookListView
         style={style}

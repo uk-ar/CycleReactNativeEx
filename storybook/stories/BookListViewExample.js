@@ -1606,6 +1606,7 @@ class BookListView7_test extends React.Component {
                       }}
                     renderLeftAction={(i, indexLock)=>
                       <Action2 index={i} left={true}
+                                              bucket="liked"
                                indexLock={indexLock}/>
                                      }
                     renderRightAction={(i, indexLock)=>
