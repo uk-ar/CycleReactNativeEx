@@ -90,6 +90,7 @@ function model(actions) {
   // selectedSection triggers scroll and update value when animation end
   // update with animation when selectedSection$ changed
   const books$ =
+    //Rx.Observable.just(null);
     Rx.Observable.combineLatest(
       actions.searchedBooksStatus$// .do(i => console.log('searched books'))
       // searchedBooks$//.do(i => console.log('searched books'))
@@ -178,6 +179,8 @@ function model(actions) {
        * rowIDs$,*/
       //dataSource$,
       books$,
+      actions.searchedBooksStatus$,
+      actions.savedBooksStatus$,
       /* dataSource$.do(i =>
        *   LayoutAnimation.configureNext(
        *     LayoutAnimation
@@ -202,8 +205,9 @@ function model(actions) {
       // Rx.Observable.just(1000),
       // actions.selectedSection$.startWith("search"),
       (/* items, sectionIDs, rowIDs,*/
-       books, selectedSection, booksLoadingState, navigationState, selectedBook, i) => ({ /* items, sectionIDs, rowIDs,*/
-         books, selectedSection, booksLoadingState, navigationState, selectedBook, i }));
+       books, searchedBooks, savedBooks,
+       selectedSection, booksLoadingState, navigationState, selectedBook, i) => ({ /* items, sectionIDs, rowIDs,*/
+         books, searchedBooks, savedBooks, selectedSection, booksLoadingState, navigationState, selectedBook, i }));
   return state$;
 }
 

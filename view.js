@@ -90,7 +90,8 @@ class MainView extends React.Component {
     this._scrollY = new Animated.Value(0);
   }
   render() {
-    const { items, sectionIDs, rowIDs, books,
+    const { items, sectionIDs, rowIDs,
+            books, searchedBooks, savedBooks,
             onSelectSection, onCloseSection, onRelease,
             onSelectCell, style, onChangeQuery, width,
             booksLoadingState, selectedSection } = this.props;
@@ -107,28 +108,33 @@ class MainView extends React.Component {
     //        key={selectedSection}
     // props.animations.start()
     //      style={{ marginTop: 64, backgroundColor: 'red' }}
-    console.log("b",books)
-    this.dataBlob = {
-      r1:{data:1,enable:true},
-      r2:{data:2,enable:false},
-      r3:{data:3,enable:true},
-    }
+    console.log("b",books,searchedBooks,savedBooks)
+    /* this.dataBlob = {
+     *   r1:{data:1,enable:true},
+     *   r2:{data:2,enable:false},
+     *   r3:{data:3,enable:true},
+     * }*/
+    this.dataBlob = [
+      {data:1,enable:true},
+      {data:2,enable:false},
+      {data:3,enable:true},
+    ]
     const dataSource = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
     })
-    
+
     return(
       <ListView
-        dataSource={dataSource.cloneWithRows(this.dataBlob)}
+        dataSource={dataSource.cloneWithRows(savedBooks)}
         scrollEnabled={false}
         renderRow={
           (rowData,sectionID,rowID, highlightRow)=>{
-            //console.log("r:",rowData)
+            //console.log("r:",rowData,rowID)
             //rowData
             //console.log("c:",this.state.alignLeft)
             return (
               <CloseableView2
-                    close={!rowData.enable}>
+                    close={rowData.bucket === "liked"}>
                 <SwipeableRow4
                     onClose={()=>{
                         let newRowData = {...rowData, enable:false}
@@ -145,7 +151,16 @@ class MainView extends React.Component {
                                indexLock={indexLock}/>
                                       }
                                          >
-                      <Text> foo </Text>
+                <BookCell
+                 onPress={() => {
+                     onSelectCell(rowData);
+                   }}
+                 book={rowData}
+                 style={{
+                   backgroundColor: materialColor.grey['50']}}
+                       >
+                  <LibraryStatus libraryStatus={rowData.libraryStatus} />
+                </BookCell>
                 </SwipeableRow4>
               </CloseableView2>
             )
@@ -280,7 +295,7 @@ const {
 } = Dimensions.get('window');
 
 function view(model) {
-  //console.log('view');
+  console.log('view',model);
   const navigationState = model.navigationState;
   // return <MainView  {...model}/>;
   // console.log('mynav', navigationState, onNavigateBack);
