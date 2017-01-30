@@ -26,7 +26,7 @@ import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {BookRow1} from '../../BookRow';
 import {genActions2,Action,Action2} from '../../Action';
-import {BookListView3,BookListView2,BookListView1,BookListView} from '../../BookListView';
+import {BookListView1,BookListView} from '../../BookListView';
 import { LayoutableView, CloseableView, CloseableView2 } from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow4,SwipeableRow3} from '../../SwipeableRow';
 import {SwipeableListView} from '../../SwipeableListView';
@@ -1559,6 +1559,61 @@ class BookListView6_test extends React.Component {
   }
 }
 
+class BookListView2 extends React.Component {
+  render(){
+    //console.log("a",this.state.dataSource)
+    //this.dataBlob = this.dataBlob.cloneWithRows(this.dataBlob)
+    //let generateActions= ()=>genActions2('search')
+    const {dataSource,onClose}=this.props;
+    return (
+      <ListView
+        dataSource={dataSource}
+        scrollEnabled={false}
+        renderRow={
+          (rowData,sectionID,rowID, highlightRow)=>{
+            //console.log("r:",rowData)
+            //rowData
+            //console.log("c:",this.state.alignLeft)
+            return (
+              <CloseableView2
+                    close={!rowData.enable}>
+                <SwipeableRow4
+                    onClose={()=>{
+                        onClose(rowData,sectionID,rowID, highlightRow)
+                        /* let newRowData = {...rowData, enable:false}
+                            this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
+                            this.updateDataSource(); */
+                        //console.log("onclose")
+                      }}
+                    renderLeftAction={(i, indexLock)=>
+                      <Action2 index={i} left={true}
+                                              bucket="liked"
+                               indexLock={indexLock}/>
+                                     }
+                    renderRightAction={(i, indexLock)=>
+                      <Action2 index={i} left={false}
+                               indexLock={indexLock}/>
+                                      }
+                                         >
+                                         {debugView("main")(rowData,sectionID,rowID)}
+                </SwipeableRow4>
+              </CloseableView2>
+            )
+          }}
+      />
+    )
+  }
+}
+BookListView2.propTypes = {
+  dataSource: React.PropTypes.object,
+  onClose: React.PropTypes.func,
+};
+
+BookListView2.defaultProps = {
+  onClose: (rowData,sectionID,rowID, highlightRow) => emptyFunction(),
+};
+
+
 class BookListView7_test extends React.Component {
   constructor(props) {
     super(props);
@@ -1586,38 +1641,13 @@ class BookListView7_test extends React.Component {
     return (
       <View
         style={{paddingTop:20}}>
-        <ListView
+        <BookListView2
           dataSource={this.state.dataSource}
-          scrollEnabled={false}
-          renderRow={
-            (rowData,sectionID,rowID, highlightRow)=>{
-              //console.log("r:",rowData)
-              //rowData
-              //console.log("c:",this.state.alignLeft)
-              return (
-                <CloseableView2
-                    close={!rowData.enable}>
-                  <SwipeableRow4
-                    onClose={()=>{
-                        let newRowData = {...rowData, enable:false}
-                        this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
-                        this.updateDataSource();
-                        //console.log("onclose")
-                      }}
-                    renderLeftAction={(i, indexLock)=>
-                      <Action2 index={i} left={true}
-                                              bucket="liked"
-                               indexLock={indexLock}/>
-                                     }
-                    renderRightAction={(i, indexLock)=>
-                      <Action2 index={i} left={false}
-                               indexLock={indexLock}/>
-                                      }
-                                                       >
-                    {debugView("main")(rowData,sectionID,rowID)}
-                  </SwipeableRow4>
-                </CloseableView2>
-              )
+          onClose={(rowData,sectionID,rowID, highlightRow)=>{
+              let newRowData = {...rowData, enable:false}
+              this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
+              this.updateDataSource();
+              console.log("onclose")
             }}
         />
         <Text>foo</Text>
