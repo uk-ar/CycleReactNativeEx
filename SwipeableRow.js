@@ -592,7 +592,7 @@ class SwipeableRow4 extends React.Component {
               )
             }
           }}>
-        <Animated.ExpandableView
+        {this.state.positiveSwipe && <Animated.ExpandableView
           key="left"
           style={{
             width:this.panX.interpolate({
@@ -614,10 +614,11 @@ class SwipeableRow4 extends React.Component {
               //same timing as renderElement? -> no
             }}
           renderElement={renderLeftAction}
-        />
+        />}
         <View style={{width:WIDTH}}>
           {children}
         </View>
+        {!this.state.positiveSwipe &&
         <Animated.ExpandableView
           key="right"
           style={{
@@ -637,6 +638,7 @@ class SwipeableRow4 extends React.Component {
             }}
           renderElement={renderRightAction}
         />
+        }
       </PanResponderView2>
     )
   }

@@ -1559,12 +1559,56 @@ class BookListView6_test extends React.Component {
   }
 }
 
+class BookRow2 extends React.Component {
+  constructor(props) {
+    super(props);
+    /* this.state = {
+     *   toggle:true,
+     * }*/
+    this.target=null;
+  }
+  render(){
+    const {rowData,sectionID,rowID, highlightRow,bucket,onClose}=this.props;
+    const {leftActions,rightActions} = genActions2(bucket);
+    console.log("book row")
+    return (
+      <CloseableView2
+        close={rowData.bucket!==bucket}>
+        <SwipeableRow4
+          onClose={()=>{
+              //console.log("target",this.target)
+              onClose(this.target,rowData,sectionID,rowID, highlightRow)
+            }}
+          renderLeftAction={(i, indexLock)=>{
+              //i,indexLock->next bucket
+              console.log("left",leftActions[i])
+              this.target=leftActions[i].target
+              return(
+                <Action2 index={i} left={true}
+                               bucket={bucket}
+                               indexLock={indexLock}/>
+              )
+            }}
+          renderRightAction={(i, indexLock)=>{
+              console.log("right",rightActions[i])
+              this.target=rightActions[i].target
+              return(<Action2 index={i} left={false}
+                               indexLock={indexLock}/>)
+            }}
+        >
+            {debugView("main")(rowData,sectionID,rowID)}
+        </SwipeableRow4>
+      </CloseableView2>
+    )
+  }
+}
+//For cycle.js
 class BookListView2 extends React.Component {
   render(){
     //console.log("a",this.state.dataSource)
     //this.dataBlob = this.dataBlob.cloneWithRows(this.dataBlob)
     //let generateActions= ()=>genActions2('search')
-    const {dataSource,onClose}=this.props;
+    const { dataSource, onClose, bucket }=this.props;
     return (
       <ListView
         dataSource={dataSource}
@@ -1572,33 +1616,9 @@ class BookListView2 extends React.Component {
         renderRow={
           (rowData,sectionID,rowID, highlightRow)=>{
             //console.log("r:",rowData)
-            //rowData
-            //console.log("c:",this.state.alignLeft)
-            return (
-              <CloseableView2
-                    close={!rowData.enable}>
-                <SwipeableRow4
-                    onClose={()=>{
-                        onClose(rowData,sectionID,rowID, highlightRow)
-                        /* let newRowData = {...rowData, enable:false}
-                            this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
-                            this.updateDataSource(); */
-                        //console.log("onclose")
-                      }}
-                    renderLeftAction={(i, indexLock)=>
-                      <Action2 index={i} left={true}
-                                              bucket="liked"
-                               indexLock={indexLock}/>
-                                     }
-                    renderRightAction={(i, indexLock)=>
-                      <Action2 index={i} left={false}
-                               indexLock={indexLock}/>
-                                      }
-                                         >
-                                         {debugView("main")(rowData,sectionID,rowID)}
-                </SwipeableRow4>
-              </CloseableView2>
-            )
+            return(
+              <BookRow2 {...{
+                  rowData,sectionID,rowID, highlightRow,bucket,onClose}} />)
           }}
       />
     )
@@ -1621,9 +1641,9 @@ class BookListView7_test extends React.Component {
       rowHasChanged: (r1, r2) => r1 !== r2,
     })
     this.dataBlob = {
-      r1:{data:1,enable:true},
-      r2:{data:2,enable:false},
-      r3:{data:3,enable:true},
+      r1:{data:1,bucket:"liked"},
+      r2:{data:2,bucket:"done"},
+      r3:{data:3,bucket:"liked"},
     }
     this.state = {
       dataSource: dataSource.cloneWithRows(this.dataBlob),
@@ -1641,27 +1661,37 @@ class BookListView7_test extends React.Component {
     return (
       <View
         style={{paddingTop:20}}>
+        <Text>liked</Text>
         <BookListView2
           dataSource={this.state.dataSource}
-          onClose={(rowData,sectionID,rowID, highlightRow)=>{
-              let newRowData = {...rowData, enable:false}
+          bucket="liked"
+          onClose={(target,rowData,sectionID,rowID, highlightRow)=>{
+              let newRowData = {...rowData, bucket:target}
+              this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
+              this.updateDataSource();
+              console.log("onclose",target)
+            }}
+        />
+        <Text>done</Text>
+        <BookListView2
+          dataSource={this.state.dataSource}
+          bucket="done"
+          onClose={(target,rowData,sectionID,rowID, highlightRow)=>{
+              let newRowData = {...rowData, bucket:target}
               this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
               this.updateDataSource();
               console.log("onclose")
             }}
         />
-        <Text>foo</Text>
-        <ListView
+        <Text>borrowed</Text>
+        <BookListView2
           dataSource={this.state.dataSource}
-          renderRow={(rowData,sectionID,rowID)=>{
-              //rowData
-              //console.log("c:",counter)
-              return (
-                <CloseableView2
-                    close={rowData.enable}>
-                          {debugView("row")(rowData,sectionID,rowID)}
-                </CloseableView2>
-              )
+          bucket="borrowed"
+          onClose={(rowData,sectionID,rowID, highlightRow)=>{
+              let newRowData = {...rowData, bucket:target}
+              this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
+              this.updateDataSource();
+              console.log("onclose")
             }}
         />
       </View>
