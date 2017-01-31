@@ -39,7 +39,7 @@
     "rx": "^4.1.0",
     "whatwg-fetch": "^1.0.0",
     "xml2js": "^0.4.17",
-    "xstream": "^9.0.0"
+    "xstream": "^10.1.0"
   },
   "devDependencies": {
     "@kadira/react-native-storybook": "^2.2.0",
