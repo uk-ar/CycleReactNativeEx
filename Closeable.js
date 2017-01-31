@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import Stylish from 'react-native-stylish';
+import emptyFunction from 'fbjs/lib/emptyFunction';
 
 import { MeasureableView } from './SwipeableRow';
 const ReactTransitionGroup = require('react-addons-transition-group');
@@ -166,7 +167,7 @@ class CloseableView2 extends React.Component {
           toValue: nextProps.close ? 0 : 1,
           useNativeDriver:false,//cannot mix height
         }
-      ).start();
+      ).start(nextProps.close ? this.props.onCloseEnd : this.props.onOpenEnd);
       //this.seed.setValue(nextProps.close ? 0 : 1)
     }
   }
@@ -200,6 +201,19 @@ class CloseableView2 extends React.Component {
     )
   }
 }
+
+CloseableView2.propTypes = {
+  ...View.propTypes,
+  close: React.PropTypes.bool,
+  onCloseEnd:  React.PropTypes.func.isRequired,
+  onOpenEnd:  React.PropTypes.func.isRequired,
+};
+CloseableView2.defaultProps = {
+  ...View.defaultProps,
+  //close: emptyFunction,
+  onCloseEnd: emptyFunction,
+  onOpenEnd: emptyFunction,
+};
 
 function makeLayoutableComponent(BaseComponent) {
   return class extends BaseComponent {

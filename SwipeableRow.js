@@ -15,7 +15,7 @@ import emptyFunction from 'fbjs/lib/emptyFunction';
 
 import Stylish from 'react-native-stylish';
 
-import { LayoutableView } from './Closeable';
+import { LayoutableView, CloseableView2 } from './Closeable';
 import { Action } from './Action';
 
 const {
@@ -555,11 +555,17 @@ class SwipeableRow4 extends React.Component {
   render(){
     const { onClose, //width,
             renderLeftAction, renderRightAction,
-            children,
+            children,close,
             ...props } = this.props;//  ...Closable.propTypes,
     //        style={[style, { width: -10 }]}
     //console.log("sw4")
     return (
+      <CloseableView2
+        close={close}
+        onCloseEnd={()=>{
+            this.panX.setValue(0.1)
+          }}
+      >
       <PanResponderView2
         style={{
           flexDirection: 'row',
@@ -592,7 +598,8 @@ class SwipeableRow4 extends React.Component {
               )
             }
           }}>
-        {this.state.positiveSwipe && <Animated.ExpandableView
+        {this.state.positiveSwipe &&
+         <Animated.ExpandableView
           key="left"
           style={{
             width:this.panX.interpolate({
@@ -640,6 +647,7 @@ class SwipeableRow4 extends React.Component {
         />
         }
       </PanResponderView2>
+      </CloseableView2>
     )
   }
 }

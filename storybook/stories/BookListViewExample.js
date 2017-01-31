@@ -1570,18 +1570,17 @@ class BookRow2 extends React.Component {
   render(){
     const {rowData,sectionID,rowID, highlightRow,bucket,onClose}=this.props;
     const {leftActions,rightActions} = genActions2(bucket);
-    console.log("book row")
+    //console.log("book row")
     return (
-      <CloseableView2
-        close={rowData.bucket!==bucket}>
         <SwipeableRow4
+          close={rowData.bucket!==bucket}
           onClose={()=>{
               //console.log("target",this.target)
               onClose(this.target,rowData,sectionID,rowID, highlightRow)
             }}
           renderLeftAction={(i, indexLock)=>{
               //i,indexLock->next bucket
-              console.log("left",leftActions[i])
+              //console.log("left",leftActions[i])
               this.target=leftActions[i].target
               return(
                 <Action2 index={i} left={true}
@@ -1590,7 +1589,7 @@ class BookRow2 extends React.Component {
               )
             }}
           renderRightAction={(i, indexLock)=>{
-              console.log("right",rightActions[i])
+              //console.log("right",rightActions[i])
               this.target=rightActions[i].target
               return(<Action2 index={i} left={false}
                                indexLock={indexLock}/>)
@@ -1598,7 +1597,6 @@ class BookRow2 extends React.Component {
         >
             {debugView("main")(rowData,sectionID,rowID)}
         </SwipeableRow4>
-      </CloseableView2>
     )
   }
 }
