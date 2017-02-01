@@ -1674,57 +1674,25 @@ class BookListView7_test extends React.Component {
    *   })
    * }*/
   render(){
-    //console.log("a",this.state.dataSource)
-    //this.dataBlob = this.dataBlob.cloneWithRows(this.dataBlob)
     const onClose=(target,rowData,sectionID,rowID, highlightRow)=>{
-      //console.log("rid:",rowID)
-      //console.log("buc:",target,rowData)
-      //this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
-      /* console.log("f",rowID,this.dataBlob.filter(
-       *   (book)=>book.isbn!==rowData.isbn))*/
-      /* if(rowData.bucket === target){
-       *   console.log("level up!!")
-       *   this.dataBlob = this.dataBlob.map((book)=>
-       *     book.isbn === rowData.isbn ? {...book, bucket : null}: book)
-       * }else{*/
-        /* let newRowData =
-         *   {...rowData, bucket:target}
-         * this.dataBlob = [
-         *   newRowData,
-         *   ...this.dataBlob.filter((book)=>book.isbn!==rowData.isbn)
-         * ]*/
-        this.dataBlob = this.dataBlob.map((book)=>
-          book.isbn === rowData.isbn ? {...book, bucket : null}: book)
-        //console.log("array:",this.dataBlob)
-        //this.updateDataSource();
-        this.setState({
-          dataSource:this.state.dataSource.cloneWithRows(
-            ...this.toDataSource(this.dataBlob)
-          )
-        })
-      //}
-      //console.log("onclose",target)
+      this.dataBlob = this.dataBlob.map((book)=>
+        book.isbn === rowData.isbn ? {...book, bucket : null}: book)
+      this.setState({
+        dataSource:this.state.dataSource.cloneWithRows(
+          ...this.toDataSource(this.dataBlob)
+        )
+      })
     }
     const onCloseEnd=(target,rowData,sectionID,rowID, highlightRow)=>{
       this.dataBlob = [
         {...rowData,bucket:target},
         ...this.dataBlob.filter((book)=>book.isbn!==rowData.isbn)
       ]
-        /* this.dataBlob.map((book)=>
-           book.isbn === rowData.isbn ? {...book, bucket : null}: book)*/
-      /* let newRowData =
-        *   {...rowData, bucket:target}
-      * this.dataBlob = [
-        *   newRowData,
-        *   ...this.dataBlob.filter((book)=>book.isbn!==rowData.isbn)
-        */
       this.setState({
         dataSource:this.state.dataSource.cloneWithRows(
           ...this.toDataSource(this.dataBlob)
         )
       })
-      //}
-      //console.log("onclose",target)
     }
 
    return (
@@ -1742,12 +1710,14 @@ class BookListView7_test extends React.Component {
           dataSource={this.state.dataSource}
           bucket="done"
           onCloseStart={onClose}
+          onCloseEnd={onCloseEnd}
         />
         <Text>borrowed</Text>
         <BookListView2
           dataSource={this.state.dataSource}
           bucket="borrowed"
           onCloseStart={onClose}
+          onCloseEnd={onCloseEnd}
         />
       </View>
     )

@@ -564,7 +564,13 @@ class SwipeableRow4 extends React.Component {
         close={close}
         onCloseEnd={()=>{
             this.panX.setValue(0.1)
-            onCloseEnd()
+            this.index = 0;
+            this.setState({
+              positiveSwipe: true,
+              releasing: false,
+              leftBackgroundColor: 0,
+              rightBackgroundColor: 0,
+            },onCloseEnd)
           }}
       >
       <PanResponderView2
@@ -599,7 +605,6 @@ class SwipeableRow4 extends React.Component {
               )
             }
           }}>
-        {this.state.positiveSwipe &&
          <Animated.ExpandableView
           key="left"
           style={{
@@ -621,12 +626,11 @@ class SwipeableRow4 extends React.Component {
               //console.log("index change")
               //same timing as renderElement? -> no
             }}
-          renderElement={renderLeftAction}
-        />}
+           renderElement={this.state.positiveSwipe ? renderLeftAction : emptyFunction}
+        />
         <View style={{width:WIDTH}}>
           {children}
         </View>
-        {!this.state.positiveSwipe &&
         <Animated.ExpandableView
           key="right"
           style={{
@@ -644,9 +648,8 @@ class SwipeableRow4 extends React.Component {
               //console.log("ch2:",i)
               this.index = i;
             }}
-          renderElement={renderRightAction}
+          renderElement={!this.state.positiveSwipe ? renderRightAction : emptyFunction}
         />
-        }
       </PanResponderView2>
       </CloseableView2>
     )
