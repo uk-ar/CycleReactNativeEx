@@ -553,7 +553,7 @@ class SwipeableRow4 extends React.Component {
     this.index = 0;
   }
   render(){
-    const { onClose, //width,
+    const { onCloseStart, onCloseEnd,
             renderLeftAction, renderRightAction,
             children,close,
             ...props } = this.props;//  ...Closable.propTypes,
@@ -564,6 +564,7 @@ class SwipeableRow4 extends React.Component {
         close={close}
         onCloseEnd={()=>{
             this.panX.setValue(0.1)
+            onCloseEnd()
           }}
       >
       <PanResponderView2
@@ -594,7 +595,7 @@ class SwipeableRow4 extends React.Component {
                                 this.state.positiveSwipe ?
                                 {toValue: WIDTH, duration:300} :
                                 {toValue:-WIDTH, duration:300})
-                        .start(onClose)
+                        .start(onCloseStart)
               )
             }
           }}>
@@ -654,13 +655,13 @@ class SwipeableRow4 extends React.Component {
 
 SwipeableRow4.propTypes = {
   ...View.propTypes,
-  onClose:  React.PropTypes.func.isRequired,
+  onCloseStart:  React.PropTypes.func.isRequired,
   renderLeftAction: React.PropTypes.func.isRequired,
   renderRightAction: React.PropTypes.func.isRequired,
 };
 SwipeableRow4.defaultProps = {
   ...View.defaultProps,
-  onClose: emptyFunction,
+  onCloseStart: emptyFunction,
   renderLeftAction: emptyFunction,
   renderRightAction: emptyFunction,
 };
