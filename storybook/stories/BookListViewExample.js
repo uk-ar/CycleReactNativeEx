@@ -1577,12 +1577,12 @@ class BookRow2 extends React.Component {
         close={rowData.bucket!==bucket}
         onCloseStart={()=>{
             const {rowData,sectionID,rowID, highlightRow,bucket,onCloseStart}=this.props;
-            //console.log("target",this.target,rowData,this.props)
+            //console.log("close start",this.target,rowData,this.props)
             onCloseStart(this.target,rowData,sectionID,rowID, highlightRow)
           }}
         onCloseEnd={()=>{
             const {rowData,sectionID,rowID, highlightRow,bucket,onCloseEnd}=this.props;
-            //console.log("target",this.target,rowData,this.props)
+            //console.log("close end",this.target,rowData,this.props)
             onCloseEnd(this.target,rowData,sectionID,rowID, highlightRow)
           }}
           renderLeftAction={(i, indexLock)=>{
@@ -1688,6 +1688,7 @@ class BookListView7_test extends React.Component {
         {...rowData,bucket:target},
         ...this.dataBlob.filter((book)=>book.isbn!==rowData.isbn)
       ]
+      //console.log("th",this.dataBlob,target)
       this.setState({
         dataSource:this.state.dataSource.cloneWithRows(
           ...this.toDataSource(this.dataBlob)
