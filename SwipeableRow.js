@@ -385,6 +385,7 @@ class PanResponderView2 extends React.Component {
     }
     const { onSwipeMove, onSwipeStart, onSwipeEnd, onSwipeDirectionChange,
             ...otherProps } = props;
+    //bound by closure
     let positiveSwipe = true;
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => false,
@@ -396,8 +397,10 @@ class PanResponderView2 extends React.Component {
       // onShouldBlockNativeResponder: (evt, gestureState) => false,
       onPanResponderGrant: (evt, gestureState) => {
         onSwipeStart(gestureState);
+        console.log("grant")
       },
       onPanResponderMove: (evt, gestureState) => {
+        console.log("move")
         onSwipeMove(gestureState);
         if(0 < gestureState.dx && !positiveSwipe){
           positiveSwipe = true;
@@ -408,9 +411,11 @@ class PanResponderView2 extends React.Component {
         }
       },
       onPanResponderRelease: (evt, gestureState) => {
+        console.log("rel")
         onSwipeEnd(gestureState);
       },
       onPanResponderTerminate: (evt, gestureState) => {
+        console.log("term")
         onSwipeEnd(gestureState);
       },
     });
@@ -423,11 +428,14 @@ class PanResponderView2 extends React.Component {
      * }*/
   }
   render(){
-    const { onSwipeMove, onSwipeStart, onSwipeEnd, onSwipeDirectionChange,
+    const { onSwipeMove, onSwipeStart, onSwipeEnd, onSwipeDirectionChange,disabled,
             ...otherProps } = this.props;
+    //const panHandlers = disabled ? {} : this.panResponder.panHandlers;
+    const panHandlers = this.panResponder.panHandlers;
+    console.log("pan",panHandlers)
     return(
       <View
-        {...this.panResponder.panHandlers}
+        {...panHandlers}
         {...otherProps}
       />
     )
@@ -439,6 +447,7 @@ PanResponderView2.propTypes = {
   onSwipeEnd: React.PropTypes.func,
   onSwipeMove: React.PropTypes.func,
   onSwipeDirectionChange: React.PropTypes.func,
+  //disabled: React.PropTypes.bool,
 };
 PanResponderView2.defaultProps = {
   ...View.defaultProps,
@@ -446,6 +455,7 @@ PanResponderView2.defaultProps = {
   onSwipeEnd: emptyFunction,
   onSwipeMove: emptyFunction,
   onSwipeDirectionChange: emptyFunction,
+  //disabled: false,
 };
 
 class ExpandableView extends React.Component {
@@ -484,24 +494,23 @@ class ExpandableView extends React.Component {
     return(
       <View
         onLayout={Animated.event([
+            //interpolated value cannot add listener
             { nativeEvent: { layout: { width:this.panX } } }
           ])}
-        {...props/* width & backgroundColor */}
+        {...props/* style:width & backgroundColor */}
       >
         <Animated.View style={[{
             //alignItems:"stretch",//not working
-            //alignItems:"center",flex:1
             flex:1,
             overflow: "scroll",
             flexDirection: enterFromLeft ? "row" : "row-reverse",
-            justifyContent: this.state.index === 0 ? "flex-end" : "flex-start"
-            //backgroundColor:"blue"
+            justifyContent: this.state.index === 0 ? "flex-end" : "flex-start",
+            backgroundColor:"blue"
           }]}
-          removeClippedSubviews={false}
         >
           <Animated.View
-            onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
-                //console.log("onL1",enterFromLeft,this.state.index,this.state.thresholds,width,height)
+            onLayout={({nativeEvent:{layout:{ x, y, width, height }}}) => {
+                // create thresholds
                 if(!this.state.thresholds[this.state.index] &&
                    !this.props.indexLock &&
                    width !== 0 &&
@@ -514,12 +523,7 @@ class ExpandableView extends React.Component {
                   })
                 }
               }}
-            style={{}
-            /* indexLock && {
-               width: WIDTH,
-               //backgroundColor:"red"
-               //left: translateX
-               } */}
+            style={{backgroundColor:"pink"}}
           >
             { renderElement(this.state.index,indexLock) }
           </Animated.View>
@@ -554,8 +558,6 @@ class SwipeableRow4 extends React.Component {
       //index:0,
       positiveSwipe: true,
       releasing: false,
-      leftBackgroundColor: 0,
-      rightBackgroundColor: 0,
     }
     this.panX = new Animated.Value(0.1);
     this.index = 0;
@@ -565,8 +567,7 @@ class SwipeableRow4 extends React.Component {
             renderLeftAction, renderRightAction,
             children,close,
             ...props } = this.props;//  ...Closable.propTypes,
-    //        style={[style, { width: -10 }]}
-    //console.log("sw4")
+    //console.log("rel",this.state.releasing)
     return (
       <CloseableView2
         close={close}
@@ -574,9 +575,6 @@ class SwipeableRow4 extends React.Component {
             onCloseEnd()
             this.setState({
               positiveSwipe: true,
-              releasing: false,
-              leftBackgroundColor: 0,
-              rightBackgroundColor: 0,
             },()=>{
               this.panX.setValue(0.01)
               this.index = 0;
@@ -586,7 +584,7 @@ class SwipeableRow4 extends React.Component {
             })
           }}
       >
-      <PanResponderView2
+        <PanResponderView2
         style={{
           flexDirection: 'row',
           justifyContent: this.state.positiveSwipe ?
@@ -595,40 +593,47 @@ class SwipeableRow4 extends React.Component {
           //alignItems: 'stretch',
           width:WIDTH,
         }}
-        onSwipeMove={Animated.event([
+          onSwipeMove={Animated.event([
             {dx:this.panX}
           ])}
-        onSwipeDirectionChange={(pos)=>{
+          onSwipeDirectionChange={(pos)=>{
             //console.log("pos",pos)
             this.setState({positiveSwipe:pos})
           }}
         onSwipeEnd={(gestureState)=>{
-            //console.log("swiped",rowID,this.dataBlob[rowID].enable,rowData)
-            if(this.index === 0){
-              Animated.timing(this.panX,
-                              {toValue:0,duration:300})
-                      .start()
-            }else{
-              this.setState({releasing:true},()=>
+            //wait for update index
+            //InteractionManager.runAfterInteractions(() => {
+            //can not disable panresponder in panHandlers
+            if(this.state.releasing){return}
+            console.log("swiped",this.state.releasing)
+              //console.log("swiped",rowID,this.dataBlob[rowID].enable,rowData)
+              if(this.index === 0){
                 Animated.timing(this.panX,
-                                this.state.positiveSwipe ?
-                                {toValue: WIDTH, duration:300} :
-                                {toValue:-WIDTH, duration:300})
-                        .start(onCloseStart)
-              )
-            }
+                                {toValue:0,duration:300})
+                        .start()
+              }else{
+                this.setState({releasing:true},()=>{
+                  Animated.timing(this.panX,
+                                  this.state.positiveSwipe ?
+                                  {toValue: WIDTH, duration:300} :
+                                  {toValue:-WIDTH, duration:300})
+                          .start(()=>{
+                            //this.setState({releasing: false})
+                            onCloseStart()
+                          })
+                })
+              }
+            //})
           }}>
          <Animated.ExpandableView
           key="left"
           style={{
             width:this.panX.interpolate({
-              inputRange: [0  , 0.1, 1],
-              outputRange:[0.1, 0.1, 1],
+              inputRange: [0  , 1],
+              outputRange:[0.1, 1],
+              extrapolateLeft:'clamp',
             }),
             //can remove?
-            justifyContent: this.state.positiveSwipe ?
-                            'flex-start' : 'flex-end',
-            backgroundColor: this.state.leftBackgroundColor
             //backgroundColor:"red",
             //alignItems:"stretch"
           }}
@@ -649,13 +654,11 @@ class SwipeableRow4 extends React.Component {
           key="right"
           style={{
             width:Animated.multiply(this.panX, -1).interpolate({
-              inputRange: [0  , 0.1, 1],
-              outputRange:[0.1, 0.1, 1],
+              inputRange: [0  , 1],
+              outputRange:[0.1, 1],
+              extrapolateLeft:'clamp',
             }),
             //can remove?
-            justifyContent: this.state.positiveSwipe ?
-                  'flex-start' : 'flex-end',
-            flexDirection:"row-reverse",
             backgroundColor: "yellow"//this.state.rightBackgroundColor
           }}
           enterFromLeft={false}

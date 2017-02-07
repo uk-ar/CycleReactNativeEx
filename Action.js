@@ -165,4 +165,42 @@ Action2.defaultProps = {
   //onBackgroundColorChange: emptyFunction,
 };
 
+class Action3 extends React.PureComponent {
+  render(){
+    const { icon, text, backgroundColor, target, style, ...props } = this.props
+    return (
+      <Stylish.View
+        style={[{
+            backgroundColor:this.actionProps[index].backgroundColor,
+            flex:1, //verticalCenter
+            paddingVertical:10,
+          },left ? {paddingLeft:10} : {paddingRight:10}]}
+        animationConfig={{duration:300}}
+      >
+        <View style={{flex:1}}/>
+        <View
+          style={indexLock && {width:WIDTH}}>
+          <FAIcon
+            name={icon} size={20}
+            style={{
+              //margin:5,
+            }}
+          />
+          <View style={{width:5}}></View>
+          <Text
+            style={{
+              //numberOfLines={1}
+              alignSelf:"center",
+              //position:"absolute",
+            }}
+          >
+            {text || ""}
+          </Text>
+        </View>
+        <View style={{flex:1}}/>
+      </Stylish.View>
+    );
+  }
+}
+
 module.exports = { Action, Action2, genActions2 };

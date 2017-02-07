@@ -11,6 +11,7 @@ import {
   UIManager,
   Dimensions,
   Easing,
+  InteractionManager,
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import util from 'util'
@@ -1585,26 +1586,25 @@ class BookRow2 extends React.Component {
             //console.log("close end",this.target,rowData,this.props)
             onCloseEnd(this.target,rowData,sectionID,rowID, highlightRow)
           }}
-          renderLeftAction={(i, indexLock)=>{
-              //i,indexLock->next bucket
-              //console.log("left",leftActions[i])
-              this.target=leftActions[i].target
-              return(
-                <Action2 index={i} left={true}
+        renderLeftAction={(i, indexLock)=>{
+            //i,indexLock->next bucket
+            //console.log("left",leftActions[i])
+            this.target=leftActions[i].target
+            return(
+              <Action2 index={i} left={true}
                                bucket={bucket}
                                indexLock={indexLock}/>
-              )
-            }}
-          renderRightAction={(i, indexLock)=>{
-              //console.log("right",rightActions[i])
-              this.target=rightActions[i].target
-              return(<Action2 index={i} left={false}
+            )
+          }}
+        renderRightAction={(i, indexLock)=>{
+            this.target=rightActions[i].target
+            return(<Action2 index={i} left={false}
                                bucket={bucket}
                                indexLock={indexLock}/>)
-            }}
-        >
+          }}
+      >
             {debugView("main")(rowData,sectionID,rowID)}
-        </SwipeableRow4>
+      </SwipeableRow4>
     )
   }
 }
@@ -1689,10 +1689,12 @@ class BookListView7_test extends React.Component {
         ...this.dataBlob.filter((book)=>book.isbn!==rowData.isbn)
       ]
       //console.log("th",this.dataBlob,target)
-      this.setState({
-        dataSource:this.state.dataSource.cloneWithRows(
-          ...this.toDataSource(this.dataBlob)
-        )
+      InteractionManager.runAfterInteractions(() => {
+        this.setState({
+          dataSource:this.state.dataSource.cloneWithRows(
+            ...this.toDataSource(this.dataBlob)
+          )
+        })
       })
     }
 
