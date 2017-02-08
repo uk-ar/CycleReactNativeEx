@@ -386,36 +386,37 @@ class PanResponderView2 extends React.Component {
     const { onSwipeMove, onSwipeStart, onSwipeEnd, onSwipeDirectionChange,
             ...otherProps } = props;
     //bound by closure
-    let positiveSwipe = true;
+    let positiveSwipe = null;
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => false,
       // for select cell
       onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
-      onMoveShouldSetPanResponder: isSwipeHorizontal,
+      //isSwipeHorizontal,
+      onMoveShouldSetPanResponder: (evt, gestureState) => false,
       onMoveShouldSetPanResponderCapture: isSwipeHorizontal,
       // no effect
       // onShouldBlockNativeResponder: (evt, gestureState) => false,
       onPanResponderGrant: (evt, gestureState) => {
         onSwipeStart(gestureState);
-        console.log("grant")
+        //console.log("grant",gestureState)
       },
       onPanResponderMove: (evt, gestureState) => {
-        console.log("move")
+        //console.log("move",gestureState)
         onSwipeMove(gestureState);
-        if(0 < gestureState.dx && !positiveSwipe){
+        if(0 < gestureState.dx && positiveSwipe!==true){
           positiveSwipe = true;
           onSwipeDirectionChange(true);
-        }else if(gestureState.dx <= 0 && positiveSwipe){
+        }else if(gestureState.dx <= 0 && positiveSwipe!==false){
           positiveSwipe = false;
           onSwipeDirectionChange(false);
         }
       },
       onPanResponderRelease: (evt, gestureState) => {
-        console.log("rel")
+        //console.log("rel")
         onSwipeEnd(gestureState);
       },
       onPanResponderTerminate: (evt, gestureState) => {
-        console.log("term")
+        //console.log("term")
         onSwipeEnd(gestureState);
       },
     });
@@ -428,14 +429,19 @@ class PanResponderView2 extends React.Component {
      * }*/
   }
   render(){
-    const { onSwipeMove, onSwipeStart, onSwipeEnd, onSwipeDirectionChange,disabled,
+    const { onSwipeMove, onSwipeStart, onSwipeEnd, onSwipeDirectionChange,
+            disabled,
             ...otherProps } = this.props;
     //const panHandlers = disabled ? {} : this.panResponder.panHandlers;
     const panHandlers = this.panResponder.panHandlers;
-    console.log("pan",panHandlers)
+    const panHandlers2 = disabled ? {
+      onMoveShouldSetResponderCapture:(evt)=>false,
+    }: {}
+    //console.log("pan",disabled)
     return(
       <View
         {...panHandlers}
+        {...panHandlers2}
         {...otherProps}
       />
     )
@@ -447,7 +453,7 @@ PanResponderView2.propTypes = {
   onSwipeEnd: React.PropTypes.func,
   onSwipeMove: React.PropTypes.func,
   onSwipeDirectionChange: React.PropTypes.func,
-  //disabled: React.PropTypes.bool,
+  disabled: React.PropTypes.bool,
 };
 PanResponderView2.defaultProps = {
   ...View.defaultProps,
@@ -455,7 +461,7 @@ PanResponderView2.defaultProps = {
   onSwipeEnd: emptyFunction,
   onSwipeMove: emptyFunction,
   onSwipeDirectionChange: emptyFunction,
-  //disabled: false,
+  disabled: false,
 };
 
 class ExpandableView extends React.Component {
@@ -480,12 +486,15 @@ class ExpandableView extends React.Component {
       if (nextIndex !== this.state.index &&
           !this.props.indexLock &&
           this.state.thresholds.length !== 0) {
-        this.setState({index:nextIndex},()=>this.props.onIndexChage(nextIndex))
+        this.setState({index:nextIndex}
+          //,()=>
+          //this.props.onIndexChange(nextIndex)
+        )
       }
     })
   }
   render(){
-    const { onIndexChage,
+    const { //onIndexChange,
             renderElement, indexLock, enterFromLeft,
             ...props } = this.props;//  ...Closable.propTypes,
     //console.log("panx",this.panX)
@@ -535,7 +544,7 @@ class ExpandableView extends React.Component {
 
 ExpandableView.propTypes = {
   ...View.propTypes,
-  onIndexChage: React.PropTypes.func,
+  //onIndexChange: React.PropTypes.func,
   renderElement: React.PropTypes.func,
   indexLock: React.PropTypes.bool,
   enterFromLeft: React.PropTypes.bool,
@@ -543,7 +552,7 @@ ExpandableView.propTypes = {
 };
 ExpandableView.defaultProps = {
   ...View.defaultProps,
-  onIndexChage: emptyFunction,
+  //onIndexChange: emptyFunction,
   renderElement: emptyFunction,
   indexLock: false,
   enterFromLeft: true,
@@ -575,6 +584,7 @@ class SwipeableRow4 extends React.Component {
             onCloseEnd()
             this.setState({
               positiveSwipe: true,
+              releasing: false,
             },()=>{
               this.panX.setValue(0.01)
               this.index = 0;
@@ -585,6 +595,7 @@ class SwipeableRow4 extends React.Component {
           }}
       >
         <PanResponderView2
+          disabled={this.state.releasing}
         style={{
           flexDirection: 'row',
           justifyContent: this.state.positiveSwipe ?
@@ -597,7 +608,7 @@ class SwipeableRow4 extends React.Component {
             {dx:this.panX}
           ])}
           onSwipeDirectionChange={(pos)=>{
-            //console.log("pos",pos)
+              //console.log("pos",pos)
             this.setState({positiveSwipe:pos})
           }}
         onSwipeEnd={(gestureState)=>{
@@ -605,7 +616,7 @@ class SwipeableRow4 extends React.Component {
             //InteractionManager.runAfterInteractions(() => {
             //can not disable panresponder in panHandlers
             if(this.state.releasing){return}
-            console.log("swiped",this.state.releasing)
+            //console.log("swiped",this.state.releasing)
               //console.log("swiped",rowID,this.dataBlob[rowID].enable,rowData)
               if(this.index === 0){
                 Animated.timing(this.panX,
@@ -617,9 +628,15 @@ class SwipeableRow4 extends React.Component {
                                   this.state.positiveSwipe ?
                                   {toValue: WIDTH, duration:300} :
                                   {toValue:-WIDTH, duration:300})
-                          .start(()=>{
-                            //this.setState({releasing: false})
-                            onCloseStart()
+                          .start(({finished:finished})=>{
+                            //console.log("fin:",finished)
+                            //set releasing state when closing end
+                            //this.setState({releasing: false},()=>{
+                              //if(finished){
+                              //Swipe end
+                              onCloseStart()
+                              //}
+                          //})
                           })
                 })
               }
@@ -639,13 +656,17 @@ class SwipeableRow4 extends React.Component {
           }}
           enterFromLeft={true}
           indexLock={this.state.releasing}
-          onIndexChage={(i)=>{
-              this.index = i;
+          onIndexChange={(i)=>{
+              //this.index = i;
               //console.log("ch1:",i,this.index)
               //console.log("index change")
               //same timing as renderElement? -> no
             }}
-           renderElement={this.state.positiveSwipe ? renderLeftAction : emptyFunction}
+           renderElement={this.state.positiveSwipe ?
+                          (i,indexLock)=>{
+                            this.index = i
+                            return renderLeftAction(i,indexLock)
+                          } : emptyFunction}
         />
         <View style={{width:WIDTH}}>
           {children}
@@ -663,12 +684,15 @@ class SwipeableRow4 extends React.Component {
           }}
           enterFromLeft={false}
           indexLock={this.state.releasing}
-          onIndexChage={(i)=>{
+          onIndexChange={(i)=>{
               //console.log("ch2:",i)
-              this.index = i;
+              //this.index = i;
             }}
           renderElement={!this.state.positiveSwipe ?
-                         renderRightAction : emptyFunction}
+                         (i,indexLock)=>{
+                           this.index = i
+                           return renderRightAction(i,indexLock)
+                         } : emptyFunction}
         />
       </PanResponderView2>
       </CloseableView2>

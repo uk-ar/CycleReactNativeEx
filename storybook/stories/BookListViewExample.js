@@ -26,7 +26,7 @@ import Welcome from './Welcome';
 
 import {BookCell} from '../../BookCell';
 import {BookRow1} from '../../BookRow';
-import {genActions2,Action,Action2} from '../../Action';
+import {genActions2,Action,Action2,Action3} from '../../Action';
 import {BookListView1,BookListView} from '../../BookListView';
 import { LayoutableView, CloseableView, CloseableView2 } from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow4,SwipeableRow3} from '../../SwipeableRow';
@@ -1582,22 +1582,30 @@ class BookRow2 extends React.Component {
             onCloseStart(this.target,rowData,sectionID,rowID, highlightRow)
           }}
         onCloseEnd={()=>{
-            const {rowData,sectionID,rowID, highlightRow,bucket,onCloseEnd}=this.props;
+            const { rowData, sectionID, rowID, highlightRow, bucket,
+                    onCloseEnd }=this.props;
             //console.log("close end",this.target,rowData,this.props)
             onCloseEnd(this.target,rowData,sectionID,rowID, highlightRow)
           }}
         renderLeftAction={(i, indexLock)=>{
             //i,indexLock->next bucket
-            //console.log("left",leftActions[i])
+            //const { left, icon, text, backgroundColor, target } = this.props
+          //console.log("left",leftActions[i],indexLock)
+          //don't update target when indexLock
+          if(!indexLock){
             this.target=leftActions[i].target
-            return(
-              <Action2 index={i} left={true}
-                               bucket={bucket}
-                               indexLock={indexLock}/>
-            )
+          }
+          return(
+            <Action2 index={i} left={true}
+              bucket={bucket}
+              indexLock={indexLock}/>
+          )
           }}
         renderRightAction={(i, indexLock)=>{
+          //don't update target when indexLock
+          if(!indexLock){
             this.target=rightActions[i].target
+          }
             return(<Action2 index={i} left={false}
                                bucket={bucket}
                                indexLock={indexLock}/>)

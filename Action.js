@@ -167,11 +167,11 @@ Action2.defaultProps = {
 
 class Action3 extends React.PureComponent {
   render(){
-    const { icon, text, backgroundColor, target, style, ...props } = this.props
+    const { left, icon, text, backgroundColor, target, ...props } = this.props
     return (
       <Stylish.View
         style={[{
-            backgroundColor:this.actionProps[index].backgroundColor,
+            backgroundColor:backgroundColor,
             flex:1, //verticalCenter
             paddingVertical:10,
           },left ? {paddingLeft:10} : {paddingRight:10}]}
@@ -179,7 +179,10 @@ class Action3 extends React.PureComponent {
       >
         <View style={{flex:1}}/>
         <View
-          style={indexLock && {width:WIDTH}}>
+          style={left ?
+                 {flexDirection:"row"} :
+                 {flexDirection:"row-reverse"}
+            /* row or row-reverse */}>
           <FAIcon
             name={icon} size={20}
             style={{
@@ -203,4 +206,4 @@ class Action3 extends React.PureComponent {
   }
 }
 
-module.exports = { Action, Action2, genActions2 };
+module.exports = { Action, Action2,Action3, genActions2 };
