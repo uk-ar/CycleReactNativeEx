@@ -140,7 +140,8 @@ class Action2 extends React.PureComponent {
           backgroundColor:this.actionProps[index].backgroundColor,
           flex:1, //verticalCenter
           paddingVertical:10,
-          },left ? {paddingLeft:10} : {paddingRight:10}]}
+          }, left ? {paddingLeft:10} : {paddingRight:10}
+          ]}
         animationConfig={{duration:300}}
       >
         <View style={{flex:1}}/>
@@ -165,6 +166,7 @@ Action2.defaultProps = {
   //onBackgroundColorChange: emptyFunction,
 };
 
+//TODO:
 class Action3 extends React.PureComponent {
   render(){
     const { left, icon, text, backgroundColor, target, ...props } = this.props

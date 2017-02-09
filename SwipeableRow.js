@@ -401,7 +401,7 @@ class PanResponderView2 extends React.Component {
         //console.log("grant",gestureState)
       },
       onPanResponderMove: (evt, gestureState) => {
-        //console.log("move",gestureState)
+        //console.log("move",positiveSwipe)
         onSwipeMove(gestureState);
         if(0 < gestureState.dx && positiveSwipe!==true){
           positiveSwipe = true;
@@ -583,7 +583,7 @@ class SwipeableRow4 extends React.Component {
         onCloseEnd={()=>{
             onCloseEnd()
             this.setState({
-              positiveSwipe: true,
+              //positiveSwipe: true,
               releasing: false,
             },()=>{
               this.panX.setValue(0.01)
@@ -646,8 +646,8 @@ class SwipeableRow4 extends React.Component {
           key="left"
           style={{
             width:this.panX.interpolate({
-              inputRange: [0  , 1],
-              outputRange:[0.1, 1],
+              inputRange: [0  , WIDTH],
+              outputRange:[0.1, WIDTH],
               extrapolateLeft:'clamp',
             }),
             //can remove?
@@ -675,8 +675,8 @@ class SwipeableRow4 extends React.Component {
           key="right"
           style={{
             width:Animated.multiply(this.panX, -1).interpolate({
-              inputRange: [0  , 1],
-              outputRange:[0.1, 1],
+              inputRange: [0  , WIDTH],
+              outputRange:[0.1, WIDTH],
               extrapolateLeft:'clamp',
             }),
             //can remove?
