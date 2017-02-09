@@ -27,7 +27,7 @@ import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {BookRow1} from '../../BookRow';
 import {genActions2,Action,Action2,Action3} from '../../Action';
-import {BookListView1,BookListView} from '../../BookListView';
+import {BookListView1,BookListView2} from '../../BookListView';
 import { LayoutableView, CloseableView, CloseableView2 } from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow4,SwipeableRow3} from '../../SwipeableRow';
 import {SwipeableListView} from '../../SwipeableListView';
@@ -1560,104 +1560,6 @@ class BookListView6_test extends React.Component {
   }
 }
 
-//for target bucket handling
-class BookRow2 extends React.Component {
-  constructor(props) {
-    super(props);
-    this.target=null;
-  }
-  render(){
-    const {bucket,onCloseStart,onCloseEnd,close}=this.props;
-    const {leftActions,rightActions} = genActions2(bucket);
-    //console.log("book row",rowData)
-    return (
-      <SwipeableRow4
-        close={close}
-        onCloseStart={()=>{
-            const { onCloseStart }=this.props;
-            //console.log("close start",this.target,rowData,this.props)
-            onCloseStart(this.target)//,rowData,sectionID,rowID, highlightRow
-          }}
-        onCloseEnd={()=>{
-            const { onCloseEnd }=this.props;
-            //console.log("close end",this.target,rowData,this.props)
-            onCloseEnd(this.target)//,rowData,sectionID,rowID, highlightRow
-          }}
-        renderLeftAction={(i, indexLock)=>{
-            //i,indexLock->next bucket
-            //const { left, icon, text, backgroundColor, target } = this.props
-          //console.log("left",leftActions[i],indexLock)
-            //don't update target when indexLock
-            if(!indexLock && leftActions[i]){
-              this.target=leftActions[i].target
-            }
-            return(
-              <Action2 index={i} left={true}
-              bucket={bucket}
-              indexLock={indexLock}/>
-            )
-          }}
-        renderRightAction={(i, indexLock)=>{
-            //don't update target when indexLock
-            //console.log("i,index:", i, indexLock)
-            if(!indexLock && rightActions[i]){
-              this.target=rightActions[i].target
-            }
-            return(<Action2 index={i} left={false}
-                               bucket={bucket}
-                               indexLock={indexLock}/>)
-          }}
-      >
-              {this.props.children}
-      </SwipeableRow4>
-    )
-  }
-}
-
-//For cycle.js
-class BookListView2 extends React.Component {
-  render(){
-    //console.log("a",this.state.dataSource)
-    //this.dataBlob = this.dataBlob.cloneWithRows(this.dataBlob)
-    //let generateActions= ()=>genActions2('search')
-    const { dataSource, onCloseStart, onCloseEnd, bucket }=this.props;
-    return (
-      <ListView
-        dataSource={dataSource}
-        scrollEnabled={false}
-        renderRow={
-          (rowData,sectionID,rowID, highlightRow)=>{
-            return(
-              <BookRow2
-                close={rowData.bucket!==bucket}
-                bucket={bucket}
-                onCloseStart={(target)=>
-                  onCloseStart(target,rowData,sectionID,rowID, highlightRow)}
-                onCloseEnd={(target)=>
-                  onCloseEnd(target,rowData,sectionID,rowID, highlightRow)}
-                           >
-                <BookCell book={rowData} />
-              </BookRow2>
-            )
-          }}
-      />
-    )
-  }
-}
-
-BookListView2.propTypes = {
-  dataSource: React.PropTypes.object,
-  bucket: React.PropTypes.string.isRequired,
-  onCloseStart: React.PropTypes.func,
-  onCloseEnd: React.PropTypes.func,
-};
-
-BookListView2.defaultProps = {
-  onCloseStart: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
-  onCloseEnd: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
-};
-
-
 class BookListView7_test extends React.Component {
   constructor(props) {
     super(props);
@@ -1683,11 +1585,6 @@ class BookListView7_test extends React.Component {
     //console.log("ndb",nextDataBlob)
     return [nextDataBlob,dataBlob.map((book)=>book.isbn)]
   }
-  /* updateDataSource(){
-   *   this.setState({
-   *     dataSource:this.state.dataSource.cloneWithRows(this.dataBlob)
-   *   })
-   * }*/
   render(){
     const onClose=(target,rowData,sectionID,rowID, highlightRow)=>{
       this.dataBlob = this.dataBlob.map((book)=>

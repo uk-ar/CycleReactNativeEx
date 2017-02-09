@@ -19,6 +19,8 @@ const {
 } = Dimensions.get('window');
 
 import { SwipeableListView } from './SwipeableListView';
+import { BookRow2 } from './BookRow';
+import { BookCell } from './BookCell';
 
 const RCTUIManager = require('NativeModules').UIManager;
 
@@ -350,4 +352,47 @@ class BookListView_old extends React.Component {
   }
 }
 
-module.exports = { BookListView, BookListView1 };
+//For cycle.js
+class BookListView2 extends React.Component {
+  render(){
+    //console.log("a",this.state.dataSource)
+    //this.dataBlob = this.dataBlob.cloneWithRows(this.dataBlob)
+    //let generateActions= ()=>genActions2('search')
+    const { dataSource, onCloseStart, onCloseEnd, bucket }=this.props;
+    return (
+      <ListView
+        dataSource={dataSource}
+        scrollEnabled={false}
+        renderRow={
+          (rowData,sectionID,rowID, highlightRow)=>{
+            return(
+              <BookRow2
+                close={rowData.bucket!==bucket}
+                bucket={bucket}
+                onCloseStart={(target)=>
+                  onCloseStart(target,rowData,sectionID,rowID, highlightRow)}
+                onCloseEnd={(target)=>
+                  onCloseEnd(target,rowData,sectionID,rowID, highlightRow)}
+                           >
+                <BookCell book={rowData} />
+              </BookRow2>
+            )
+          }}
+      />
+    )
+  }
+}
+
+BookListView2.propTypes = {
+  dataSource: React.PropTypes.object,
+  bucket: React.PropTypes.string.isRequired,
+  onCloseStart: React.PropTypes.func,
+  onCloseEnd: React.PropTypes.func,
+};
+
+BookListView2.defaultProps = {
+  onCloseStart: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
+  onCloseEnd: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
+};
+
+module.exports = { BookListView, BookListView1, BookListView2 };

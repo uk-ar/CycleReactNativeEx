@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { SwipeableRow3 } from './SwipeableRow';
-import { genActions2 } from './Action';
+import { SwipeableRow3,SwipeableRow4 } from './SwipeableRow';
+import { genActions2,Action2 } from './Action';
 
 class BookRow1 extends React.Component {
   constructor(props) {
@@ -19,4 +19,59 @@ class BookRow1 extends React.Component {
     );
   }
 }
-module.exports = { BookRow1 };
+
+//for target bucket handling
+class BookRow2 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.target=null;
+  }
+  render(){
+    const {bucket,onCloseStart,onCloseEnd,close}=this.props;
+    const {leftActions,rightActions} = genActions2(bucket);
+    //console.log("book row",rowData)
+    return (
+      <SwipeableRow4
+        close={close}
+        onCloseStart={()=>{
+            const { onCloseStart }=this.props;
+            //console.log("close start",this.target,rowData,this.props)
+            onCloseStart(this.target)//,rowData,sectionID,rowID, highlightRow
+          }}
+        onCloseEnd={()=>{
+            const { onCloseEnd }=this.props;
+            //console.log("close end",this.target,rowData,this.props)
+            onCloseEnd(this.target)//,rowData,sectionID,rowID, highlightRow
+          }}
+        renderLeftAction={(i, indexLock)=>{
+            //i,indexLock->next bucket
+            //const { left, icon, text, backgroundColor, target } = this.props
+            //console.log("left",leftActions[i],indexLock)
+            //don't update target when indexLock
+            if(!indexLock && leftActions[i]){
+              this.target=leftActions[i].target
+            }
+            return(
+              <Action2 index={i} left={true}
+              bucket={bucket}
+              indexLock={indexLock}/>
+            )
+          }}
+        renderRightAction={(i, indexLock)=>{
+            //don't update target when indexLock
+            //console.log("i,index:", i, indexLock)
+            if(!indexLock && rightActions[i]){
+              this.target=rightActions[i].target
+            }
+            return(<Action2 index={i} left={false}
+                               bucket={bucket}
+                               indexLock={indexLock}/>)
+          }}
+      >
+              {this.props.children}
+      </SwipeableRow4>
+    )
+  }
+}
+
+module.exports = { BookRow1,BookRow2 };
