@@ -27,7 +27,7 @@ import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {BookRow1} from '../../BookRow';
 import {genActions2,Action,Action2,Action3} from '../../Action';
-import {BookListView1,BookListView2} from '../../BookListView';
+import {BookListView1,BookListView2,BooksDataSource} from '../../BookListView';
 import { LayoutableView, CloseableView, CloseableView2 } from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow4,SwipeableRow3} from '../../SwipeableRow';
 import {SwipeableListView} from '../../SwipeableListView';
@@ -1586,7 +1586,8 @@ class BookListView7_test extends React.Component {
     return [nextDataBlob,dataBlob.map((book)=>book.isbn)]
   }
   render(){
-    const onClose=(target,rowData,sectionID,rowID, highlightRow)=>{
+    const onCloseStart=(target,rowData,sectionID,rowID, highlightRow)=>{
+      //keep order when close start
       this.dataBlob = this.dataBlob.map((book)=>
         book.isbn === rowData.isbn ? {...book, bucket : null}: book)
       this.setState({
@@ -1611,30 +1612,95 @@ class BookListView7_test extends React.Component {
     }
 
    return (
-      <View
+     <View
         style={{paddingTop:20}}>
         <Text>liked</Text>
         <BookListView2
           dataSource={this.state.dataSource}
           bucket="liked"
-          onCloseStart={onClose}
+          onCloseStart={onCloseStart}
           onCloseEnd={onCloseEnd}
         />
         <Text>done</Text>
         <BookListView2
           dataSource={this.state.dataSource}
           bucket="done"
-          onCloseStart={onClose}
+          onCloseStart={onCloseStart}
           onCloseEnd={onCloseEnd}
         />
         <Text>borrowed</Text>
         <BookListView2
           dataSource={this.state.dataSource}
           bucket="borrowed"
-          onCloseStart={onClose}
+          onCloseStart={onCloseStart}
           onCloseEnd={onCloseEnd}
         />
       </View>
+    )
+  }
+}
+
+class BookListView8_test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      books : [
+        {isbn:1,title:"foo",bucket:"liked"},
+        {isbn:2,title:"bar",bucket:"done" },
+        {isbn:3,bucket:"liked"},
+      ]
+    }
+  }
+  render(){
+    const onCloseStart=(target,rowData,sectionID,rowID, highlightRow)=>{
+      //keep order when close start
+      //this.dataBlob =
+      this.setState({
+        books: this.state.books.map((book)=>
+          book.isbn === rowData.isbn ? {...book, bucket : null}: book)
+      })
+    }
+    const onCloseEnd=(target,rowData,sectionID,rowID, highlightRow)=>{
+      this.setState({
+        books: [{...rowData,bucket:target},
+                ...this.state.books.filter((book)=>book.isbn!==rowData.isbn)
+        ]
+      })
+      //console.log("th",this.dataBlob,target)
+    }
+
+    return (
+      <BooksDataSource
+        books={this.state.books}
+        renderListView={(dataSource)=>{
+            return(
+              <View
+        style={{paddingTop:20}}>
+                <Text>liked</Text>
+                <BookListView2
+          dataSource={dataSource}
+          bucket="liked"
+          onCloseStart={onCloseStart}
+          onCloseEnd={onCloseEnd}
+                     />
+                <Text>done</Text>
+                <BookListView2
+          dataSource={dataSource}
+          bucket="done"
+          onCloseStart={onCloseStart}
+          onCloseEnd={onCloseEnd}
+                     />
+                <Text>borrowed</Text>
+                <BookListView2
+          dataSource={dataSource}
+          bucket="borrowed"
+          onCloseStart={onCloseStart}
+          onCloseEnd={onCloseEnd}
+                     />
+              </View>
+            )
+          }}
+      />
     )
   }
 }
@@ -1657,4 +1723,7 @@ storiesOf('BookListView2', module)
   })
   .add('BookListView7',() => {
     return(<BookListView7_test />)
+  })
+  .add('BookListView8',() => {
+    return(<BookListView8_test />)
   })

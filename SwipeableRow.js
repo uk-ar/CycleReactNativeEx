@@ -15,7 +15,7 @@ import emptyFunction from 'fbjs/lib/emptyFunction';
 
 import Stylish from 'react-native-stylish';
 
-import { LayoutableView, CloseableView2 } from './Closeable';
+import { CloseableView, LayoutableView, CloseableView2 } from './Closeable';
 import { Action } from './Action';
 
 const {
@@ -577,10 +577,12 @@ class SwipeableRow4 extends React.Component {
             children,close,
             ...props } = this.props;//  ...Closable.propTypes,
     //console.log("rel",this.state.releasing)
+    //console.log("cl:",close)
     return (
       <CloseableView2
         close={close}
         onCloseEnd={()=>{
+            //console.log("close end?")
             onCloseEnd()
             this.setState({
               //positiveSwipe: true,

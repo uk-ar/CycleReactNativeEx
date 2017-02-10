@@ -1,5 +1,15 @@
 import React from 'react';
 
+import {
+  View,
+  Text,
+  ListView,
+  ScrollView,
+  findNodeHandle,
+  TouchableHighlight,
+  StyleSheet,
+} from 'react-native';
+
 import { SwipeableRow3,SwipeableRow4 } from './SwipeableRow';
 import { genActions2,Action2 } from './Action';
 
@@ -29,7 +39,7 @@ class BookRow2 extends React.Component {
   render(){
     const {bucket,onCloseStart,onCloseEnd,close}=this.props;
     const {leftActions,rightActions} = genActions2(bucket);
-    //console.log("book row",rowData)
+    //console.log("row",close)
     return (
       <SwipeableRow4
         close={close}
@@ -40,7 +50,7 @@ class BookRow2 extends React.Component {
           }}
         onCloseEnd={()=>{
             const { onCloseEnd }=this.props;
-            //console.log("close end",this.target,rowData,this.props)
+            //console.log("close end",this.target,this.props)
             onCloseEnd(this.target)//,rowData,sectionID,rowID, highlightRow
           }}
         renderLeftAction={(i, indexLock)=>{

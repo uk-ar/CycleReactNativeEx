@@ -395,4 +395,35 @@ BookListView2.defaultProps = {
   onCloseEnd: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
 };
 
-module.exports = { BookListView, BookListView1, BookListView2 };
+function toDataSource(dataBlob){
+  const nextDataBlob=dataBlob.reduce((acc,book)=>{
+    acc[book.isbn] = book;
+    return acc;
+  },{})
+  //console.log("ndb",nextDataBlob)
+  return [nextDataBlob,dataBlob.map((book)=>book.isbn)]
+}
+
+class BooksDataSource extends React.Component {
+  constructor(props) {
+    super(props)
+    this.dataSource = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+    })
+  }
+  render() {
+    //console.log("books:",this.props.books)
+    this.dataSource = this.dataSource
+                          .cloneWithRows(...toDataSource(this.props.books))
+    return(
+      this.props.renderListView(this.dataSource)
+    )
+  }
+}
+//ArrayDataSource
+BooksDataSource.propTypes = {
+  books: React.PropTypes.array,
+  renderListView: React.PropTypes.func,
+};
+
+module.exports = { BookListView, BookListView1, BookListView2,BooksDataSource };

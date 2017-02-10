@@ -24,15 +24,15 @@ AppState.addEventListener('change',()=>{
 })
 /* const mockbooks = [
  *   { title: 'like:SOFT SKILLS', isbn: '9784822251550', bucket: 'liked' },
- *   { title: 'like:bukkyou', isbn: '9784480064851', bucket: 'liked' },
+ *   { title: 'like:bukkyou', isbn: '9784480064851', bucket: 'done' },
  *   { title: 'borrow:youji kyouiku keizai this is long long tile for test', isbn: '9784492314630', bucket: 'borrowed' },
  *   { title: 'borrow:gabage collection', isbn: '9784798134208', bucket: 'borrowed' },
  *   { title: 'done:simpsons', isbn: '9784105393069', bucket: 'done' },
  *   { title: 'done:wakuwaku programming', isbn: '9784822285159', bucket: 'done' },
  *   { title: 'done:toshi ha saikou no hatumei', isbn: '9784757142794', bucket: 'done' },
  * ];
- * */
-//const initialBooks = mockbooks;
+ * 
+ * const initialBooks = mockbooks;*/
 
 function intent(RN, HTTP) {
   // Actions
@@ -60,6 +60,18 @@ function intent(RN, HTTP) {
     //.do(args => console.log('foo2:', args))
     .shareReplay()
 
+  const close$ = RN
+    .select('main')
+    .events('closeStart')
+  //.do(args => console.log('foo0:', args))
+    .shareReplay()
+
+  const open$ = RN
+    .select('main')
+    .events('closeEnd')
+    //.do(args => console.log('foo0:', args))
+    .shareReplay()
+  
   const changeQuery$ = RN
   /* .select('text-input')
    * .events('changeText')*/
@@ -211,9 +223,11 @@ function intent(RN, HTTP) {
   const changeBucket$ =
     Rx.Observable
       .merge(
-        release$.map(([book, bucket])=>({ type: 'remove', book })),
-        release$.map(([book, bucket])=>({ type: 'add', book, bucket }))
-                .delay(1)//100 ms for re-render
+        /* release$.map(([book, bucket])=>({ type: 'remove', book })),
+         * release$.map(([book, bucket])=>({ type: 'add', book, bucket }))
+         *         .delay(1)//100 ms for re-render*/
+        close$.map(([bucket,book])=>({ type: 'close', book, bucket:null })),
+        open$.map(([bucket, book])=>({ type: 'open', book, bucket }))
       )
       .shareReplay();
 
@@ -232,6 +246,14 @@ function intent(RN, HTTP) {
               { ...book, bucket,
                 modifyDate: new Date(Date.now()), appear: true }]
               .concat(books);
+          case 'close':
+            return books.map((elem)=>
+              elem.isbn === book.isbn ? {...elem, bucket : null} : elem)
+          case 'open':
+            return [
+              {...book,bucket},
+              ...books.filter((elem)=>elem.isbn!==book.isbn)
+            ]
             /* case 'replace':
              *   return [{ ...book, bucket, modifyDate: new Date(Date.now()) }]
              *     .concat(books.filter(elem =>

@@ -178,7 +178,6 @@ function model(actions) {
        * sectionIDs$,
        * rowIDs$,*/
       //dataSource$,
-      books$,
       actions.searchedBooksStatus$,
       actions.savedBooksStatus$,
       /* dataSource$.do(i =>
@@ -205,9 +204,9 @@ function model(actions) {
       // Rx.Observable.just(1000),
       // actions.selectedSection$.startWith("search"),
       (/* items, sectionIDs, rowIDs,*/
-       books, searchedBooks, savedBooks,
+       searchedBooks, savedBooks,
        selectedSection, booksLoadingState, navigationState, selectedBook, i) => ({ /* items, sectionIDs, rowIDs,*/
-         books, searchedBooks, savedBooks, selectedSection, booksLoadingState, navigationState, selectedBook, i }));
+         searchedBooks, savedBooks, selectedSection, booksLoadingState, navigationState, selectedBook, i }));
   return state$;
 }
 

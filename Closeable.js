@@ -177,7 +177,12 @@ class CloseableView2 extends React.Component {
     return(
       <Animated.View
         removeClippedSubviews={true}
-        style={this.state.style}
+        style={this.state.style.height ?
+               this.state.style :
+               this.props.close ? 
+               {overflow:"scroll",height:0.1} :
+               {overflow:"scroll",height:null}
+              }
       >
         <View
           onLayout={

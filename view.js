@@ -5,6 +5,7 @@ import materialColor from 'material-colors';
 import {
   Platform,
   Text,
+  View,
   ListView,
   WebView,
   NavigationExperimental,
@@ -26,7 +27,6 @@ import emptyFunction from 'fbjs/lib/emptyFunction';
 
 const FAIcon = require('react-native-vector-icons/FontAwesome');
 
-import { CloseableView2 } from './Closeable';
 import { SwipeableRow4 } from './SwipeableRow';
 import { Action2 } from './Action';
 
@@ -69,19 +69,21 @@ function MyCard({ children, navigationProps, style }) {
   );
 }
 
-import { LibraryStatus, BookCell } from './BookCell';
-import { BookRow1 } from './BookRow';
-Touchable.BookRow1 = Touchable.createCycleComponent(
-  BookRow1, {
-    onRelease: 'release',
-  });
+/* import { LibraryStatus, BookCell } from './BookCell';
+ * import { BookRow1 } from './BookRow';
+ * Touchable.BookRow1 = Touchable.createCycleComponent(
+ *   BookRow1, {
+ *     onRelease: 'release',
+ *   });*/
 
 import { genActions2 } from './Action';
-import { BookListView } from './BookListView';
+import { BookListView,BookListView2,BooksDataSource } from './BookListView';
 import { ItemsFooter, ItemsHeader } from './Header';
 Touchable.ItemsHeader = Touchable.createCycleComponent(ItemsHeader);
 
 import Stylish from 'react-native-stylish';
+
+Touchable.BookListView2 = Touchable.createCycleComponent(BookListView2);
 
 class MainView extends React.Component {
   constructor(props) {
@@ -108,62 +110,62 @@ class MainView extends React.Component {
     //        key={selectedSection}
     // props.animations.start()
     //      style={{ marginTop: 64, backgroundColor: 'red' }}
-    console.log("b",books,searchedBooks,savedBooks)
+
+    //called twice for card stack
+    //console.log("b",books,searchedBooks,savedBooks)
+    
     /* this.dataBlob = {
      *   r1:{data:1,enable:true},
      *   r2:{data:2,enable:false},
      *   r3:{data:3,enable:true},
      * }*/
-    this.dataBlob = [
-      {data:1,enable:true},
-      {data:2,enable:false},
-      {data:3,enable:true},
-    ]
-    const dataSource = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2,
-    })
-
+    /* this.dataBlob = [
+     *   {data:1,enable:true},
+     *   {data:2,enable:false},
+     *   {data:3,enable:true},
+     * ]
+     * const dataSource = new ListView.DataSource({
+     *   rowHasChanged: (r1, r2) => r1 !== r2,
+     * })
+     * const onClose=()=>{console.log("close start")}
+     * const onCloseEnd=()=>{console.log("close end")}
+     * function toDataSource(dataBlob){
+     *   const nextDataBlob=dataBlob.reduce((acc,book)=>{
+     *     acc[book.isbn] = book;
+     *     return acc;
+     *   },{})
+     *   //console.log("ndb",nextDataBlob)
+     *   return [nextDataBlob,dataBlob.map((book)=>book.isbn)]
+     * }*/
+    //console.log("da:",toDataSource(savedBooks))
+    
     return(
-      <ListView
-        dataSource={dataSource.cloneWithRows(savedBooks)}
-        scrollEnabled={false}
-        renderRow={
-          (rowData,sectionID,rowID, highlightRow)=>{
-            //console.log("r:",rowData,rowID)
-            //rowData
-            //console.log("c:",this.state.alignLeft)
-            return (
-              <CloseableView2
-                    close={rowData.bucket === "liked"}>
-                <SwipeableRow4
-                    onClose={()=>{
-                        let newRowData = {...rowData, enable:false}
-                        this.dataBlob = {...this.dataBlob, [rowID]: newRowData}
-                        this.updateDataSource();
-                        //console.log("onclose")
-                      }}
-                    renderLeftAction={(i, indexLock)=>
-                      <Action2 index={i} left={true}
-                               indexLock={indexLock}/>
-                                     }
-                    renderRightAction={(i, indexLock)=>
-                      <Action2 index={i} left={false}
-                               indexLock={indexLock}/>
-                                      }
-                                         >
-                <BookCell
-                 onPress={() => {
-                     onSelectCell(rowData);
-                   }}
-                 book={rowData}
-                 style={{
-                   backgroundColor: materialColor.grey['50']}}
-                       >
-                  <LibraryStatus libraryStatus={rowData.libraryStatus} />
-                </BookCell>
-                </SwipeableRow4>
-              </CloseableView2>
-            )
+      <BooksDataSource
+        books={savedBooks}
+        renderListView={(dataSource)=>{
+            return(
+              <View
+                style={{paddingTop:20}}>
+                <Text>liked</Text>
+                <Touchable.BookListView2
+                  dataSource={dataSource}
+                  bucket="liked"
+                  selector="main"
+                />
+                <Text>done</Text>
+                <Touchable.BookListView2
+                  dataSource={dataSource}
+                  bucket="done"
+                  selector="main"
+                />
+                <Text>borrowed</Text>
+                <Touchable.BookListView2
+                  dataSource={dataSource}
+                  bucket="borrowed"
+                  selector="main"
+                />
+              </View> 
+            )//                  dataSource={dataSource.cloneWithRows(...toDataSource(savedBooks))}
           }}
       />
     )
@@ -295,7 +297,7 @@ const {
 } = Dimensions.get('window');
 
 function view(model) {
-  console.log('view',model);
+  //console.log('view',model);
   const navigationState = model.navigationState;
   // return <MainView  {...model}/>;
   // console.log('mynav', navigationState, onNavigateBack);
