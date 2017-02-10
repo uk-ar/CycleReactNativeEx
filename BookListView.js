@@ -355,9 +355,6 @@ class BookListView_old extends React.Component {
 //For cycle.js
 class BookListView2 extends React.Component {
   render(){
-    //console.log("a",this.state.dataSource)
-    //this.dataBlob = this.dataBlob.cloneWithRows(this.dataBlob)
-    //let generateActions= ()=>genActions2('search')
     const { dataSource, onCloseStart, onCloseEnd, bucket }=this.props;
     return (
       <ListView

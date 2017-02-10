@@ -95,7 +95,7 @@ function model(actions) {
       actions.searchedBooksStatus$// .do(i => console.log('searched books'))
       // searchedBooks$//.do(i => console.log('searched books'))
       ,
-      actions.savedBooksStatus$// .do(i => console.log('saved books',i))
+      actions.savedBooksStatus$//.do(i => console.log('saved books st:',i))
       ,
       genItems)
       // .debounce(1)// Millisecond
@@ -179,7 +179,7 @@ function model(actions) {
        * rowIDs$,*/
       //dataSource$,
       actions.searchedBooksStatus$,
-      actions.savedBooksStatus$,
+      actions.savedBooksStatus$,//.do(i => console.log('saved books st:',i)),
       /* dataSource$.do(i =>
        *   LayoutAnimation.configureNext(
        *     LayoutAnimation

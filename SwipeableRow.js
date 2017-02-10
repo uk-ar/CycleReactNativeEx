@@ -704,7 +704,7 @@ class SwipeableRow4 extends React.Component {
 
 SwipeableRow4.propTypes = {
   ...View.propTypes,
-  onCloseStart:  React.PropTypes.func.isRequired,
+  onCloseStart: React.PropTypes.func.isRequired,
   renderLeftAction: React.PropTypes.func.isRequired,
   renderRightAction: React.PropTypes.func.isRequired,
 };

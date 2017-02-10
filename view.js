@@ -113,7 +113,7 @@ class MainView extends React.Component {
 
     //called twice for card stack
     //console.log("b",books,searchedBooks,savedBooks)
-    
+
     /* this.dataBlob = {
      *   r1:{data:1,enable:true},
      *   r2:{data:2,enable:false},
@@ -137,8 +137,7 @@ class MainView extends React.Component {
      *   //console.log("ndb",nextDataBlob)
      *   return [nextDataBlob,dataBlob.map((book)=>book.isbn)]
      * }*/
-    //console.log("da:",toDataSource(savedBooks))
-    
+    //console.log("da:",savedBooks)
     return(
       <BooksDataSource
         books={savedBooks}
@@ -164,7 +163,7 @@ class MainView extends React.Component {
                   bucket="borrowed"
                   selector="main"
                 />
-              </View> 
+              </View>
             )//                  dataSource={dataSource.cloneWithRows(...toDataSource(savedBooks))}
           }}
       />

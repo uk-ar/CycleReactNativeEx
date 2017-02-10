@@ -31,7 +31,7 @@ AppState.addEventListener('change',()=>{
  *   { title: 'done:wakuwaku programming', isbn: '9784822285159', bucket: 'done' },
  *   { title: 'done:toshi ha saikou no hatumei', isbn: '9784757142794', bucket: 'done' },
  * ];
- * 
+ *
  * const initialBooks = mockbooks;*/
 
 function intent(RN, HTTP) {
@@ -71,7 +71,7 @@ function intent(RN, HTTP) {
     .events('closeEnd')
     //.do(args => console.log('foo0:', args))
     .shareReplay()
-  
+
   const changeQuery$ = RN
   /* .select('text-input')
    * .events('changeText')*/
@@ -212,6 +212,7 @@ function intent(RN, HTTP) {
           mergeBooksStatus,
         ) // .do(i => console.log('books$:', category, i))
     // .switch()
+        .distinctUntilChanged(i => JSON.stringify(i))
         .map(books =>
           books.map(book => ({ ...book, key: `isbn-${book.isbn}` })))
         .shareReplay();
@@ -263,7 +264,7 @@ function intent(RN, HTTP) {
         }
       } // ).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
       )
-      //.do((books)=> console.log("books:",books))
+      //.do((books)=> console.log("saved books:",books))
       .shareReplay();
 
   savedBooks$.do((books) => {
