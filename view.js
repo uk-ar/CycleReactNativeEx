@@ -137,7 +137,7 @@ class MainView extends React.Component {
      *   //console.log("ndb",nextDataBlob)
      *   return [nextDataBlob,dataBlob.map((book)=>book.isbn)]
      * }*/
-    //console.log("da:",savedBooks)
+    console.log("da:",savedBooks,style)
     return(
       <BooksDataSource
         books={savedBooks}
@@ -145,19 +145,16 @@ class MainView extends React.Component {
             return(
               <View
                 style={{paddingTop:20}}>
-                <Text>liked</Text>
                 <Touchable.BookListView2
                   dataSource={dataSource}
                   bucket="liked"
                   selector="main"
                 />
-                <Text>done</Text>
                 <Touchable.BookListView2
                   dataSource={dataSource}
                   bucket="done"
                   selector="main"
                 />
-                <Text>borrowed</Text>
                 <Touchable.BookListView2
                   dataSource={dataSource}
                   bucket="borrowed"

@@ -12,6 +12,8 @@ import {
 
 import util from 'util';
 import emptyFunction from 'fbjs/lib/emptyFunction';
+import Stylish from 'react-native-stylish';
+import materialColor from 'material-colors';
 
 import Dimensions from 'Dimensions';
 const {
@@ -21,6 +23,8 @@ const {
 import { SwipeableListView } from './SwipeableListView';
 import { BookRow2 } from './BookRow';
 import { BookCell } from './BookCell';
+import { ItemsFooter, ItemsHeader } from './Header';
+import { styles } from './styles';
 
 const RCTUIManager = require('NativeModules').UIManager;
 
@@ -356,14 +360,32 @@ class BookListView_old extends React.Component {
 class BookListView2 extends React.Component {
   render(){
     const { dataSource, onCloseStart, onCloseEnd, bucket }=this.props;
+    console.log("dataSource",dataSource.rowIdentities)
+    dataSource.rowIdentities.map((sectionData,sectionIndex)=>{
+      sectionData.map((rowData,rowIndex)=>{
+        console.log(dataSource.getRowData(sectionIndex,rowIndex))
+        //console.log("r:",sectionIndex,rowIndex,rowData)
+      })
+    })
     return (
-      <ListView
-        dataSource={dataSource}
-        scrollEnabled={false}
-        renderRow={
-          (rowData,sectionID,rowID, highlightRow)=>{
-            return(
-              <BookRow2
+      <View>
+        <ItemsHeader
+          style={styles.sectionHeader}
+          section={bucket/* TODO:change prop name */}
+          close={false}
+          onSelectSection={(section) => {
+            }}
+          onCloseSection={() => {
+            }}
+        />
+        <Stylish.ListView
+          style={{height:84*2}}
+          dataSource={dataSource}
+          scrollEnabled={false}
+          renderRow={
+            (rowData,sectionID,rowID, highlightRow)=>{
+              return(
+                <BookRow2
                 close={rowData.bucket!==bucket}
                 bucket={bucket}
                 onCloseStart={(target)=>
@@ -371,11 +393,21 @@ class BookListView2 extends React.Component {
                 onCloseEnd={(target)=>
                   onCloseEnd(target,rowData,sectionID,rowID, highlightRow)}
                            >
-                <BookCell book={rowData} />
-              </BookRow2>
-            )
-          }}
-      />
+                  <BookCell
+                  style={{
+                    height:84,
+                    backgroundColor: materialColor.grey['50']
+                  }}
+                  book={rowData} />
+                </BookRow2>
+              )
+            }}
+        />
+        <ItemsFooter
+          count={dataSource.getRowCount()}
+          onSelectSection={()=>{}}
+        />
+      </View>
     )
   }
 }
