@@ -12,6 +12,7 @@ import {
   Dimensions,
   Easing,
   InteractionManager,
+  findNodeHandle,
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 import util from 'util'
@@ -1682,6 +1683,7 @@ class BookListView8_test extends React.Component {
           bucket="liked"
           onCloseStart={onCloseStart}
           onCloseEnd={onCloseEnd}
+          onSelectSection={(section)=>console.log("se:",section)}
             />
                 <BookListView2
           dataSource={dataSource}
@@ -1696,6 +1698,92 @@ class BookListView8_test extends React.Component {
           onCloseEnd={onCloseEnd}
                      />
               </View>
+            )
+          }}
+      />
+    )
+  }
+}
+
+class BookListView9_test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      books: [
+        {isbn:1,title:"foo",bucket:"liked"},
+        {isbn:2,title:"bar",bucket:"done" },
+        {isbn:3,bucket:"liked"},
+      ],
+      selectedSection: null
+    }
+  }
+  render(){
+    const onCloseStart=(target,rowData,sectionID,rowID, highlightRow)=>{
+      //keep order when close start
+      //this.dataBlob =
+      this.setState({
+        books: this.state.books.map((book)=>
+          book.isbn === rowData.isbn ? {...book, bucket : null}: book)
+      })
+    }
+    const onCloseEnd=(target,rowData,sectionID,rowID, highlightRow)=>{
+      this.setState({
+        books: [{...rowData,bucket:target},
+                ...this.state.books.filter((book)=>book.isbn!==rowData.isbn)
+        ]
+      })
+      //console.log("th",this.dataBlob,target)
+    }
+
+    return (
+      <BooksDataSource
+        books={this.state.books}
+        renderListView={(dataSource)=>{
+            return(
+              <ScrollView
+                       ref={(scroll)=>this.scroll=scroll}
+                 scrollEnabled={!this.state.selectedSection}
+        style={{paddingTop:20,
+                backgroundColor: '#1A237E'}}>
+                <BookListView2
+          dataSource={dataSource}
+          bucket="liked"
+          onCloseStart={onCloseStart}
+          onCloseEnd={onCloseEnd}
+          selectedSection={this.state.selectedSection}
+          onSelectSection={(selectedSection)=>this.setState({selectedSection})}
+                          />
+                <BookListView2
+          dataSource={dataSource}
+          bucket="done"
+                  ref={(listview)=>this.done=listview}
+          onCloseStart={onCloseStart}
+          onCloseEnd={onCloseEnd}
+          selectedSection={this.state.selectedSection}
+          onSelectSection={(selectedSection)=>{
+              if(selectedSection){
+                const scrollResponder = this.scroll.getScrollResponder()
+                console.log("sc",this.done,scrollResponder)
+                const handle = findNodeHandle(this.done)
+                scrollResponder.scrollResponderScrollNativeHandleToKeyboard(
+                //scrollResponder.scrollResponderScrollTo(
+                  handle, // The TextInput node handle
+                  0, // The scroll view's bottom "contentInset" (default 0)
+                  true // Prevent negative scrolling
+                )
+              }
+              this.setState({selectedSection})
+            }}
+                     />
+                <BookListView2
+          dataSource={dataSource}
+          bucket="borrowed"
+          onCloseStart={onCloseStart}
+          onCloseEnd={onCloseEnd}
+          selectedSection={this.state.selectedSection}
+          onSelectSection={(selectedSection)=>this.setState({selectedSection})}
+                     />
+              </ScrollView>
             )
           }}
       />
@@ -1724,4 +1812,7 @@ storiesOf('BookListView2', module)
   })
   .add('BookListView8',() => {
     return(<BookListView8_test />)
+  })
+  .add('BookListView9',() => {
+    return(<BookListView9_test />)
   })

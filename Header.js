@@ -57,7 +57,7 @@ function ItemsHeader({
   if (!itemsInfo[section]) { return null; }
   // const icon = (selectedSection === null) ? (
   const icon = close ? (
-    <TouchableHighlight
+    <TouchableElement
       onPress={() => onCloseSection(section)}
     >
       <Icon
@@ -66,7 +66,7 @@ function ItemsHeader({
         size={20}
         style={{ margin:5, marginRight: 5}}
       />
-    </TouchableHighlight>
+    </TouchableElement>
   ) : (
       <Icon
         name={itemsInfo[section].icon}
@@ -113,6 +113,8 @@ function ItemsHeader({
     >
       {close ?
        content : (
+         /* FIXME: workaround for
+            https://github.com/facebook/react-native/issues/11834 */
          <TouchableElement
            underlayColor="rgb(210, 230, 255)"
            onPress={() => onSelectSection(section)}
@@ -142,7 +144,7 @@ function ItemsFooter({ count, onSelectSection }) {
   return (
     <TouchableElement
       underlayColor="rgb(210, 230, 255)"
-      onPress={() => onSelectSection(section)}
+      onPress={() => onSelectSection()}
     >
       <View style={styles.sectionFooter}>
         <Text>

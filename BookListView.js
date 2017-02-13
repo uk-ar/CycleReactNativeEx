@@ -17,7 +17,8 @@ import materialColor from 'material-colors';
 
 import Dimensions from 'Dimensions';
 const {
-  height,
+  height:HEIGHT,
+  //width:WIDTH
 } = Dimensions.get('window');
 
 import { SwipeableListView } from './SwipeableListView';
@@ -359,22 +360,27 @@ class BookListView_old extends React.Component {
 //For cycle.js
 class BookListView2 extends React.Component {
   render(){
-    const { renderFooter, onSelectSection ,onCloseSection,
+    const { renderFooter, onSelectSection ,onCloseSection, selectedSection,
             dataSource, onCloseStart, onCloseEnd, bucket }=this.props;
-    //console.log("dataSource",dataSource)
+    //console.log("dataSource",selectedSection)
+    //console.log("tr;",this.done)
     return (
-      <View>
+      <View ref="root">
         <ItemsHeader
           style={styles.sectionHeader}
           section={bucket/* TODO:change prop name */}
-          close={false}
-          onSelectSection={onSelectSection}
-          onCloseSection={onCloseSection}
+          close={ selectedSection === bucket }
+          onSelectSection={(section)=>{
+              //this.refs.root.focus()
+              onSelectSection(section)
+            }}
+          onCloseSection={()=>onSelectSection(null)}
         />
         <Stylish.ListView
-          style={{height:84*2}}
+          style={selectedSection===bucket ?
+                 {height:HEIGHT} : {height:84*2}}
           dataSource={dataSource}
-          scrollEnabled={false}
+          scrollEnabled={selectedSection!==null}
           renderRow={
             (rowData,sectionID,rowID, highlightRow)=>{
               return(
@@ -404,7 +410,7 @@ class BookListView2 extends React.Component {
                       .filter((book)=>book.bucket===bucket)
                       .length
                 }
-          onSelectSection={onSelectSection}
+          onSelectSection={()=>onSelectSection(bucket)}
         />
       </View>
     )
@@ -417,12 +423,14 @@ BookListView2.propTypes = {
   onCloseStart: React.PropTypes.func,
   onCloseEnd: React.PropTypes.func,
   onSelectSection: React.PropTypes.func,
+  onCloseSection: React.PropTypes.func,
 };
 
 BookListView2.defaultProps = {
   onCloseStart: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
   onCloseEnd: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
   onSelectSection: emptyFunction,
+  onCloseSection: emptyFunction,
 };
 
 function toDataSource(dataBlob){
