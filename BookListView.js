@@ -359,14 +359,9 @@ class BookListView_old extends React.Component {
 //For cycle.js
 class BookListView2 extends React.Component {
   render(){
-    const { dataSource, onCloseStart, onCloseEnd, bucket }=this.props;
-    console.log("dataSource",dataSource.rowIdentities)
-    dataSource.rowIdentities.map((sectionData,sectionIndex)=>{
-      sectionData.map((rowData,rowIndex)=>{
-        console.log(dataSource.getRowData(sectionIndex,rowIndex))
-        //console.log("r:",sectionIndex,rowIndex,rowData)
-      })
-    })
+    const { renderFooter,
+            dataSource, onCloseStart, onCloseEnd, bucket }=this.props;
+    //console.log("dataSource",dataSource)
     return (
       <View>
         <ItemsHeader
@@ -402,9 +397,15 @@ class BookListView2 extends React.Component {
                 </BookRow2>
               )
             }}
-        />
+      />
         <ItemsFooter
-          count={dataSource.getRowCount()}
+          count={
+            /* cannot pass ListView because of height */
+            dataSource.rowIdentities[0]
+                      .map((id,j)=>dataSource.getRowData(0,j))
+                      .filter((book)=>book.bucket===bucket)
+                      .length
+                }
           onSelectSection={()=>{}}
         />
       </View>

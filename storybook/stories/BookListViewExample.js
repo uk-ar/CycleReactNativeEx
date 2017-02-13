@@ -1675,22 +1675,20 @@ class BookListView8_test extends React.Component {
         renderListView={(dataSource)=>{
             return(
               <View
-        style={{paddingTop:20}}>
-                <Text>liked</Text>
+        style={{paddingTop:20,
+                backgroundColor: '#1A237E'}}>
                 <BookListView2
           dataSource={dataSource}
           bucket="liked"
           onCloseStart={onCloseStart}
           onCloseEnd={onCloseEnd}
-                     />
-                <Text>done</Text>
+            />
                 <BookListView2
           dataSource={dataSource}
           bucket="done"
           onCloseStart={onCloseStart}
           onCloseEnd={onCloseEnd}
                      />
-                <Text>borrowed</Text>
                 <BookListView2
           dataSource={dataSource}
           bucket="borrowed"
