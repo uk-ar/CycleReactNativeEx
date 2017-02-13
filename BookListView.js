@@ -359,7 +359,7 @@ class BookListView_old extends React.Component {
 //For cycle.js
 class BookListView2 extends React.Component {
   render(){
-    const { renderFooter,
+    const { renderFooter, onSelectSection ,onCloseSection,
             dataSource, onCloseStart, onCloseEnd, bucket }=this.props;
     //console.log("dataSource",dataSource)
     return (
@@ -368,10 +368,8 @@ class BookListView2 extends React.Component {
           style={styles.sectionHeader}
           section={bucket/* TODO:change prop name */}
           close={false}
-          onSelectSection={(section) => {
-            }}
-          onCloseSection={() => {
-            }}
+          onSelectSection={onSelectSection}
+          onCloseSection={onCloseSection}
         />
         <Stylish.ListView
           style={{height:84*2}}
@@ -406,7 +404,7 @@ class BookListView2 extends React.Component {
                       .filter((book)=>book.bucket===bucket)
                       .length
                 }
-          onSelectSection={()=>{}}
+          onSelectSection={onSelectSection}
         />
       </View>
     )
@@ -418,11 +416,13 @@ BookListView2.propTypes = {
   bucket: React.PropTypes.string.isRequired,
   onCloseStart: React.PropTypes.func,
   onCloseEnd: React.PropTypes.func,
+  onSelectSection: React.PropTypes.func,
 };
 
 BookListView2.defaultProps = {
   onCloseStart: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
   onCloseEnd: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
+  onSelectSection: emptyFunction,
 };
 
 function toDataSource(dataBlob){

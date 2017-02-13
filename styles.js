@@ -51,14 +51,16 @@ const styles = StyleSheet.create({
    *   height: 24,
    *   marginHorizontal: 8,
    * },*/
+  iconAndText:{
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   sectionHeader: {
     backgroundColor: materialColor.grey['200'],
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
-    // marginTop:3,
     padding: 5,
-    flexDirection: 'row',
-    alignItems: 'center'
+    // marginTop:3,
   },
   sectionFooter: {
     backgroundColor: materialColor.grey['200'],

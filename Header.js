@@ -9,6 +9,7 @@ import {
   LayoutAnimation,
   ActivityIndicator,
   TouchableOpacity,
+  TouchableHighlight,
   // TouchableHighlight,
   // TouchableNativeFeedback
 } from 'react-native';
@@ -56,7 +57,7 @@ function ItemsHeader({
   if (!itemsInfo[section]) { return null; }
   // const icon = (selectedSection === null) ? (
   const icon = close ? (
-    <TouchableOpacity
+    <TouchableHighlight
       onPress={() => onCloseSection(section)}
     >
       <Icon
@@ -65,7 +66,7 @@ function ItemsHeader({
         size={20}
         style={{ margin:5, marginRight: 5}}
       />
-    </TouchableOpacity>
+    </TouchableHighlight>
   ) : (
       <Icon
         name={itemsInfo[section].icon}
@@ -97,7 +98,7 @@ function ItemsHeader({
     </View>
   ) : (
     <View
-      style={styles.sectionHeader}
+      style={styles.iconAndText}
       key={section}>
       {icon}
       <Text>
@@ -107,10 +108,13 @@ function ItemsHeader({
   );
 
   return (
-    <View style={style}>
+    <View
+      style={styles.sectionHeader}
+    >
       {close ?
        content : (
          <TouchableElement
+           underlayColor="rgb(210, 230, 255)"
            onPress={() => onSelectSection(section)}
            key={section}
          >
@@ -137,6 +141,7 @@ ItemsHeader.defaultProps = {
 function ItemsFooter({ count, onSelectSection }) {
   return (
     <TouchableElement
+      underlayColor="rgb(210, 230, 255)"
       onPress={() => onSelectSection(section)}
     >
       <View style={styles.sectionFooter}>
