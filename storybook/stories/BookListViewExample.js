@@ -1712,10 +1712,18 @@ class BookListView9_test extends React.Component {
       books: [
         {isbn:1,title:"foo",bucket:"liked"},
         {isbn:2,title:"bar",bucket:"done" },
-        {isbn:3,bucket:"liked"},
+        {isbn:3,bucket:"done"},
+        {isbn:4,bucket:"done"},
+        {isbn:5,bucket:"done"},
+        {isbn:6,bucket:"done"},
+        {isbn:7,bucket:"done"},
+        {isbn:8,bucket:"done"},
+        {isbn:9,bucket:"done"},
+        {isbn:10,bucket:"done"},
       ],
       selectedSection: null
     }
+    this.positionY=0;
   }
   render(){
     const onCloseStart=(target,rowData,sectionID,rowID, highlightRow)=>{
@@ -1734,6 +1742,13 @@ class BookListView9_test extends React.Component {
       })
       //console.log("th",this.dataBlob,target)
     }
+    const onCloseSection=()=>{
+      const scrollResponder = this.scroll.getScrollResponder();
+      scrollResponder.scrollTo({x:0,y:0})
+      //InteractionManager.runAfterInteractions(()=>{
+      this.setState({selectedSection:null})
+      //})
+    }
 
     return (
       <BooksDataSource
@@ -1743,7 +1758,7 @@ class BookListView9_test extends React.Component {
               <ScrollView
                        ref={(scroll)=>this.scroll=scroll}
                  scrollEnabled={!this.state.selectedSection}
-        style={{paddingTop:20,
+        style={{//paddingTop:20,//for ios
                 backgroundColor: '#1A237E'}}>
                 <BookListView2
           dataSource={dataSource}
@@ -1760,21 +1775,29 @@ class BookListView9_test extends React.Component {
           onCloseStart={onCloseStart}
           onCloseEnd={onCloseEnd}
           selectedSection={this.state.selectedSection}
+          onCloseSection={onCloseSection}
           onSelectSection={(selectedSection)=>{
-              if(selectedSection){
-                const scrollResponder = this.scroll.getScrollResponder()
-                console.log("sc",this.done,scrollResponder)
-                const handle = findNodeHandle(this.done)
-                scrollResponder.scrollResponderScrollNativeHandleToKeyboard(
-                //scrollResponder.scrollResponderScrollTo(
-                  handle, // The TextInput node handle
-                  0, // The scroll view's bottom "contentInset" (default 0)
-                  true // Prevent negative scrolling
-                )
-              }
-              this.setState({selectedSection})
+              //params selectedSection,node
+              //cannot measure position directory when in ScrollView
+              //return this.setState({selectedSection})
+              const handle = findNodeHandle(this.done)
+              const scrollResponder = this.scroll.getScrollResponder();
+              UIManager.measureLayoutRelativeToParent(
+                handle,
+                (e)=>console.log(e),
+                //this.done.measure(
+                (x,y,w,h,px,py)=>{
+                  //console.log("x,y:",x,y,w,h,px,py)
+                  this.setState({selectedSection},()=>
+                    //expand view
+                    InteractionManager.runAfterInteractions(()=>{
+                      scrollResponder.scrollTo({x,y})
+                    })
+                  )
+                }
+              )
             }}
-                     />
+                          />
                 <BookListView2
           dataSource={dataSource}
           bucket="borrowed"

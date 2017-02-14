@@ -359,13 +359,20 @@ class BookListView_old extends React.Component {
 
 //For cycle.js
 class BookListView2 extends React.Component {
+  /* measure(fn){
+   *   console.log("measure",this.root)
+   *   this.root.measureInWindow((x,y,w,h,px,py)=>{
+   *     console.log("view2",x,y,w,h,px,py)
+   *   })
+   *   this.root.measure(fn)
+   * }*/
   render(){
     const { renderFooter, onSelectSection ,onCloseSection, selectedSection,
             dataSource, onCloseStart, onCloseEnd, bucket }=this.props;
     //console.log("dataSource",selectedSection)
     //console.log("tr;",this.done)
     return (
-      <View ref="root">
+      <View ref={(root)=>this.root=root}>
         <ItemsHeader
           style={styles.sectionHeader}
           section={bucket/* TODO:change prop name */}
@@ -374,7 +381,7 @@ class BookListView2 extends React.Component {
               //this.refs.root.focus()
               onSelectSection(section)
             }}
-          onCloseSection={()=>onSelectSection(null)}
+          onCloseSection={()=>onCloseSection()}
         />
         <Stylish.ListView
           style={selectedSection===bucket ?
