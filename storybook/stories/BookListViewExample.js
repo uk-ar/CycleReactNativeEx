@@ -1876,7 +1876,7 @@ class BookListView10_test extends React.Component {
         books={this.state.books}
         renderListView={(dataSource)=>{
             return(
-                <BookListView3
+              <BookListView3
           dataSource={dataSource}
           onCloseStart={onCloseStart}
           onCloseEnd={onCloseEnd}

@@ -359,6 +359,12 @@ class BookListView_old extends React.Component {
 
 //For cycle.js
 class BookListView2 extends React.Component {
+  componentWillReceiveProps(nextProps) {
+    if (this.props.selectedSection !== nextProps.selectedSection) {
+      //this.header.forceUpdate()
+      //console.log("th",this.header)
+    }
+  }
   render(){
     const { renderFooter, onSelectSection ,onCloseSection, selectedSection,
             dataSource, onCloseStart, onCloseEnd, bucket }=this.props;
@@ -374,10 +380,8 @@ class BookListView2 extends React.Component {
     //Math.min(2,count)
     return (
       <View>
-        <ListView
-          renderHeader={()=>
-            <ItemsHeader
-          style={styles.sectionHeader}
+        <ItemsHeader
+          style={styles.sectionHeader/*grey 200*/}
           section={bucket/* TODO:change prop name */}
           close={ selectedSection === bucket }
           onSelectSection={(section)=>{
@@ -385,14 +389,12 @@ class BookListView2 extends React.Component {
               onSelectSection(section)
             }}
           onCloseSection={()=>onCloseSection()}
-                         />
-                       }
-          style={[/* {backgroundColor: materialColor.grey['50'],
-                      borderTopLeftRadius: 5,
-                      borderTopRightRadius: 5} */
+        />
+        <ListView
+          style={[{backgroundColor: materialColor.grey['100']},
                   selectedSection===bucket ?
-                  {height: HEIGHT } :
-                  {maxHeight: ROW_HEIGHT*2 + HEADER_HEIGHT}]}
+                  {height: HEIGHT - HEADER_HEIGHT } :
+                  {maxHeight: ROW_HEIGHT*2}]}
           dataSource={dataSource}
           scrollEnabled={selectedSection!==null}
           renderRow={
