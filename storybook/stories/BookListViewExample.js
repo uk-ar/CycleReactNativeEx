@@ -28,7 +28,7 @@ import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {BookRow1} from '../../BookRow';
 import {genActions2,Action,Action2,Action3} from '../../Action';
-import {BookListView1,BookListView2,BooksDataSource} from '../../BookListView';
+import {BookListView3,BookListView1,BookListView2,BooksDataSource} from '../../BookListView';
 import { LayoutableView, CloseableView, CloseableView2 } from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow4,SwipeableRow3} from '../../SwipeableRow';
 import {SwipeableListView} from '../../SwipeableListView';
@@ -1779,7 +1779,7 @@ class BookListView9_test extends React.Component {
           onSelectSection={(selectedSection)=>{
               //params selectedSection,node
               //cannot measure position directory when in ScrollView
-              //return this.setState({selectedSection})
+              return this.setState({selectedSection})
               const handle = findNodeHandle(this.done)
               const scrollResponder = this.scroll.getScrollResponder();
               UIManager.measureLayoutRelativeToParent(
@@ -1814,6 +1814,100 @@ class BookListView9_test extends React.Component {
   }
 }
 
+class BookListView10_test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      books: [
+        {isbn:1,title:"foo",bucket:"liked"},
+        {isbn:2,title:"bar",bucket:"done" },
+        {isbn:3,bucket:"done"},
+        {isbn:4,bucket:"done"},
+        {isbn:5,bucket:"done"},
+        {isbn:6,bucket:"liked"},
+        {isbn:7,bucket:"liked"},
+        {isbn:8,bucket:"borrowed"},
+        {isbn:9,bucket:"borrowed"},
+        {isbn:10,bucket:"borrowed"},
+        {isbn:11,bucket:"done"},
+        {isbn:12,bucket:"done"},
+        {isbn:13,bucket:"done"},
+        {isbn:14,bucket:"done"},
+        {isbn:15,bucket:"done"},
+        {isbn:16,bucket:"done"},
+        {isbn:17,bucket:"done"},
+        {isbn:18,bucket:"done"},
+        {isbn:19,bucket:"done"},
+        {isbn:20,bucket:"done"},
+        {isbn:21,bucket:"done"},
+        {isbn:22,bucket:"done"},
+      ],
+      selectedSection: null
+    }
+    this.positionY=0;
+  }
+  render(){
+    const onCloseStart=(target,rowData,sectionID,rowID, highlightRow)=>{
+      //keep order when close start
+      //this.dataBlob =
+      this.setState({
+        books: this.state.books.map((book)=>
+          book.isbn === rowData.isbn ? {...book, bucket : null}: book)
+      })
+    }
+    const onCloseEnd=(target,rowData,sectionID,rowID, highlightRow)=>{
+      this.setState({
+        books: [{...rowData,bucket:target},
+                ...this.state.books.filter((book)=>book.isbn!==rowData.isbn)
+        ]
+      })
+      //console.log("th",this.dataBlob,target)
+    }
+    const onCloseSection=()=>{
+      /* const scrollResponder = this.scroll.getScrollResponder();
+       * scrollResponder.scrollTo({x:0,y:0})*/
+      //InteractionManager.runAfterInteractions(()=>{
+      this.setState({selectedSection:null})
+      //})
+    }
+
+    return (
+      <BooksDataSource
+        books={this.state.books}
+        renderListView={(dataSource)=>{
+            return(
+                <BookListView3
+          dataSource={dataSource}
+          onCloseStart={onCloseStart}
+          onCloseEnd={onCloseEnd}
+          selectedSection={this.state.selectedSection}
+          onCloseSection={()=>{
+              LayoutAnimation.configureNext(
+                LayoutAnimation
+                  .create(600,
+                          LayoutAnimation.Types.easeInEaseOut,
+                          LayoutAnimation.Properties.opacity))
+              this.setState({selectedSection:null})
+            }}
+          onSelectSection={(selectedSection)=>{
+              LayoutAnimation.configureNext(
+                        LayoutAnimation
+                          .create(600,
+                                  LayoutAnimation.Types.easeInEaseOut,
+                                  LayoutAnimation.Properties.opacity))
+              //LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+              this.setState({
+                selectedSection
+              })
+            }}
+                          />
+            )
+          }}
+      />
+    )
+  }
+}
+
 storiesOf('BookListView2', module)
   .add('BookListView2',() => {
     return(<BookListView2_test />)
@@ -1838,4 +1932,7 @@ storiesOf('BookListView2', module)
   })
   .add('BookListView9',() => {
     return(<BookListView9_test />)
+  })
+  .add('BookListView10',() => {
+    return(<BookListView10_test />)
   })

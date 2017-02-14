@@ -359,21 +359,24 @@ class BookListView_old extends React.Component {
 
 //For cycle.js
 class BookListView2 extends React.Component {
-  /* measure(fn){
-   *   console.log("measure",this.root)
-   *   this.root.measureInWindow((x,y,w,h,px,py)=>{
-   *     console.log("view2",x,y,w,h,px,py)
-   *   })
-   *   this.root.measure(fn)
-   * }*/
   render(){
     const { renderFooter, onSelectSection ,onCloseSection, selectedSection,
             dataSource, onCloseStart, onCloseEnd, bucket }=this.props;
     //console.log("dataSource",selectedSection)
     //console.log("tr;",this.done)
+    //console.log("v2;",this.props)
+    const HEADER_HEIGHT=40
+    const ROW_HEIGHT=84
+    const count=dataSource.rowIdentities[0]
+                          .map((id,j)=>dataSource.getRowData(0,j))
+                          .filter((book)=>book.bucket===bucket)
+                          .length
+    //Math.min(2,count)
     return (
-      <View ref={(root)=>this.root=root}>
-        <ItemsHeader
+      <View>
+        <ListView
+          renderHeader={()=>
+            <ItemsHeader
           style={styles.sectionHeader}
           section={bucket/* TODO:change prop name */}
           close={ selectedSection === bucket }
@@ -382,14 +385,20 @@ class BookListView2 extends React.Component {
               onSelectSection(section)
             }}
           onCloseSection={()=>onCloseSection()}
-        />
-        <Stylish.ListView
-          style={selectedSection===bucket ?
-                 {height:HEIGHT} : {height:84*2}}
+                         />
+                       }
+          style={[/* {backgroundColor: materialColor.grey['50'],
+                      borderTopLeftRadius: 5,
+                      borderTopRightRadius: 5} */
+                  selectedSection===bucket ?
+                  {height: HEIGHT } :
+                  {maxHeight: ROW_HEIGHT*2 + HEADER_HEIGHT}]}
           dataSource={dataSource}
           scrollEnabled={selectedSection!==null}
           renderRow={
+            //contentContainerStyle style
             (rowData,sectionID,rowID, highlightRow)=>{
+              //console.log("rr")
               return(
                 <BookRow2
                 close={rowData.bucket!==bucket}
@@ -401,7 +410,7 @@ class BookListView2 extends React.Component {
                            >
                   <BookCell
                   style={{
-                    height:84,
+                    height:ROW_HEIGHT,
                     backgroundColor: materialColor.grey['50']
                   }}
                   book={rowData} />
@@ -411,11 +420,8 @@ class BookListView2 extends React.Component {
       />
         <ItemsFooter
           count={
+            count
             /* cannot pass ListView because of height */
-            dataSource.rowIdentities[0]
-                      .map((id,j)=>dataSource.getRowData(0,j))
-                      .filter((book)=>book.bucket===bucket)
-                      .length
                 }
           onSelectSection={()=>onSelectSection(bucket)}
         />
@@ -434,6 +440,84 @@ BookListView2.propTypes = {
 };
 
 BookListView2.defaultProps = {
+  onCloseStart: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
+  onCloseEnd: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
+  onSelectSection: emptyFunction,
+  onCloseSection: emptyFunction,
+};
+
+class BookListView3 extends React.Component {
+  componentWillReceiveProps(nextProps) {
+    if (this.props.selectedSection !== nextProps.selectedSection) {
+      this.refs.scroll.scrollTo({x:0,y:0,animated:false})
+    }
+  }
+  render(){
+    const {selectedSection,dataSource,
+           onCloseStart,onCloseEnd,onCloseSection,onSelectSection,
+    }=this.props;
+
+    const props = {
+      selectedSection,
+      onCloseStart,
+      onCloseEnd,
+      onSelectSection,
+      onCloseSection
+    }
+    //console.log("p",this.props)
+    return(
+      selectedSection ?
+      <ScrollView
+        ref="scroll"
+          scrollEnabled={false}
+          style={{//paddingTop:20,//for ios
+            backgroundColor: '#1A237E'}}>
+          <BookListView2
+            dataSource={dataSource}
+            key={selectedSection}
+            bucket={selectedSection}
+            {...props}
+          />
+        </ScrollView> :
+      <ScrollView
+        ref="scroll"
+          scrollEnabled={true}
+          style={{//paddingTop:20,//for ios
+            backgroundColor: '#1A237E'}}>
+          <BookListView2
+            dataSource={dataSource}
+            key="liked"
+            bucket="liked"
+            {...props}
+          />
+          <BookListView2
+            dataSource={dataSource}
+            bucket="done"
+            key="done"
+            {...props}
+          />
+          <BookListView2
+            dataSource={dataSource}
+            bucket="borrowed"
+            key="borrowed"
+            {...props}
+          />
+        </ScrollView>
+    )
+  }
+}
+
+BookListView3.propTypes = {
+  dataSource: React.PropTypes.object,
+  selectedSection: React.PropTypes.string,
+  onCloseStart: React.PropTypes.func,
+  onCloseEnd: React.PropTypes.func,
+  onSelectSection: React.PropTypes.func,
+  onCloseSection: React.PropTypes.func,
+};
+
+BookListView3.defaultProps = {
+  selectedSection: null,
   onCloseStart: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
   onCloseEnd: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
   onSelectSection: emptyFunction,
@@ -471,4 +555,5 @@ BooksDataSource.propTypes = {
   renderListView: React.PropTypes.func,
 };
 
-module.exports = { BookListView, BookListView1, BookListView2,BooksDataSource };
+module.exports = { BookListView, BookListView1, BookListView2, BookListView3,
+                   BooksDataSource };
