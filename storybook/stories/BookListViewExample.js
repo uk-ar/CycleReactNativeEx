@@ -1877,6 +1877,8 @@ class BookListView10_test extends React.Component {
         renderListView={(dataSource)=>{
             return(
               <BookListView3
+                       style={{
+                         paddingTop:20,backgroundColor: '#1A237E'}}
           dataSource={dataSource}
           onCloseStart={onCloseStart}
           onCloseEnd={onCloseEnd}

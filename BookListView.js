@@ -367,7 +367,7 @@ class BookListView2 extends React.Component {
   }
   render(){
     const { renderFooter, onSelectSection ,onCloseSection, selectedSection,
-            dataSource, onCloseStart, onCloseEnd, bucket }=this.props;
+            dataSource, onCloseStart, onCloseEnd, bucket,style }=this.props;
     //console.log("dataSource",selectedSection)
     //console.log("tr;",this.done)
     //console.log("v2;",this.props)
@@ -393,7 +393,8 @@ class BookListView2 extends React.Component {
         <ListView
           style={[{backgroundColor: materialColor.grey['100']},
                   selectedSection===bucket ?
-                  {height: HEIGHT - HEADER_HEIGHT } :
+                  {flex:1}//{minHeight: HEIGHT - HEADER_HEIGHT +20 }
+               :
                   {maxHeight: ROW_HEIGHT*2}]}
           dataSource={dataSource}
           scrollEnabled={selectedSection!==null}
@@ -455,7 +456,7 @@ class BookListView3 extends React.Component {
     }
   }
   render(){
-    const {selectedSection,dataSource,
+    const {selectedSection,dataSource,style,
            onCloseStart,onCloseEnd,onCloseSection,onSelectSection,
     }=this.props;
 
@@ -472,8 +473,7 @@ class BookListView3 extends React.Component {
       <ScrollView
         ref="scroll"
           scrollEnabled={false}
-          style={{//paddingTop:20,//for ios
-            backgroundColor: '#1A237E'}}>
+          style={style}>
           <BookListView2
             dataSource={dataSource}
             key={selectedSection}
@@ -484,8 +484,7 @@ class BookListView3 extends React.Component {
       <ScrollView
         ref="scroll"
           scrollEnabled={true}
-          style={{//paddingTop:20,//for ios
-            backgroundColor: '#1A237E'}}>
+          style={style}>
           <BookListView2
             dataSource={dataSource}
             key="liked"
