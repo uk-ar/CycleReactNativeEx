@@ -449,12 +449,18 @@ BookListView2.defaultProps = {
   onCloseSection: emptyFunction,
 };
 
-class BookListView3 extends React.Component {
-  componentWillReceiveProps(nextProps) {
-    if (this.props.selectedSection !== nextProps.selectedSection) {
-      this.refs.scroll.scrollTo({x:0,y:0,animated:false})
-    }
+class ToggleableScrollView extends React.Component {
+  render(){
+    const { scrollEnabled,...props } = this.props;
+    return(
+      scrollEnabled ?
+      <ScrollView {...props} /> :
+      <View {...props} />
+    )
   }
+}
+
+class BookListView3 extends React.Component {
   render(){
     const {selectedSection,dataSource,style,
            onCloseStart,onCloseEnd,onCloseSection,onSelectSection,
@@ -471,7 +477,7 @@ class BookListView3 extends React.Component {
     return(
       selectedSection ?
       <ScrollView
-        ref="scroll"
+        key="scroll"
           scrollEnabled={false}
           style={style}>
           <BookListView2
@@ -482,7 +488,7 @@ class BookListView3 extends React.Component {
           />
         </ScrollView> :
       <ScrollView
-        ref="scroll"
+        key="scroll"
           scrollEnabled={true}
           style={style}>
           <BookListView2
