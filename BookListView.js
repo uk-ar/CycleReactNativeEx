@@ -377,7 +377,9 @@ class BookListView2 extends React.Component {
                           .map((id,j)=>dataSource.getRowData(0,j))
                           .filter((book)=>book.bucket===bucket)
                           .length
+    const INDICATOR_HEIGHT=20
     //Math.min(2,count)
+    //        style={{height:600}}
     return (
       <View>
         <ItemsHeader
@@ -393,8 +395,7 @@ class BookListView2 extends React.Component {
         <ListView
           style={[{backgroundColor: materialColor.grey['100']},
                   selectedSection===bucket ?
-                  {flex:1}//{minHeight: HEIGHT - HEADER_HEIGHT +20 }
-               :
+                  {height: HEIGHT - HEADER_HEIGHT - INDICATOR_HEIGHT } :
                   {maxHeight: ROW_HEIGHT*2}]}
           dataSource={dataSource}
           scrollEnabled={selectedSection!==null}
