@@ -40,8 +40,6 @@
     "xstream": "^10.2.0"
   },
   "devDependencies": {
-    "@kadira/react-native-storybook": "^2.2.0",
-    "@kadira/storybook": "^2.34.0",
     "apphubdeploy": "^0.0.8",
     "babel-cli": "^6.18.0",
     "babel-core": "^6.18.2",
@@ -60,6 +58,7 @@
     "eslint-plugin-react": "^6.9.0",
     "eslint-plugin-react-native": "^2.0.0",
     "flow-bin": "^0.39.0",
+    "getstorybook": "^1.7.0",
     "jest": "^18.1.0",
     "jest-cli": "^18.1.0",
     "jest-react-native": "^18.0.0",
@@ -67,6 +66,8 @@
     "react-addons-test-utils": "^15.4.1",
     "react-native-mock": "^0.3.1",
     "react-test-renderer": "^15.4.1",
-    "sinon": "^1.17.5"
+    "sinon": "^1.17.5",
+    "storyshots": "^3.2.1",
+    "@kadira/react-native-storybook": "^2.0.0"
   }
 }
