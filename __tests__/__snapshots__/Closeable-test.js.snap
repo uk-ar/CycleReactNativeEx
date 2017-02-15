@@ -3,7 +3,7 @@ exports[`Closeable tests animate correctly by open() 1`] = `
   collapsable={false}
   style={
     Object {
-      "height": 0.01,
+      "height": 1,
       "overflow": "hidden",
     }
   }>
@@ -25,7 +25,7 @@ exports[`Closeable tests animate correctly by props change 1`] = `
   collapsable={false}
   style={
     Object {
-      "height": 0.01,
+      "height": 1,
       "overflow": "hidden",
     }
   }>
@@ -130,7 +130,7 @@ exports[`Closeable tests with close props true 1`] = `
   collapsable={false}
   style={
     Object {
-      "height": 0.01,
+      "height": 1,
       "overflow": "hidden",
     }
   }>

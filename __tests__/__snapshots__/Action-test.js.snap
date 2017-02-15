@@ -1,17 +1,6 @@
 exports[`Action tests renders 1 CloseableView component 1`] = `
 <View
-  style={
-    Array [
-      Object {
-        "alignItems": "center",
-        "flex": 1,
-        "flexDirection": "row-reverse",
-        "padding": 10,
-        "paddingRight": 0,
-      },
-      undefined,
-    ]
-  }>
+  style={undefined}>
   <Text
     accessible={true}
     allowFontScaling={false}
@@ -31,6 +20,23 @@ exports[`Action tests renders 1 CloseableView component 1`] = `
       ]
     }>
     ?
+  </Text>
+  <View
+    style={
+      Object {
+        "width": 5,
+      }
+    } />
+  <Text
+    accessible={true}
+    allowFontScaling={true}
+    ellipsizeMode="tail"
+    style={
+      Object {
+        "alignSelf": "center",
+      }
+    }>
+    
   </Text>
 </View>
 `;
