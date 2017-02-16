@@ -67,7 +67,7 @@
     "react-native-mock": "^0.3.1",
     "react-test-renderer": "^15.4.1",
     "sinon": "^1.17.5",
-    "storyshots": "^3.2.1",
+    "storyshots": "^3.2.2",
     "@kadira/react-native-storybook": "^2.0.0"
   }
 }
