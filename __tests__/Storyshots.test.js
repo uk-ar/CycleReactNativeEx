@@ -1,4 +1,5 @@
 import initStoryshots from 'storyshots';
 initStoryshots({
-  configPath: 'storybook'
+  configPath: 'storybook',
+  storyRegex: /Linking/
 });

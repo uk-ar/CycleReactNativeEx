@@ -1338,19 +1338,19 @@ babel-register@^6.18.0:
     mkdirp "^0.5.1"
     source-map-support "^0.4.2"
 
-babel-runtime@6.x.x, babel-runtime@^6.0.0, babel-runtime@^6.11.6, babel-runtime@^6.18.0, babel-runtime@^6.2.0, babel-runtime@^6.5.0, babel-runtime@^6.9.0, babel-runtime@^6.9.1:
-  version "6.18.0"
-  resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.18.0.tgz#0f4177ffd98492ef13b9f823e9994a02584c9078"
-  dependencies:
-    core-js "^2.4.0"
-    regenerator-runtime "^0.9.5"
-
-babel-runtime@^6.20.0:
+babel-runtime@6.x.x, babel-runtime@^6.0.0, babel-runtime@^6.20.0, babel-runtime@^6.5.0:
   version "6.23.0"
   resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.23.0.tgz#0a9489f144de70efb3ce4300accdb329e2fc543b"
   dependencies:
     core-js "^2.4.0"
     regenerator-runtime "^0.10.0"
+
+babel-runtime@^6.11.6, babel-runtime@^6.18.0, babel-runtime@^6.2.0, babel-runtime@^6.9.0, babel-runtime@^6.9.1:
+  version "6.18.0"
+  resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.18.0.tgz#0f4177ffd98492ef13b9f823e9994a02584c9078"
+  dependencies:
+    core-js "^2.4.0"
+    regenerator-runtime "^0.9.5"
 
 babel-template@^6.14.0, babel-template@^6.15.0, babel-template@^6.16.0, babel-template@^6.3.0, babel-template@^6.8.0:
   version "6.16.0"
@@ -3280,6 +3280,19 @@ gauge@~2.6.0:
     aproba "^1.0.3"
     console-control-strings "^1.0.0"
     has-color "^0.1.7"
+    has-unicode "^2.0.0"
+    object-assign "^4.1.0"
+    signal-exit "^3.0.0"
+    string-width "^1.0.1"
+    strip-ansi "^3.0.1"
+    wide-align "^1.1.0"
+
+gauge@~2.7.1:
+  version "2.7.3"
+  resolved "https://registry.yarnpkg.com/gauge/-/gauge-2.7.3.tgz#1c23855f962f17b3ad3d0dc7443f304542edfe09"
+  dependencies:
+    aproba "^1.0.3"
+    console-control-strings "^1.0.0"
     has-unicode "^2.0.0"
     object-assign "^4.1.0"
     signal-exit "^3.0.0"
@@ -5230,6 +5243,20 @@ node-pre-gyp@^0.6.29, node-pre-gyp@^0.6.30:
     tar "~2.2.1"
     tar-pack "~3.3.0"
 
+node-pre-gyp@^0.6.33:
+  version "0.6.33"
+  resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.6.33.tgz#640ac55198f6a925972e0c16c4ac26a034d5ecc9"
+  dependencies:
+    mkdirp "~0.5.1"
+    nopt "~3.0.6"
+    npmlog "^4.0.1"
+    rc "~1.1.6"
+    request "^2.79.0"
+    rimraf "~2.5.4"
+    semver "~5.3.0"
+    tar "~2.2.1"
+    tar-pack "~3.3.0"
+
 node-status-codes@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/node-status-codes/-/node-status-codes-1.0.0.tgz#5ae5541d024645d32a58fcddc9ceecea7ae3ac2f"
@@ -5285,6 +5312,15 @@ npmlog@^4.0.0:
     are-we-there-yet "~1.1.2"
     console-control-strings "~1.1.0"
     gauge "~2.6.0"
+    set-blocking "~2.0.0"
+
+npmlog@^4.0.1:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/npmlog/-/npmlog-4.0.2.tgz#d03950e0e78ce1527ba26d2a7592e9348ac3e75f"
+  dependencies:
+    are-we-there-yet "~1.1.2"
+    console-control-strings "~1.1.0"
+    gauge "~2.7.1"
     set-blocking "~2.0.0"
 
 nth-check@~1.0.0:
@@ -6095,9 +6131,9 @@ react-native-modalbox:
   version "1.3.8"
   resolved "https://registry.yarnpkg.com/react-native-modalbox/-/react-native-modalbox-1.3.8.tgz#dc83bf90ded653288842a21153b5fca1af82e355"
 
-"react-native-share-extension@git+http://github.com/uk-ar/react-native-share-extension.git":
-  version "1.0.3"
-  resolved "git+http://github.com/uk-ar/react-native-share-extension.git#7902842d46aeb72396b45a7dfa2fba6ce4a295d5"
+react-native-share-extension:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/react-native-share-extension/-/react-native-share-extension-1.1.1.tgz#da2c4758c8a800c2241e797deb90298b5388053c"
 
 react-native-stylish@^0.3.0:
   version "0.3.0"

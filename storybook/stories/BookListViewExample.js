@@ -1910,6 +1910,72 @@ class BookListView10_test extends React.Component {
   }
 }
 
+class BookListView11_test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      books: [
+        {isbn:1,title:"foo",bucket:"liked"},
+        {isbn:2,title:"bar",bucket:"done" },
+        {isbn:3,bucket:"done"},
+        {isbn:4,bucket:"done"},
+        {isbn:5,bucket:"done"},
+        {isbn:6,bucket:"liked"},
+        {isbn:7,bucket:"liked"},
+        {isbn:8,bucket:"borrowed"},
+        {isbn:9,bucket:"borrowed"},
+        {isbn:10,bucket:"borrowed"},
+        {isbn:11,bucket:"done"},
+        {isbn:12,bucket:"done"},
+        {isbn:13,bucket:"done"},
+        {isbn:14,bucket:"done"},
+        {isbn:15,bucket:"done"},
+        {isbn:16,bucket:"done"},
+        {isbn:17,bucket:"done"},
+        {isbn:18,bucket:"done"},
+        {isbn:19,bucket:"done"},
+        {isbn:20,bucket:"done"},
+        {isbn:21,bucket:"done"},
+        {isbn:22,bucket:"done"},
+      ],
+      selectedSection: null
+    }
+    /* UIManager.setLayoutAnimationEnabledExperimental &&
+     *                UIManager.setLayoutAnimationEnabledExperimental(true);*/
+  }
+  render(){
+    return (
+      <BooksDataSource
+        books={this.state.books}
+        renderListView={(dataSource)=>
+          <ToggleableView
+            renderChildren={(toggle) =>
+              //scrollEnabled={toggle}
+              <ScrollView
+                onScroll={()=>{console.log('outer responding?');}}
+                onResponderMove={()=>{console.log('outer responding');}}
+                scrollEnabled={toggle}
+                           >
+              <ListView
+               dataSource={dataSource}
+               renderRow={(rowData,sectionID,rowID)=>
+                 <Text style={{height:100}}>{rowID}</Text>}
+                         />
+                 <ListView
+                onScroll={()=>{console.log('inner responding?');}}
+                onResponderMove={()=>{console.log('inner responding');}}
+                dataSource={dataSource}
+               style={toggle?{}:{position:"absolute"}}
+               renderRow={(rowData,sectionID,rowID)=>
+                 <Text style={{height:100}}>{rowID}</Text>}
+                         />
+              </ScrollView>}
+                         />}
+      />)
+    return null
+  }
+}
+
 storiesOf('BookListView2', module)
   .add('BookListView2',() => {
     return(<BookListView2_test />)
@@ -1937,4 +2003,7 @@ storiesOf('BookListView2', module)
   })
   .add('BookListView10',() => {
     return(<BookListView10_test />)
+  })
+  .add('BookListView11',() => {
+    return(<BookListView11_test />)
   })

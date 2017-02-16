@@ -180,9 +180,6 @@ class LifeCycleView extends React.Component {
       }
     )
   }
-  componentDidMount() {
-    action("componentDidMount4")()
-  }
   render(){
     //this.props.data.length
     return (
@@ -436,7 +433,7 @@ class ModalExample2 extends React.Component {
   }
   render(){
     //this.props.data.length
-    console.log("he",NavigationExperimental.Header.HEIGHT,)
+    //console.log("he",NavigationExperimental.Header.HEIGHT)
     return (
       <View
         style={{
