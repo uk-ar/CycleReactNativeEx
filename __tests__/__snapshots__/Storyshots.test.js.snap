@@ -10214,7 +10214,7 @@ exports[`Storyshots BookListView with TestBookListView1 1`] = `
             "backgroundColor": "#f5f5f5",
           },
           Object {
-            "flex": 1,
+            "height": 1274,
           },
         ]
       }>
@@ -12107,7 +12107,7 @@ exports[`Storyshots BookListView with TestBookListView2 1`] = `
             "backgroundColor": "#f5f5f5",
           },
           Object {
-            "flex": 1,
+            "height": 1274,
           },
         ]
       }>
@@ -15204,7 +15204,7 @@ exports[`Storyshots BookListView with TestBookListView3 1`] = `
             "backgroundColor": "#f5f5f5",
           },
           Object {
-            "flex": 1,
+            "height": 1274,
           },
         ]
       }>
@@ -45444,6 +45444,315 @@ exports[`Storyshots BookListView2 BookListView10 1`] = `
     </View>
   </View>
 </ScrollView>
+`;
+
+exports[`Storyshots BookListView2 BookListView11 1`] = `
+<View
+  style={
+    Object {
+      "paddingTop": 20,
+    }
+  }>
+  <Text
+    accessible={true}
+    allowFontScaling={true}
+    ellipsizeMode="tail">
+    state.toggle is 
+    true
+  </Text>
+  <Text
+    accessible={true}
+    allowFontScaling={true}
+    ellipsizeMode="tail"
+    onPress={[Function]}>
+    pressMe to toggle
+  </Text>
+  <Text
+    accessible={true}
+    allowFontScaling={true}
+    ellipsizeMode="tail"
+    onPress={[Function]}>
+    pressMe to set true
+  </Text>
+  <Text
+    accessible={true}
+    allowFontScaling={true}
+    ellipsizeMode="tail"
+    onPress={[Function]}>
+    pressMe to set false
+  </Text>
+  <ScrollView
+    onResponderMove={[Function]}
+    onScroll={[Function]}
+    scrollEnabled={true}>
+    <ScrollView
+      dataSource={
+        ListViewDataSource {
+          "items": NaN,
+        }
+      }
+      initialListSize={10}
+      onContentSizeChange={[Function]}
+      onEndReachedThreshold={1000}
+      onKeyboardDidHide={undefined}
+      onKeyboardDidShow={undefined}
+      onKeyboardWillHide={undefined}
+      onKeyboardWillShow={undefined}
+      onLayout={[Function]}
+      onScroll={[Function]}
+      pageSize={1}
+      removeClippedSubviews={true}
+      renderRow={[Function]}
+      scrollEventThrottle={50}
+      scrollRenderAheadDistance={1000}
+      stickyHeaderIndices={Array []}>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        1
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        2
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        3
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        4
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        5
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        6
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        7
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        8
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        9
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        10
+      </Text>
+    </ScrollView>
+    <ScrollView
+      dataSource={
+        ListViewDataSource {
+          "items": NaN,
+        }
+      }
+      initialListSize={10}
+      onContentSizeChange={[Function]}
+      onEndReachedThreshold={1000}
+      onKeyboardDidHide={undefined}
+      onKeyboardDidShow={undefined}
+      onKeyboardWillHide={undefined}
+      onKeyboardWillShow={undefined}
+      onLayout={[Function]}
+      onResponderMove={[Function]}
+      onScroll={[Function]}
+      pageSize={1}
+      removeClippedSubviews={true}
+      renderRow={[Function]}
+      scrollEventThrottle={50}
+      scrollRenderAheadDistance={1000}
+      stickyHeaderIndices={Array []}
+      style={Object {}}>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        1
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        2
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        3
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        4
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        5
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        6
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        7
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        8
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        9
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "height": 100,
+          }
+        }>
+        10
+      </Text>
+    </ScrollView>
+  </ScrollView>
+</View>
 `;
 
 exports[`Storyshots BookRow1 with close props 1`] = `

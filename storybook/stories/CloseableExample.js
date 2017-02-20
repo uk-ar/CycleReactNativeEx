@@ -269,43 +269,44 @@ storiesOf('LayoutableView', module)
         backgroundColor:"yellow"}} />
     </View>
   ))
-  .add('section ListView & transitionEnter', () => {
+//BookListView is broken because BookListView1 only accept dataBlob
+/* .add('section ListView & transitionEnter', () => {
 
-    return (<View
-            style={{marginTop:20}}
-    >
-      <Text onPress={()=>{
-        //this["r1"].close()
-        this.listview.close("s1","r1")
-        }}>
-        press to close
-      </Text>
-      <TestSectionListView>
-        {(dataSource)=>
-          <BookListView
-            style={{flex:1}}
-            ref={c => this.listview = c}
-            dataSource={dataSource}
-            generateActions={()=>genActions2('search')}
-            renderRow={(rowData,sectionID,rowID) =>
-              <View>
-              <LayoutableView
-                    transitionEnter={true}
-                    ref={c => this[rowID] = c}
-                        >
-                        {debugView("row")(rowData,rowID,sectionID)}
-              </LayoutableView>
-              </View>
-                      }
-            renderSectionHeader={(rowData,sectionID) =>
-              debugView("section")(rowData,sectionID)
-                                }
-          />
-        }
-      </TestSectionListView>
-      <View
-        style={{
-          height:50,
-          backgroundColor:"yellow"}} />
-    </View>)
-  })
+ *   return (<View
+ *           style={{marginTop:20}}
+ *   >
+ *     <Text onPress={()=>{
+ *       //this["r1"].close()
+ *       this.listview.close("s1","r1")
+ *       }}>
+ *       press to close
+ *     </Text>
+ *     <TestSectionListView>
+ *       {(dataSource)=>
+ *         <BookListView
+ *           style={{flex:1}}
+ *           ref={c => this.listview = c}
+ *           dataSource={dataSource}
+ *           generateActions={()=>genActions2('search')}
+ *           renderRow={(rowData,sectionID,rowID) =>
+ *             <View>
+ *             <LayoutableView
+ *                   transitionEnter={true}
+ *                   ref={c => this[rowID] = c}
+ *                       >
+ *                       {debugView("row")(rowData,rowID,sectionID)}
+ *             </LayoutableView>
+ *             </View>
+ *                     }
+ *           renderSectionHeader={(rowData,sectionID) =>
+ *             debugView("section")(rowData,sectionID)
+ *                               }
+ *         />
+ *       }
+ *     </TestSectionListView>
+ *     <View
+ *       style={{
+ *         height:50,
+ *         backgroundColor:"yellow"}} />
+ *   </View>)
+ * })*/

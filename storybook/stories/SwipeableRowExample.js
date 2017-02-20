@@ -297,14 +297,15 @@ storiesOf('SwipeableActions', module)
     const { leftActions, rightActions } = genActions2('search');
     return (
       <Actions />
-    )}).add('with sw b', () => {
-      const { leftActions, rightActions } = genActions2('done');
-      return (
-        <SwipeableButtons2
-          ref="rightButtons"
-          direction="right"
-          width={new Animated.Value(100)}
-          buttons={leftActions}
-        />
-      )
-    })
+    )})
+/* .add('with sw b', () => {
+ *     const { leftActions, rightActions } = genActions2('done');
+ *     return (
+ *       <SwipeableButtons2
+ *         ref="rightButtons"
+ *         direction="right"
+ *         width={new Animated.Value(100)}
+ *         buttons={leftActions}
+ *       />
+ *     )
+ *   })*/

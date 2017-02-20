@@ -1086,72 +1086,72 @@ storiesOf('BookListView', module)
 /* .addDecorator(getStory => (
  *   <CenterView>{getStory()}</CenterView>
  * ))*/
-  .add('with book', () => {
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    return(
-      <View
-        style={{
-          paddingTop:20,
-          paddingHorizontal:5,
-        }}>
-        <BookListView
-          style={{backgroundColor:"blue"}}
-          width={width-10}
-          generateActions={()=>genActions2('search')}
-          dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
-          renderRow={(rowData) => <Text>row</Text>}
-          renderSectionHeader={(rowData) => <Text>sec</Text>}
-        />
-      </View>
-    )
-  })
-  .add('with callback', () => {
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    return(
-      <BookListView
-        style={{paddingTop:20}}
-        generateActions={()=>genActions2('search')}
-        dataSource={ds.cloneWithRows(
-            {a:{title:'row 1',isbn:'123'},
-             b:{title:'row 2',isbn:'456'}
-            })}
-        onRelease={action('onRelease')}
-      renderRow={(rowData,rowID,sectionID) =>
-        <Text>foo</Text>
-          }
-        renderSectionHeader={debugView("head")}
-      />
-    )
-  })
-  .add('with add row', () => {
-    return(
-      <TestListView>
-        {(dataSource)=>
-          <BookListView
-            style={{paddingTop:20}}
-            generateActions={()=>genActions2('search')}
-            dataSource={dataSource}
-            onRelease={action('onRelease')}
-            renderRow={(rowData,rowID,sectionID) =>
-                <LayoutableView>
-                          {debugView("row")(rowData,rowID,sectionID)}
-                </LayoutableView>
-                      }
-            renderSectionHeader={debugView("head")}
-          />
-        }
-      </TestListView>
-    )
-  })
-  .add('with TestListView2', () => {
-    return(<TestListView2 />)
-  })
-  .add('with TestListView3', () => {
-    return(<TestListView3 />)
-  })
-  .add('with TestListView4', () => {
-    return(<TestListView4 />)
-  })
+/* .add('with book', () => {
+ *   const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+ *   return(
+ *     <View
+ *       style={{
+ *         paddingTop:20,
+ *         paddingHorizontal:5,
+ *       }}>
+ *       <BookListView
+ *         style={{backgroundColor:"blue"}}
+ *         width={width-10}
+ *         generateActions={()=>genActions2('search')}
+ *         dataSource={ds.cloneWithRows(['row 1', 'row 2'])}
+ *         renderRow={(rowData) => <Text>row</Text>}
+ *         renderSectionHeader={(rowData) => <Text>sec</Text>}
+ *       />
+ *     </View>
+ *   )
+ * })*/
+/* .add('with callback', () => {
+ *   const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+ *   return(
+ *     <BookListView
+ *       style={{paddingTop:20}}
+ *       generateActions={()=>genActions2('search')}
+ *       dataSource={ds.cloneWithRows(
+ *           {a:{title:'row 1',isbn:'123'},
+ *            b:{title:'row 2',isbn:'456'}
+ *           })}
+ *       onRelease={action('onRelease')}
+ *     renderRow={(rowData,rowID,sectionID) =>
+ *       <Text>foo</Text>
+ *         }
+ *       renderSectionHeader={debugView("head")}
+ *     />
+ *   )
+ * })
+ * .add('with add row', () => {
+ *   return(
+ *     <TestListView>
+ *       {(dataSource)=>
+ *         <BookListView
+ *           style={{paddingTop:20}}
+ *           generateActions={()=>genActions2('search')}
+ *           dataSource={dataSource}
+ *           onRelease={action('onRelease')}
+ *           renderRow={(rowData,rowID,sectionID) =>
+ *               <LayoutableView>
+ *                         {debugView("row")(rowData,rowID,sectionID)}
+ *               </LayoutableView>
+ *                     }
+ *           renderSectionHeader={debugView("head")}
+ *         />
+ *       }
+ *     </TestListView>
+ *   )
+ * })*/
+/* .add('with TestListView2', () => {
+ *   return(<TestListView2 />)
+ * })*/
+/* .add('with TestListView3', () => {
+ *   return(<TestListView3 />)
+ * })*/
+/* .add('with TestListView4', () => {
+ *   return(<TestListView4 />)
+ * })*/
   .add('with MultipleListView', () => {
     return(<MultipleListView/>)
   })
@@ -1164,26 +1164,26 @@ storiesOf('BookListView', module)
   .add('with NestedListView3', () => {
     return(<NestedListView3 />)
   })
-  .add('with add or remove row', () => {
-    return(
-      <TestSectionListView>
-        {(dataSource)=>
-          <BookListView
-            style={{paddingTop:20}}
-            generateActions={()=>genActions2('search')}
-            dataSource={dataSource}
-            onRelease={action('onRelease')}
-            renderRow={(rowData,rowID,sectionID) =>
-              <LayoutableView>
-                      {debugView("row")(rowData,rowID,sectionID)}
-              </LayoutableView>
-                      }
-            renderSectionHeader={debugView("head")}
-          />
-        }
-      </TestSectionListView>
-    )
-  })
+/* .add('with add or remove row', () => {
+ *   return(
+ *     <TestSectionListView>
+ *       {(dataSource)=>
+ *         <BookListView
+ *           style={{paddingTop:20}}
+ *           generateActions={()=>genActions2('search')}
+ *           dataSource={dataSource}
+ *           onRelease={action('onRelease')}
+ *           renderRow={(rowData,rowID,sectionID) =>
+ *             <LayoutableView>
+ *                     {debugView("row")(rowData,rowID,sectionID)}
+ *             </LayoutableView>
+ *                     }
+ *           renderSectionHeader={debugView("head")}
+ *         />
+ *       }
+ *     </TestSectionListView>
+ *   )
+ * })*/
   .add('with TestBookListView1', () => {
     return(<TestBookListView1/>)
   })
@@ -1193,9 +1193,9 @@ storiesOf('BookListView', module)
   .add('with TestBookListView3', () => {
     return(<TestBookListView3/>)
   })
-  .add('with TestBookListView4', () => {
-    return(<TestBookListView4/>)
-  })
+/* .add('with TestBookListView4', () => {
+ *   return(<TestBookListView4/>)
+ * })*/
 
 class DelayedListView extends React.Component {
   constructor(props) {
@@ -1943,6 +1943,20 @@ class BookListView11_test extends React.Component {
     /* UIManager.setLayoutAnimationEnabledExperimental &&
      *                UIManager.setLayoutAnimationEnabledExperimental(true);*/
   }
+  /* <ListView
+   * dataSource={dataSource}
+   * renderRow={(rowData,sectionID,rowID)=>
+   *   <Text style={{height:100}}>{rowID}</Text>}
+   * />
+   * <ListView
+   * onScroll={()=>{console.log('inner responding?');}}
+   * onResponderMove={()=>{console.log('inner responding');}}
+   * dataSource={dataSource}
+   * style={toggle?{}:{position:"absolute"}}
+   * renderRow={(rowData,sectionID,rowID)=>
+   *   <Text style={{height:100}}>{rowID}</Text>}
+   * />
+   */
   render(){
     return (
       <BooksDataSource
@@ -1955,22 +1969,108 @@ class BookListView11_test extends React.Component {
                 onScroll={()=>{console.log('outer responding?');}}
                 onResponderMove={()=>{console.log('outer responding');}}
                 scrollEnabled={toggle}
+                horizontal={!toggle}
+                contentContainerStyle={{flexDirection:"column"}}
                            >
-              <ListView
-               dataSource={dataSource}
-               renderRow={(rowData,sectionID,rowID)=>
-                 <Text style={{height:100}}>{rowID}</Text>}
-                         />
-                 <ListView
-                onScroll={()=>{console.log('inner responding?');}}
-                onResponderMove={()=>{console.log('inner responding');}}
-                dataSource={dataSource}
-               style={toggle?{}:{position:"absolute"}}
-               renderRow={(rowData,sectionID,rowID)=>
-                 <Text style={{height:100}}>{rowID}</Text>}
-                         />
+                           {debugView("row")("content2")}
+                           {debugView("row")("content2")}
+                           {debugView("row")("content2")}
+                <ScrollView
+                  key={'scrollView'}
+                  horizontal={false}
+                scrollEnabled={!toggle}
+                             >
+                             {debugView("row")("content1")}
+                             {debugView("row")("content1")}
+                             {debugView("row")("content1")}
+                             {debugView("row")("content1")}
+                             {debugView("row")("content1")}
+                </ScrollView>
+                           {debugView("row")("content3")}
+                           {debugView("row")("content3")}
               </ScrollView>}
                          />}
+      />)
+    return null
+  }
+}
+
+class BookListView12_test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      books: [
+        {isbn:1,title:"foo",bucket:"liked"},
+        {isbn:2,title:"bar",bucket:"done" },
+        {isbn:3,bucket:"done"},
+        {isbn:4,bucket:"done"},
+        {isbn:5,bucket:"done"},
+        {isbn:6,bucket:"liked"},
+        {isbn:7,bucket:"liked"},
+        {isbn:8,bucket:"borrowed"},
+        {isbn:9,bucket:"borrowed"},
+        {isbn:10,bucket:"borrowed"},
+        {isbn:11,bucket:"done"},
+        {isbn:12,bucket:"done"},
+        {isbn:13,bucket:"done"},
+        {isbn:14,bucket:"done"},
+        {isbn:15,bucket:"done"},
+        {isbn:16,bucket:"done"},
+        {isbn:17,bucket:"done"},
+        {isbn:18,bucket:"done"},
+        {isbn:19,bucket:"done"},
+        {isbn:20,bucket:"done"},
+        {isbn:21,bucket:"done"},
+        {isbn:22,bucket:"done"},
+      ],
+      selectedSection: null
+    }
+    /* UIManager.setLayoutAnimationEnabledExperimental &&
+     *                UIManager.setLayoutAnimationEnabledExperimental(true);*/
+  }
+  /* <ListView
+   * dataSource={dataSource}
+   * renderRow={(rowData,sectionID,rowID)=>
+   *   <Text style={{height:100}}>{rowID}</Text>}
+   * />
+   * <ListView
+   * onScroll={()=>{console.log('inner responding?');}}
+   * onResponderMove={()=>{console.log('inner responding');}}
+   * dataSource={dataSource}
+   * style={toggle?{}:{position:"absolute"}}
+   * renderRow={(rowData,sectionID,rowID)=>
+   *   <Text style={{height:100}}>{rowID}</Text>}
+   * />
+   */
+  render(){
+    return (
+      <BooksDataSource
+        books={this.state.books}
+        renderListView={(dataSource)=>
+          <ToggleableView
+            renderChildren={(toggle) =>
+              //scrollEnabled={toggle}
+              <ScrollView>
+                <View key="foo">
+                  <Text>foo</Text>
+                           {debugView("row")("content2")}
+                           {debugView("row")("content2")}
+                           {debugView("row")("content2")}
+                </View>
+                <View key="bar">
+                  <Text>bar</Text>
+                           {debugView("row")("content1")}
+                           {debugView("row")("content1")}
+                           {debugView("row")("content1")}
+                           {debugView("row")("content1")}
+                           {debugView("row")("content1")}
+                           {debugView("row")("content1")}
+                </View>
+                <Text>bar</Text>
+                           {debugView("row")("content3")}
+                           {debugView("row")("content3")}
+              </ScrollView>}
+                              />}
       />)
     return null
   }
@@ -2006,4 +2106,7 @@ storiesOf('BookListView2', module)
   })
   .add('BookListView11',() => {
     return(<BookListView11_test />)
+  })
+  .add('BookListView12',() => {
+    return(<BookListView12_test />)
   })
