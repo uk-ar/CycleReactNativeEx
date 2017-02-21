@@ -15,7 +15,7 @@ import Welcome from './Welcome';
 
 import {BookCell} from '../../BookCell';
 import {genActions2,Action} from '../../Action';
-import {SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
+import {SwipeableRow5,SwipeableRow4,SwipeableButtons2,SwipeableActions,SwipeableRow3} from '../../SwipeableRow';
 import {withDebug,VerticalCenterView} from './common';
 
 //with row && small height
@@ -309,3 +309,15 @@ storiesOf('SwipeableActions', module)
  *       />
  *     )
  *   })*/
+
+storiesOf('SwipeableRow5', module)
+  .add('with book', () => (
+    <SwipeableRow5
+      renderLeftAction={()=>
+        <Text>left</Text>}
+      renderRightAction={()=>
+        <Text>right</Text>}
+    >
+    <Text>center</Text>
+    </SwipeableRow5>
+  ))

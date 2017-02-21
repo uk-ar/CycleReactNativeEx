@@ -1814,102 +1814,6 @@ class BookListView9_test extends React.Component {
   }
 }
 
-class BookListView10_test extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      books: [
-        {isbn:1,title:"foo",bucket:"liked"},
-        {isbn:2,title:"bar",bucket:"done" },
-        {isbn:3,bucket:"done"},
-        {isbn:4,bucket:"done"},
-        {isbn:5,bucket:"done"},
-        {isbn:6,bucket:"liked"},
-        {isbn:7,bucket:"liked"},
-        {isbn:8,bucket:"borrowed"},
-        {isbn:9,bucket:"borrowed"},
-        {isbn:10,bucket:"borrowed"},
-        {isbn:11,bucket:"done"},
-        {isbn:12,bucket:"done"},
-        {isbn:13,bucket:"done"},
-        {isbn:14,bucket:"done"},
-        {isbn:15,bucket:"done"},
-        {isbn:16,bucket:"done"},
-        {isbn:17,bucket:"done"},
-        {isbn:18,bucket:"done"},
-        {isbn:19,bucket:"done"},
-        {isbn:20,bucket:"done"},
-        {isbn:21,bucket:"done"},
-        {isbn:22,bucket:"done"},
-      ],
-      selectedSection: null
-    }
-    this.positionY=0;
-  }
-  render(){
-    const onCloseStart=(target,rowData,sectionID,rowID, highlightRow)=>{
-      //keep order when close start
-      //this.dataBlob =
-      this.setState({
-        books: this.state.books.map((book)=>
-          book.isbn === rowData.isbn ? {...book, bucket : null}: book)
-      })
-    }
-    const onCloseEnd=(target,rowData,sectionID,rowID, highlightRow)=>{
-      this.setState({
-        books: [{...rowData,bucket:target},
-                ...this.state.books.filter((book)=>book.isbn!==rowData.isbn)
-        ]
-      })
-      //console.log("th",this.dataBlob,target)
-    }
-    const onCloseSection=()=>{
-      /* const scrollResponder = this.scroll.getScrollResponder();
-       * scrollResponder.scrollTo({x:0,y:0})*/
-      //InteractionManager.runAfterInteractions(()=>{
-      this.setState({selectedSection:null})
-      //})
-    }
-
-    return (
-      <BooksDataSource
-        books={this.state.books}
-        renderListView={(dataSource)=>{
-            return(
-              <BookListView3
-                       style={{
-                         paddingTop:20,backgroundColor: '#1A237E'}}
-          dataSource={dataSource}
-          onCloseStart={onCloseStart}
-          onCloseEnd={onCloseEnd}
-          selectedSection={this.state.selectedSection}
-          onCloseSection={()=>{
-              LayoutAnimation.configureNext(
-                LayoutAnimation
-                  .create(600,
-                          LayoutAnimation.Types.easeInEaseOut,
-                          LayoutAnimation.Properties.opacity))
-              this.setState({selectedSection:null})
-            }}
-          onSelectSection={(selectedSection)=>{
-              LayoutAnimation.configureNext(
-                        LayoutAnimation
-                          .create(600,
-                                  LayoutAnimation.Types.easeInEaseOut,
-                                  LayoutAnimation.Properties.opacity))
-              //LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
-              this.setState({
-                selectedSection
-              })
-            }}
-                          />
-            )
-          }}
-      />
-    )
-  }
-}
-
 class BookListView11_test extends React.Component {
   constructor(props) {
     super(props);
@@ -1941,7 +1845,7 @@ class BookListView11_test extends React.Component {
       selectedSection: null
     }
     /* UIManager.setLayoutAnimationEnabledExperimental &&
-     *                UIManager.setLayoutAnimationEnabledExperimental(true);*/
+     *              UIManager.setLayoutAnimationEnabledExperimental(true);*/
   }
   /* <ListView
    * dataSource={dataSource}
@@ -1969,8 +1873,11 @@ class BookListView11_test extends React.Component {
                 onScroll={()=>{console.log('outer responding?');}}
                 onResponderMove={()=>{console.log('outer responding');}}
                 scrollEnabled={toggle}
-                horizontal={!toggle}
-                contentContainerStyle={{flexDirection:"column"}}
+                contentContainerStyle={{
+                  flexDirection:"column",
+                  alignItems:"stretch",
+                  //alignContent:"stretch",
+                }}
                            >
                            {debugView("row")("content2")}
                            {debugView("row")("content2")}
@@ -1978,7 +1885,7 @@ class BookListView11_test extends React.Component {
                 <ScrollView
                   key={'scrollView'}
                   horizontal={false}
-                scrollEnabled={!toggle}
+                  scrollEnabled={!toggle}
                              >
                              {debugView("row")("content1")}
                              {debugView("row")("content1")}
@@ -2076,6 +1983,152 @@ class BookListView12_test extends React.Component {
   }
 }
 
+class BookListView13_test extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+    //UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+  render(){
+    return (
+      <View
+        removeClippedSubviews={false}
+        key="foo"
+        style={{
+          overflow:"hidden",height:300,backgroundColor:"red",
+          //justifyContent:"flex-end",
+        }}
+        >
+        <Text>head</Text>
+        <View
+          style={{height:600,backgroundColor:"blue"}}/>
+      </View>
+    )
+  }
+}
+
+//Worsk well?
+class BookListView14_test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      books: [
+        {isbn:1,title:"foo",bucket:"liked"},
+        {isbn:2,title:"bar",bucket:"done" },
+        {isbn:3,bucket:"done"},
+        {isbn:4,bucket:"done"},
+        {isbn:5,bucket:"done"},
+        {isbn:6,bucket:"liked"},
+        {isbn:7,bucket:"liked"},
+        {isbn:8,bucket:"borrowed"},
+        {isbn:9,bucket:"borrowed"},
+        {isbn:10,bucket:"borrowed"},
+        {isbn:11,bucket:"liked"},
+        {isbn:12,bucket:"liked"},
+        {isbn:13,bucket:"liked"},
+        {isbn:14,bucket:"liked"},
+        {isbn:15,bucket:"liked"},
+        {isbn:16,bucket:"liked"},
+        {isbn:17,bucket:"liked"},
+        {isbn:18,bucket:"done"},
+        {isbn:19,bucket:"done"},
+        {isbn:20,bucket:"done"},
+        {isbn:21,bucket:"done"},
+        {isbn:22,bucket:"done"},
+      ],
+      selectedSection: null
+    }
+    this.positionY=0;
+    UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+  render(){
+    const onCloseStart=(target,rowData,sectionID,rowID, highlightRow)=>{
+      //keep order when close start
+      //this.dataBlob =
+      //LayoutAnimation.easeInEaseOut();
+      this.setState({
+        books: this.state.books.map((book)=>
+          book.isbn === rowData.isbn ? {...book, bucket : null}: book)
+      })
+    }
+    const onCloseEnd=(target,rowData,sectionID,rowID, highlightRow)=>{
+      this.setState({
+        books: [{...rowData,bucket:target},
+                ...this.state.books.filter((book)=>book.isbn!==rowData.isbn)
+        ]
+      })
+      //console.log("th",this.dataBlob,target)
+    }
+    const onCloseSection=()=>{
+      const scrollResponder = this[this.state.selectedSection].getScrollResponder();
+      scrollResponder.scrollTo({x:0,y:0,animated:false})
+      LayoutAnimation.configureNext(
+        LayoutAnimation
+          .create(600,
+                  LayoutAnimation.Types.easeInEaseOut,
+                  LayoutAnimation.Properties.opacity))
+      this.setState({selectedSection:null})
+    }
+    const onSelectSection=(selectedSection)=>{
+      const scrollResponder = this.scroll.getScrollResponder();
+      scrollResponder.scrollTo({x:0,y:0,animated:false})
+      LayoutAnimation.configureNext(
+        LayoutAnimation
+          .create(600,
+                  LayoutAnimation.Types.easeInEaseOut,
+                  LayoutAnimation.Properties.opacity))
+      //LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+      this.setState({
+        selectedSection
+      })
+    }
+    
+    return (
+      <BooksDataSource
+        books={this.state.books}
+        renderListView={(dataSource)=>{
+            const props = {
+              selectedSection:this.state.selectedSection,
+              onCloseStart,
+              onCloseEnd,
+              onSelectSection,
+              onCloseSection,
+              dataSource,
+            }
+            return(
+              <View
+                 style={{backgroundColor: '#1A237E'}}>
+                <ScrollView
+        ref={(comp)=>this.scroll=comp}
+        key="scroll"
+        scrollEnabled={!this.state.selectedSection}
+        style={{marginTop:20}}>
+                  <BookListView2
+        ref={(comp)=>this.liked=comp}              
+          key="liked"
+          bucket="liked"
+          {...props}
+          />
+                  <BookListView2
+                  ref={(comp)=>this.done=comp}
+          bucket="done"
+          key="done"
+          {...props}
+          />
+                  <BookListView2
+                  ref={(comp)=>this.borrowed=comp}
+          bucket="borrowed"
+          key="borrowed"
+          {...props}
+          />
+                </ScrollView>                       
+              </View>
+            )
+          }}
+      />
+    )
+  }
+}
+
 storiesOf('BookListView2', module)
   .add('BookListView2',() => {
     return(<BookListView2_test />)
@@ -2101,12 +2154,15 @@ storiesOf('BookListView2', module)
   .add('BookListView9',() => {
     return(<BookListView9_test />)
   })
-  .add('BookListView10',() => {
-    return(<BookListView10_test />)
-  })
   .add('BookListView11',() => {
     return(<BookListView11_test />)
   })
   .add('BookListView12',() => {
     return(<BookListView12_test />)
+  })
+  .add('BookListView13',() => {
+    return(<BookListView13_test />)
+  })
+  .add('BookListView14',() => {
+    return(<BookListView14_test />)
   })

@@ -359,11 +359,8 @@ class BookListView_old extends React.Component {
 
 //For cycle.js
 class BookListView2 extends React.Component {
-  componentWillReceiveProps(nextProps) {
-    if (this.props.selectedSection !== nextProps.selectedSection) {
-      //this.header.forceUpdate()
-      //console.log("th",this.header)
-    }
+  getScrollResponder(){
+    return this.scroll.getScrollResponder()
   }
   render(){
     const { renderFooter, onSelectSection ,onCloseSection, selectedSection,
@@ -380,10 +377,19 @@ class BookListView2 extends React.Component {
     const INDICATOR_HEIGHT=20
     //Math.min(2,count)
     //        style={{height:600}}
+    /* style={selectedSection===bucket ?
+     *        {position:"absolute",bottom:0,top:0} : {}
+     * }*/
+    //set pageSize to draw cell for listview
+    //https://github.com/facebook/react-native/issues/1831#issuecomment-279185276
     return (
-      <View>
+      <View style={selectedSection && selectedSection !== bucket ?
+                   [style,{height:0}] : style}
+        onResponderMove={(evt)=>console.log("mov")}
+      >
         <ItemsHeader
-          style={styles.sectionHeader/*grey 200*/}
+          style={styles.sectionHeader
+                  /*grey 200*/}
           section={bucket/* TODO:change prop name */}
           close={ selectedSection === bucket }
           onSelectSection={(section)=>{
@@ -393,9 +399,13 @@ class BookListView2 extends React.Component {
           onCloseSection={()=>onCloseSection()}
         />
         <ListView
+          ref={(comp)=>this.scroll=comp}
+          pageSize={10}
           style={[{backgroundColor: materialColor.grey['100']},
                   selectedSection===bucket ?
-                  {height: HEIGHT - HEADER_HEIGHT - INDICATOR_HEIGHT } :
+                  {height: HEIGHT - HEADER_HEIGHT*2 } :
+                  //{flex:1 } :
+                  //{height: 500 } ://659 40 20
                   {maxHeight: ROW_HEIGHT*2}]}
           dataSource={dataSource}
           scrollEnabled={selectedSection!==null}
@@ -462,6 +472,9 @@ class ToggleableScrollView extends React.Component {
 }
 
 class BookListView3 extends React.Component {
+  getScrollResponder(){
+    return this.refs.scroll.getScrollResponder()
+  }
   render(){
     const {selectedSection,dataSource,style,
            onCloseStart,onCloseEnd,onCloseSection,onSelectSection,
@@ -471,46 +484,53 @@ class BookListView3 extends React.Component {
       selectedSection,
       onCloseStart,
       onCloseEnd,
-      onSelectSection,
-      onCloseSection
+      //style:{flex:1},
+      onSelectSection:(section)=>{
+        //this.refs.scroll.scrollTo({x:0,y:0})
+        onSelectSection(section)
+      },
+      onCloseSection,
     }
     //console.log("p",this.props)
     return(
-      selectedSection ?
+      //filter by BookListView2 has not sticky header
+      /* selectedSection ?
+       * <View
+       *   key="scroll"
+       *   ref="scroll"
+       *   style={{}}>
+       *   <BookListView2
+       *     dataSource={dataSource}
+       *     key={selectedSection}
+       *     bucket={selectedSection}
+       *     {...props}
+       *   />
+       * </View>
+       * :*/
       <ScrollView
         key="scroll"
-          scrollEnabled={false}
-          style={style}>
-          <BookListView2
-            dataSource={dataSource}
-            key={selectedSection}
-            bucket={selectedSection}
-            {...props}
-          />
-        </ScrollView> :
-      <ScrollView
-        key="scroll"
-          scrollEnabled={true}
-          style={style}>
-          <BookListView2
-            dataSource={dataSource}
-            key="liked"
-            bucket="liked"
-            {...props}
-          />
-          <BookListView2
-            dataSource={dataSource}
-            bucket="done"
-            key="done"
-            {...props}
-          />
-          <BookListView2
-            dataSource={dataSource}
-            bucket="borrowed"
-            key="borrowed"
-            {...props}
-          />
-        </ScrollView>
+        ref="scroll"
+        scrollEnabled={!selectedSection}
+        style={style}>
+        <BookListView2
+          dataSource={dataSource}
+          key="liked"
+          bucket="liked"
+          {...props}
+        />
+        <BookListView2
+          dataSource={dataSource}
+          bucket="done"
+          key="done"
+          {...props}
+        />
+        <BookListView2
+          dataSource={dataSource}
+          bucket="borrowed"
+          key="borrowed"
+          {...props}
+        />
+    </ScrollView>
     )
   }
 }

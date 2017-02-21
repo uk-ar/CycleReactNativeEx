@@ -705,16 +705,116 @@ class SwipeableRow4 extends React.Component {
 SwipeableRow4.propTypes = {
   ...View.propTypes,
   onCloseStart: React.PropTypes.func.isRequired,
+  onCloseEnd: React.PropTypes.func.isRequired,
   renderLeftAction: React.PropTypes.func.isRequired,
   renderRightAction: React.PropTypes.func.isRequired,
+  close: React.PropTypes.bool.isRequired,
 };
 SwipeableRow4.defaultProps = {
   ...View.defaultProps,
   onCloseStart: emptyFunction,
+  onCloseEnd: emptyFunction,
   renderLeftAction: emptyFunction,
   renderRightAction: emptyFunction,
+  close: false,
+};
+
+class SwipeableRow5 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      index:0,
+      positiveSwipe: true,
+      releasing: false,
+    }
+    this.panX = new Animated.Value(0.1);
+    //this.index = 0;
+  }
+  render(){
+    const { onCloseStart, onCloseEnd,
+            renderLeftAction, renderRightAction,
+            children,close,
+            ...props } = this.props;
+    return (
+        <PanResponderView2
+          disabled={this.state.releasing}
+          style={{
+            flexDirection: 'row',
+            width:WIDTH,
+          }}
+          onSwipeMove={Animated.event([
+              {dx:this.panX}
+            ])}
+          onSwipeDirectionChange={(pos)=>{
+              this.setState({positiveSwipe:pos})
+            }}
+          onSwipeEnd={(gestureState)=>{
+              if(this.state.releasing){return}
+              if(this.index === 0){
+                Animated.timing(this.panX,
+                                {toValue:0,duration:300})
+                        .start()
+              }else{
+                this.setState({releasing:true},()=>{
+                  Animated.timing(this.panX,
+                                  this.state.positiveSwipe ?
+                                  {toValue: WIDTH, duration:300} :
+                                  {toValue:-WIDTH, duration:300})
+                          .start(({finished:finished})=>{
+                            onCloseStart()
+
+                          })
+                })
+              }
+            }}>          
+          <View
+            key="background_action"
+            style={{
+              flex:1,
+              alignItems:this.state.positiveSwipe? "flex-start" : "flex-end"
+            }}>
+            <Text>{this.state.positiveSwipe? "left" : "right"}</Text>
+          </View>
+          <Animated.View
+            style={{
+              width:100,
+              right:this.panX,
+              position:"absolute",
+            }}>
+            <Text>leftActions(fg)</Text>
+          </Animated.View>
+          <Animated.View
+            style={{
+              transform:[{
+                translateX:this.panX
+              }],
+              width:WIDTH,
+              position:"absolute",
+            }}>
+            {children}
+          </Animated.View>
+        </PanResponderView2>
+    )
+  }
+}
+
+SwipeableRow5.propTypes = {
+  ...View.propTypes,
+  onCloseStart: React.PropTypes.func.isRequired,
+  onCloseEnd: React.PropTypes.func.isRequired,
+  renderLeftAction: React.PropTypes.func.isRequired,
+  renderRightAction: React.PropTypes.func.isRequired,
+  close: React.PropTypes.bool.isRequired,
+};
+SwipeableRow5.defaultProps = {
+  ...View.defaultProps,
+  onCloseStart: emptyFunction,
+  onCloseEnd: emptyFunction,
+  renderLeftAction: emptyFunction,
+  renderRightAction: emptyFunction,
+  close: false,
 };
 
 // scroll view base
 // ref: http://browniefed.com/blog/react-native-animated-listview-row-swipe/
-module.exports = { SwipeableRow4, SwipeableRow3, MeasureableView, SwipeableActions, withState2 };
+module.exports = { SwipeableRow5, SwipeableRow4, SwipeableRow3, MeasureableView, SwipeableActions, withState2 };
