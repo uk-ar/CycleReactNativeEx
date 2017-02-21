@@ -733,9 +733,10 @@ class SwipeableRow5 extends React.Component {
   render(){
     const { onCloseStart, onCloseEnd,
             renderLeftAction, renderRightAction,
-            children,close,
+            children,close,style,
             ...props } = this.props;
     return (
+      <View style={style}>
         <PanResponderView2
           disabled={this.state.releasing}
           style={{
@@ -766,34 +767,68 @@ class SwipeableRow5 extends React.Component {
                           })
                 })
               }
-            }}>          
+            }}>
           <View
             key="background_action"
             style={{
               flex:1,
               alignItems:this.state.positiveSwipe? "flex-start" : "flex-end"
             }}>
-            <Text>{this.state.positiveSwipe? "left" : "right"}</Text>
+            {this.state.positiveSwipe?
+             <Text>left</Text>:
+             <Text>right</Text>}
           </View>
           <Animated.View
             style={{
-              width:100,
-              right:this.panX,
-              position:"absolute",
-            }}>
-            <Text>leftActions(fg)</Text>
-          </Animated.View>
-          <Animated.View
-            style={{
+              flexDirection:"row",
               transform:[{
                 translateX:this.panX
               }],
-              width:WIDTH,
               position:"absolute",
+              //debug
             }}>
-            {children}
+            <MeasureableView
+              onFirstLayout={
+                ({nativeEvent:{layout:{x, y, width, height}}}) =>{
+                  this.panX.setOffset(-width)
+                  this.leftOffset = width
+                  this.panX.addListener(({value:w})=>{
+                    //this.panX is offseted
+                    0 < w ?
+                    this.left.setNativeProps({style:{opacity:0}}):
+                    this.left.setNativeProps({style:{opacity:1}})
+                  })
+                  this.setState({index:0})//update view
+                }}>
+              <Text
+                style={{backgroundColor:"white"}}
+                ref={comp=>this.left=comp}>
+                left</Text>
+            </MeasureableView>
+            <View style={{width:WIDTH}}>
+              {children}
+            </View>
+            <MeasureableView
+              removeClippedSubviews={false}
+              onFirstLayout={
+                ({nativeEvent:{layout:{x, y, width, height}}}) =>{
+                  this.rightOffset = width
+                  this.panX.addListener(({value:w})=>{
+                    //this.panX is offseted
+                    //console.log("w:",w,this.rightOffset,this.leftOffset)
+                    w < -1 * (this.rightOffset+this.leftOffset) ?
+                    this.right.setNativeProps({style:{opacity:0}}) :
+                    this.right.setNativeProps({style:{opacity:1}})
+                  })
+                }}>
+              <Text
+                style={{backgroundColor:"white"}}
+                ref={comp=>this.right=comp}>
+                right</Text>
+            </MeasureableView>
           </Animated.View>
         </PanResponderView2>
+      </View>
     )
   }
 }
