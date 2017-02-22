@@ -314,10 +314,12 @@ storiesOf('SwipeableRow5', module)
   .add('with book', () => (
     <SwipeableRow5
       style={{paddingTop:20}}
-      renderLeftAction={()=>
-        <Text>left</Text>}
-      renderRightAction={()=>
-        <Text>right</Text>}
+      renderLeftAction={(i)=>
+        i === 0 ? <Text>left</Text> : <Text>left 2nd</Text>
+                       }
+      renderRightAction={(i)=>
+        i === 0 ? <Text>right</Text> : <Text>2nd right</Text>
+                        }
     >
       <Text
         style={{backgroundColor:"white"}}>

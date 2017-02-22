@@ -25,6 +25,9 @@ const {
 const SWIPEABLE_MAIN_WIDTH = width;
 
 class MeasureableView extends React.Component {
+  setNativeProps(nativeProps){
+    this.root.setNativeProps(nativeProps);
+  }
   constructor(props) {
     super(props);
     this.state = { layouted: false };
@@ -32,11 +35,14 @@ class MeasureableView extends React.Component {
   render() {
     return (
       this.state.layouted ?
-        <View {...this.props}>
+      <View
+        ref={comp => this.root = comp}
+        {...this.props}>
           {this.props.children}
         </View> :
-        <View
-          {...this.props}
+      <View
+        ref={comp => this.root = comp}
+        {...this.props}
           style={[this.props.style, { position: 'absolute', opacity: 0 }]}
           onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
             if (!this.state.layouted) {
@@ -719,16 +725,26 @@ SwipeableRow4.defaultProps = {
   close: false,
 };
 
+class ExpandableView2 extends React.Component {
+  render(){
+    const { renderAction, panX,
+            ...props } = this.props;
+    return(
+      <View
+        {...props} >
+        {renderAction(1)}
+      </View>)
+  }
+}
+
 class SwipeableRow5 extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      index:0,
       positiveSwipe: true,
       releasing: false,
     }
     this.panX = new Animated.Value(0.1);
-    //this.index = 0;
   }
   render(){
     const { onCloseStart, onCloseEnd,
@@ -750,8 +766,11 @@ class SwipeableRow5 extends React.Component {
               this.setState({positiveSwipe:pos})
             }}
           onSwipeEnd={(gestureState)=>{
+              //wait for update index
+              //can not disable panresponder in panHandlers
               if(this.state.releasing){return}
-              if(this.index === 0){
+              if(gestureState.dx  < this.leftOffset &&
+                 - this.rightOffset < gestureState.dx){
                 Animated.timing(this.panX,
                                 {toValue:0,duration:300})
                         .start()
@@ -762,8 +781,8 @@ class SwipeableRow5 extends React.Component {
                                   {toValue: WIDTH, duration:300} :
                                   {toValue:-WIDTH, duration:300})
                           .start(({finished:finished})=>{
+                            //set releasing state when closing end(CloseableView2)
                             onCloseStart()
-
                           })
                 })
               }
@@ -774,20 +793,23 @@ class SwipeableRow5 extends React.Component {
               flex:1,
               alignItems:this.state.positiveSwipe? "flex-start" : "flex-end"
             }}>
-            {this.state.positiveSwipe?
-             <Text>left</Text>:
-             <Text>right</Text>}
+            <ExpandableView2
+              renderAction={
+                this.state.positiveSwipe ?
+                            renderLeftAction :
+                            renderRightAction } />
           </View>
           <Animated.View
+            ref={comp=>this.center=comp}
             style={{
               flexDirection:"row",
               transform:[{
                 translateX:this.panX
               }],
               position:"absolute",
-              //debug
             }}>
             <MeasureableView
+              ref={comp=>this.left=comp}
               onFirstLayout={
                 ({nativeEvent:{layout:{x, y, width, height}}}) =>{
                   this.panX.setOffset(-width)
@@ -798,17 +820,15 @@ class SwipeableRow5 extends React.Component {
                     this.left.setNativeProps({style:{opacity:0}}):
                     this.left.setNativeProps({style:{opacity:1}})
                   })
-                  this.setState({index:0})//update view
+                  this.setState({releasing: false})//update view
                 }}>
-              <Text
-                style={{backgroundColor:"white"}}
-                ref={comp=>this.left=comp}>
-                left</Text>
+              {renderLeftAction(0)}
             </MeasureableView>
             <View style={{width:WIDTH}}>
               {children}
             </View>
             <MeasureableView
+              ref={comp=>this.right=comp}
               removeClippedSubviews={false}
               onFirstLayout={
                 ({nativeEvent:{layout:{x, y, width, height}}}) =>{
@@ -820,11 +840,9 @@ class SwipeableRow5 extends React.Component {
                     this.right.setNativeProps({style:{opacity:0}}) :
                     this.right.setNativeProps({style:{opacity:1}})
                   })
-                }}>
-              <Text
-                style={{backgroundColor:"white"}}
-                ref={comp=>this.right=comp}>
-                right</Text>
+                }}
+            >
+              {renderRightAction(0)}
             </MeasureableView>
           </Animated.View>
         </PanResponderView2>
