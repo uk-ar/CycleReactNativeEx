@@ -757,7 +757,7 @@ class SwipeableRow5 extends React.Component {
           disabled={this.state.releasing}
           style={{
             flexDirection: 'row',
-            width:WIDTH,
+            //width:WIDTH,
           }}
           onSwipeMove={Animated.event([
               {dx:this.panX}
@@ -835,7 +835,6 @@ class SwipeableRow5 extends React.Component {
                   this.rightOffset = width
                   this.panX.addListener(({value:w})=>{
                     //this.panX is offseted
-                    //console.log("w:",w,this.rightOffset,this.leftOffset)
                     w < -1 * (this.rightOffset+this.leftOffset) ?
                     this.right.setNativeProps({style:{opacity:0}}) :
                     this.right.setNativeProps({style:{opacity:1}})

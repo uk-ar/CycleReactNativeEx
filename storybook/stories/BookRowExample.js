@@ -74,3 +74,25 @@ storiesOf('BookRow1', module)
       </View>
     </BookRow1>
   ))
+
+storiesOf('BookRow3', module)
+  .addDecorator(getStory => (
+    <CenterView>{getStory()}</CenterView>
+  ))
+  .add('with width as style', () => (
+    <BookRow3
+      bucket="liked"
+      style={{
+        //width:width-20,
+        backgroundColor:"red"
+      }}
+    >
+      <View
+        style={{flexDirection:"row"}}>
+        <Text>foo</Text>
+        <View
+          style={{flex:1}}/>
+        <Text>bar</Text>
+      </View>
+    </BookRow3>
+  ))
