@@ -90,16 +90,20 @@ function genActions2(bucket) {
       ...nop,
       style: {
         flexDirection: 'row',
+        backgroundColor: nop.backgroundColor,
         //justifyContent: 'flex-end'
       } },
     { ...getProps(bucket, 'liked'),
       style: {
         flexDirection: 'row',
-        width: width / 2 } },
+        width: width / 2,
+        backgroundColor: getProps(bucket, 'liked').backgroundColor,
+      } },
     { ...getProps(bucket, 'borrowed'),
       style: {
         flexDirection: 'row',
-        width
+        width,
+        backgroundColor: getProps(bucket, 'borrowed').backgroundColor,
       } }
   ];
   const rightActions = [
@@ -107,12 +111,14 @@ function genActions2(bucket) {
       ...nop,
       style: {
         flexDirection: 'row-reverse',
+        backgroundColor: nop.backgroundColor,
         //justifyContent: 'flex-end'
       } },
     { ...getProps(bucket, 'done'),
       style: {
         flexDirection: 'row-reverse',
-        width
+        width,
+        backgroundColor: getProps(bucket, 'done').backgroundColor,
       } }
   ];
   return { leftActions, rightActions };

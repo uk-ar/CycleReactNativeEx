@@ -8,10 +8,14 @@ import {
   findNodeHandle,
   TouchableHighlight,
   StyleSheet,
+  Dimensions,
 } from 'react-native';
 
 import { SwipeableRow3,SwipeableRow4,SwipeableRow5 } from './SwipeableRow';
-import { genActions2,Action2 } from './Action';
+import { genActions2,Action,Action2 } from './Action';
+import emptyFunction from 'fbjs/lib/emptyFunction';
+
+var {width:WIDTH} = Dimensions.get('window');
 
 class BookRow1 extends React.Component {
   constructor(props) {
@@ -91,11 +95,13 @@ class BookRow3 extends React.Component {
     this.target=null;
   }
   render(){
-    const {bucket,onCloseStart,onCloseEnd,close}=this.props;
+    const {bucket,onCloseStart,onCloseEnd,close, ...props}=this.props;
     const {leftActions,rightActions} = genActions2(bucket);
-    //console.log("row",close)
+    console.log("la:",leftActions,rightActions)
+    //onResponderMove
     return (
       <SwipeableRow5
+        {...props}
         close={close}
         onCloseStart={()=>{
             const { onCloseStart }=this.props;
@@ -109,24 +115,26 @@ class BookRow3 extends React.Component {
           }}
         renderLeftAction={(i, indexLock)=>{
             //i,indexLock->next bucket
-            //const { left, icon, text, backgroundColor, target } = this.props
-            //console.log("left",leftActions[i],indexLock)
             //don't update target when indexLock
             if(!indexLock && leftActions[i]){
               this.target=leftActions[i].target
             }
             return(
-              <Action2 index={i} left={true}
-              bucket={bucket}
-              indexLock={indexLock}/>
+              <Action
+                 {...leftActions[i]}
+                 style={[leftActions[i].style,indexLock && {width: WIDTH}]}/>
             )
           }}
         renderRightAction={(i, indexLock)=>{
             //don't update target when indexLock
-            //console.log("i,index:", i, indexLock)
             if(!indexLock && rightActions[i]){
               this.target=rightActions[i].target
             }
+            return(
+              <Action
+                 {...rightActions[i]}
+                 style={[rightActions[i].style,indexLock && {width: WIDTH}]}/>
+            )
             return(<Action2 index={i} left={false}
                                bucket={bucket}
                                indexLock={indexLock}/>)
@@ -137,5 +145,21 @@ class BookRow3 extends React.Component {
     )
   }
 }
+
+BookRow3.propTypes = {
+  ...View.propTypes,
+  onCloseStart: React.PropTypes.func.isRequired,
+  onCloseEnd: React.PropTypes.func.isRequired,
+  close: React.PropTypes.bool.isRequired,
+  bucket: React.PropTypes.string.isRequired,
+};
+
+BookRow3.defaultProps = {
+  ...View.defaultProps,
+  onCloseStart: emptyFunction,
+  onCloseEnd: emptyFunction,
+  close: false,
+  //bucket: null,
+};
 
 module.exports = { BookRow1,BookRow2,BookRow3 };

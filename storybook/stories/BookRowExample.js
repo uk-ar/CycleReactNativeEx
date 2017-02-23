@@ -14,7 +14,7 @@ import Button from './Button';
 import CenterView from './CenterView';
 import Welcome from './Welcome';
 
-import {BookRow1} from '../../BookRow';
+import {BookRow1,BookRow3} from '../../BookRow';
 
 import {withDebug} from './common';
 const BookRow1Debug = withDebug(BookRow1)
@@ -77,7 +77,9 @@ storiesOf('BookRow1', module)
 
 storiesOf('BookRow3', module)
   .addDecorator(getStory => (
-    <CenterView>{getStory()}</CenterView>
+    <View style={{paddingTop:20}}>
+      {getStory()}
+    </View>
   ))
   .add('with width as style', () => (
     <BookRow3
@@ -88,7 +90,10 @@ storiesOf('BookRow3', module)
       }}
     >
       <View
-        style={{flexDirection:"row"}}>
+        style={{
+          flexDirection:"row",
+          backgroundColor:"white"
+        }}>
         <Text>foo</Text>
         <View
           style={{flex:1}}/>

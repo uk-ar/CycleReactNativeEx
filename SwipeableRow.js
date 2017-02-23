@@ -727,8 +727,9 @@ SwipeableRow4.defaultProps = {
 
 class ExpandableView2 extends React.Component {
   render(){
-    const { renderAction, panX,
+    const { renderAction, panX, //indexLock,
             ...props } = this.props;
+    //panX, indexLock => index
     return(
       <View
         {...props} >
@@ -745,6 +746,7 @@ class SwipeableRow5 extends React.Component {
       releasing: false,
     }
     this.panX = new Animated.Value(0.1);
+    this.canRelease = false;
   }
   render(){
     const { onCloseStart, onCloseEnd,
@@ -794,10 +796,12 @@ class SwipeableRow5 extends React.Component {
               alignItems:this.state.positiveSwipe? "flex-start" : "flex-end"
             }}>
             <ExpandableView2
+              panX={this.panX}
               renderAction={
                 this.state.positiveSwipe ?
-                            renderLeftAction :
-                            renderRightAction } />
+                            (i)=>renderLeftAction(i,this.state.releasing) :
+                                (i)=>renderRightAction(i,this.state.releasing)
+                 }/>
           </View>
           <Animated.View
             ref={comp=>this.center=comp}
@@ -814,12 +818,8 @@ class SwipeableRow5 extends React.Component {
                 ({nativeEvent:{layout:{x, y, width, height}}}) =>{
                   this.panX.setOffset(-width)
                   this.leftOffset = width
-                  this.panX.addListener(({value:w})=>{
-                    //this.panX is offseted
-                    0 < w ?
-                    this.left.setNativeProps({style:{opacity:0}}):
-                    this.left.setNativeProps({style:{opacity:1}})
-                  })
+
+                  //console.log("onLay")
                   this.setState({releasing: false})//update view
                 }}>
               {renderLeftAction(0)}
@@ -833,11 +833,19 @@ class SwipeableRow5 extends React.Component {
               onFirstLayout={
                 ({nativeEvent:{layout:{x, y, width, height}}}) =>{
                   this.rightOffset = width
+
                   this.panX.addListener(({value:w})=>{
                     //this.panX is offseted
-                    w < -1 * (this.rightOffset+this.leftOffset) ?
-                    this.right.setNativeProps({style:{opacity:0}}) :
-                    this.right.setNativeProps({style:{opacity:1}})
+                    const canRelease =
+                      w < -1 * (this.rightOffset+this.leftOffset) || 0 < w
+
+                    if(this.canRelease !== canRelease){
+                      this.canRelease = canRelease;
+                      this.left.setNativeProps(
+                        {style:{opacity:canRelease ? 0 :1}})
+                      this.right.setNativeProps(
+                        {style:{opacity:canRelease ? 0 :1}})
+                    }
                   })
                 }}
             >
