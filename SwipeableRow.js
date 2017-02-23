@@ -470,6 +470,61 @@ PanResponderView2.defaultProps = {
   disabled: false,
 };
 
+
+class ExpandableView2 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      index:0,
+      thresholds:[],
+    }
+    function calcIndex(value, thresholds) {
+      let index = thresholds.findIndex((elem, i) =>
+        value < elem
+      );
+      if (index === -1) { index = thresholds.length; }
+      return index;
+    }
+    props.panX.addListener(({value:width})=>{
+      const nextIndex = calcIndex(width + this.state.thresholds[0],
+                                  this.state.thresholds);
+      if (nextIndex !== this.state.index &&
+          !this.props.indexLock &&
+          this.state.thresholds.length !== 0) {
+        this.setState({index:nextIndex})
+      }
+    })
+  }
+  render(){
+    const { renderAction, panX, //indexLock,
+            ...props } = this.props;
+    //panX, indexLock => index
+    return(
+      <Animated.View
+        {...props}
+        onLayout={({nativeEvent:{layout:{ x, y, width, height }}}) => {
+            // create thresholds
+            if(!this.state.thresholds[this.state.index] &&
+               !this.props.indexLock &&
+               width !== 0 &&
+               (this.state.index === 0 ||
+                this.state.thresholds[this.state.index-1] !== width)){
+              console.log("width",width,this.state.thresholds,
+                          this.props.indexLock,this.state.index)
+              this.setState((prevState,props)=>{
+                let thresholds = [...this.state.thresholds]
+                thresholds[this.state.index] = width;
+                return {thresholds:thresholds}
+              })
+            }
+          }}
+      >
+        {renderAction(this.state.index)}
+      </Animated.View>)
+  }
+}
+
+
 class ExpandableView extends React.Component {
   constructor(props) {
     super(props);
@@ -487,14 +542,10 @@ class ExpandableView extends React.Component {
     }
     this.panX.addListener(({value:width})=>{
       const nextIndex = calcIndex(width, this.state.thresholds);
-      /* console.log("width change:",width,nextIndex,this.state.thresholds,
-       *             this.state.index,this.props.indexLock)*/
       if (nextIndex !== this.state.index &&
           !this.props.indexLock &&
           this.state.thresholds.length !== 0) {
         this.setState({index:nextIndex}
-          //,()=>
-          //this.props.onIndexChange(nextIndex)
         )
       }
     })
@@ -503,8 +554,7 @@ class ExpandableView extends React.Component {
     const { //onIndexChange,
             renderElement, indexLock, enterFromLeft,
             ...props } = this.props;//  ...Closable.propTypes,
-    //console.log("panx",this.panX)
-    //console.log("ex")
+
     const offset =  this.state.thresholds[0];
     return(
       <View
@@ -725,19 +775,6 @@ SwipeableRow4.defaultProps = {
   close: false,
 };
 
-class ExpandableView2 extends React.Component {
-  render(){
-    const { renderAction, panX, //indexLock,
-            ...props } = this.props;
-    //panX, indexLock => index
-    return(
-      <View
-        {...props} >
-        {renderAction(1)}
-      </View>)
-  }
-}
-
 class SwipeableRow5 extends React.Component {
   constructor(props) {
     super(props);
@@ -770,6 +807,7 @@ class SwipeableRow5 extends React.Component {
           onSwipeEnd={(gestureState)=>{
               //wait for update index
               //can not disable panresponder in panHandlers
+              return
               if(this.state.releasing){return}
               if(gestureState.dx  < this.leftOffset &&
                  - this.rightOffset < gestureState.dx){
@@ -796,6 +834,7 @@ class SwipeableRow5 extends React.Component {
               alignItems:this.state.positiveSwipe? "flex-start" : "flex-end"
             }}>
             <ExpandableView2
+              style={{backgroundColor:"green"}}
               panX={this.panX}
               renderAction={
                 this.state.positiveSwipe ?
@@ -819,7 +858,7 @@ class SwipeableRow5 extends React.Component {
                   this.panX.setOffset(-width)
                   this.leftOffset = width
 
-                  //console.log("onLay")
+                  //console.log("onLay:",width)
                   this.setState({releasing: false})//update view
                 }}>
               {renderLeftAction(0)}

@@ -41,7 +41,7 @@ class Action extends React.PureComponent {
      *   paddingRight:0,
      *   //backgroundColor:backgroundColor,
      * },*/
-    <View
+    <Stylish.View
       {...props}
       style={style}>
       <FAIcon
@@ -50,17 +50,20 @@ class Action extends React.PureComponent {
           //margin:5,
         }}
       />
-      <View style={{width:5}}></View>
-       <Text
-         style={{
-           //numberOfLines={1}
-           alignSelf:"center",
-           //position:"absolute",
-         }}
-       >
-         {text || ""}
-       </Text>
-    </View>
+      <View style={{
+        width:5,
+        backgroundColor:"yellow"
+      }}/>
+      <Text
+        style={{
+          //numberOfLines={1}
+          alignSelf:"center",
+          //position:"absolute",
+        }}
+      >
+        {text || ""}
+      </Text>
+    </Stylish.View>
   );
 }}
 

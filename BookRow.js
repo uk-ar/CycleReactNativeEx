@@ -116,6 +116,7 @@ class BookRow3 extends React.Component {
         renderLeftAction={(i, indexLock)=>{
             //i,indexLock->next bucket
             //don't update target when indexLock
+            console.log("i:",i)
             if(!indexLock && leftActions[i]){
               this.target=leftActions[i].target
             }
