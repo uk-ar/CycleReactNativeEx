@@ -58,7 +58,7 @@
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.9.0",
     "eslint-plugin-react-native": "^2.0.0",
-    "flow-bin": "^0.39.0",
+    "flow-bin": "^0.40.0",
     "getstorybook": "^1.7.0",
     "jest": "^18.1.0",
     "jest-cli": "^18.1.0",
