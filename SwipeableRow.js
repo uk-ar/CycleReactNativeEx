@@ -478,6 +478,8 @@ class ExpandableView2 extends React.Component {
       index:0,
       thresholds:[],
     }
+  }
+  componentDidMount(){
     function calcIndex(value, thresholds) {
       let index = thresholds.findIndex((elem, i) =>
         value < elem
@@ -485,8 +487,8 @@ class ExpandableView2 extends React.Component {
       if (index === -1) { index = thresholds.length; }
       return index;
     }
-    props.panX.addListener(({value:width})=>{
-      const nextIndex = calcIndex(width + this.state.thresholds[0],
+    this.id = this.props.panX.addListener(({value:width})=>{
+      const nextIndex = calcIndex(width,
                                   this.state.thresholds);
       if (nextIndex !== this.state.index &&
           !this.props.indexLock &&
@@ -495,10 +497,15 @@ class ExpandableView2 extends React.Component {
       }
     })
   }
+  componentWillUnmount(){
+    this.props.panX.removeListener(this.id)
+  }
   render(){
     const { renderAction, panX, //indexLock,
             ...props } = this.props;
     //panX, indexLock => index
+    /* console.log("width1",width,this.state.thresholds,
+     *             this.props.indexLock,this.state.index)*/
     return(
       <Animated.View
         {...props}
@@ -509,8 +516,8 @@ class ExpandableView2 extends React.Component {
                width !== 0 &&
                (this.state.index === 0 ||
                 this.state.thresholds[this.state.index-1] !== width)){
-              console.log("width",width,this.state.thresholds,
-                          this.props.indexLock,this.state.index)
+              /* console.log("width",width,this.state.thresholds,
+                  this.props.indexLock,this.state.index) */
               this.setState((prevState,props)=>{
                 let thresholds = [...this.state.thresholds]
                 thresholds[this.state.index] = width;
@@ -783,7 +790,10 @@ class SwipeableRow5 extends React.Component {
       releasing: false,
     }
     this.panX = new Animated.Value(0.1);
+    this.reverseX = new Animated.Value(-0.1);
     this.canRelease = false;
+    this.leftOffset=0
+    this.rightOffset=0
   }
   render(){
     const { onCloseStart, onCloseEnd,
@@ -798,16 +808,20 @@ class SwipeableRow5 extends React.Component {
             flexDirection: 'row',
             //width:WIDTH,
           }}
-          onSwipeMove={Animated.event([
-              {dx:this.panX}
-            ])}
+          onSwipeMove={Animated.event(
+              [{dx:this.panX}],
+              {listener:(gestureState)=>
+                this.reverseX.setValue(- gestureState.dx)}
+              //{listener:(i)=>console.log(i)}//{dx:aaa}
+              //{listener:Animated.event([{dx: this.reverseX}])}
+              //{listener:(i)=>console.log(i)}
+            )}
           onSwipeDirectionChange={(pos)=>{
               this.setState({positiveSwipe:pos})
             }}
           onSwipeEnd={(gestureState)=>{
               //wait for update index
               //can not disable panresponder in panHandlers
-              return
               if(this.state.releasing){return}
               if(gestureState.dx  < this.leftOffset &&
                  - this.rightOffset < gestureState.dx){
@@ -828,19 +842,22 @@ class SwipeableRow5 extends React.Component {
               }
             }}>
           <View
-            key="background_action"
             style={{
               flex:1,
-              alignItems:this.state.positiveSwipe? "flex-start" : "flex-end"
+              alignItems:this.state.positiveSwipe ? "flex-start" : "flex-end"
             }}>
+          { this.state.positiveSwipe ?
             <ExpandableView2
-              style={{backgroundColor:"green"}}
-              panX={this.panX}
+              key="leftActions"
+                panX={this.panX}
+                renderAction={
+                  (i)=>renderLeftAction(i,this.state.releasing)}/> :
+            <ExpandableView2
+              key="rightActions"
+              panX={this.reverseX}
               renderAction={
-                this.state.positiveSwipe ?
-                            (i)=>renderLeftAction(i,this.state.releasing) :
-                                (i)=>renderRightAction(i,this.state.releasing)
-                 }/>
+                (i)=>renderRightAction(i,this.state.releasing)}/>
+          }
           </View>
           <Animated.View
             ref={comp=>this.center=comp}
@@ -848,6 +865,8 @@ class SwipeableRow5 extends React.Component {
               flexDirection:"row",
               transform:[{
                 translateX:this.panX
+              },{
+                translateX:- this.leftOffset
               }],
               position:"absolute",
             }}>
@@ -855,13 +874,16 @@ class SwipeableRow5 extends React.Component {
               ref={comp=>this.left=comp}
               onFirstLayout={
                 ({nativeEvent:{layout:{x, y, width, height}}}) =>{
-                  this.panX.setOffset(-width)
+                  //this.panX.setOffset(-width)
                   this.leftOffset = width
 
-                  //console.log("onLay:",width)
                   this.setState({releasing: false})//update view
                 }}>
-              {renderLeftAction(0)}
+              {/* use expandable to change color */}
+              <ExpandableView2
+                  style={{width:this.leftOffset}}
+                  panX={this.panX}
+                  renderAction={renderLeftAction}/>
             </MeasureableView>
             <View style={{width:WIDTH}}>
               {children}
@@ -872,11 +894,11 @@ class SwipeableRow5 extends React.Component {
               onFirstLayout={
                 ({nativeEvent:{layout:{x, y, width, height}}}) =>{
                   this.rightOffset = width
-
+                  //console.log("aaa",width)
                   this.panX.addListener(({value:w})=>{
                     //this.panX is offseted
                     const canRelease =
-                      w < -1 * (this.rightOffset+this.leftOffset) || 0 < w
+                      w < - this.rightOffset || this.leftOffset < w
 
                     if(this.canRelease !== canRelease){
                       this.canRelease = canRelease;
@@ -888,7 +910,10 @@ class SwipeableRow5 extends React.Component {
                   })
                 }}
             >
-              {renderRightAction(0)}
+              <ExpandableView2
+                style={{width:this.rightOffset}}
+                panX={this.reverseX}
+                renderAction={renderRightAction}/>
             </MeasureableView>
           </Animated.View>
         </PanResponderView2>

@@ -14,6 +14,7 @@ import {
 import { SwipeableRow3,SwipeableRow4,SwipeableRow5 } from './SwipeableRow';
 import { genActions2,Action,Action2 } from './Action';
 import emptyFunction from 'fbjs/lib/emptyFunction';
+import Stylish from 'react-native-stylish';
 
 var {width:WIDTH} = Dimensions.get('window');
 
@@ -97,7 +98,7 @@ class BookRow3 extends React.Component {
   render(){
     const {bucket,onCloseStart,onCloseEnd,close, ...props}=this.props;
     const {leftActions,rightActions} = genActions2(bucket);
-    console.log("la:",leftActions,rightActions)
+    //console.log("la:",leftActions,rightActions)
     //onResponderMove
     return (
       <SwipeableRow5
@@ -116,14 +117,21 @@ class BookRow3 extends React.Component {
         renderLeftAction={(i, indexLock)=>{
             //i,indexLock->next bucket
             //don't update target when indexLock
-            console.log("i:",i)
+            //console.log("i:",i)
             if(!indexLock && leftActions[i]){
               this.target=leftActions[i].target
             }
+            //Stylish.View is heavy?
             return(
-              <Action
+              <Stylish.View
+                style={{backgroundColor:leftActions[i].backgroundColor}}>
+                <Action
                  {...leftActions[i]}
-                 style={[leftActions[i].style,indexLock && {width: WIDTH}]}/>
+                 style={[
+                   leftActions[i].style,
+                   indexLock && {width: WIDTH}
+                 ]}/>
+              </Stylish.View>
             )
           }}
         renderRightAction={(i, indexLock)=>{
@@ -132,13 +140,16 @@ class BookRow3 extends React.Component {
               this.target=rightActions[i].target
             }
             return(
-              <Action
+              <Stylish.View
+                style={{backgroundColor:rightActions[i].backgroundColor}}>
+                <Action
                  {...rightActions[i]}
-                 style={[rightActions[i].style,indexLock && {width: WIDTH}]}/>
+                 style={[
+                   rightActions[i].style,
+                   indexLock && {width: WIDTH}
+                 ]}/>
+              </Stylish.View>
             )
-            return(<Action2 index={i} left={false}
-                               bucket={bucket}
-                               indexLock={indexLock}/>)
           }}
       >
               {this.props.children}

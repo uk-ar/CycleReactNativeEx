@@ -41,7 +41,7 @@ class Action extends React.PureComponent {
      *   paddingRight:0,
      *   //backgroundColor:backgroundColor,
      * },*/
-    <Stylish.View
+    <View
       {...props}
       style={style}>
       <FAIcon
@@ -63,7 +63,7 @@ class Action extends React.PureComponent {
       >
         {text || ""}
       </Text>
-    </Stylish.View>
+    </View>
   );
 }}
 
@@ -93,20 +93,16 @@ function genActions2(bucket) {
       ...nop,
       style: {
         flexDirection: 'row',
-        backgroundColor: nop.backgroundColor,
-        //justifyContent: 'flex-end'
       } },
     { ...getProps(bucket, 'liked'),
       style: {
         flexDirection: 'row',
         width: width / 2,
-        backgroundColor: getProps(bucket, 'liked').backgroundColor,
       } },
     { ...getProps(bucket, 'borrowed'),
       style: {
         flexDirection: 'row',
         width,
-        backgroundColor: getProps(bucket, 'borrowed').backgroundColor,
       } }
   ];
   const rightActions = [
@@ -114,14 +110,12 @@ function genActions2(bucket) {
       ...nop,
       style: {
         flexDirection: 'row-reverse',
-        backgroundColor: nop.backgroundColor,
-        //justifyContent: 'flex-end'
+        //backgroundColor:"blue",
       } },
     { ...getProps(bucket, 'done'),
       style: {
         flexDirection: 'row-reverse',
         width,
-        backgroundColor: getProps(bucket, 'done').backgroundColor,
       } }
   ];
   return { leftActions, rightActions };

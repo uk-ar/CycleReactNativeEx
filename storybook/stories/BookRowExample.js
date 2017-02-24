@@ -92,7 +92,8 @@ storiesOf('BookRow3', module)
       <View
         style={{
           flexDirection:"row",
-          backgroundColor:"white"
+          backgroundColor:"white",
+          backgroundColor:"transparent"
         }}>
         <Text>foo</Text>
         <View
