@@ -801,11 +801,16 @@ class SwipeableRow5 extends React.Component {
             children,close,style,
             ...props } = this.props;
     return (
-      <View style={style}>
+      <View
+        style={style}
+        close={false}
+      >
         <PanResponderView2
           disabled={this.state.releasing}
           style={{
-            flexDirection: 'row',
+            //flexDirection: 'row',
+            //alignItems:"stretch",
+            justifyContent:"center",
             //width:WIDTH,
           }}
           onSwipeMove={Animated.event(
@@ -843,7 +848,7 @@ class SwipeableRow5 extends React.Component {
             }}>
           <View
             style={{
-              flex:1,
+              //flex:1,
               alignItems:this.state.positiveSwipe ? "flex-start" : "flex-end"
             }}>
           { this.state.positiveSwipe ?
@@ -863,6 +868,11 @@ class SwipeableRow5 extends React.Component {
             ref={comp=>this.center=comp}
             style={{
               flexDirection:"row",
+              alignItems:"stretch",
+              /* alignSelf:"stretch",
+                  justifyContent:"center", */
+              backgroundColor:"blue",
+              opacity:0.5,
               transform:[{
                 translateX:this.panX
               },{
