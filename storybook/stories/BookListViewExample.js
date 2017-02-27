@@ -2081,7 +2081,7 @@ class BookListView14_test extends React.Component {
         selectedSection
       })
     }
-    
+
     return (
       <BooksDataSource
         books={this.state.books}
@@ -2103,7 +2103,7 @@ class BookListView14_test extends React.Component {
         scrollEnabled={!this.state.selectedSection}
         style={{marginTop:20}}>
                   <BookListView2
-        ref={(comp)=>this.liked=comp}              
+        ref={(comp)=>this.liked=comp}
           key="liked"
           bucket="liked"
           {...props}
@@ -2120,7 +2120,7 @@ class BookListView14_test extends React.Component {
           key="borrowed"
           {...props}
           />
-                </ScrollView>                       
+                </ScrollView>
               </View>
             )
           }}

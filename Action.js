@@ -211,4 +211,4 @@ class Action3 extends React.PureComponent {
   }
 }
 
-module.exports = { Action, Action2,Action3, genActions2 };
+module.exports = { Action, Action2, Action3, genActions2 };

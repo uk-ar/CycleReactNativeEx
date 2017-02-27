@@ -124,7 +124,11 @@ class BookRow3 extends React.Component {
             //Stylish.View is heavy?
             return(
               <Stylish.View
-                style={{backgroundColor:leftActions[i].backgroundColor}}>
+                style={{
+                  backgroundColor:leftActions[i].backgroundColor,
+                  //flex:1,
+                  //justifyContent:"center"
+                }}>
                 <Action
                  {...leftActions[i]}
                  style={[
@@ -141,7 +145,12 @@ class BookRow3 extends React.Component {
             }
             return(
               <Stylish.View
-                style={{backgroundColor:rightActions[i].backgroundColor}}>
+                style={{
+                  backgroundColor:rightActions[i].backgroundColor,
+                  //flex:1,
+                  //justifyContent:"center"
+                  //alignItems:"center",
+                }}>
                 <Action
                  {...rightActions[i]}
                  style={[
