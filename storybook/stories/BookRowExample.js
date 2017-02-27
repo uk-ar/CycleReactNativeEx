@@ -82,6 +82,28 @@ storiesOf('BookRow3', module)
     </View>
   ))
   .add('with width as style', () => (
+    <View>
+    <BookRow3
+      bucket="liked"
+      style={{
+        //width:width-20,
+        backgroundColor:"red"
+      }}
+    >
+      <View
+        style={{
+          height:50,
+          flexDirection:"row",
+          backgroundColor:"white",
+          //opacity:0.8,
+          //backgroundColor:"transparent"
+        }}>
+        <Text>foo</Text>
+        <View
+          style={{flex:1}}/>
+        <Text>bar</Text>
+      </View>
+    </BookRow3>
     <BookRow3
       bucket="liked"
       style={{
@@ -103,4 +125,5 @@ storiesOf('BookRow3', module)
         <Text>bar</Text>
       </View>
     </BookRow3>
+    </View>
   ))

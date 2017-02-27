@@ -810,7 +810,7 @@ class SwipeableRow5 extends React.Component {
           style={{
             //flexDirection: 'row',
             //alignItems:"stretch",
-            justifyContent:"center",
+            //justifyContent:"center",
             //width:WIDTH,
           }}
           onSwipeMove={Animated.event(
@@ -827,6 +827,7 @@ class SwipeableRow5 extends React.Component {
           onSwipeEnd={(gestureState)=>{
               //wait for update index
               //can not disable panresponder in panHandlers
+              return
               if(this.state.releasing){return}
               if(gestureState.dx  < this.leftOffset &&
                  - this.rightOffset < gestureState.dx){
@@ -848,16 +849,27 @@ class SwipeableRow5 extends React.Component {
             }}>
           <View
             style={{
+              //height:30,
               //flex:1,
-              alignItems:this.state.positiveSwipe ? "flex-start" : "flex-end"
+              position:"absolute",
+              top:0,
+              bottom:0,
+              left:0,
+              right:0,
             }}>
           { this.state.positiveSwipe ?
             <ExpandableView2
+              style={{
+                alignSelf:"flex-start",
+              }}
               key="leftActions"
                 panX={this.panX}
                 renderAction={
                   (i)=>renderLeftAction(i,this.state.releasing)}/> :
             <ExpandableView2
+              style={{
+                alignSelf:"flex-end",
+              }}
               key="rightActions"
               panX={this.reverseX}
               renderAction={
@@ -868,25 +880,23 @@ class SwipeableRow5 extends React.Component {
             ref={comp=>this.center=comp}
             style={{
               flexDirection:"row",
-              alignItems:"stretch",
-              /* alignSelf:"stretch",
-                  justifyContent:"center", */
-              backgroundColor:"blue",
-              opacity:0.5,
               transform:[{
                 translateX:this.panX
               },{
                 translateX:- this.leftOffset
               }],
-              position:"absolute",
+              //position:"absolute",
             }}>
             <MeasureableView
+              style={{
+                //flexDirection:"column"
+              }}
               ref={comp=>this.left=comp}
               onFirstLayout={
                 ({nativeEvent:{layout:{x, y, width, height}}}) =>{
                   //this.panX.setOffset(-width)
                   this.leftOffset = width
-
+                  console.log("w:",width)
                   this.setState({releasing: false})//update view
                 }}>
               {/* use expandable to change color */}
