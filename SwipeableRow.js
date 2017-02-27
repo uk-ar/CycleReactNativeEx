@@ -891,9 +891,11 @@ class SwipeableRow5 extends React.Component {
                 }}>
               {/* use expandable to change color */}
               <ExpandableView2
-                  style={{width:this.leftOffset}}
-                  panX={this.panX}
-                  renderAction={renderLeftAction}/>
+                style={this.leftOffset !== 0 && {
+                  width: this.leftOffset
+                }}
+                panX={this.panX}
+                renderAction={renderLeftAction}/>
             </MeasureableView>
             <View style={{width:WIDTH}}>
               {children}
@@ -921,7 +923,8 @@ class SwipeableRow5 extends React.Component {
                 }}
             >
               <ExpandableView2
-                style={{width:this.rightOffset}}
+                style={this.rightOffset !== 0 &&
+                       {width:this.rightOffset}}
                 panX={this.reverseX}
                 renderAction={renderRightAction}/>
             </MeasureableView>
