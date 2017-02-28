@@ -44,6 +44,9 @@ class Action extends React.PureComponent {
     <View
       {...props}
       style={style}>
+      <View style={{
+        width:10,
+      }}/>
       <FAIcon
         name={icon} size={20}
         style={{
@@ -52,7 +55,6 @@ class Action extends React.PureComponent {
       />
       <View style={{
         width:5,
-        backgroundColor:"yellow"
       }}/>
       <Text
         style={{

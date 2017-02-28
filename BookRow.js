@@ -124,10 +124,11 @@ class BookRow3 extends React.Component {
             //Stylish.View is heavy?
             return(
               <Stylish.View
+                removeClippedSubviews={false}
                 style={{
+                  flex:1,
+                  justifyContent:"center",//vertical Center
                   backgroundColor:leftActions[i].backgroundColor,
-                  //flex:1,
-                  //justifyContent:"center"
                 }}>
                 <Action
                  {...leftActions[i]}
@@ -145,11 +146,11 @@ class BookRow3 extends React.Component {
             }
             return(
               <Stylish.View
+                removeClippedSubviews={false}
                 style={{
+                  flex:1,
+                  justifyContent:"center",
                   backgroundColor:rightActions[i].backgroundColor,
-                  //flex:1,
-                  //justifyContent:"center"
-                  //alignItems:"center",
                 }}>
                 <Action
                  {...rightActions[i]}

@@ -859,8 +859,10 @@ class SwipeableRow5 extends React.Component {
             }}>
           { this.state.positiveSwipe ?
             <ExpandableView2
+              removeClippedSubviews={false}
               style={{
-                alignSelf:"flex-start",
+                alignSelf:"flex-start",//horizontal
+                flex:1,
               }}
               key="leftActions"
                 panX={this.panX}
@@ -869,6 +871,7 @@ class SwipeableRow5 extends React.Component {
             <ExpandableView2
               style={{
                 alignSelf:"flex-end",
+                flex:1,
               }}
               key="rightActions"
               panX={this.reverseX}
@@ -901,9 +904,11 @@ class SwipeableRow5 extends React.Component {
                 }}>
               {/* use expandable to change color */}
               <ExpandableView2
-                style={this.leftOffset !== 0 && {
+                style={[this.leftOffset !== 0 && {
                   width: this.leftOffset
-                }}
+                  },{
+                    flex:1
+                  }]}
                 panX={this.panX}
                 renderAction={renderLeftAction}/>
             </MeasureableView>
@@ -933,8 +938,11 @@ class SwipeableRow5 extends React.Component {
                 }}
             >
               <ExpandableView2
-                style={this.rightOffset !== 0 &&
-                       {width:this.rightOffset}}
+                style={[this.rightOffset !== 0 &&
+                        {width:this.rightOffset},
+                        {
+                          flex:1
+                        }]}
                 panX={this.reverseX}
                 renderAction={renderRightAction}/>
             </MeasureableView>
