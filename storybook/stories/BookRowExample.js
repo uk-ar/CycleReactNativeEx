@@ -20,7 +20,7 @@ import {withDebug} from './common';
 const BookRow1Debug = withDebug(BookRow1)
 
 const {
-  width,
+  width:WIDTH,
 } = Dimensions.get('window');
 
 storiesOf('BookRow1', module)
@@ -125,5 +125,105 @@ storiesOf('BookRow3', module)
         <Text>bar</Text>
       </View>
     </BookRow3>
+    </View>
+  ))
+  .add('horizontal flex', () => (
+    <ScrollView
+      horizontal={true}
+    >
+      <View style={{
+        //width:100,
+        flex:1,
+        height:20,
+        backgroundColor:"red"
+      }}/>
+      <View style={{
+        width:10,
+        height:20,
+        backgroundColor:"yellow"
+      }}/>
+      <View style={{
+        width:30,
+        height:20,
+        backgroundColor:"green"
+      }}/>
+    </ScrollView>
+  ))
+  .add('horizontal flex', () => (
+    <ScrollView
+      horizontal={true}
+    >
+      <View style={{
+        //width:100,
+        flex:1,
+        height:20,
+        backgroundColor:"red"
+      }}/>
+      <View style={{
+        width:10,
+        height:20,
+        backgroundColor:"yellow"
+      }}/>
+      <View style={{
+        width:30,
+        height:20,
+        backgroundColor:"green"
+      }}/>
+    </ScrollView>
+  ))
+  .add('horizontal flex2', () => (
+    <View style={{
+      //width:WIDTH*2,
+      height:20,
+      backgroundColor:"red"
+    }}>
+      <View style={{
+        backgroundColor:"yellow",
+        position:"absolute",
+        width:WIDTH,
+        top:0,
+        bottom:0,
+        flexDirection:"row",
+      }}>
+        <Text>left</Text>
+        <View style={{flex:1}}/>
+        <Text>right</Text>
+      </View>
+      <ScrollView
+        style={{
+          width:WIDTH,
+          backgroundColor:"transparent",
+        }}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        ref={(comp)=>this.scroll=comp}
+      >
+        <View style={{
+          width:WIDTH,
+          backgroundColor:"transparent"
+        }}/>
+        <View style={{
+          backgroundColor:"yellow"
+        }}
+          onLayout={({nativeEvent:{layout:{x, y, width, height}}}) => {
+              this.scroll.scrollTo({x:WIDTH + width,animated:false})
+            }}
+        >
+          <Text>left</Text>
+        </View>
+        <View style={{
+          width:WIDTH,
+          backgroundColor:"green"
+        }}/>
+        <View style={{
+          backgroundColor:"yellow"
+        }}>
+          <Text>right</Text>
+        </View>
+        <View style={{
+          width:WIDTH,
+          backgroundColor:"transparent"
+        }}/>
+      </ScrollView>
     </View>
   ))
