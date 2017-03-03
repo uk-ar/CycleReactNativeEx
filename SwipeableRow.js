@@ -887,6 +887,7 @@ class SwipeableRow5 extends React.Component {
               }, {
                 translateX: -this.leftOffset
               }],
+              width:WIDTH + this.leftOffset + this.rightOffset
               //position:"absolute",
             }}
           >
