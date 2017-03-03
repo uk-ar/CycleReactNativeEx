@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@cycle/fetch": "^4.0.0",
-    "@cycle/http": "^12.0.0",
+    "@cycle/http": "^11.0.1",
     "@cycle/react-native": "git+http://github.com/uk-ar/cycle-react-native.git",
     "@cycle/rx-adapter": "^3.0.0",
     "@cycle/rx-run": "^7.0.1",
@@ -28,7 +28,7 @@
     "react-addons-transition-group": "^15.4.1",
     "react-clone-referenced-element": "^1.0.1",
     "react-dom": "^15.4.1",
-    "react-native": "0.41.2",
+    "react-native": "0.42.0",
     "react-native-modalbox": "^1.3.8",
     "react-native-share-extension": "^1.1.1",
     "react-native-stylish": "^0.3.0",

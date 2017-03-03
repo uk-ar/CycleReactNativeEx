@@ -1,7 +1,6 @@
 package com.cyclereactnativeex;
 
 import android.app.Application;
-import android.util.Log;
 
 import com.facebook.react.ReactApplication;
 import io.realm.react.RealmReactPackage;

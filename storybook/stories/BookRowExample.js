@@ -96,6 +96,7 @@ storiesOf('BookRow3', module)
           flexDirection:"row",
           backgroundColor:"white",
           //opacity:0.8,
+          borderWidth:2,
           //backgroundColor:"transparent"
         }}>
         <Text>foo</Text>
