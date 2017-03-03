@@ -63,12 +63,12 @@ class CloseableView extends React.Component {
           { height: 1, opacity: 0.1, transform: [{ scale: 0.1 }] },
           // this.style
         () => {
-          //console.log("close fin")
-            this.setState({
-              close: true, // shrink//absolute
+          // console.log("close fin")
+          this.setState({
+            close: true, // shrink//absolute
               //style: { height: 1 }
-            }, onComplete);
-          }
+          }, onComplete);
+        }
         );
     });
   }
@@ -78,13 +78,13 @@ class CloseableView extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.close !== nextProps.close) {
       this.toggle();
-      //console.log("willRecieveProps::close change")
+      // console.log("willRecieveProps::close change")
     }
   }
   render() {
     const { animationConfig, style, close, ...props } = this.props;
-    //console.log("cl",this,this.props.close,this.state.close,this.style)
-    //console.log("cl",this.props)
+    // console.log("cl",this,this.props.close,this.state.close,this.style)
+    // console.log("cl",this.props)
     const content = (
       <Stylish.View
         ref={c => (this.outer = c)}
@@ -92,11 +92,11 @@ class CloseableView extends React.Component {
         style={[// this.style,
           // this.initialStyle,
           this.state.style,
-              this.state.close ? { height: 1 } : { height: null },
+          this.state.close ? { height: 1 } : { height: null },
                 { overflow: 'hidden' }]}
         animationConfig={{
           ...animationConfig,
-          duration:3000,
+          duration: 3000,
         }}
       >
         <View
@@ -104,9 +104,9 @@ class CloseableView extends React.Component {
           collapsable={false}
           {...props}
           style={[style,
-                  this.state.close ? // to measure height
+            this.state.close ? // to measure height
                   { position: 'absolute' } : null
-            ]}
+          ]}
         />
       </Stylish.View>
     );
@@ -114,24 +114,23 @@ class CloseableView extends React.Component {
   }
 }
 
-function interpolateStyle(seed,from,to){
-  let style =
+function interpolateStyle(seed, from, to) {
+  const style =
     Object.keys(to)
           .filter(key =>
             (typeof to[key] === 'number' ||
              key.toLowerCase().endsWith('color')) && from[key]
           ).map(key =>
-            ({key:key,
-              value:seed.interpolate({
-                inputRange:[0,1],
-                outputRange:[from[key],to[key]]
+            ({ key,
+              value: seed.interpolate({
+                inputRange: [0, 1],
+                outputRange: [from[key], to[key]]
               })
-            })).reduce((acc,{key:key,value:value})=> {
-              acc[key]=value
-              return acc
-            },{})
-  const transform = to.transform.map((obj) => {
-    return Object
+            })).reduce((acc, { key, value }) => {
+              acc[key] = value;
+              return acc;
+            }, {});
+  const transform = to.transform.map(obj => Object
       .keys(obj)
       .filter(key =>
         (typeof obj[key] === 'number' ||
@@ -142,80 +141,79 @@ function interpolateStyle(seed,from,to){
           outputRange: [from.transform[0][key], obj[key]],
         });
         return acc;
-      }, {});
-  })
-  return {...to,...style,transform:transform}
+      }, {}));
+  return { ...to, ...style, transform };
 }
-//class Enterable
+// class Enterable
 class CloseableView2 extends React.Component {
   constructor(props) {
     super(props);
-    this.seed = new Animated.Value(props.close ? 0 : 1)
-    let style = interpolateStyle(
+    this.seed = new Animated.Value(props.close ? 0 : 1);
+    const style = interpolateStyle(
       this.seed,
-      {overflow:"scroll",opacity: 0.1,transform:[{scale:0.1}]},
-      {overflow:"scroll",opacity: 1,  transform:[{scale:1  }]}
-    )
+      { overflow: 'scroll', opacity: 0.1, transform: [{ scale: 0.1 }] },
+      { overflow: 'scroll', opacity: 1, transform: [{ scale: 1 }] }
+    );
     this.state = {
-      style: style
-    }
+      style
+    };
   }
-  componentWillReceiveProps(nextProps){
+  componentWillReceiveProps(nextProps) {
     if (this.props.close !== nextProps.close) {
       Animated.timing(
         this.seed, {
           toValue: nextProps.close ? 0 : 1,
-          useNativeDriver:false,//cannot mix height
+          useNativeDriver: false, //cannot mix height
         }
       ).start(nextProps.close ? this.props.onCloseEnd : this.props.onOpenEnd);
-      //this.seed.setValue(nextProps.close ? 0 : 1)
+      // this.seed.setValue(nextProps.close ? 0 : 1)
     }
   }
-  render(){
-    //console.log("rend",this.state.style)
-    //removeClippedSubviews is for android
-    return(
+  render() {
+    // console.log("rend",this.state.style)
+    // removeClippedSubviews is for android
+    return (
       <Animated.View
-        removeClippedSubviews={true}
+        removeClippedSubviews
         style={this.state.style.height ?
                this.state.style :
-               this.props.close ? 
-               {overflow:"scroll",height:0.1} :
-               {overflow:"scroll",height:null}
+               this.props.close ?
+               { overflow: 'scroll', height: 0.1 } :
+               { overflow: 'scroll', height: null }
               }
       >
         <View
           onLayout={
             this.state.style.height ? null :
-                    ({nativeEvent: { layout: {x, y, width, height}}}) => {
+                    ({ nativeEvent: { layout: { x, y, width, height } } }) => {
                       this.setState({
                         style: {
                           ...this.state.style,
-                          height:this.seed.interpolate({
-                            inputRange:[0,1],
-                            outputRange:[0.1,height]
+                          height: this.seed.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0.1, height]
                           }),
-                        }});
-                      //layouted: props.transitionEnter ? false : true
+                        } });
+                      // layouted: props.transitionEnter ? false : true
                     }
                    }
         >
           {this.props.children}
         </View>
       </Animated.View>
-    )
+    );
   }
 }
 
 CloseableView2.propTypes = {
   ...View.propTypes,
   close: React.PropTypes.bool,
-  onCloseEnd:  React.PropTypes.func.isRequired,
-  onOpenEnd:  React.PropTypes.func.isRequired,
+  onCloseEnd: React.PropTypes.func.isRequired,
+  onOpenEnd: React.PropTypes.func.isRequired,
 };
 CloseableView2.defaultProps = {
   ...View.defaultProps,
-  //close: emptyFunction,
+  // close: emptyFunction,
   onCloseEnd: emptyFunction,
   onOpenEnd: emptyFunction,
 };
@@ -248,7 +246,7 @@ class LayoutableView extends React.Component {
     super(props);
     this.state = {
       // props.transitionEnter
-      layouted: props.transitionEnter ? false : true
+      layouted: !props.transitionEnter
     };
   }
   close(onComplete) {
@@ -271,7 +269,7 @@ class LayoutableView extends React.Component {
     return (
       <CloseableView
         ref={c => this.closeable = c}
-        close={this.state.layouted ? false : true}
+        close={!this.state.layouted}
         onLayout={this.state.layouted ? null : () =>
           this.setState({ layouted: true })}
         {...props}
@@ -284,7 +282,7 @@ class LayoutableView extends React.Component {
 
 LayoutableView.propTypes = {
   ...View.propTypes, //  ...Closeable.propTypes,
-  transitionEnter:React.PropTypes.bool,
+  transitionEnter: React.PropTypes.bool,
 };
 
 LayoutableView.defaultProps = {

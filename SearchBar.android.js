@@ -26,7 +26,7 @@ import {
   PanResponder,
 } from 'react-native';
 
-let { makeReactNativeDriver, generateCycleRender } = require('@cycle/react-native');
+const { makeReactNativeDriver, generateCycleRender } = require('@cycle/react-native');
 import Touchable from '@cycle/react-native/src/Touchable';
 
 const IS_RIPPLE_EFFECT_SUPPORTED = Platform.Version >= 21;

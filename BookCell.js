@@ -16,18 +16,18 @@ import {
 import { styles } from './styles';
 import { itemsInfo } from './common';
 
-function TextWithIndicator({ children }){
-  return(
+function TextWithIndicator({ children }) {
+  return (
     <View style={[styles.row]}>
       <Text>
         {children}
       </Text>
       <ActivityIndicator
         size="small"
-        style={{marginLeft:5}}
+        style={{ marginLeft: 5 }}
       />
     </View>
-  )
+  );
 }
 
 // const LibraryStatusWithLoading = withLoading(LibraryStatus)
@@ -65,19 +65,19 @@ function LibraryStatus({ libraryStatus = {}, ...props }) {
   );
 }
 
-function genTempThumbnail(isbn){
-  return `http://www.hanmoto.com/bd/img/${isbn}.jpg`
+function genTempThumbnail(isbn) {
+  return `http://www.hanmoto.com/bd/img/${isbn}.jpg`;
 }
 
 function BookCell({ book, ...props }) {
   return (
     book.title ?
-    <BookCell1 book={book} {...props}/> :
-    <BookCell1 book={book} {...props}>
-      <TextWithIndicator>
+      <BookCell1 book={book} {...props} /> :
+      <BookCell1 book={book} {...props}>
+        <TextWithIndicator>
         タイトル確認中
       </TextWithIndicator>
-    </BookCell1>)
+      </BookCell1>);
 }
 
 function BookCell1({ book, style, onPress, children, ...props }) {
@@ -93,48 +93,52 @@ function BookCell1({ book, style, onPress, children, ...props }) {
         <Image
           source={{ uri: book.thumbnail ||
                          genTempThumbnail(book.isbn) || undefined
-            /* Image source cannot accept null */ }}
+          /* Image source cannot accept null */ }}
           resizeMode="contain"
           style={
-            styles.cellImage            //left
+            styles.cellImage            // left
                 }
         />
         <View
           style={[{
-              flexDirection: 'column',
-              flex: 1,
-              margin: 10,
-              marginBottom:0,
+            flexDirection: 'column',
+            flex: 1,
+            margin: 10,
+            marginBottom: 0,
               //justifyContent: 'center'
               //right
               //backgroundColor:"red",
-        }]}
+          }]}
         >
-          <View style={{
-            flex: 1,
+          <View
+            style={{
+              flex: 1,
             //flexDirection: 'row',
             //right hight
-          }}>
+            }}
+          >
             <Text
               numberOfLines={1}
-              ellipsizeMode={"middle"}
+              ellipsizeMode={'middle'}
               style={{
-              //flex: 1,
-              flexDirection: 'row',
-            }}>
+              // flex: 1,
+                flexDirection: 'row',
+              }}
+            >
               { book.bucket ?
                 <FAIcon
                   name={itemsInfo[book.bucket].icon} size={20}
                   style={{
-                    //marginRight: 5,
-                    letterSpacing:5,
+                    // marginRight: 5,
+                    letterSpacing: 5,
                     color: itemsInfo[book.bucket].backgroundColor }}
                 /> : null }
-                <Text style={styles.bookTitle}
-                  numberOfLines={1}
-                >
-                  {book.title}
-                </Text>
+              <Text
+                style={styles.bookTitle}
+                numberOfLines={1}
+              >
+                {book.title}
+              </Text>
             </Text>
             <Text style={styles.bookAuthor} numberOfLines={1}>
               {book.author}
@@ -143,11 +147,12 @@ function BookCell1({ book, style, onPress, children, ...props }) {
           </View>
           <View
             style={{
-              //right low
+              // right low
               height: StyleSheet.hairlineWidth,
               backgroundColor: 'rgba(0, 0, 0, 0.1)',
               //separator
-            }} />
+            }}
+          />
         </View>
       </View>
     </TouchableElement>

@@ -123,7 +123,7 @@ class SwipeableListView extends React.Component {
     this.listview.setNativeProps(props);
   }
   render() {
-    const { renderRow, generateActions,width,
+    const { renderRow, generateActions, width,
             onSwipeStart, onSwipeEnd, ...props } = this.props;
     // console.log("sw re",this.props.dataSource)
     this.rows = this.rows || {};
@@ -152,11 +152,11 @@ class SwipeableListView extends React.Component {
                 // console.log("swlv",gestureState,action)
                    onSwipeEnd(
                      { gestureState, rowData, sectionID, rowID, highlightRow, action });
-                   }}
-                 onRelease={()=>{
-                     this.props.onRelease()
-                     this.listview.setNativeProps({ scrollEnabled: true });
-                   }}
+                 }}
+                 onRelease={() => {
+                   this.props.onRelease();
+                   this.listview.setNativeProps({ scrollEnabled: true });
+                 }}
                >
                  {renderRow(rowData, sectionID, rowID, highlightRow)}
                </SwipeableRow3>

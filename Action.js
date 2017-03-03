@@ -20,18 +20,18 @@ const {
 } = Dimensions.get('window');
 
 const {
-  width:WIDTH,
+  width: WIDTH,
 } = Dimensions.get('window');
 
 // bucket,target->icon,text,backgroundColor,close,target
 class Action extends React.PureComponent {
-//function Action({ icon, text, backgroundColor, target, style, ...props }) {
+// function Action({ icon, text, backgroundColor, target, style, ...props }) {
   // backgroundColor,target are used from SwipeableActions
-  //console.log("pro",style,text,icon)
-  render(){
-    const { icon, text, backgroundColor, target, style, ...props } = this.props
-  return (
-    //FIXME:backgroundColor must handle upper because of half width action
+  // console.log("pro",style,text,icon)
+  render() {
+    const { icon, text, backgroundColor, target, style, ...props } = this.props;
+    return (
+    // FIXME:backgroundColor must handle upper because of half width action
     /* {
      *   //passed
      *   flexDirection:"row-reverse",
@@ -43,37 +43,38 @@ class Action extends React.PureComponent {
      * },*/
     <View
       {...props}
-      style={style}>
-      <View style={{
-        width:10,
-      }}/>
+      style={style}
+    >
+      <View
+      style={{
+        width: 10,
+      }} />
       <FAIcon
         name={icon} size={20}
-        style={{
-          //margin:5,
-        }}
       />
-      <View style={{
-        width:5,
-      }}/>
+      <View
+style={{
+        width: 5,
+      }} />
       <Text
         style={{
-          //numberOfLines={1}
-          alignSelf:"center",
+          // numberOfLines={1}
+          alignSelf: "center",
           //position:"absolute",
         }}
       >
-        {text || ""}
+        {text || ''}
       </Text>
     </View>
   );
-}}
+  }
+}
 
 Action.propTypes = {
-  icon:React.PropTypes.string,
-  text:React.PropTypes.string,
-  backgroundColor:React.PropTypes.string,
-  target:React.PropTypes.string,
+  icon: React.PropTypes.string,
+  text: React.PropTypes.string,
+  backgroundColor: React.PropTypes.string,
+  target: React.PropTypes.string,
 };
 
 Action.defaultProps = {
@@ -127,37 +128,39 @@ class Action2 extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      //thresholds:[],
-    }
-    const {leftActions,rightActions} = genActions2(props.bucket);
-    //this.leftActions = leftActions;
-    //this.rightActions = rightActions;
-    this.actionProps = props.left ? leftActions : rightActions
+      // thresholds:[],
+    };
+    const { leftActions, rightActions } = genActions2(props.bucket);
+    // this.leftActions = leftActions;
+    // this.rightActions = rightActions;
+    this.actionProps = props.left ? leftActions : rightActions;
   }
   render() {
-    //console.log(this.props)
-    const { index, left, indexLock, ...props } = this.props
-    //onBackgroundColorChange(actionProps[index].backgroundColor)
-    //console.log("ba",index,this.actionProps[index].backgroundColor,this.styles)
+    // console.log(this.props)
+    const { index, left, indexLock, ...props } = this.props;
+    // onBackgroundColorChange(actionProps[index].backgroundColor)
+    // console.log("ba",index,this.actionProps[index].backgroundColor,this.styles)
     return (
       <Stylish.View
         style={[{
-          backgroundColor:this.actionProps[index].backgroundColor,
-          flex:1, //verticalCenter
-          paddingVertical:10,
-          }, left ? {paddingLeft:10} : {paddingRight:10}
-          ]}
-        animationConfig={{duration:300}}
+          backgroundColor: this.actionProps[index].backgroundColor,
+          flex: 1, // verticalCenter
+          paddingVertical: 10,
+        }, left ? { paddingLeft: 10 } : { paddingRight: 10 }
+        ]}
+        animationConfig={{ duration: 300 }}
       >
-        <View style={{flex:1}}/>
+        <View style={{ flex: 1 }} />
         <View
-          style={indexLock && {width:WIDTH}}>
-          <Action {...this.actionProps[index]}
-            style={this.actionProps[index].style}/>
+          style={indexLock && { width: WIDTH }}
+        >
+          <Action
+{...this.actionProps[index]}
+            style={this.actionProps[index].style} />
         </View>
-        <View style={{flex:1}}/>
+        <View style={{ flex: 1 }} />
       </Stylish.View>
-    )
+    );
   }
 }
 
@@ -171,43 +174,41 @@ Action2.defaultProps = {
   //onBackgroundColorChange: emptyFunction,
 };
 
-//TODO:
+// TODO:
 class Action3 extends React.PureComponent {
-  render(){
-    const { left, icon, text, backgroundColor, target, ...props } = this.props
+  render() {
+    const { left, icon, text, backgroundColor, target, ...props } = this.props;
     return (
       <Stylish.View
         style={[{
-            backgroundColor:backgroundColor,
-            flex:1, //verticalCenter
-            paddingVertical:10,
-          },left ? {paddingLeft:10} : {paddingRight:10}]}
-        animationConfig={{duration:300}}
+          backgroundColor: backgroundColor,
+          flex: 1, // verticalCenter
+          paddingVertical: 10,
+        }, left ? { paddingLeft: 10 } : { paddingRight: 10 }]}
+        animationConfig={{ duration: 300 }}
       >
-        <View style={{flex:1}}/>
+        <View style={{ flex: 1 }} />
         <View
           style={left ?
-                 {flexDirection:"row"} :
-                 {flexDirection:"row-reverse"}
-            /* row or row-reverse */}>
+                 { flexDirection: "row" } :
+                 { flexDirection: "row-reverse" }
+            /* row or row-reverse */}
+        >
           <FAIcon
             name={icon} size={20}
-            style={{
-              //margin:5,
-            }}
           />
-          <View style={{width:5}}></View>
+          <View style={{ width: 5 }} />
           <Text
             style={{
-              //numberOfLines={1}
-              alignSelf:"center",
+              // numberOfLines={1}
+              alignSelf: "center",
               //position:"absolute",
             }}
           >
-            {text || ""}
+            {text || ''}
           </Text>
         </View>
-        <View style={{flex:1}}/>
+        <View style={{ flex: 1 }} />
       </Stylish.View>
     );
   }

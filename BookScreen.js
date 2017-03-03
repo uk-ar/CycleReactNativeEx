@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-let { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
+const { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
 const Icon = require('react-native-vector-icons/FontAwesome');
 
 import {

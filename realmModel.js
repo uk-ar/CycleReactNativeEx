@@ -14,14 +14,14 @@ Book.schema = {
     title: { type: 'string', optional: true },
     author: { type: 'string', optional: true },
     // Image raise error when src is null
-    thumbnail: { type: 'string', optional:true },
+    thumbnail: { type: 'string', optional: true },
     modifyDate: 'date',
   },
 };
 
 let realm;
-if(Platform.OS === 'ios'){
-  Realm.defaultPath = NativeModules.MySafariViewController.appGroupPath + "/baz.realm"
+if (Platform.OS === 'ios') {
+  Realm.defaultPath = `${NativeModules.MySafariViewController.appGroupPath}/baz.realm`;
   realm = new Realm({ schema: [Book], schemaVersion: 4 });
 } else {
   realm = new Realm({ schema: [Book], schemaVersion: 4 });
@@ -36,7 +36,7 @@ if(Platform.OS === 'ios'){
  * });*/
 const initialBooks = realm.objects('Book')
                           .sorted('modifyDate', true)// reverse sort
-                          .map((i) => i);// convert result to array
+                          .map(i => i);// convert result to array
 
 module.exports = {
   initialBooks,

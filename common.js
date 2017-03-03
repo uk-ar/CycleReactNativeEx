@@ -16,7 +16,8 @@ const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : 0;
 // ああ　あ
 
 const MOCKED_MOVIES_DATA = [
-  { title: 'ぐりとぐらの絵本7冊セット', author: '',
+  { title: 'ぐりとぐらの絵本7冊セット',
+    author: '',
     thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/2147/9784834032147.jpg?_ex=200x200',
     libraryStatus: {
       exist: false,
@@ -26,13 +27,16 @@ const MOCKED_MOVIES_DATA = [
     isbn: '9784834032147',
     active: true,
   },
-  { title: 'はじめてのABCえほん', author: '仲田利津子/黒田昌代',
+  { title: 'はじめてのABCえほん',
+    author: '仲田利津子/黒田昌代',
     thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/7472/9784828867472.jpg?_ex=200x200',
     isbn: '9784828867472',
     active: true,
   },
-  { title: 'ぐりとぐら(複数蔵書)', author: '中川李枝子/大村百合子',
-    thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/0825/9784834000825.jpg?_ex=200x200', isbn: '9784834000825',
+  { title: 'ぐりとぐら(複数蔵書)',
+    author: '中川李枝子/大村百合子',
+    thumbnail: 'http://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/0825/9784834000825.jpg?_ex=200x200',
+    isbn: '9784834000825',
     libraryStatus: {
       exist: true,
       rentable: true,
@@ -41,7 +45,8 @@ const MOCKED_MOVIES_DATA = [
     active: true,
   },
   { title: 'ぐりとぐらの1ねんかん(単一蔵書)',
-    author: '中川李枝子/山脇百合子（絵本作家）', isbn: '9784834014655',
+    author: '中川李枝子/山脇百合子（絵本作家）',
+    isbn: '9784834014655',
     libraryStatus: {
       exist: true,
       rentable: true,

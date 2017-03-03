@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
    *   height: 24,
    *   marginHorizontal: 8,
    * },*/
-  iconAndText:{
+  iconAndText: {
     flexDirection: 'row',
     alignItems: 'center',
   },

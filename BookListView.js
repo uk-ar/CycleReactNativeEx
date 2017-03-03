@@ -17,7 +17,7 @@ import materialColor from 'material-colors';
 
 import Dimensions from 'Dimensions';
 const {
-  height:HEIGHT,
+  height: HEIGHT,
   //width:WIDTH
 } = Dimensions.get('window');
 
@@ -60,9 +60,9 @@ class BookListView1 extends React.Component {
         sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
         /* getSectionHeaderData: (dataBlob, sectionID) =>
          *   dataBlob.sections[sectionID]*/
-      })
-    //this.dataSource = this.props.dataSource;
-    //this.listviews = {};
+      });
+    // this.dataSource = this.props.dataSource;
+    // this.listviews = {};
     // this.sections = {};
     // this.rows = {};
   }
@@ -88,7 +88,7 @@ class BookListView1 extends React.Component {
   render() {
     const {
       renderRow,
-      //dataSource,
+      // dataSource,
       dataBlob,
       selectedSection,
       onSwipeEnd,
@@ -100,22 +100,22 @@ class BookListView1 extends React.Component {
       // TODO: onSwipeStart?
       ...props } = this.props;
     // console.log("r",Object.keys(dataSource._dataBlob),{...dataSource._dataBlob})
-    //console.log("dBlob",dataBlob)
+    // console.log("dBlob",dataBlob)
 
     const nestedDataSource =
       Object.keys(dataBlob)
-            .reduce((acc,sectionID)=>{
+            .reduce((acc, sectionID) => {
               acc[sectionID] = [{ [sectionID]: dataBlob[sectionID] }];
               acc[`${sectionID}_end`] = { count: Object.keys(dataBlob[sectionID]).length };
               return acc;
-            },{})
+            }, {});
 
     const sectionIdentities =
       selectedSection ?
       [selectedSection, `${selectedSection}_end`] :
-      undefined ;
-    //console.log("sec",sectionIdentities)
-      //foreach(dataBlob)
+      undefined;
+    // console.log("sec",sectionIdentities)
+      // foreach(dataBlob)
       /* dataSource.sectionIdentities
        * // Object.keys(dataSource._dataBlob)//section
        *       .reduce((acc, sectionID) => {
@@ -137,13 +137,12 @@ class BookListView1 extends React.Component {
         ref={c => this.listview = c}
         removeClippedSubviews={false}
         {...props}
-        renderSectionHeader={(rowData, sectionID, rowID, highlightRow) =>{
+        renderSectionHeader={(rowData, sectionID, rowID, highlightRow) =>
             // ref={c => this.sections[sectionID] = c}
-            //console.log("row",rowData,sectionID,rowID);
-            return(
+            // console.log("row",rowData,sectionID,rowID);
+           (
               renderSectionHeader(rowData, sectionID, rowID, highlightRow)
-            )
-          }}
+            )}
         dataSource={this.dataSource}
         renderRow={(rowData, sectionID, rowID, highlightRow) => {
           this.dataSources[sectionID] =
@@ -151,36 +150,36 @@ class BookListView1 extends React.Component {
                 rowHasChanged: (r1, r2) => r1 !== r2,
                 sectionHeaderHasChanged: (s1, s2) => s1 !== s2
               });
-            //console.log("rend row",rowData);
-            //const num = Math.min(Object.keys(rowData[sectionID]).length, 2);
+            // console.log("rend row",rowData);
+            // const num = Math.min(Object.keys(rowData[sectionID]).length, 2);
             // Wrapper View for prevent layout destruction
             // removeClippedSubviews={false} seems no mean
             //                style={{maxHeight: 100 * num}}
             //                 ref={c => this.rows[sectionID] = c}
-            return (
-              //dummy view for insert?
-              <SwipeableListView
-                width={width}
-                enableEnterAnimation={sectionID !== "search"}
-                enableEmptySections
-                scrollEnabled={false}
-                removeClippedSubviews={false}
-                onSwipeEnd={onSwipeEnd}
-                onSwipeStart={onSwipeStart}
-                onRelease={onRelease}
-                renderRow={renderRow}
-                generateActions={generateActions}
-                renderSectionHeader={(sectionData, sectionID) =>
+          return (
+              // dummy view for insert?
+            <SwipeableListView
+              width={width}
+              enableEnterAnimation={sectionID !== 'search'}
+              enableEmptySections
+              scrollEnabled={false}
+              removeClippedSubviews={false}
+              onSwipeEnd={onSwipeEnd}
+              onSwipeStart={onSwipeStart}
+              onRelease={onRelease}
+              renderRow={renderRow}
+              generateActions={generateActions}
+              renderSectionHeader={(sectionData, sectionID) =>
                   // workround for android to fix entering animations
                   //                    style={{height:StyleSheet.hairlineWidth}}
                   // collapsable={false} seems no mean
-                  <View
-                    style={{ height: 1 }}
-                  />
+                <View
+                  style={{ height: 1 }}
+                />
                                     }
-                dataSource={this.dataSources[sectionID]
+              dataSource={this.dataSources[sectionID]
                                 .cloneWithRowsAndSections(rowData)}
-                           />
+            />
           );
         }}
       />
@@ -223,12 +222,12 @@ class BookListView extends React.Component {
                    renderSectionHeader(sectionData, sectionID)
           }
         onSwipeStart={(args) => {
-            this.listview.setNativeProps({ scrollEnabled: false });
+          this.listview.setNativeProps({ scrollEnabled: false });
           onSwipeStart(args);
-          }}
-        onRelease={()=>{
-            this.listview.setNativeProps({ scrollEnabled: true });
-          }}
+        }}
+        onRelease={() => {
+          this.listview.setNativeProps({ scrollEnabled: true });
+        }}
         onSwipeEnd={(args) => {
           onSwipeEnd(args);
             // onRelease(rowData,action)
@@ -357,90 +356,91 @@ class BookListView_old extends React.Component {
   }
 }
 
-//For cycle.js
+// For cycle.js
 class BookListView2 extends React.Component {
-  getScrollResponder(){
-    return this.scroll.getScrollResponder()
+  getScrollResponder() {
+    return this.scroll.getScrollResponder();
   }
-  render(){
-    const { renderFooter, onSelectSection ,onCloseSection, selectedSection,
-            dataSource, onCloseStart, onCloseEnd, bucket,style }=this.props;
-    //console.log("dataSource",selectedSection)
-    //console.log("tr;",this.done)
-    //console.log("v2;",this.props)
-    const HEADER_HEIGHT=40
-    const ROW_HEIGHT=84
-    const count=dataSource.rowIdentities[0]
-                          .map((id,j)=>dataSource.getRowData(0,j))
-                          .filter((book)=>book.bucket===bucket)
-                          .length
-    const INDICATOR_HEIGHT=20
-    //Math.min(2,count)
+  render() {
+    const { renderFooter, onSelectSection, onCloseSection, selectedSection,
+            dataSource, onCloseStart, onCloseEnd, bucket, style } = this.props;
+    // console.log("dataSource",selectedSection)
+    // console.log("tr;",this.done)
+    // console.log("v2;",this.props)
+    const HEADER_HEIGHT = 40;
+    const ROW_HEIGHT = 84;
+    const count = dataSource.rowIdentities[0]
+                          .map((id, j) => dataSource.getRowData(0, j))
+                          .filter(book => book.bucket === bucket)
+                          .length;
+    const INDICATOR_HEIGHT = 20;
+    // Math.min(2,count)
     //        style={{height:600}}
     /* style={selectedSection===bucket ?
      *        {position:"absolute",bottom:0,top:0} : {}
      * }*/
-    //set pageSize to draw cell for listview
-    //https://github.com/facebook/react-native/issues/1831#issuecomment-279185276
+    // set pageSize to draw cell for listview
+    // https://github.com/facebook/react-native/issues/1831#issuecomment-279185276
     return (
-      <View style={selectedSection && selectedSection !== bucket ?
-                   [style,{height:0}] : style}
-        onResponderMove={(evt)=>console.log("mov")}
+      <View
+        style={selectedSection && selectedSection !== bucket ?
+                   [style, { height: 0 }] : style}
+        onResponderMove={evt => console.log('mov')}
       >
         <ItemsHeader
           style={styles.sectionHeader
-                  /*grey 200*/}
+                  /* grey 200*/}
           section={bucket/* TODO:change prop name */}
-          close={ selectedSection === bucket }
-          onSelectSection={(section)=>{
-              //this.refs.root.focus()
-              onSelectSection(section)
-            }}
-          onCloseSection={()=>onCloseSection()}
+          close={selectedSection === bucket}
+          onSelectSection={(section) => {
+              // this.refs.root.focus()
+            onSelectSection(section);
+          }}
+          onCloseSection={() => onCloseSection()}
         />
         <ListView
-          ref={(comp)=>this.scroll=comp}
+          ref={comp => this.scroll = comp}
           pageSize={10}
-          style={[{backgroundColor: materialColor.grey['100']},
-                  selectedSection===bucket ?
-                  {height: HEIGHT - HEADER_HEIGHT*2 } :
-                  //{flex:1 } :
-                  //{height: 500 } ://659 40 20
-                  {maxHeight: ROW_HEIGHT*2}]}
+          style={[{ backgroundColor: materialColor.grey['100'] },
+            selectedSection === bucket ?
+                  { height: HEIGHT - HEADER_HEIGHT * 2 } :
+                  // {flex:1 } :
+                  // {height: 500 } ://659 40 20
+                  { maxHeight: ROW_HEIGHT * 2 }]}
           dataSource={dataSource}
-          scrollEnabled={selectedSection!==null}
+          scrollEnabled={selectedSection !== null}
           renderRow={
-            //contentContainerStyle style
-            (rowData,sectionID,rowID, highlightRow)=>{
-              //console.log("rr")
-              return(
-                <BookRow2
-                close={rowData.bucket!==bucket}
-                bucket={bucket}
-                onCloseStart={(target)=>
-                  onCloseStart(target,rowData,sectionID,rowID, highlightRow)}
-                onCloseEnd={(target)=>
-                  onCloseEnd(target,rowData,sectionID,rowID, highlightRow)}
-                           >
-                  <BookCell
-                  style={{
-                    height:ROW_HEIGHT,
-                    backgroundColor: materialColor.grey['50']
-                  }}
-                  book={rowData} />
-                </BookRow2>
-              )
-            }}
-      />
+            // contentContainerStyle style
+            (rowData, sectionID, rowID, highlightRow) =>
+              // console.log("rr")
+               (
+                 <BookRow2
+                   close={rowData.bucket !== bucket}
+                   bucket={bucket}
+                   onCloseStart={target =>
+                  onCloseStart(target, rowData, sectionID, rowID, highlightRow)}
+                   onCloseEnd={target =>
+                  onCloseEnd(target, rowData, sectionID, rowID, highlightRow)}
+                 >
+                   <BookCell
+                     style={{
+                       height: ROW_HEIGHT,
+                       backgroundColor: materialColor.grey['50']
+                     }}
+                     book={rowData}
+                   />
+                 </BookRow2>
+              )}
+        />
         <ItemsFooter
           count={
             count
             /* cannot pass ListView because of height */
                 }
-          onSelectSection={()=>onSelectSection(bucket)}
+          onSelectSection={() => onSelectSection(bucket)}
         />
       </View>
-    )
+    );
   }
 }
 
@@ -454,46 +454,46 @@ BookListView2.propTypes = {
 };
 
 BookListView2.defaultProps = {
-  onCloseStart: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
-  onCloseEnd: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
+  onCloseStart: (target, rowData, sectionID, rowID, highlightRow) => emptyFunction(),
+  onCloseEnd: (target, rowData, sectionID, rowID, highlightRow) => emptyFunction(),
   onSelectSection: emptyFunction,
   onCloseSection: emptyFunction,
 };
 
 class ToggleableScrollView extends React.Component {
-  render(){
-    const { scrollEnabled,...props } = this.props;
-    return(
+  render() {
+    const { scrollEnabled, ...props } = this.props;
+    return (
       scrollEnabled ?
-      <ScrollView {...props} /> :
-      <View {...props} />
-    )
+        <ScrollView {...props} /> :
+        <View {...props} />
+    );
   }
 }
 
 class BookListView3 extends React.Component {
-  getScrollResponder(){
-    return this.refs.scroll.getScrollResponder()
+  getScrollResponder() {
+    return this.refs.scroll.getScrollResponder();
   }
-  render(){
-    const {selectedSection,dataSource,style,
-           onCloseStart,onCloseEnd,onCloseSection,onSelectSection,
-    }=this.props;
+  render() {
+    const { selectedSection, dataSource, style,
+           onCloseStart, onCloseEnd, onCloseSection, onSelectSection,
+    } = this.props;
 
     const props = {
       selectedSection,
       onCloseStart,
       onCloseEnd,
-      //style:{flex:1},
-      onSelectSection:(section)=>{
-        //this.refs.scroll.scrollTo({x:0,y:0})
-        onSelectSection(section)
+      // style:{flex:1},
+      onSelectSection: (section) => {
+        // this.refs.scroll.scrollTo({x:0,y:0})
+        onSelectSection(section);
       },
       onCloseSection,
-    }
-    //console.log("p",this.props)
-    return(
-      //filter by BookListView2 has not sticky header
+    };
+    // console.log("p",this.props)
+    return (
+      // filter by BookListView2 has not sticky header
       /* selectedSection ?
        * <View
        *   key="scroll"
@@ -511,7 +511,8 @@ class BookListView3 extends React.Component {
         key="scroll"
         ref="scroll"
         scrollEnabled={!selectedSection}
-        style={style}>
+        style={style}
+      >
         <BookListView2
           dataSource={dataSource}
           key="liked"
@@ -530,8 +531,8 @@ class BookListView3 extends React.Component {
           key="borrowed"
           {...props}
         />
-    </ScrollView>
-    )
+      </ScrollView>
+    );
   }
 }
 
@@ -546,42 +547,45 @@ BookListView3.propTypes = {
 
 BookListView3.defaultProps = {
   selectedSection: null,
-  onCloseStart: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
-  onCloseEnd: (target,rowData,sectionID,rowID, highlightRow) => emptyFunction(),
+  onCloseStart: (target, rowData, sectionID, rowID, highlightRow) => emptyFunction(),
+  onCloseEnd: (target, rowData, sectionID, rowID, highlightRow) => emptyFunction(),
   onSelectSection: emptyFunction,
   onCloseSection: emptyFunction,
 };
 
-function toDataSource(dataBlob){
-  const nextDataBlob=dataBlob.reduce((acc,book)=>{
+function toDataSource(dataBlob) {
+  const nextDataBlob = dataBlob.reduce((acc, book) => {
     acc[book.isbn] = book;
     return acc;
-  },{})
-  //console.log("ndb",nextDataBlob)
-  return [nextDataBlob,dataBlob.map((book)=>book.isbn)]
+  }, {});
+  // console.log("ndb",nextDataBlob)
+  return [nextDataBlob, dataBlob.map(book => book.isbn)];
 }
 
 class BooksDataSource extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.dataSource = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
-    })
+    });
   }
   render() {
-    //console.log("books:",this.props.books)
+    // console.log("books:",this.props.books)
     this.dataSource = this.dataSource
-                          .cloneWithRows(...toDataSource(this.props.books))
-    return(
+                          .cloneWithRows(...toDataSource(this.props.books));
+    return (
       this.props.renderListView(this.dataSource)
-    )
+    );
   }
 }
-//ArrayDataSource
+// ArrayDataSource
 BooksDataSource.propTypes = {
   books: React.PropTypes.array,
   renderListView: React.PropTypes.func,
 };
 
-module.exports = { BookListView, BookListView1, BookListView2, BookListView3,
-                   BooksDataSource };
+module.exports = { BookListView,
+  BookListView1,
+  BookListView2,
+  BookListView3,
+  BooksDataSource };

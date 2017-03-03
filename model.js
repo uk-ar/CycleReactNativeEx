@@ -90,12 +90,12 @@ function model(actions) {
   // selectedSection triggers scroll and update value when animation end
   // update with animation when selectedSection$ changed
   const books$ =
-    //Rx.Observable.just(null);
+    // Rx.Observable.just(null);
     Rx.Observable.combineLatest(
       actions.searchedBooksStatus$// .do(i => console.log('searched books'))
       // searchedBooks$//.do(i => console.log('searched books'))
       ,
-      actions.savedBooksStatus$//.do(i => console.log('saved books st:',i))
+      actions.savedBooksStatus$// .do(i => console.log('saved books st:',i))
       ,
       genItems)
       // .debounce(1)// Millisecond
@@ -151,7 +151,7 @@ function model(actions) {
    *         getSectionHeaderData: (dataBlob, sectionID) =>
    *           dataBlob.sections[sectionID]
    *       }))*/
-      //.do(i=>console.log("items2:",i._dataBlob))
+      // .do(i=>console.log("items2:",i._dataBlob))
       // .do(i => console.log('datasource:', i));
       // .subscribe()
 
@@ -177,9 +177,9 @@ function model(actions) {
       /* items$,
        * sectionIDs$,
        * rowIDs$,*/
-      //dataSource$,
+      // dataSource$,
       actions.searchedBooksStatus$,
-      actions.savedBooksStatus$,//.do(i => console.log('saved books st:',i)),
+      actions.savedBooksStatus$, // .do(i => console.log('saved books st:',i)),
       /* dataSource$.do(i =>
        *   LayoutAnimation.configureNext(
        *     LayoutAnimation
@@ -197,7 +197,7 @@ function model(actions) {
       // counts$,
       // actions.savedBooks$,
       actions.booksLoadingState$.startWith(false).distinctUntilChanged(),
-      navigationState$.distinctUntilChanged(),//.do(i=>console.log("nav",i)),
+      navigationState$.distinctUntilChanged(), // .do(i=>console.log("nav",i)),
       selectedBook$.startWith(null).distinctUntilChanged(),
       // LayoutAnimation treate listview as different
       // Rx.Observable.interval(1000).do(i=>console.log("int",i)),

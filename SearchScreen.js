@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-let { makeReactNativeDriver, generateCycleRender } = require('@cycle/react-native');
+const { makeReactNativeDriver, generateCycleRender } = require('@cycle/react-native');
 const FAIcon = require('react-native-vector-icons/FontAwesome');
 const MIcon = require('react-native-vector-icons/MaterialIcons');
 
@@ -54,18 +54,17 @@ const GiftedNavigator = React.createClass({
           }
 
         />);
-    } else {
-      return (
-        <NavigatorIOS
-          {...this.props}
-          ref="nav"
-          style={styles.container}
-        />);
     }
+    return (
+      <NavigatorIOS
+        {...this.props}
+        ref="nav"
+        style={styles.container}
+      />);
   },
 });
 
-let { AnimatedFlick, BookCell } = require('./BookCell');
+const { AnimatedFlick, BookCell } = require('./BookCell');
 
 /* var dataSource = new ListView.DataSource({
   rowHasChanged: (row1, row2) => row1 !== row2,

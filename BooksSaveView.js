@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import {
   Text,
   TextInput,
@@ -13,10 +13,10 @@ import {
   ListView,
   ActivityIndicator,
   Alert,
-} from 'react-native'
+} from 'react-native';
 import emptyFunction from 'fbjs/lib/emptyFunction';
 
-import {BookCell} from './BookCell';
+import { BookCell } from './BookCell';
 
 const RAKUTEN_ISBN_API =
   'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&applicationId=1088506385229803383&formatVersion=2&isbnjan=';
@@ -24,65 +24,65 @@ const RAKUTEN_ISBN_API =
 class BooksFromURL extends React.Component {
   constructor(props) {
     super(props);
-    this.state={
+    this.state = {
       books: null,
-      dataSource:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+      dataSource: new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 }),
     };
   }
-  //https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86
-  componentDidMount(){
+  // https://gist.github.com/uk-ar/7574cb6d06dfa848780f508073492d86
+  componentDidMount() {
     const { url, onProgress, onComplete, ...props } = this.props;
 
     fetch(url)
       .then(response => response.text())
-      .then(text => {
-        let isbns = text.match(/978-?\d{10}/g)//remove dup
-                        .filter((x, i, self) => self.indexOf(x) === i)
+      .then((text) => {
+        const isbns = text.match(/978-?\d{10}/g)// remove dup
+                        .filter((x, i, self) => self.indexOf(x) === i);
 
         this.setState({
           books: isbns.map(isbn => ({ isbn }))
-        })
-        return isbns
+        });
+        return isbns;
       })
-      .then(isbns =>{
-        //console.log("isbns",isbns)
-        //let books = [];
-        isbns.forEach((isbn,index) =>
-          //fetch('http://www.hanmoto.com/api/book.php?ISBN='+isbn)
-          //fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+isbn)
-          setTimeout(()=>{
-            fetch(RAKUTEN_ISBN_API+isbn)
-            //.then(response => response.ok )
-              .then(response => {
-                //console.log(response)
-                return response.json()
-              })
-              .then(body =>{
-                //console.log("b",body)
-                let { title, author, isbn, largeImageUrl } = body.Items[0]
-                //let { title, authors, largeImageUrl } = body.items[0].volumeInfo
-                let book = {
+      .then((isbns) => {
+        // console.log("isbns",isbns)
+        // let books = [];
+        isbns.forEach((isbn, index) =>
+          // fetch('http://www.hanmoto.com/api/book.php?ISBN='+isbn)
+          // fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+isbn)
+          setTimeout(() => {
+            fetch(RAKUTEN_ISBN_API + isbn)
+            // .then(response => response.ok )
+              .then(response =>
+                // console.log(response)
+                 response.json())
+              .then((body) => {
+                // console.log("b",body)
+                const { title, author, isbn, largeImageUrl } = body.Items[0];
+                // let { title, authors, largeImageUrl } = body.items[0].volumeInfo
+                const book = {
                   title: title.replace(/^【バーゲン本】/, ''),
-                  author: author,
+                  author,
                   isbn,
                   thumbnail: largeImageUrl,
-                }
+                };
                 return book;
-              }).done( book =>{
-                //books[isbn]=res
-                this.setState((prevState)=>{
-                  prevState.books[index] = book
-                  onProgress(index+1,isbns.length)
-                  if(index+1 === isbns.length){
+              }).done((book) => {
+                // books[isbn]=res
+                this.setState((prevState) => {
+                  prevState.books[index] = book;
+                  onProgress(index + 1, isbns.length);
+                  if (index + 1 === isbns.length) {
                     onComplete(prevState.books);
                   }
                   return {
-                    books:[...prevState.books]
-                  }
-                })
-              })},index*1000)
-        )
-      })
+                    books: [...prevState.books]
+                  };
+                });
+              });
+          }, index * 1000)
+        );
+      });
     /* .catch(error=>{
      *   //console.log("error",error,url)
      *   setTimeout(()=>{Alert.alert(
@@ -95,29 +95,28 @@ class BooksFromURL extends React.Component {
      *   })
      * })*/
   }
-  render(){
-    const { url, onProgress, ...props } = this.props
-    //console.log("render",this.state.books)
-    if(this.state.books === null){
-      return(
+  render() {
+    const { url, onProgress, ...props } = this.props;
+    // console.log("render",this.state.books)
+    if (this.state.books === null) {
+      return (
         <ActivityIndicator
           size="large"
           style={{
-            //alignItems:'center',
-            //justifyContent:'center',
-            flex:1,
-            height:80}}
-        />)
+            // alignItems:'center',
+            // justifyContent:'center',
+            flex: 1,
+            height: 80 }}
+        />);
     }
     return (
       <ListView
         {...props}
         dataSource={this.state.dataSource.cloneWithRows(this.state.books)}
-        renderRow={(rowData) =>{
-            //console.log("rd",rowData)
-            return <BookCell book={rowData}/>
-          }}
-      />)
+        renderRow={rowData =>
+            // console.log("rd",rowData)
+          <BookCell book={rowData} />}
+      />);
   }
 }
 
@@ -133,33 +132,34 @@ class BooksSaveView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      processed:0,
-      total:0,
-      books:[],
-    }
+      processed: 0,
+      total: 0,
+      books: [],
+    };
   }
-  render(){
-    const { url, onCancel, onSave, ...props } = this.props
-    //console.log("bool",this.state.books.length !== 0)
-    return(
+  render() {
+    const { url, onCancel, onSave, ...props } = this.props;
+    // console.log("bool",this.state.books.length !== 0)
+    return (
       <View
         style={{
           //
-          flex:1,
-          //justifyContent:"center",
+          flex: 1,
+          // justifyContent:"center",
           backgroundColor: '#EBEBF1',
         }}
       >
-        <StatusBar barStyle="dark-content"/>
+        <StatusBar barStyle="dark-content" />
         <View
           style={{
-            height:NavigationExperimental.Header.HEIGHT,
-            paddingTop:Platform.OS === 'ios' ? 20 : 0,
-            backgroundColor: "#f7f7f8",//copy
+            height: NavigationExperimental.Header.HEIGHT,
+            paddingTop: Platform.OS === 'ios' ? 20 : 0,
+            backgroundColor: '#f7f7f8', // copy
             borderBottomWidth: Platform.OS === 'ios' ? StyleSheet.hairlineWidth : 0,
-            justifyContent:"center",
-            flexDirection:"row",
-          }}>
+            justifyContent: 'center',
+            flexDirection: 'row',
+          }}
+        >
           <Button
             onPress={onCancel}
             title="Cancel"
@@ -168,7 +168,7 @@ class BooksSaveView extends React.Component {
             Add to Favorites
           </NavigationExperimental.Header.Title>
           <Button
-            onPress={()=>onSave(this.state.books)}
+            onPress={() => onSave(this.state.books)}
             disabled={this.state.books.length === 0}
             title="Save"
           />
@@ -176,28 +176,28 @@ class BooksSaveView extends React.Component {
         <Text>
           { this.state.total !== 0 ?
             `${this.state.processed}/${this.state.total}件を処理` :
-            "" }
+            '' }
         </Text>
-        {url==='' ?
-         <ActivityIndicator
-           size="large"
-           style={{
-             //alignItems:'center',
-             //justifyContent:'center',
-             flex:1,
-             height:80}}
-         /> :
-         <BooksFromURL
-           style={{backgroundColor: '#FFFFFF'}}
-           url={url}
-           onProgress={(i,t)=>this.setState({
-               processed:i,
-               total:t
-             })}
-           onComplete={(books)=>this.setState({books})}
-         />}
+        {url === '' ?
+          <ActivityIndicator
+            size="large"
+            style={{
+             // alignItems:'center',
+             // justifyContent:'center',
+              flex: 1,
+              height: 80 }}
+          /> :
+          <BooksFromURL
+            style={{ backgroundColor: '#FFFFFF' }}
+            url={url}
+            onProgress={(i, t) => this.setState({
+              processed: i,
+              total: t
+            })}
+            onComplete={books => this.setState({ books })}
+          />}
       </View>
-    )
+    );
   }
 }
 

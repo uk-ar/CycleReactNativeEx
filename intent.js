@@ -17,11 +17,11 @@ import {
 import {
   AppState,
   InteractionManager,
-} from 'react-native'
+} from 'react-native';
 
-AppState.addEventListener('change',()=>{
-  console.log("AppState",AppState.currentState)
-})
+AppState.addEventListener('change', () => {
+  console.log('AppState', AppState.currentState);
+});
 /* const mockbooks = [
  *   { title: 'like:SOFT SKILLS', isbn: '9784822251550', bucket: 'liked' },
  *   { title: 'like:bukkyou', isbn: '9784480064851', bucket: 'done' },
@@ -41,7 +41,7 @@ function intent(RN, HTTP) {
     .select('main')
   // .events('swipeEnd')
     .events('release')
-    //.do(args => console.log('foo0:', args))
+    // .do(args => console.log('foo0:', args))
     .map(([book, action]) => [book, action.target])
   // .map(([{rowData:book,action}]) => [book, action.target])
     // .map(([book, action, closeAnimation]) => [book, action.target, closeAnimation])
@@ -57,20 +57,20 @@ function intent(RN, HTTP) {
    * .switch()*/
   // map is better?
     // .do(([book, action, closeAnimation]) => closeAnimation.start())//map is better?
-    //.do(args => console.log('foo2:', args))
-    .shareReplay()
+    // .do(args => console.log('foo2:', args))
+    .shareReplay();
 
   const close$ = RN
     .select('main')
     .events('closeStart')
-  //.do(args => console.log('foo0:', args))
-    .shareReplay()
+  // .do(args => console.log('foo0:', args))
+    .shareReplay();
 
   const open$ = RN
     .select('main')
     .events('closeEnd')
-    //.do(args => console.log('foo0:', args))
-    .shareReplay()
+    // .do(args => console.log('foo0:', args))
+    .shareReplay();
 
   const changeQuery$ = RN
   /* .select('text-input')
@@ -227,8 +227,8 @@ function intent(RN, HTTP) {
         /* release$.map(([book, bucket])=>({ type: 'remove', book })),
          * release$.map(([book, bucket])=>({ type: 'add', book, bucket }))
          *         .delay(1)//100 ms for re-render*/
-        close$.map(([bucket,book])=>({ type: 'close', book, bucket:null })),
-        open$.map(([bucket, book])=>({ type: 'open', book, bucket }))
+        close$.map(([bucket, book]) => ({ type: 'close', book, bucket: null })),
+        open$.map(([bucket, book]) => ({ type: 'open', book, bucket }))
       )
       .shareReplay();
 
@@ -244,17 +244,19 @@ function intent(RN, HTTP) {
               elem.isbn.toString() !== book.isbn.toString());
           case 'add':
             return [
-              { ...book, bucket,
-                modifyDate: new Date(Date.now()), appear: true }]
+              { ...book,
+                bucket,
+                modifyDate: new Date(Date.now()),
+                appear: true }]
               .concat(books);
           case 'close':
-            return books.map((elem)=>
-              elem.isbn === book.isbn ? {...elem, bucket : null} : elem)
+            return books.map(elem =>
+              elem.isbn === book.isbn ? { ...elem, bucket: null } : elem);
           case 'open':
             return [
-              {...book,bucket},
-              ...books.filter((elem)=>elem.isbn!==book.isbn)
-            ]
+              { ...book, bucket },
+              ...books.filter(elem => elem.isbn !== book.isbn)
+            ];
             /* case 'replace':
              *   return [{ ...book, bucket, modifyDate: new Date(Date.now()) }]
              *     .concat(books.filter(elem =>
@@ -264,11 +266,11 @@ function intent(RN, HTTP) {
         }
       } // ).do((books)=>LayoutAnimation.easeInEaseOut() //bug in ios
       )
-      //.do((books)=> console.log("saved books:",books))
+      // .do((books)=> console.log("saved books:",books))
       .shareReplay();
 
   savedBooks$.do((books) => {
-    InteractionManager.runAfterInteractions(()=>{
+    InteractionManager.runAfterInteractions(() => {
       realm.write(() => {
         books.forEach((book) => {
           realm.create('Book', book, true);
@@ -361,7 +363,7 @@ function intent(RN, HTTP) {
         RN.select('main')
           // .events('press')// section,this.listview
           .events('selectSection')
-          //.do(i => console.log('section selected0:%O', i))
+          // .do(i => console.log('section selected0:%O', i))
           .shareReplay(),
         RN.select('main')
           .events('closeSection')

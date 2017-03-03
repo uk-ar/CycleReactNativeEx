@@ -26,7 +26,7 @@ import {
   PanResponder,
 } from 'react-native';
 
-let { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
+const { makeReactNativeDriver, generateCycleRender, CycleView } = require('@cycle/react-native');
 
 const SearchBar = React.createClass({
   render() {

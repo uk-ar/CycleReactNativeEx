@@ -11,12 +11,12 @@ import {
   Dimensions,
 } from 'react-native';
 
-import { SwipeableRow3,SwipeableRow4,SwipeableRow5 } from './SwipeableRow';
-import { genActions2,Action,Action2 } from './Action';
+import { SwipeableRow3, SwipeableRow4, SwipeableRow5 } from './SwipeableRow';
+import { genActions2, Action, Action2 } from './Action';
 import emptyFunction from 'fbjs/lib/emptyFunction';
 import Stylish from 'react-native-stylish';
 
-var {width:WIDTH} = Dimensions.get('window');
+const { width: WIDTH } = Dimensions.get('window');
 
 class BookRow1 extends React.Component {
   constructor(props) {
@@ -35,136 +35,144 @@ class BookRow1 extends React.Component {
   }
 }
 
-//for target bucket handling
+// for target bucket handling
 class BookRow2 extends React.Component {
   constructor(props) {
     super(props);
-    this.target=null;
+    this.target = null;
   }
-  render(){
-    const {bucket,onCloseStart,onCloseEnd,close}=this.props;
-    const {leftActions,rightActions} = genActions2(bucket);
-    //console.log("row",close)
+  render() {
+    const { bucket, onCloseStart, onCloseEnd, close } = this.props;
+    const { leftActions, rightActions } = genActions2(bucket);
+    // console.log("row",close)
     return (
       <SwipeableRow4
         close={close}
-        onCloseStart={()=>{
-            const { onCloseStart }=this.props;
-            //console.log("close start",this.target,rowData,this.props)
-            onCloseStart(this.target)//,rowData,sectionID,rowID, highlightRow
-          }}
-        onCloseEnd={()=>{
-            const { onCloseEnd }=this.props;
-            //console.log("close end",this.target,this.props)
-            onCloseEnd(this.target)//,rowData,sectionID,rowID, highlightRow
-          }}
-        renderLeftAction={(i, indexLock)=>{
-            //i,indexLock->next bucket
-            //const { left, icon, text, backgroundColor, target } = this.props
-            //console.log("left",leftActions[i],indexLock)
-            //don't update target when indexLock
-            if(!indexLock && leftActions[i]){
-              this.target=leftActions[i].target
-            }
-            return(
-              <Action2 index={i} left={true}
+        onCloseStart={() => {
+          const { onCloseStart } = this.props;
+            // console.log("close start",this.target,rowData,this.props)
+          onCloseStart(this.target);// ,rowData,sectionID,rowID, highlightRow
+        }}
+        onCloseEnd={() => {
+          const { onCloseEnd } = this.props;
+            // console.log("close end",this.target,this.props)
+          onCloseEnd(this.target);// ,rowData,sectionID,rowID, highlightRow
+        }}
+        renderLeftAction={(i, indexLock) => {
+            // i,indexLock->next bucket
+            // const { left, icon, text, backgroundColor, target } = this.props
+            // console.log("left",leftActions[i],indexLock)
+            // don't update target when indexLock
+          if (!indexLock && leftActions[i]) {
+            this.target = leftActions[i].target;
+          }
+          return (
+            <Action2
+              index={i} left
               bucket={bucket}
-              indexLock={indexLock}/>
-            )
-          }}
-        renderRightAction={(i, indexLock)=>{
-            //don't update target when indexLock
-            //console.log("i,index:", i, indexLock)
-            if(!indexLock && rightActions[i]){
-              this.target=rightActions[i].target
-            }
-            return(<Action2 index={i} left={false}
-                               bucket={bucket}
-                               indexLock={indexLock}/>)
-          }}
+              indexLock={indexLock}
+            />
+          );
+        }}
+        renderRightAction={(i, indexLock) => {
+            // don't update target when indexLock
+            // console.log("i,index:", i, indexLock)
+          if (!indexLock && rightActions[i]) {
+            this.target = rightActions[i].target;
+          }
+          return (<Action2
+            index={i} left={false}
+            bucket={bucket}
+            indexLock={indexLock}
+          />);
+        }}
       >
-              {this.props.children}
+        {this.props.children}
       </SwipeableRow4>
-    )
+    );
   }
 }
 
-//for target bucket handling
+// for target bucket handling
 class BookRow3 extends React.Component {
   constructor(props) {
     super(props);
-    this.target=null;
+    this.target = null;
   }
-  render(){
-    const {bucket,onCloseStart,onCloseEnd,close, ...props}=this.props;
-    const {leftActions,rightActions} = genActions2(bucket);
-    //console.log("la:",leftActions,rightActions)
-    //onResponderMove
+  render() {
+    const { bucket, onCloseStart, onCloseEnd, close, ...props } = this.props;
+    const { leftActions, rightActions } = genActions2(bucket);
+    // console.log("la:",leftActions,rightActions)
+    // onResponderMove
     return (
       <SwipeableRow5
         {...props}
         close={close}
-        onCloseStart={()=>{
-            const { onCloseStart }=this.props;
-            //console.log("close start",this.target,rowData,this.props)
-            onCloseStart(this.target)//,rowData,sectionID,rowID, highlightRow
-          }}
-        onCloseEnd={()=>{
-            const { onCloseEnd }=this.props;
-            //console.log("close end",this.target,this.props)
-            onCloseEnd(this.target)//,rowData,sectionID,rowID, highlightRow
-          }}
-        renderLeftAction={(i, indexLock)=>{
-            //i,indexLock->next bucket
-            //don't update target when indexLock
-            //console.log("i:",i)
-            if(!indexLock && leftActions[i]){
-              this.target=leftActions[i].target
-            }
-            //Stylish.View is heavy?
-            return(
-              <Stylish.View
-                removeClippedSubviews={false}
-                style={{
-                  flex:1,
-                  justifyContent:"center",//vertical Center
-                  backgroundColor:leftActions[i].backgroundColor,
-                }}>
-                <Action
-                 {...leftActions[i]}
-                 style={[
-                   leftActions[i].style,
-                   indexLock && {width: WIDTH}
-                 ]}/>
-              </Stylish.View>
-            )
-          }}
-        renderRightAction={(i, indexLock)=>{
-            //don't update target when indexLock
-            if(!indexLock && rightActions[i]){
-              this.target=rightActions[i].target
-            }
-            return(
-              <Stylish.View
-                removeClippedSubviews={false}
-                style={{
-                  flex:1,
-                  justifyContent:"center",
-                  backgroundColor:rightActions[i].backgroundColor,
-                }}>
-                <Action
-                 {...rightActions[i]}
-                 style={[
-                   rightActions[i].style,
-                   indexLock && {width: WIDTH}
-                 ]}/>
-              </Stylish.View>
-            )
-          }}
+        onCloseStart={() => {
+          const { onCloseStart } = this.props;
+            // console.log("close start",this.target,rowData,this.props)
+          onCloseStart(this.target);// ,rowData,sectionID,rowID, highlightRow
+        }}
+        onCloseEnd={() => {
+          const { onCloseEnd } = this.props;
+            // console.log("close end",this.target,this.props)
+          onCloseEnd(this.target);// ,rowData,sectionID,rowID, highlightRow
+        }}
+        renderLeftAction={(i, indexLock) => {
+            // i,indexLock->next bucket
+            // don't update target when indexLock
+            // console.log("i:",i)
+          if (!indexLock && leftActions[i]) {
+            this.target = leftActions[i].target;
+          }
+            // Stylish.View is heavy?
+          return (
+            <Stylish.View
+              removeClippedSubviews={false}
+              style={{
+                flex: 1,
+                justifyContent: 'center', // vertical Center
+                backgroundColor: leftActions[i].backgroundColor,
+              }}
+            >
+              <Action
+                {...leftActions[i]}
+                style={[
+                  leftActions[i].style,
+                  indexLock && { width: WIDTH }
+                ]}
+              />
+            </Stylish.View>
+          );
+        }}
+        renderRightAction={(i, indexLock) => {
+            // don't update target when indexLock
+          if (!indexLock && rightActions[i]) {
+            this.target = rightActions[i].target;
+          }
+          return (
+            <Stylish.View
+              removeClippedSubviews={false}
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                backgroundColor: rightActions[i].backgroundColor,
+              }}
+            >
+              <Action
+                {...rightActions[i]}
+                style={[
+                  rightActions[i].style,
+                  indexLock && { width: WIDTH }
+                ]}
+              />
+            </Stylish.View>
+          );
+        }}
       >
-              {this.props.children}
+        {this.props.children}
       </SwipeableRow5>
-    )
+    );
   }
 }
 
@@ -184,4 +192,4 @@ BookRow3.defaultProps = {
   //bucket: null,
 };
 
-module.exports = { BookRow1,BookRow2,BookRow3 };
+module.exports = { BookRow1, BookRow2, BookRow3 };

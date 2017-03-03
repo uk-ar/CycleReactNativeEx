@@ -77,7 +77,7 @@ function MyCard({ children, navigationProps, style }) {
  *   });*/
 
 import { genActions2 } from './Action';
-import { BookListView,BookListView2,BooksDataSource } from './BookListView';
+import { BookListView, BookListView2, BooksDataSource } from './BookListView';
 import { ItemsFooter, ItemsHeader } from './Header';
 Touchable.ItemsHeader = Touchable.createCycleComponent(ItemsHeader);
 
@@ -97,9 +97,9 @@ class MainView extends React.Component {
             onSelectSection, onCloseSection, onRelease,
             onSelectCell, style, onChangeQuery, width,
             booksLoadingState, selectedSection } = this.props;
-    //console.log("sel",selectedSection)
+    // console.log("sel",selectedSection)
     // TODO:keep query text & scroll position
-    //console.log('ds change', dataSource._dataBlob);
+    // console.log('ds change', dataSource._dataBlob);
     // TODO: transition to detail view
     // console.log('render main', { items, sectionIDs, rowIDs, booksLoadingState, selectedSection });
     /* LayoutAnimation.configureNext(
@@ -111,8 +111,8 @@ class MainView extends React.Component {
     // props.animations.start()
     //      style={{ marginTop: 64, backgroundColor: 'red' }}
 
-    //called twice for card stack
-    //console.log("b",books,searchedBooks,savedBooks)
+    // called twice for card stack
+    // console.log("b",books,searchedBooks,savedBooks)
 
     /* this.dataBlob = {
      *   r1:{data:1,enable:true},
@@ -137,41 +137,41 @@ class MainView extends React.Component {
      *   //console.log("ndb",nextDataBlob)
      *   return [nextDataBlob,dataBlob.map((book)=>book.isbn)]
      * }*/
-    console.log("da:",savedBooks,style)
-    return(
+    console.log('da:', savedBooks, style);
+    return (
       <BooksDataSource
         books={savedBooks}
-        renderListView={(dataSource)=>{
-            return(
-              <View
-                style={{paddingTop:20}}>
-                <Touchable.BookListView2
-                  dataSource={dataSource}
-                  bucket="liked"
-                  selector="main"
-                />
-                <Touchable.BookListView2
-                  dataSource={dataSource}
-                  bucket="done"
-                  selector="main"
-                />
-                <Touchable.BookListView2
-                  dataSource={dataSource}
-                  bucket="borrowed"
-                  selector="main"
-                />
-              </View>
+        renderListView={dataSource => (
+          <View
+            style={{ paddingTop: 20 }}
+          >
+            <Touchable.BookListView2
+              dataSource={dataSource}
+              bucket="liked"
+              selector="main"
+            />
+            <Touchable.BookListView2
+              dataSource={dataSource}
+              bucket="done"
+              selector="main"
+            />
+            <Touchable.BookListView2
+              dataSource={dataSource}
+              bucket="borrowed"
+              selector="main"
+            />
+          </View>
             )//                  dataSource={dataSource.cloneWithRows(...toDataSource(savedBooks))}
-          }}
+        }
       />
-    )
+    );
     return (
       <BookListView
         style={style}
         dataBlob={books}
         ref={(c) => {
-            this.listview = c;
-          }}
+          this.listview = c;
+        }}
         selectedSection={selectedSection}
         directionalLockEnabled
         enableEmptySections
@@ -179,7 +179,7 @@ class MainView extends React.Component {
         generateActions={(rowData, sectionID, rowID) =>
           genActions2(sectionID)}
         onSwipeEnd={({ rowData, sectionID, rowID, action, ...rest }) => {
-            onRelease(rowData, action);
+          onRelease(rowData, action);
             /* if(action.target == null) { return }
              *   this.listview
              *       .close(sectionID,rowID)*/
@@ -197,17 +197,17 @@ class MainView extends React.Component {
                }
                this.updateDataSource()
                }) */
-          }}
+        }}
         renderRow={(rowData, sectionID, rowID) =>
           (
             <BookCell
-                 onPress={() => {
-                     onSelectCell(rowData);
-                   }}
-                 book={rowData}
-                 style={{
-                   backgroundColor: materialColor.grey['50']}}
-                       >
+              onPress={() => {
+                onSelectCell(rowData);
+              }}
+              book={rowData}
+              style={{
+                backgroundColor: materialColor.grey['50'] }}
+            >
               <LibraryStatus libraryStatus={rowData.libraryStatus} />
             </BookCell>
           )
@@ -221,53 +221,53 @@ class MainView extends React.Component {
             [{ nativeEvent: { contentOffset: { y: this._scrollY } } }],
             //{listener},          // Optional async listener
           )}
-        renderSectionHeader={(sectionData, sectionID) =>{
+        renderSectionHeader={(sectionData, sectionID) =>
             // call upper onSelectSection after scroll
-            //console.log("sec header")
-            return (
-            <ItemsHeader
-                 style={{backgroundColor:style.backgroundColor}}
-                 onChangeQuery={onChangeQuery}
-              section={sectionID}
-              close={selectedSection}
-                 key={sectionID}
-                 {...sectionData}
-                 onSelectSection={(section) => {
-                     //if (dataSource.sectionIdentities.length === 2) { return; }
-                     this.positions.push(this._scrollY.__getValue());
+            // console.log("sec header")
+           (
+             <ItemsHeader
+               style={{ backgroundColor: style.backgroundColor }}
+               onChangeQuery={onChangeQuery}
+               section={sectionID}
+               close={selectedSection}
+               key={sectionID}
+               {...sectionData}
+               onSelectSection={(section) => {
+                     // if (dataSource.sectionIdentities.length === 2) { return; }
+                 this.positions.push(this._scrollY.__getValue());
                      // TODO:
                      // 1. scroll to section header with animation
                      // (need expand view in android)
                      // 2. save section header position
-                     this.listview.scrollTo({ y: 0, animated: false });
-                     //TODO: no need to handle in intent?
-                     onSelectSection(section);
+                 this.listview.scrollTo({ y: 0, animated: false });
+                     // TODO: no need to handle in intent?
+                 onSelectSection(section);
                      // this.sectionIdentities = [section,`${section}_end`]
                      // this.updateDataSource()
-                   }}
-                 onCloseSection={() => {
+               }}
+               onCloseSection={() => {
                      // TODO:
                      // 1. scroll to section header with animation
                      // this.listview.scrollTo({y:0,animated:true})
                      // this.sectionIdentities = Object.keys(this.data)
-                     onCloseSection();
-                     const pos = this.positions.pop();
-                     setTimeout(() =>
+                 onCloseSection();
+                 const pos = this.positions.pop();
+                 setTimeout(() =>
                        this.listview.scrollTo({ y: pos,
-                                                animated: false }));
+                         animated: false }));
                      /* this.updateDataSource().then(()=>{
                         //TODO:
                         //2. scroll to section header with no animation
                         //2. scroll to original position with animation
                         }) */
-                   }}
-                                />)}}
+               }}
+             />)}
         renderSectionFooter={(sectionData, sectionID) =>
           // console.log("fo",sectionData)
           (
             <ItemsFooter
-                 {...sectionData}
-                 />)
+              {...sectionData}
+            />)
                             }
       />
     );
@@ -282,8 +282,8 @@ MainView.propTypes = {
   onChangeQuery: React.PropTypes.func
 };
 MainView.defaultProps = {
-  //onRelease:
-  onChangeQuery:emptyFunction
+  // onRelease:
+  onChangeQuery: emptyFunction
 };
 Touchable.MainView = Touchable.createCycleComponent(
   MainView);
@@ -293,7 +293,7 @@ const {
 } = Dimensions.get('window');
 
 function view(model) {
-  //console.log('view',model);
+  // console.log('view',model);
   const navigationState = model.navigationState;
   // return <MainView  {...model}/>;
   // console.log('mynav', navigationState, onNavigateBack);
@@ -304,7 +304,7 @@ function view(model) {
       navigationState={navigationState}
       onNavigate={onNavigateBack}
       renderScene={(navigationProps) => {
-          //console.log('MyNav:renderScene', navigationProps);
+          // console.log('MyNav:renderScene', navigationProps);
       // const key = navigationProps.scene.navigationState.key;
         const key = navigationProps.scene.route.key;
         switch (key) {
@@ -326,7 +326,7 @@ function view(model) {
               >
                 <StatusBar
                   barStyle="light-content"
-                  networkActivityIndicatorVisible={true}
+                  networkActivityIndicatorVisible
                 />
                 <Touchable.MainView
                   selector="main"
@@ -335,39 +335,39 @@ function view(model) {
                     flex: 1,
                     backgroundColor: '#1A237E', // indigo 900
                   }}
-                  width={width-6}
+                  width={width - 6}
                   {...model}
                 />
               </MyCard>
             );
           case 'Book Detail':
             // return (MainView(model))
-            //console.log(model.selectedBook)
-            let {selectedBook:{libraryStatus:{reserveUrl:url}}} = model;
-            url = url || 'https://github.com/facebook/react-native'
+            // console.log(model.selectedBook)
+            let { selectedBook: { libraryStatus: { reserveUrl: url } } } = model;
+            url = url || 'https://github.com/facebook/react-native';
             return (
               <MyCard
                 navigationProps={navigationProps}
-                style={{backgroundColor: 'yellow' }}
-                      >
+                style={{ backgroundColor: 'yellow' }}
+              >
                 <StatusBar
-                  animated={true}
-                  barStyle='dark-content'
-                            />
+                  animated
+                  barStyle="dark-content"
+                />
                 <NavigationExperimental.Header
-            {...navigationProps}
-            onNavigateBack={onNavigateBack}
-            renderTitleComponent={props =>
+                  {...navigationProps}
+                  onNavigateBack={onNavigateBack}
+                  renderTitleComponent={props =>
               (
                 <NavigationExperimental.Header.Title>
                                  foo
                 </NavigationExperimental.Header.Title>
               )
                                  }
-                                 />
+                />
                 <WebView
-        source={{uri: url}}
-              />
+                  source={{ uri: url }}
+                />
               </MyCard>
             );
           default:

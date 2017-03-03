@@ -64,42 +64,44 @@ function ItemsHeader({
         name="close"
         selector="close"
         size={20}
-        style={{ margin:5, marginRight: 5}}
+        style={{ margin: 5, marginRight: 5 }}
       />
     </TouchableElement>
   ) : (
-      <Icon
-        name={itemsInfo[section].icon}
-        color={itemsInfo[section].backgroundColor}
-        size={20}
-        style={{ margin:5, marginRight: 5 }}
-      />
+    <Icon
+      name={itemsInfo[section].icon}
+      color={itemsInfo[section].backgroundColor}
+      size={20}
+      style={{ margin: 5, marginRight: 5 }}
+    />
   );
 
   const content = (section === 'search' && close) ? (
     <View
       style={styles.sectionHeader}
-      key={section}>
+      key={section}
+    >
       {icon}
       <TextInput
-        autoFocus={true}
+        autoFocus
         selector="text-input"
         onChangeText={onChangeQuery}
         style={styles.searchBarInput}
       />
       { loadingState ? (
-          <ActivityIndicator
-            animating
-            color="white"
-            size="large"
-            style={styles.spinner}
-          />) : null
+        <ActivityIndicator
+          animating
+          color="white"
+          size="large"
+          style={styles.spinner}
+        />) : null
       }
     </View>
   ) : (
     <View
       style={styles.iconAndText}
-      key={section}>
+      key={section}
+    >
       {icon}
       <Text>
         {itemsInfo[section].text}
