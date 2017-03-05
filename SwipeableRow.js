@@ -897,7 +897,7 @@ class SwipeableRow5 extends React.Component {
                 ({ nativeEvent: { layout: { x, y, width, height } } }) => {
                   // this.panX.setOffset(-width)
                   this.leftOffset = width;
-                  console.log('w:', width);
+                  //console.log('w:', width);
                   this.setState({ releasing: false });// update view
                 }}
             >
@@ -916,7 +916,6 @@ class SwipeableRow5 extends React.Component {
             </View>
             <MeasureableView
               ref={comp => this.right = comp}
-              removeClippedSubviews={false}
               onFirstLayout={
                 ({ nativeEvent: { layout: { x, y, width, height } } }) => {
                   this.rightOffset = width;

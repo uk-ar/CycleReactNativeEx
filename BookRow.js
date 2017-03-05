@@ -126,9 +126,9 @@ class BookRow3 extends React.Component {
             this.target = leftActions[i].target;
           }
             // Stylish.View is heavy?
-          return (
+            // animationConfig={{duration:100}}
+            return (
             <Stylish.View
-              removeClippedSubviews={false}
               style={{
                 flex: 1,
                 justifyContent: 'center', // vertical Center
@@ -152,7 +152,6 @@ class BookRow3 extends React.Component {
           }
           return (
             <Stylish.View
-              removeClippedSubviews={false}
               style={{
                 flex: 1,
                 justifyContent: 'center',
