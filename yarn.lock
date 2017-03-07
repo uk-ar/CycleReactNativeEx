@@ -36,9 +36,9 @@
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@cycle/xstream-adapter/-/xstream-adapter-3.1.0.tgz#97b64f3161d91913666be81ee11a13f3d1e754b4"
 
-"@kadira/react-native-storybook@^2.0.0":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@kadira/react-native-storybook/-/react-native-storybook-2.2.2.tgz#5b6494d6fa5e729bb9bb5c3c1cb002cc7c808c12"
+"@kadira/react-native-storybook@git+http://github.com/uk-ar/react-native-storybook.git":
+  version "2.1.2"
+  resolved "git+http://github.com/uk-ar/react-native-storybook.git#1e1bc4049cc7091df81cd3c57487f63f3c14513d"
   dependencies:
     "@kadira/storybook-addon-actions" "^1.0.4"
     "@kadira/storybook-addon-links" "^1.0.1"
@@ -4403,13 +4403,13 @@ mime-db@~1.23.0:
   version "1.23.0"
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.23.0.tgz#a31b4070adaea27d732ea333740a64d0ec9a6659"
 
-mime-types@2.1.11, mime-types@~2.1.7, mime-types@~2.1.9:
+mime-types@2.1.11, mime-types@^2.1.10, mime-types@~2.1.7, mime-types@~2.1.9:
   version "2.1.11"
   resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.11.tgz#c259c471bda808a85d6cd193b430a5fae4473b3c"
   dependencies:
     mime-db "~1.23.0"
 
-mime-types@^2.1.10, mime-types@^2.1.12, mime-types@~2.1.11, mime-types@~2.1.13, mime-types@~2.1.6:
+mime-types@^2.1.12, mime-types@~2.1.11, mime-types@~2.1.13, mime-types@~2.1.6:
   version "2.1.14"
   resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.14.tgz#f7ef7d97583fcaf3b7d282b6f8b5679dab1e94ee"
   dependencies:
@@ -5460,9 +5460,11 @@ react-native-share-extension@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/react-native-share-extension/-/react-native-share-extension-1.1.1.tgz#da2c4758c8a800c2241e797deb90298b5388053c"
 
-react-native-stylish@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/react-native-stylish/-/react-native-stylish-0.3.0.tgz#3c4dd8ea684748c8e25d4f199ce676cac027b9f7"
+react-native-stylish@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-stylish/-/react-native-stylish-0.5.0.tgz#9b2a608dd329f2f1cf323772468ca4776a42d970"
+  dependencies:
+    style-equal "^1.0.0"
 
 react-native-vector-icons@^4.0.0:
   version "4.0.0"
@@ -6310,6 +6312,10 @@ strip-json-comments@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
 
+style-equal@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/style-equal/-/style-equal-1.0.0.tgz#98a1c5922226bfe13c196e73f1940e91b8e66595"
+
 style-loader@^0.13.1:
   version "0.13.2"
   resolved "https://registry.yarnpkg.com/style-loader/-/style-loader-0.13.2.tgz#74533384cf698c7104c7951150b49717adc2f3bb"
@@ -6331,7 +6337,7 @@ superagent@2.3.0:
     qs "^6.1.0"
     readable-stream "^2.0.5"
 
-supports-color@3.1.2, supports-color@^3.1.0:
+supports-color@3.1.2, supports-color@^3.1.0, supports-color@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-3.1.2.tgz#72a262894d9d408b956ca05ff37b2ed8a6e2a2d5"
   dependencies:
@@ -6341,7 +6347,7 @@ supports-color@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
 
-supports-color@^3.1.2, supports-color@^3.2.3:
+supports-color@^3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-3.2.3.tgz#65ac0504b3954171d8a64946b2ae3cbb8a5f54f6"
   dependencies:

@@ -121,7 +121,7 @@ class BookRow3 extends React.Component {
         renderLeftAction={(i, indexLock) => {
             // i,indexLock->next bucket
             // don't update target when indexLock
-            // console.log("i:",i)
+            console.log("i:",i,indexLock)
           if (!indexLock && leftActions[i]) {
             this.target = leftActions[i].target;
           }
@@ -132,14 +132,15 @@ class BookRow3 extends React.Component {
               style={{
                 flex: 1,
                 justifyContent: 'center', // vertical Center
-                backgroundColor: leftActions[i].backgroundColor,
+                backgroundColor: leftActions[i] &&
+                                leftActions[i].backgroundColor,
               }}
             >
               <Action
                 {...leftActions[i]}
                 style={[
                   leftActions[i].style,
-                  indexLock && { width: WIDTH }
+                  indexLock && { width: WIDTH + 100 }
                 ]}
               />
             </Stylish.View>
@@ -162,7 +163,7 @@ class BookRow3 extends React.Component {
                 {...rightActions[i]}
                 style={[
                   rightActions[i].style,
-                  indexLock && { width: WIDTH }
+                  indexLock && { width: WIDTH + 100 }
                 ]}
               />
             </Stylish.View>

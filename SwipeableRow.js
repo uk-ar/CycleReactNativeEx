@@ -517,8 +517,8 @@ class ExpandableView2 extends React.Component {
                width !== 0 &&
                (this.state.index === 0 ||
                 this.state.thresholds[this.state.index - 1] !== width)) {
-              /* console.log("width",width,this.state.thresholds,
-                  this.props.indexLock,this.state.index) */
+            /* console.log("width",width,this.state.thresholds,
+                this.props.indexLock,this.state.index) */
               this.setState((prevState, props) => {
                 const thresholds = [...this.state.thresholds];
                 thresholds[this.state.index] = width;
@@ -803,10 +803,23 @@ class SwipeableRow5 extends React.Component {
             renderLeftAction, renderRightAction,
             children, close, style,
             ...props } = this.props;
+
     return (
-      <View
+      <CloseableView2
         style={style}
-        close={false}
+        close={close}
+        onCloseEnd={() => {
+            onCloseEnd();
+            this.setState({
+              // positiveSwipe: true,
+              releasing: false,
+            }, () => {
+              this.panX.setValue(0.01);
+              /* Animated.timing(this.panX,
+                 {toValue:0,duration:300})
+                 .start() */
+            });
+          }}
       >
         <PanResponderView2
           disabled={this.state.releasing}
@@ -824,7 +837,6 @@ class SwipeableRow5 extends React.Component {
           onSwipeEnd={(gestureState) => {
               // wait for update index
               // can not disable panresponder in panHandlers
-            return;
             if (this.state.releasing) { return }
             if (gestureState.dx < this.leftOffset &&
                  -this.rightOffset < gestureState.dx) {
@@ -880,6 +892,7 @@ class SwipeableRow5 extends React.Component {
           </View>
           <Animated.View
             ref={comp => this.center = comp}
+            renderToHardwareTextureAndroid={true}
             style={{
               flexDirection: "row",
               transform: [{
@@ -909,7 +922,8 @@ class SwipeableRow5 extends React.Component {
                     flex: 1
                   }]}
                 panX={this.panX}
-                renderAction={renderLeftAction} />
+                renderAction={
+                  i=> renderLeftAction(i, this.state.releasing)} />
             </MeasureableView>
             <View style={{ width: WIDTH }}>
               {children}
@@ -942,11 +956,12 @@ class SwipeableRow5 extends React.Component {
                   flex: 1
                 }]}
                 panX={this.reverseX}
-                renderAction={renderRightAction} />
+                renderAction={
+                  i=> renderRightAction(i, this.state.releasing)} />
             </MeasureableView>
           </Animated.View>
         </PanResponderView2>
-      </View>
+      </CloseableView2>
     );
   }
 }
