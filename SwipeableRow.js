@@ -871,7 +871,6 @@ class SwipeableRow5 extends React.Component {
           >
             { this.state.positiveSwipe ?
             <ExpandableView2
-              removeClippedSubviews={false}
               style={{
                 alignSelf: "flex-start", // horizontal
                 flex: 1,

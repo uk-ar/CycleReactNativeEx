@@ -2226,18 +2226,21 @@ class BookListView15_test extends React.Component {
         scrollEnabled={!this.state.selectedSection}
         style={{marginTop:20}}>
                   <BookListView4
+                        scrollRenderAheadDistance={500}
         ref={(comp)=>this.liked=comp}
           key="liked"
           bucket="liked"
           {...props}
           />
                   <BookListView4
+          scrollRenderAheadDistance={500}
                   ref={(comp)=>this.done=comp}
           bucket="done"
           key="done"
           {...props}
           />
                   <BookListView4
+                    scrollRenderAheadDistance={500}
                   ref={(comp)=>this.borrowed=comp}
           bucket="borrowed"
           key="borrowed"

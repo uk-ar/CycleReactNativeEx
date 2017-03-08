@@ -589,8 +589,10 @@ class BookListView4 extends React.Component {
     return this.scroll.getScrollResponder();
   }
   render() {
-    const { renderFooter, onSelectSection, onCloseSection, selectedSection,
-            dataSource, onCloseStart, onCloseEnd, bucket, style } = this.props;
+    const {
+      renderFooter, onSelectSection, onCloseSection, selectedSection,
+      dataSource, onCloseStart, onCloseEnd, bucket, style, ...props
+    } = this.props;
     // console.log("dataSource",selectedSection)
     // console.log("tr;",this.done)
     // console.log("v2;",this.props)
@@ -612,7 +614,6 @@ class BookListView4 extends React.Component {
       <View
         style={selectedSection && selectedSection !== bucket ?
                [style, { height: 0 }] : style}
-        onResponderMove={evt => console.log('mov')}
       >
         <ItemsHeader
           style={styles.sectionHeader
@@ -626,8 +627,9 @@ class BookListView4 extends React.Component {
           onCloseSection={() => onCloseSection()}
         />
         <ListView
-          ref={comp => this.scroll = comp}
+          {...props}
           pageSize={10}
+          ref={comp => this.scroll = comp}
           style={[{ backgroundColor: materialColor.grey['100'] },
                   selectedSection === bucket ?
                   { height: HEIGHT - HEADER_HEIGHT * 2 } :

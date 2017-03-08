@@ -70,14 +70,15 @@ function genTempThumbnail(isbn) {
 }
 
 function BookCell({ book, ...props }) {
-  return (
-    book.title ?
-      <BookCell1 book={book} {...props} /> :
-      <BookCell1 book={book} {...props}>
-        <TextWithIndicator>
-        タイトル確認中
-      </TextWithIndicator>
-      </BookCell1>);
+  return (<BookCell1 book={book} {...props} />)
+  /* return (
+   *   book.title ?
+   *     <BookCell1 book={book} {...props} /> :
+   *     <BookCell1 book={book} {...props}>
+   *       <TextWithIndicator>
+   *       タイトル確認中
+   *     </TextWithIndicator>
+   *     </BookCell1>);*/
 }
 
 function BookCell1({ book, style, onPress, children, ...props }) {
