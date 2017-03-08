@@ -573,14 +573,15 @@ class ExpandableView extends React.Component {
         {...props/* style:width & backgroundColor */}
       >
         <Animated.View
-style={[{
-            // alignItems:"stretch",//not working
-          flex: 1,
-          overflow: 'scroll',
-          flexDirection: enterFromLeft ? 'row' : 'row-reverse',
-          justifyContent: this.state.index === 0 ? 'flex-end' : 'flex-start',
-          backgroundColor: "blue"
-        }]}
+          style={[{
+              // alignItems:"stretch",//not working
+              flex: 1,
+              overflow: 'scroll',
+              flexDirection: enterFromLeft ? 'row' : 'row-reverse',
+              justifyContent: this.state.index === 0 ?
+                              'flex-end' : 'flex-start',
+              backgroundColor: "blue"
+            }]}
         >
           <Animated.View
             onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {

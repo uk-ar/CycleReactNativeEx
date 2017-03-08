@@ -22,7 +22,7 @@ const {
 } = Dimensions.get('window');
 
 import { SwipeableListView } from './SwipeableListView';
-import { BookRow2 } from './BookRow';
+import { BookRow2, BookRow3 } from './BookRow';
 import { BookCell } from './BookCell';
 import { ItemsFooter, ItemsHeader } from './Header';
 import { styles } from './styles';
@@ -584,8 +584,113 @@ BooksDataSource.propTypes = {
   renderListView: React.PropTypes.func,
 };
 
-module.exports = { BookListView,
+class BookListView4 extends React.Component {
+  getScrollResponder() {
+    return this.scroll.getScrollResponder();
+  }
+  render() {
+    const { renderFooter, onSelectSection, onCloseSection, selectedSection,
+            dataSource, onCloseStart, onCloseEnd, bucket, style } = this.props;
+    // console.log("dataSource",selectedSection)
+    // console.log("tr;",this.done)
+    // console.log("v2;",this.props)
+    const HEADER_HEIGHT = 40;
+    const ROW_HEIGHT = 84;
+    const count = dataSource.rowIdentities[0]
+                            .map((id, j) => dataSource.getRowData(0, j))
+                            .filter(book => book.bucket === bucket)
+                            .length;
+    const INDICATOR_HEIGHT = 20;
+    // Math.min(2,count)
+    //        style={{height:600}}
+    /* style={selectedSection===bucket ?
+     *        {position:"absolute",bottom:0,top:0} : {}
+     * }*/
+    // set pageSize to draw cell for listview
+    // https://github.com/facebook/react-native/issues/1831#issuecomment-279185276
+    return (
+      <View
+        style={selectedSection && selectedSection !== bucket ?
+               [style, { height: 0 }] : style}
+        onResponderMove={evt => console.log('mov')}
+      >
+        <ItemsHeader
+          style={styles.sectionHeader
+            /* grey 200*/}
+          section={bucket/* TODO:change prop name */}
+          close={selectedSection === bucket}
+          onSelectSection={(section) => {
+              // this.refs.root.focus()
+              onSelectSection(section);
+            }}
+          onCloseSection={() => onCloseSection()}
+        />
+        <ListView
+          ref={comp => this.scroll = comp}
+          pageSize={10}
+          style={[{ backgroundColor: materialColor.grey['100'] },
+                  selectedSection === bucket ?
+                  { height: HEIGHT - HEADER_HEIGHT * 2 } :
+                  // {flex:1 } :
+                  // {height: 500 } ://659 40 20
+                  { maxHeight: ROW_HEIGHT * 2 }]}
+          dataSource={dataSource}
+          scrollEnabled={selectedSection !== null}
+          renderRow={
+            // contentContainerStyle style
+            (rowData, sectionID, rowID, highlightRow) =>
+              // console.log("rr")
+              (
+                <BookRow3
+                   close={rowData.bucket !== bucket}
+                   bucket={bucket}
+                   onCloseStart={target =>
+                     onCloseStart(target, rowData, sectionID, rowID, highlightRow)}
+                   onCloseEnd={target =>
+                     onCloseEnd(target, rowData, sectionID, rowID, highlightRow)}
+                              >
+                  <BookCell
+                     style={{
+                       height: ROW_HEIGHT,
+                       backgroundColor: materialColor.grey['50']
+                     }}
+                     book={rowData}
+                          />
+                </BookRow3>
+              )}
+        />
+        <ItemsFooter
+          count={
+            count
+            /* cannot pass ListView because of height */
+                }
+          onSelectSection={() => onSelectSection(bucket)}
+        />
+      </View>
+    );
+  }
+}
+
+BookListView4.propTypes = {
+  dataSource: React.PropTypes.object,
+  bucket: React.PropTypes.string.isRequired,
+  onCloseStart: React.PropTypes.func,
+  onCloseEnd: React.PropTypes.func,
+  onSelectSection: React.PropTypes.func,
+  onCloseSection: React.PropTypes.func,
+};
+
+BookListView4.defaultProps = {
+  onCloseStart: (target, rowData, sectionID, rowID, highlightRow) => emptyFunction(),
+  onCloseEnd: (target, rowData, sectionID, rowID, highlightRow) => emptyFunction(),
+  onSelectSection: emptyFunction,
+  onCloseSection: emptyFunction,
+};
+
+module.exports = {
+  BookListView,
   BookListView1,
   BookListView2,
   BookListView3,
+  BookListView4,
   BooksDataSource };

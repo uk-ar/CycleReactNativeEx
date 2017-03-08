@@ -28,7 +28,7 @@ import Welcome from './Welcome';
 import {BookCell} from '../../BookCell';
 import {BookRow1} from '../../BookRow';
 import {genActions2,Action,Action2,Action3} from '../../Action';
-import {BookListView,BookListView3,BookListView1,BookListView2,BooksDataSource} from '../../BookListView';
+import {BookListView,BookListView3,BookListView1,BookListView4,BookListView2,BooksDataSource} from '../../BookListView';
 import { LayoutableView, CloseableView, CloseableView2 } from '../../Closeable';
 import {SwipeableButtons2,SwipeableActions,SwipeableRow4,SwipeableRow3} from '../../SwipeableRow';
 import {SwipeableListView} from '../../SwipeableListView';
@@ -2006,7 +2006,7 @@ class BookListView13_test extends React.Component {
   }
 }
 
-//Worsk well?
+//Works well?
 class BookListView14_test extends React.Component {
   constructor(props) {
     super(props);
@@ -2129,6 +2129,129 @@ class BookListView14_test extends React.Component {
   }
 }
 
+//Works well?
+class BookListView15_test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      books: [
+        {isbn:1,title:"foo",bucket:"liked"},
+        {isbn:2,title:"bar",bucket:"done" },
+        {isbn:3,bucket:"done"},
+        {isbn:4,bucket:"done"},
+        {isbn:5,bucket:"done"},
+        {isbn:6,bucket:"liked"},
+        {isbn:7,bucket:"liked"},
+        {isbn:8,bucket:"borrowed"},
+        {isbn:9,bucket:"borrowed"},
+        {isbn:10,bucket:"borrowed"},
+        {isbn:11,bucket:"liked"},
+        {isbn:12,bucket:"liked"},
+        {isbn:13,bucket:"liked"},
+        {isbn:14,bucket:"liked"},
+        {isbn:15,bucket:"liked"},
+        {isbn:16,bucket:"liked"},
+        {isbn:17,bucket:"liked"},
+        {isbn:18,bucket:"done"},
+        {isbn:19,bucket:"done"},
+        {isbn:20,bucket:"done"},
+        {isbn:21,bucket:"done"},
+        {isbn:22,bucket:"done"},
+      ],
+      selectedSection: null
+    }
+    this.positionY=0;
+    UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+  render(){
+    const onCloseStart=(target,rowData,sectionID,rowID, highlightRow)=>{
+      //keep order when close start
+      //this.dataBlob =
+      //LayoutAnimation.easeInEaseOut();
+      this.setState({
+        books: this.state.books.map((book)=>
+          book.isbn === rowData.isbn ? {...book, bucket : null}: book)
+      })
+    }
+    const onCloseEnd=(target,rowData,sectionID,rowID, highlightRow)=>{
+      this.setState({
+        books: [{...rowData,bucket:target},
+                ...this.state.books.filter((book)=>book.isbn!==rowData.isbn)
+        ]
+      })
+      //console.log("th",this.dataBlob,target)
+    }
+    const onCloseSection=()=>{
+      const scrollResponder = this[this.state.selectedSection].getScrollResponder();
+      scrollResponder.scrollTo({x:0,y:0,animated:false})
+      LayoutAnimation.configureNext(
+        LayoutAnimation
+          .create(600,
+                  LayoutAnimation.Types.easeInEaseOut,
+                  LayoutAnimation.Properties.opacity))
+      this.setState({selectedSection:null})
+    }
+    const onSelectSection=(selectedSection)=>{
+      const scrollResponder = this.scroll.getScrollResponder();
+      scrollResponder.scrollTo({x:0,y:0,animated:false})
+      LayoutAnimation.configureNext(
+        LayoutAnimation
+          .create(600,
+                  LayoutAnimation.Types.easeInEaseOut,
+                  LayoutAnimation.Properties.opacity))
+      //LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+      this.setState({
+        selectedSection
+      })
+    }
+
+    return (
+      <BooksDataSource
+        books={this.state.books}
+        renderListView={(dataSource)=>{
+            const props = {
+              selectedSection:this.state.selectedSection,
+              onCloseStart,
+              onCloseEnd,
+              onSelectSection,
+              onCloseSection,
+              dataSource,
+            }
+            return(
+              <View
+                 style={{backgroundColor: '#1A237E'}}>
+                <ScrollView
+        ref={(comp)=>this.scroll=comp}
+        key="scroll"
+        scrollEnabled={!this.state.selectedSection}
+        style={{marginTop:20}}>
+                  <BookListView4
+        ref={(comp)=>this.liked=comp}
+          key="liked"
+          bucket="liked"
+          {...props}
+          />
+                  <BookListView4
+                  ref={(comp)=>this.done=comp}
+          bucket="done"
+          key="done"
+          {...props}
+          />
+                  <BookListView4
+                  ref={(comp)=>this.borrowed=comp}
+          bucket="borrowed"
+          key="borrowed"
+          {...props}
+          />
+                </ScrollView>
+              </View>
+            )
+          }}
+      />
+    )
+  }
+}
+
 storiesOf('BookListView2', module)
   .add('BookListView2',() => {
     return(<BookListView2_test />)
@@ -2165,4 +2288,7 @@ storiesOf('BookListView2', module)
   })
   .add('BookListView14',() => {
     return(<BookListView14_test />)
+  })
+  .add('BookListView15',() => {
+    return(<BookListView15_test />)
   })
