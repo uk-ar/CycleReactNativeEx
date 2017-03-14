@@ -36,9 +36,9 @@
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@cycle/xstream-adapter/-/xstream-adapter-3.1.0.tgz#97b64f3161d91913666be81ee11a13f3d1e754b4"
 
-"@kadira/react-native-storybook@git+http://github.com/uk-ar/react-native-storybook.git":
-  version "2.1.2"
-  resolved "git+http://github.com/uk-ar/react-native-storybook.git#1e1bc4049cc7091df81cd3c57487f63f3c14513d"
+"@kadira/react-native-storybook@^2.2.4":
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/@kadira/react-native-storybook/-/react-native-storybook-2.2.4.tgz#2a00972467f7d919d4e036a90a0091a9448e8bb4"
   dependencies:
     "@kadira/storybook-addon-actions" "^1.0.4"
     "@kadira/storybook-addon-links" "^1.0.1"
@@ -5341,7 +5341,7 @@ react-addons-create-fragment@^15.4.0:
     fbjs "^0.8.4"
     object-assign "^4.1.0"
 
-react-addons-perf@^15.4.0:
+react-addons-perf@^15.4.0, react-addons-perf@^15.4.1:
   version "15.4.2"
   resolved "https://registry.yarnpkg.com/react-addons-perf/-/react-addons-perf-15.4.2.tgz#110bdcf5c459c4f77cb85ed634bcd3397536383b"
   dependencies:
@@ -6337,7 +6337,7 @@ superagent@2.3.0:
     qs "^6.1.0"
     readable-stream "^2.0.5"
 
-supports-color@3.1.2, supports-color@^3.1.0, supports-color@^3.1.2:
+supports-color@3.1.2, supports-color@^3.1.0:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-3.1.2.tgz#72a262894d9d408b956ca05ff37b2ed8a6e2a2d5"
   dependencies:
@@ -6347,7 +6347,7 @@ supports-color@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
 
-supports-color@^3.2.3:
+supports-color@^3.1.2, supports-color@^3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-3.2.3.tgz#65ac0504b3954171d8a64946b2ae3cbb8a5f54f6"
   dependencies:

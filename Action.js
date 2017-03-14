@@ -24,12 +24,12 @@ const {
 } = Dimensions.get('window');
 
 // bucket,target->icon,text,backgroundColor,close,target
-class Action extends React.PureComponent {
-// function Action({ icon, text, backgroundColor, target, style, ...props }) {
+//class Action extends React.PureComponent {
+function Action({ icon, text, backgroundColor, target, ...props }) {
   // backgroundColor,target are used from SwipeableActions
   // console.log("pro",style,text,icon)
-  render() {
-    const { icon, text, backgroundColor, target, style, ...props } = this.props;
+  //render() {
+    //const { icon, text, backgroundColor, target, ...props } = this.props;
     return (
     // FIXME:backgroundColor must handle upper because of half width action
     /* {
@@ -41,24 +41,23 @@ class Action extends React.PureComponent {
      *   paddingRight:0,
      *   //backgroundColor:backgroundColor,
      * },*/
-    <View
-      {...props}
-      style={style}
-    >
       <View
-      style={{
-        width: 10,
-      }} />
-      <FAIcon
-        name={icon} size={20}
-      />
-      <View
-style={{
-        width: 5,
-      }} />
-      <Text
-        style={{
-          // numberOfLines={1}
+        {...props}
+      >
+        <View
+          style={{
+            width: 10,
+          }} />
+        <FAIcon
+          name={icon} size={20}
+        />
+        <View
+          style={{
+            width: 5,
+          }} />
+        <Text
+          style={{
+            // numberOfLines={1}
           alignSelf: "center",
           //position:"absolute",
         }}
@@ -67,8 +66,8 @@ style={{
       </Text>
     </View>
   );
-  }
 }
+//}
 
 Action.propTypes = {
   icon: React.PropTypes.string,

@@ -117,23 +117,24 @@ class BookRow3 extends React.Component {
           const { onCloseEnd } = this.props;
             // console.log("close end",this.target,this.props)
           onCloseEnd(this.target);// ,rowData,sectionID,rowID, highlightRow
-        }}
+          }}
         renderLeftAction={(i, indexLock) => {
             // i,indexLock->next bucket
             // don't update target when indexLock
             //console.log("i:",i,indexLock)
+            //console.log("left")
           if (!indexLock && leftActions[i]) {
             this.target = leftActions[i].target;
           }
             // Stylish.View is heavy?
             // animationConfig={{duration:100}}
             return (
-            <Stylish.View
+            <View
               style={{
                 flex: 1,
                 justifyContent: 'center', // vertical Center
-                backgroundColor: leftActions[i] &&
-                                leftActions[i].backgroundColor,
+                /* backgroundColor: leftActions[i] &&
+                    leftActions[i].backgroundColor, */
               }}
             >
               <Action
@@ -142,8 +143,8 @@ class BookRow3 extends React.Component {
                   leftActions[i].style,
                   indexLock && { width: WIDTH + 100 }
                 ]}
-              />
-            </Stylish.View>
+                      />
+            </View>
           );
         }}
         renderRightAction={(i, indexLock) => {
@@ -151,6 +152,7 @@ class BookRow3 extends React.Component {
           if (!indexLock && rightActions[i]) {
             this.target = rightActions[i].target;
           }
+            //console.log("right")
           return (
             <Stylish.View
               style={{

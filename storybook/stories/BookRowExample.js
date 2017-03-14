@@ -19,6 +19,9 @@ import {BookRow1,BookRow3} from '../../BookRow';
 import {withDebug} from './common';
 const BookRow1Debug = withDebug(BookRow1)
 
+//import Perf from 'react-addons-perf';
+var Perf = require('ReactPerf');
+
 const {
   width:WIDTH,
 } = Dimensions.get('window');
@@ -74,6 +77,50 @@ storiesOf('BookRow1', module)
       </View>
     </BookRow1>
   ))
+//import PrefMonitor from 'react-native/Libraries/Performance/RCTRenderingPerf';
+
+https://github.com/facebook/react-native/issues/11410
+//Perf.start();
+class PerfComp extends React.Component {
+  perf(){
+    console.log('start perf tracking');
+    setTimeout(() => {
+      console.log('stop perf tracking');
+      Perf.stop();
+      //Perf.printExclusive();
+      const measurements = Perf.getLastMeasurements();
+      console.log('stop perf tracking:',measurements);
+      Perf.printInclusive(measurements);
+      //Perf.printInclusive();
+    }, 3000);
+  }
+  perfmon(){
+    console.log('start perf tracking');
+    PrefMonitor.toggle();
+    PrefMonitor.start();
+    setTimeout(() => {
+      PrefMonitor.stop();
+    },5000);
+  }
+  componentDidMount() {
+    console.log('start perf tracking');
+    setTimeout(() => {
+      Perf.start();
+      setTimeout(() => {
+        Perf.stop();
+        const measurements = Perf.getLastMeasurements();
+        Perf.printInclusive(measurements);
+        Perf.printExclusive(measurements);
+        Perf.printWasted(measurements);
+      }, 30000);
+    }, 5000);
+  }
+  render() {
+    return this.props.children;
+  }
+}
+
+window.Perf = Perf;
 
 storiesOf('BookRow3', module)
   .addDecorator(getStory => (
@@ -127,6 +174,31 @@ storiesOf('BookRow3', module)
       </View>
     </BookRow3>
     </View>
+  ))
+  .add('with 1 transparent children', () => (
+    <PerfComp>
+    <BookRow3
+      bucket="liked"
+      style={{
+        //width:width-20,
+        backgroundColor:"red"
+      }}
+    >
+      <View
+        style={{
+          height:50,
+          flexDirection:"row",
+          backgroundColor:"white",
+          //opacity:0.8,
+          backgroundColor:"transparent"
+        }}>
+        <Text>foo</Text>
+        <View
+          style={{flex:1}}/>
+        <Text>bar</Text>
+      </View>
+    </BookRow3>
+    </PerfComp>
   ))
   .add('horizontal flex', () => (
     <ScrollView

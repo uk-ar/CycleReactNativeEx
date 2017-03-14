@@ -135,7 +135,6 @@ class BookListView1 extends React.Component {
     return (
       <ListView
         ref={c => this.listview = c}
-        removeClippedSubviews={false}
         {...props}
         renderSectionHeader={(rowData, sectionID, rowID, highlightRow) =>
             // ref={c => this.sections[sectionID] = c}
@@ -163,7 +162,6 @@ class BookListView1 extends React.Component {
               enableEnterAnimation={sectionID !== 'search'}
               enableEmptySections
               scrollEnabled={false}
-              removeClippedSubviews={false}
               onSwipeEnd={onSwipeEnd}
               onSwipeStart={onSwipeStart}
               onRelease={onRelease}

@@ -88,7 +88,6 @@ class CloseableView extends React.Component {
     const content = (
       <Stylish.View
         ref={c => (this.outer = c)}
-        collapsable={false}
         style={[// this.style,
           // this.initialStyle,
           this.state.style,
@@ -101,7 +100,6 @@ class CloseableView extends React.Component {
       >
         <View
           ref={c => (this.inner = c)}
-          collapsable={false}
           {...props}
           style={[style,
             this.state.close ? // to measure height
@@ -174,7 +172,6 @@ class CloseableView2 extends React.Component {
     // removeClippedSubviews is for android
     return (
       <Animated.View
-        removeClippedSubviews
         style={this.state.style.height ?
                this.state.style :
                this.props.close ?

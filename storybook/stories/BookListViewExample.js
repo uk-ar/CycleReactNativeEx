@@ -114,7 +114,6 @@ class NestedListView extends React.Component {
           pressMe
         </Text>
         <ListView
-          removeClippedSubviews={false}
           ref={c=> this.listview = c}
           dataSource={this.state.ds}
           renderRow={(rowData,sectionID,rowID) =>{
@@ -287,7 +286,6 @@ class NestedListView3 extends React.Component {
           press to add
         </Text>
         <ListView
-          removeClippedSubviews={false}
           ref={c=> this.listview = c}
           dataSource={this.state.ds.getDataSource()}
           renderRow={(rowData,sectionID,rowID) =>{
@@ -1991,7 +1989,6 @@ class BookListView13_test extends React.Component {
   render(){
     return (
       <View
-        removeClippedSubviews={false}
         key="foo"
         style={{
           overflow:"hidden",height:300,backgroundColor:"red",

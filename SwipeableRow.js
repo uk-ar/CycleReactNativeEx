@@ -38,9 +38,7 @@ class MeasureableView extends React.Component {
         <View
         ref={comp => this.root = comp}
         {...this.props}
-      >
-        {this.props.children}
-      </View> :
+          /> :
       <View
         ref={comp => this.root = comp}
         {...this.props}
@@ -53,9 +51,7 @@ class MeasureableView extends React.Component {
               this.setState({ layouted: true });
             }
           }}
-      >
-        {this.props.children}
-      </View>);
+      />);
   }
 }
 
@@ -471,7 +467,6 @@ PanResponderView2.defaultProps = {
   disabled: false,
 };
 
-
 class ExpandableView2 extends React.Component {
   constructor(props) {
     super(props);
@@ -479,6 +474,7 @@ class ExpandableView2 extends React.Component {
       index: 0,
       thresholds: [],
     };
+    this.nextIndex = 0;
   }
   componentDidMount() {
     function calcIndex(value, thresholds) {
@@ -489,12 +485,15 @@ class ExpandableView2 extends React.Component {
       return index;
     }
     this.id = this.props.panX.addListener(({ value: width }) => {
-      const nextIndex = calcIndex(width,
+      this.nextIndex = calcIndex(width,
                                   this.state.thresholds);
-      if (nextIndex !== this.state.index &&
+      if (this.nextIndex !== this.state.index &&
           !this.props.indexLock &&
           this.state.thresholds.length !== 0) {
-        this.setState({ index: nextIndex });
+        this.setState((prevState,props)=>
+          ( this.nextIndex !== prevState.index ) ?
+                                        { index: this.nextIndex } : null
+        );
       }
     });
   }
@@ -507,8 +506,9 @@ class ExpandableView2 extends React.Component {
     // panX, indexLock => index
     /* console.log("width1",width,this.state.thresholds,
      *             this.props.indexLock,this.state.index)*/
+    //console.log("exp2")
     return (
-      <Animated.View
+      <View
         {...props}
         onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
             // create thresholds
@@ -528,10 +528,74 @@ class ExpandableView2 extends React.Component {
         }}
       >
         {renderAction(this.state.index)}
-      </Animated.View>);
+      </View>);
   }
 }
 
+class ExpandableView3 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      index: 0,
+      thresholds: [],
+    };
+    this.nextIndex = 0;
+  }
+  componentDidMount() {
+    function calcIndex(value, thresholds) {
+      let index = thresholds.findIndex((elem, i) =>
+        value < elem
+      );
+      if (index === -1) { index = thresholds.length; }
+      return index;
+    }
+    this.id = this.props.panX.addListener(({ value: width }) => {
+      this.nextIndex = calcIndex(width,
+                                 this.state.thresholds);
+      if (this.nextIndex !== this.state.index &&
+          !this.props.indexLock &&
+          this.state.thresholds.length !== 0) {
+        this.setState((prevState,props)=>
+          ( this.nextIndex !== prevState.index ) ?
+                                        { index: this.nextIndex } : null
+        );
+      }
+    });
+  }
+  componentWillUnmount() {
+    this.props.panX.removeListener(this.id);
+  }
+  render() {
+    const { renderAction, panX, // indexLock,
+            ...props } = this.props;
+    // panX, indexLock => index
+    /* console.log("width1",width,this.state.thresholds,
+     *             this.props.indexLock,this.state.index)*/
+    //console.log("exp2")
+    return (
+      <View
+        {...props}
+        onLayout={({ nativeEvent: { layout: { x, y, width, height } } }) => {
+            // create thresholds
+            if (!this.state.thresholds[this.state.index] &&
+                !this.props.indexLock &&
+                width !== 0 &&
+                (this.state.index === 0 ||
+                 this.state.thresholds[this.state.index - 1] !== width)) {
+              /* console.log("width",width,this.state.thresholds,
+                 this.props.indexLock,this.state.index) */
+              this.setState((prevState, props) => {
+                const thresholds = [...this.state.thresholds];
+                thresholds[this.state.index] = width;
+                return { thresholds: thresholds };
+              });
+            }
+          }}
+      >
+        {renderAction(this.state.index)}
+      </View>);
+  }
+}
 
 class ExpandableView extends React.Component {
   constructor(props) {
@@ -790,7 +854,7 @@ class SwipeableRow5 extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      positiveSwipe: true,
+      //positiveSwipe: true,
       releasing: false,
     };
     this.panX = new Animated.Value(0.1);
@@ -826,21 +890,22 @@ class SwipeableRow5 extends React.Component {
           disabled={this.state.releasing}
           onSwipeMove={Animated.event(
               [{ dx: this.panX }],
-            { listener: (gestureState) =>
+              { listener: (gestureState) =>
                 this.reverseX.setValue(-gestureState.dx) }
               // {listener:(i)=>console.log(i)}//{dx:aaa}
               // {listener:Animated.event([{dx: this.reverseX}])}
               // {listener:(i)=>console.log(i)}
             )}
           onSwipeDirectionChange={(pos) => {
-            this.setState({ positiveSwipe: pos });
-          }}
+              //this.setState({ positiveSwipe: pos });
+              return null
+            }}
           onSwipeEnd={(gestureState) => {
               // wait for update index
               // can not disable panresponder in panHandlers
-            if (this.state.releasing) { return }
-            if (gestureState.dx < this.leftOffset &&
-                 -this.rightOffset < gestureState.dx) {
+              if (this.state.releasing) { return }
+              if (gestureState.dx < this.leftOffset &&
+                  -this.rightOffset < gestureState.dx) {
                 Animated.timing(this.panX,
                                 { toValue: 0, duration: 300 })
                         .start();
@@ -856,7 +921,7 @@ class SwipeableRow5 extends React.Component {
                           });
                 });
               }
-          }}
+            }}
         >
           <View
             style={{
@@ -869,30 +934,31 @@ class SwipeableRow5 extends React.Component {
               right: 0,
             }}
           >
-            { this.state.positiveSwipe ?
             <ExpandableView2
               style={{
                 alignSelf: "flex-start", // horizontal
                 flex: 1,
               }}
-              key="leftActions"
               panX={this.panX}
               renderAction={
-                  i=> renderLeftAction(i, this.state.releasing)} /> :
-            <ExpandableView2
-              style={{
+                i=> renderLeftAction(i, this.state.releasing)} />
+            {/*  this.state.positiveSwipe ?
+                :
+                <ExpandableView2
+                style={{
                 alignSelf: "flex-end",
                 flex: 1,
-              }}
-              key="rightActions"
-              panX={this.reverseX}
-              renderAction={
+                }}
+                key="rightActions"
+                panX={this.reverseX}
+                renderAction={
                 i=> renderRightAction(i, this.state.releasing)} />
-          }
+                 */}
           </View>
           <Animated.View
             ref={comp => this.center = comp}
             renderToHardwareTextureAndroid={true}
+            shouldRasterizeIOS={true}
             style={{
               flexDirection: "row",
               transform: [{
@@ -915,15 +981,16 @@ class SwipeableRow5 extends React.Component {
                 }}
             >
               {/* use expandable to change color */}
-              <ExpandableView2
-                style={[this.leftOffset !== 0 && {
+              {/* <ExpandableView2
+                  style={[this.leftOffset !== 0 && {
                   width: this.leftOffset
-                }, {
-                    flex: 1
+                  }, {
+                  flex: 1
                   }]}
-                panX={this.panX}
-                renderAction={
-                  i=> renderLeftAction(i, this.state.releasing)} />
+                  panX={this.panX}
+                  renderAction={
+                  i=> renderLeftAction(i, this.state.releasing)} /> */}
+              {renderLeftAction(0, this.state.releasing)}
             </MeasureableView>
             <View style={{ width: WIDTH }}>
               {children}
@@ -949,15 +1016,16 @@ class SwipeableRow5 extends React.Component {
                   });
                 }}
             >
-              <ExpandableView2
-                style={[this.rightOffset !== 0 &&
-                        { width: this.rightOffset },
-                {
+              {renderRightAction(0, this.state.releasing)}
+              {/* <ExpandableView2
+                  style={[this.rightOffset !== 0 &&
+                  { width: this.rightOffset },
+                  {
                   flex: 1
-                }]}
-                panX={this.reverseX}
-                renderAction={
-                  i=> renderRightAction(i, this.state.releasing)} />
+                  }]}
+                  panX={this.reverseX}
+                  renderAction={
+                  i=> renderRightAction(i, this.state.releasing)} /> */}
             </MeasureableView>
           </Animated.View>
         </PanResponderView2>
@@ -983,6 +1051,207 @@ SwipeableRow5.defaultProps = {
   close: false,
 };
 
+class SwipeableRow6 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      //positiveSwipe: true,
+      releasing: false,
+    };
+    this.panX = new Animated.Value(0.1);
+    this.reverseX = new Animated.Value(-0.1);
+    this.canRelease = false;
+    this.leftOffset = 0;
+    this.rightOffset = 0;
+  }
+  render() {
+    const { onCloseStart, onCloseEnd,
+            renderLeftAction, renderRightAction,
+            children, close, style,
+            ...props } = this.props;
+
+    return (
+      <CloseableView2
+        style={style}
+        close={close}
+        onCloseEnd={() => {
+            onCloseEnd();
+            this.setState({
+              // positiveSwipe: true,
+              releasing: false,
+            }, () => {
+              this.panX.setValue(0.01);
+              /* Animated.timing(this.panX,
+                 {toValue:0,duration:300})
+                 .start() */
+            });
+          }}
+      >
+        <PanResponderView2
+          disabled={this.state.releasing}
+          onSwipeMove={Animated.event(
+              [{ dx: this.panX }],
+              { listener: (gestureState) =>
+                this.reverseX.setValue(-gestureState.dx) }
+              // {listener:(i)=>console.log(i)}//{dx:aaa}
+              // {listener:Animated.event([{dx: this.reverseX}])}
+              // {listener:(i)=>console.log(i)}
+            )}
+          onSwipeDirectionChange={(pos) => {
+              //this.setState({ positiveSwipe: pos });
+              return null
+            }}
+          onSwipeEnd={(gestureState) => {
+              // wait for update index
+              // can not disable panresponder in panHandlers
+              if (this.state.releasing) { return }
+              if (gestureState.dx < this.leftOffset &&
+                  -this.rightOffset < gestureState.dx) {
+                Animated.timing(this.panX,
+                                { toValue: 0, duration: 300 })
+                        .start();
+              } else {
+                this.setState({ releasing: true }, () => {
+                  Animated.timing(this.panX,
+                                  this.state.positiveSwipe ?
+                                  { toValue: WIDTH, duration: 300 } :
+                                  { toValue: -WIDTH, duration: 300 })
+                          .start(({ finished: finished }) => {
+                            // set releasing state when closing end(CloseableView2)
+                            onCloseStart();
+                          });
+                });
+              }
+            }}
+        >
+          <View
+            style={{
+              // height:30,
+              // flex:1,
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+            }}
+          >
+            <ExpandableView2
+              style={{
+                alignSelf: "flex-start", // horizontal
+                flex: 1,
+              }}
+              panX={this.panX}
+              renderAction={
+                i=> renderLeftAction(i, this.state.releasing)} />
+            {/*  this.state.positiveSwipe ?
+                :
+                <ExpandableView2
+                style={{
+                alignSelf: "flex-end",
+                flex: 1,
+                }}
+                key="rightActions"
+                panX={this.reverseX}
+                renderAction={
+                i=> renderRightAction(i, this.state.releasing)} />
+              */}
+          </View>
+          <Animated.View
+            ref={comp => this.center = comp}
+            renderToHardwareTextureAndroid={true}
+            shouldRasterizeIOS={true}
+            style={{
+              flexDirection: "row",
+              transform: [{
+                translateX: this.panX
+              }, {
+                translateX: -this.leftOffset
+              }],
+              width:WIDTH + this.leftOffset + this.rightOffset
+              //position:"absolute",
+            }}
+          >
+            <MeasureableView
+              ref={comp => this.left = comp}
+              onFirstLayout={
+                ({ nativeEvent: { layout: { x, y, width, height } } }) => {
+                  // this.panX.setOffset(-width)
+                  this.leftOffset = width;
+                  //console.log('w:', width);
+                  this.setState({ releasing: false });// update view
+                }}
+            >
+              {/* use expandable to change color */}
+              {/* <ExpandableView2
+                  style={[this.leftOffset !== 0 && {
+                  width: this.leftOffset
+                  }, {
+                  flex: 1
+                  }]}
+                  panX={this.panX}
+                  renderAction={
+                  i=> renderLeftAction(i, this.state.releasing)} /> */}
+              {renderLeftAction(0, this.state.releasing)}
+            </MeasureableView>
+            <View style={{ width: WIDTH }}>
+              {children}
+            </View>
+            <MeasureableView
+              ref={comp => this.right = comp}
+              onFirstLayout={
+                ({ nativeEvent: { layout: { x, y, width, height } } }) => {
+                  this.rightOffset = width;
+                  // console.log("aaa",width)
+                  this.panX.addListener(({ value: w }) => {
+                    // this.panX is offseted
+                    const canRelease =
+                      w < -this.rightOffset || this.leftOffset < w;
+
+                    if (this.canRelease !== canRelease) {
+                      this.canRelease = canRelease;
+                      this.left.setNativeProps(
+                        { style: { opacity: canRelease ? 0 : 1 } });
+                      this.right.setNativeProps(
+                        { style: { opacity: canRelease ? 0 : 1 } });
+                    }
+                  });
+                }}
+            >
+              {renderRightAction(0, this.state.releasing)}
+              {/* <ExpandableView2
+                  style={[this.rightOffset !== 0 &&
+                  { width: this.rightOffset },
+                  {
+                  flex: 1
+                  }]}
+                  panX={this.reverseX}
+                  renderAction={
+                  i=> renderRightAction(i, this.state.releasing)} /> */}
+            </MeasureableView>
+          </Animated.View>
+        </PanResponderView2>
+      </CloseableView2>
+    );
+  }
+}
+
+SwipeableRow6.propTypes = {
+  ...View.propTypes,
+  onCloseStart: React.PropTypes.func.isRequired,
+  onCloseEnd: React.PropTypes.func.isRequired,
+  renderLeftAction: React.PropTypes.func.isRequired,
+  renderRightAction: React.PropTypes.func.isRequired,
+  close: React.PropTypes.bool.isRequired,
+};
+SwipeableRow6.defaultProps = {
+  ...View.defaultProps,
+  onCloseStart: emptyFunction,
+  onCloseEnd: emptyFunction,
+  renderLeftAction: emptyFunction,
+  renderRightAction: emptyFunction,
+  close: false,
+};
+
 // scroll view base
 // ref: http://browniefed.com/blog/react-native-animated-listview-row-swipe/
-module.exports = { SwipeableRow5, SwipeableRow4, SwipeableRow3, MeasureableView, SwipeableActions, withState2 };
+module.exports = { SwipeableRow6, SwipeableRow5, SwipeableRow4, SwipeableRow3, MeasureableView, SwipeableActions, withState2 };
