@@ -6,7 +6,9 @@ import {
   Animated,
   View,
   ScrollView,
-  Dimensions
+  Dimensions,
+  InteractionManager,
+  StyleSheet,
 } from 'react-native';
 import { storiesOf, action, linkTo } from '@kadira/react-native-storybook';
 
@@ -103,6 +105,7 @@ class PerfComp extends React.Component {
     },5000);
   }
   componentDidMount() {
+    //https://github.com/facebook/react-native/issues/11410#issuecomment-267785635
     console.log('start perf tracking');
     setTimeout(() => {
       Perf.start();
@@ -119,8 +122,6 @@ class PerfComp extends React.Component {
     return this.props.children;
   }
 }
-
-window.Perf = Perf;
 
 storiesOf('BookRow3', module)
   .addDecorator(getStory => (
@@ -176,7 +177,6 @@ storiesOf('BookRow3', module)
     </View>
   ))
   .add('with 1 transparent children', () => (
-    <PerfComp>
     <BookRow3
       bucket="liked"
       style={{
@@ -198,29 +198,6 @@ storiesOf('BookRow3', module)
         <Text>bar</Text>
       </View>
     </BookRow3>
-    </PerfComp>
-  ))
-  .add('horizontal flex', () => (
-    <ScrollView
-      horizontal={true}
-    >
-      <View style={{
-        //width:100,
-        flex:1,
-        height:20,
-        backgroundColor:"red"
-      }}/>
-      <View style={{
-        width:10,
-        height:20,
-        backgroundColor:"yellow"
-      }}/>
-      <View style={{
-        width:30,
-        height:20,
-        backgroundColor:"green"
-      }}/>
-    </ScrollView>
   ))
   .add('horizontal flex', () => (
     <ScrollView
@@ -300,3 +277,217 @@ storiesOf('BookRow3', module)
       </ScrollView>
     </View>
   ))
+  .add('panResponder & useNativeDriver', () => {
+    this.panX = new Animated.Value(0);
+    this._panResponder = PanResponder.create({
+      // Ask to be the responder:
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+      /* onPanResponderMove: Animated.event(
+       *   [null, {dx: this.panX}],
+       *   //{useNativeDriver: true}//error
+       * ),*/
+      //onPanResponderGrant: e => console.log(e),
+      onPanResponderTerminationRequest: (evt, gestureState) => true,
+      onPanResponderRelease: (evt, gestureState) => {
+      },
+      onPanResponderTerminate: (evt, gestureState) => {
+      },
+      onShouldBlockNativeResponder: (evt, gestureState) => {
+        return true;
+      },
+    });
+    //this.panX.addListener(v=>console.log(v))
+    /* onResponderMove={Animated.event(
+     *   [null, {dx: this.panX}],
+     *   //{ useNativeDriver: true}//error
+     * )}*/
+    return(
+      <Animated.View
+        {...this._panResponder.panHandlers}
+        style={{
+          flexDirection:"row",
+          transform: [{
+            translateX: this.panX
+          }]
+        }}
+      >
+        <View style={{
+          //width:100,
+          position:"absolute",
+          height:20,
+          backgroundColor:"red"
+        }}/>
+        <View style={{
+          width:10,
+          height:20,
+          backgroundColor:"yellow"
+        }}/>
+        <View style={{
+          width:30,
+          height:20,
+          backgroundColor:"green"
+        }}/>
+      </Animated.View>
+    )
+    }
+  )
+  .add('scrollView & useNativeDriver', () => {
+    //Simple scrollView can drop fps...
+    this.panX = new Animated.Value(0);
+    this.panX.addListener(v=>console.log(v.value))
+    //c.scrollTo({x:10,animated:false})
+    //console.log(c._component.scrollTo({x:-100,animated:false}))
+    return(
+      <View>
+      <Animated.View style={{
+        position:"absolute",
+        width:WIDTH,
+        top:0,
+        bottom:0,
+        flexDirection:"row",
+        /* backgroundColor:this.panX.interpolate({
+         *   inputRange:[-WIDTH,WIDTH],
+         *   outputRange:["red","blue"]
+         * })*/
+        //"yellow",
+        /*  */
+      }}>
+        <Text>left</Text>
+        <View style={{flex:1}}/>
+        <Text>right</Text>
+      </Animated.View>
+      <Animated.ScrollView
+      horizontal={true}
+      showsHorizontalScrollIndicator={false}
+      ref={comp=>this.scroll=comp._component}
+      style={{opacity:0}}
+      onMomentumScrollBegin={()=>console.log("disabled?")}
+      onLayout={()=>{
+        console.log("onlay")
+        this.panX.setOffset(-WIDTH)
+        this.scroll.scrollTo({x:WIDTH,animated:false})
+        InteractionManager.runAfterInteractions(()=>
+          this.scroll.setNativeProps({style:{opacity:1}}))
+        //need animation
+        //setTimeout(()=>)
+      }}
+      onScroll={Animated.event(
+        [{ nativeEvent: { contentOffset: { x: this.panX } } }],
+        { useNativeDriver: true }//error
+      )}
+      >
+      <View style={{
+        width:WIDTH,
+        height:20,
+        //backgroundColor:"red"
+      }}/>
+      <Animated.View style={{
+        //width:30,
+        width:WIDTH,
+        height:20,
+        backgroundColor:"green",
+      }}/>
+      <View style={{
+        width:WIDTH,
+        height:20,
+        //backgroundColor:"yellow"
+      }}>
+      </View>
+      </Animated.ScrollView>
+      </View>
+    )
+  })
+  .add('scrollView & useNativeDriver 2', () => {
+    //Simple scrollView can drop fps...
+    this.panX = new Animated.Value(0);
+    this.panX.addListener(v=>console.log(v.value))
+    //c.scrollTo({x:10,animated:false})
+    //console.log(c._component.scrollTo({x:-100,animated:false}))
+    return(
+      <View>
+        <View
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            //opacity:0.3,
+            flexDirection:"row",
+            backgroundColor:"yellow",
+          }}>
+          {/* background action */}
+          <Text>left</Text>
+          <View style={{flex:1}}/>
+          <Text>right</Text>
+        </View>
+        <Animated.View
+          style={{
+          //...StyleSheet.absoluteFillObject,
+          //width:30,
+            width:WIDTH*3,
+            opacity:0.3,
+            flexDirection:"row",
+          transform: [{
+            translateX: Animated.multiply(-1,this.panX),
+          }]
+          }}>
+          <View
+            style={{
+              //...StyleSheet.absoluteFillObject,
+              //width:30,
+              width:WIDTH,
+              height:20,
+              backgroundColor:"black",
+            }}
+          />
+          <View
+            style={{
+              //...StyleSheet.absoluteFillObject,
+              //width:30,
+              width:WIDTH,
+              height:20,
+              backgroundColor:"green",
+            }}
+          />
+          <View
+            style={{
+              //...StyleSheet.absoluteFillObject,
+              //width:30,
+              width:WIDTH,
+              height:20,
+              backgroundColor:"orange",
+            }}
+          />
+        </Animated.View>
+        <Animated.ScrollView
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            //backgroundColor:"red",
+            opacity:0
+          }}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          ref={comp=>this.scroll=comp._component}
+          onMomentumScrollBegin={()=>console.log("disabled?")}
+          onLayout={()=>{
+              console.log("onlay")
+              this.panX.setOffset(-WIDTH)
+              this.scroll.scrollTo({x:WIDTH,animated:false})
+              InteractionManager.runAfterInteractions(()=>
+                this.scroll.setNativeProps({style:{opacity:1}}))
+              //need animation
+              //setTimeout(()=>)
+            }}
+          onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: this.panX } } }],
+              { useNativeDriver: true }//error
+            )}
+        >
+          <View style={{
+            width:WIDTH*3,
+            //height:20,
+          }}/>
+        </Animated.ScrollView>
+      </View>
+    )
+  })

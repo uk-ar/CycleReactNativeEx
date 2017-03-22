@@ -1091,8 +1091,10 @@ class SwipeableRow6 extends React.Component {
           disabled={this.state.releasing}
           onSwipeMove={Animated.event(
               [{ dx: this.panX }],
-              { listener: (gestureState) =>
-                this.reverseX.setValue(-gestureState.dx) }
+              { useNativeDriver:true,
+                //conflict with useNativeDriver
+                //listener: (gestureState) => this.reverseX.setValue(-gestureState.dx)
+              }
               // {listener:(i)=>console.log(i)}//{dx:aaa}
               // {listener:Animated.event([{dx: this.reverseX}])}
               // {listener:(i)=>console.log(i)}
@@ -1135,14 +1137,14 @@ class SwipeableRow6 extends React.Component {
               right: 0,
             }}
           >
-            <ExpandableView2
-              style={{
+            {/* <ExpandableView2
+                style={{
                 alignSelf: "flex-start", // horizontal
                 flex: 1,
-              }}
-              panX={this.panX}
-              renderAction={
-                i=> renderLeftAction(i, this.state.releasing)} />
+                }}
+                panX={this.panX}
+                renderAction={
+                i=> renderLeftAction(i, this.state.releasing)} /> */}
             {/*  this.state.positiveSwipe ?
                 :
                 <ExpandableView2
@@ -1164,9 +1166,9 @@ class SwipeableRow6 extends React.Component {
               flexDirection: "row",
               transform: [{
                 translateX: this.panX
-              }, {
-                translateX: -this.leftOffset
-              }],
+              }/* , {
+                   translateX: -this.leftOffset
+                   } */],
               width:WIDTH + this.leftOffset + this.rightOffset
               //position:"absolute",
             }}

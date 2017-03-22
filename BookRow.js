@@ -11,7 +11,7 @@ import {
   Dimensions,
 } from 'react-native';
 
-import { SwipeableRow3, SwipeableRow4, SwipeableRow5 } from './SwipeableRow';
+import { SwipeableRow6, SwipeableRow3, SwipeableRow4, SwipeableRow5 } from './SwipeableRow';
 import { genActions2, Action, Action2 } from './Action';
 import emptyFunction from 'fbjs/lib/emptyFunction';
 import Stylish from 'react-native-stylish';
@@ -104,8 +104,9 @@ class BookRow3 extends React.Component {
     const { leftActions, rightActions } = genActions2(bucket);
     // console.log("la:",leftActions,rightActions)
     // onResponderMove
+    //      <SwipeableRow5
     return (
-      <SwipeableRow5
+      <SwipeableRow6
         {...props}
         close={close}
         onCloseStart={() => {
@@ -173,7 +174,7 @@ class BookRow3 extends React.Component {
         }}
       >
         {this.props.children}
-      </SwipeableRow5>
+      </SwipeableRow6>
     );
   }
 }
