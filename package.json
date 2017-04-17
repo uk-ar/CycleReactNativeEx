@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@kadira/react-native-storybook": "^2.2.4",
-    "apphubdeploy": "^0.0.8",
+    "apphubdeploy": "^1.0.0",
     "babel-cli": "^6.18.0",
     "babel-core": "^6.18.2",
     "babel-eslint": "^7.1.0",
